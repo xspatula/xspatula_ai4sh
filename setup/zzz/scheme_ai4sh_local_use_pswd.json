@@ -1,0 +1,15 @@
+{
+  "project_path": "./ai4sh",
+  "user_project": {
+    "user_name": "thomasg",
+    "password": "tarzana22"
+  },
+  "process": [
+    {
+      "execute": true,
+      "verbose": 1,
+      "overwrite": false,
+      "delete": false
+    }
+  ]
+}
