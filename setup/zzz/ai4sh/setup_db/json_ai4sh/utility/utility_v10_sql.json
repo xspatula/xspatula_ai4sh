@@ -1,0 +1,83 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "utility",
+        "table": "foreign_key",
+        "command": [
+          "foreign_key TEXT",
+          "dst_schema TEXT",
+          "dst_table TEXT",
+          "dst_search_column TEXT",
+          "dst_alt_search_column TEXT",
+          "PRIMARY KEY (foreign_key)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "utility",
+        "table": "foreign_key",
+        "command": {
+          "columns": [
+            "foreign_key",
+            "dst_schema",
+            "dst_table",
+            "dst_search_column",
+            "dst_alt_search_column"
+          ],
+          "values": [
+            [
+              "organisation_id",
+              "community",
+              "organisation",
+              "name",
+              "alias"
+            ],
+            [
+              "user_id",
+              "community",
+              "user",
+              "user_name",
+              "email"
+            ],
+            [
+              "territory_id",
+              "utility",
+              "name",
+              "name",
+              "iso_code_a2_ext"
+            ],
+            [
+              "location_error_unit_id",
+              "observation_utility",
+              "unit",
+              "name",
+              "alias"
+            ],
+            [
+              "area_unit_id",
+              "observation_utility",
+              "unit",
+              "name",
+              "alias"
+            ],
+            [
+              "wavelength_unit_id",
+              "observation_utility",
+              "unit",
+              "name",
+              "alias"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "process": [
+    {
+      "process_id": "delete_schema",
+      "overwrite": false,
+      "verbose": 2,
+      "schema": "community"
+    }
+  ]
+}

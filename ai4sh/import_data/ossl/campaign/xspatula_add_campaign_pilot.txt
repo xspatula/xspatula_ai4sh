@@ -1,0 +1,5 @@
+############################################
+##### XSPATULA ADD CAMPAIGN #####
+############################################
+lucas_eu_2009_campaign.json
+lucas_eu_2015_campaign.json

@@ -1,0 +1,262 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "chemometric_default",
+        "min_user_stratum": 3,
+        "title": "Chemometric deault chain of processes",
+        "label": "Convert spectra to derivates and either append to or replace the original bands in the dataframe."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+            },
+            {
+              "parameter": "chemometrics",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Chemometric methods applied before plotting, default applies a predefined methods set for each type of chemometric method (derivatives, scattercorrection,  scaling and decomposition)."
+            },
+            {
+              "parameter": "chemometrics_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Array of chemometric methods to actually apply, leave empty for none; if multiple methods are selected, the methods will be applied in the listed order."
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "jet",
+              "hint": "Name of the matplotlib colormap to use"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "spectra_derivative",
+        "min_user_stratum": 3,
+        "title": "Convert spectra to derivatives",
+        "label": "Convert spectra to derivates and either append to or replace the original bands in the dataframe."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+            },
+            {
+              "parameter": "derivative",
+              "parameter_type": "integer",
+              "required": true,
+              "default_value": 1,
+              "hint": "Derivative to calculate from the input dataframe."
+            },
+            {
+              "parameter": "append",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "if append is set to true the derivatives will be appended to the original bands; this is not recommended but can be used to explore which is more significant, the orignal bands or the derivatives, and then iterated to only select one for the coninued modeling."
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "jet",
+              "hint": "Name of the matplotlib colormap to use"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "spectra_scatter_correction",
+        "min_user_stratum": 3,
+        "title": "Scatter correction of spectral data",
+        "label": "Run a single or sequence of scatter correction to remove noise from spectral signals."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+            },
+            {
+              "parameter": "scaler",
+              "parameter_type": "array",
+              "required": true,
+              "default_value": [
+                "snv"
+              ],
+              "hint": "Scaler, or array of 2 scalers to apply for scatter correction."
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "jet",
+              "hint": "Name of the matplotlib colormap to use"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "spectra_scaling",
+        "min_user_stratum": 3,
+        "title": "Scaling of spectral data",
+        "label": "Run a scaling algroithm for leveling the spectral signals."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+            },
+            {
+              "parameter": "method",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "meancentring",
+              "hint": "Available options: meancentring, autoscaling, paretoscaling, poissonscaling."
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "jet",
+              "hint": "Name of the matplotlib colormap to use"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "spectra_decomposition",
+        "min_user_stratum": 3,
+        "title": "Decomposition of spectral data",
+        "label": "Run a decomposition for compressing the information of spectral signals.."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+            },
+            {
+              "parameter": "method",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "pca",
+              "hint": "Available options: Pricipal Component Analysis (pca)."
+            },
+            {
+              "parameter": "n_components",
+              "parameter_type": "integer",
+              "required": true,
+              "default_value": 5,
+              "hint": "Available options: Pricipal Component Analysis (pca)."
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "jet",
+              "hint": "Name of the matplotlib colormap to use"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

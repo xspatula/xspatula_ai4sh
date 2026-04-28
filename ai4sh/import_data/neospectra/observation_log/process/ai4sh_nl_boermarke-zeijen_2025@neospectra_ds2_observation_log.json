@@ -1,0 +1,18 @@
+{
+  "process": [
+    {
+      "process": "manage_observation_log",
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_nl_boermarke-zeijen_2025",
+        "provision_id__provision_name": "neospectra",
+        "name": "ai4sh_nl_boermarke-zeijen_2025@neospectra_ds2",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "gustaf.hugelius@natgeo.su.se",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "home": 1
+      }
+    }
+  ]
+}

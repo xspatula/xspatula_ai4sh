@@ -1,0 +1,32 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "community",
+        "table": "organisation",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "url TEXT",
+          "address1 TEXT",
+          "address2 TEXT",
+          "postal_address VARCHAR",
+          "postal_zip_code VARCHAR",
+          "state VARCHAR",
+          "territory_id INTEGER REFERENCES utility.territory (id)",
+          "telephone VARCHAR",
+          "contact_name VARCHAR",
+          "contact_email VARCHAR",
+          "create_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "status_code SMALLINT DEFAULT 10",
+          "PRIMARY KEY(id)"
+        ]
+      }
+    }  
+  ]
+}

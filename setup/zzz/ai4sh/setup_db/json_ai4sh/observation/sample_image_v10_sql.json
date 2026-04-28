@@ -1,0 +1,43 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sample_image",
+        "command": [
+          "id SERIAL",
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "name TEXT",
+          "image_approach_id INTEGER REFERENCES observation_utility.image_approach (id)",
+          "image_substrate_id INTEGER REFERENCES observation_utility.image_substrate (id)",
+          "image_camera_id INTEGER REFERENCES observation_utility.image_setup (id)",
+          "image_setup_id INTEGER REFERENCES observation_utility.image_setup (id)",
+          "image_lightsource_id INTEGER REFERENCES observation_utility.image_lightsource (id)",
+          "UNIQUE (sample_id, name)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sample_image_orientation",
+        "command": [
+          "sample_image_id INTEGER REFERENCES observation.sample_image (id)",
+          "horisontal_orientation INTEGER",
+          "pitch INTEGER",
+          "roll INTEGER",
+          "yaw INTEGER",
+          "panorama BOOLEAN",
+          "PRIMARY KEY (sample_image_id)"
+        ]
+      }
+    }
+  ]
+}

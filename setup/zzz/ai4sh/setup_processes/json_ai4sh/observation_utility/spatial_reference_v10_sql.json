@@ -1,0 +1,119 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_spatial_reference",
+        "min_user_stratum": 5,
+        "title": "Manage a spatial reference system",
+        "label": "Insert, update or delete a spatial reference system for geographic or local positioning"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the spatial reference system",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spatial_reference",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Popular alias of the spatial reference system if it exists",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spatial_reference",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name for the spatial reference system",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spatial_reference",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "epsg",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The EPSG code for geographic spatial reference systems",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spatial_reference",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The url for the reference systems if it exists",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spatial_reference",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "For EPSG geographic reference systems enter the PROJ4 reference (even if deprecared), for local systems explain the origin and direction of x and y",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spatial_reference",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

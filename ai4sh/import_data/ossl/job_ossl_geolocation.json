@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "import_data/ossl/geolocation",
+    "process_sub_folder": "process",
+    "pilot_file": "xspatula_add_geolocation_pilot.txt"
+  }
+}

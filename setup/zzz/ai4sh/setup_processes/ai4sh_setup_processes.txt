@@ -1,0 +1,127 @@
+####################################
+##### SETUP XSPATULA PROCESSES #####
+#####################################
+
+### observation UTILITY ROOT PROCESS ###
+
+#!!!!! The root process must be setup before the sub processes
+#!!!!!
+
+# Root processes
+root_process/root_processes_v10_sql.json
+
+translate/translate_tabular_data_v10_sql.json
+
+### UTILITIES ###
+
+utility/foreign_key_v10_sql.json
+
+utility/territory_v10_sql.json
+
+### OBSERVATION UTILITIES ###
+
+observation_utility/analysis_method_translate_v10_sql.json
+
+observation_utility/analysis_method_v10_sql.json
+
+observation_utility/apparatus_v10_sql.json
+
+observation_utility/classification_v10_sql.json
+
+observation_utility/indicator_default_unit_v10_sql.json
+
+observation_utility/indicator_v10_sql.json
+
+observation_utility/juxtaposition_v10_sql.json
+
+observation_utility/license_v10_sql.json
+
+observation_utility/location_method_v10_sql.json
+
+observation_utility/method_tier_v10_sql.json
+
+observation_utility/preparation_v10_sql.json
+
+observation_utility/preservation_v10_sql.json
+
+observation_utility/profiling_v10_sql.json
+
+observation_utility/provider_v10_sql.json
+
+observation_utility/provision_indicator_v10_sql.json
+
+observation_utility/provision_serial_nr_v10_sql.json
+
+observation_utility/provision_v10_sql.json
+
+observation_utility/quantity_default_unit_v10_sql.json
+
+observation_utility/quantity_v10_sql.json
+
+observation_utility/setting_system_v10_sql.json
+
+observation_utility/spatial_reference_v10_sql.json
+
+observation_utility/spectrometer_v10_sql.json
+
+observation_utility/spectroscopy_method_v10_sql.json
+
+observation_utility/storage_v10_sql.json
+
+observation_utility/transportation_v10_sql.json
+
+observation_utility/unit_translate_v10_sql.json
+
+observation_utility/unit_v10_sql.json
+
+### observation DATASET ###
+
+observation/campaign_v10_sql.json
+
+observation/dataset_v10_sql.json
+
+observation/measurement_v10_sql.json
+
+observation/observation_log_v10_sql.json
+
+observation/observation_v10_sql.json
+
+observation/data_source_v10_sql.json
+
+observation/person_v10_sql.json
+
+observation/sample_v10_sql.json
+
+observation/sample_geolocation_v10_sql.json
+
+###FOR LATER###observation_sample+location_v10_sql.json
+
+observation/sampling_log_v10_sql.json
+
+### SELECT SPECTRA ###
+
+select/select_data_v10_sql.json
+
+### PLOT ###
+
+plot/plot_v10_sql.json
+
+### MACHINE LEARNING ###
+
+machine_learning/outlier_detection_v10_sql.json
+
+machine_learning/variance_threshold_v10_sql.json
+
+machine_learning/chemometrics_v10_sql.json
+
+machine_learning/filter_v10_sql.json
+
+machine_learning/multi-filter_v10_sql.json
+
+machine_learning/agglomeration_v10_sql.json
+
+machine_learning/spectra_univariate_indicator_selection_v10_sql.json
+
+machine_learning/regression_models_v10_sql.json
+
+machine_learning/spectra_indicator_permutation_selection_v10_sql.json

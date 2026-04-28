@@ -1,0 +1,5 @@
+{
+  "SelectKBest": {
+    "n_features": 50
+  }
+}

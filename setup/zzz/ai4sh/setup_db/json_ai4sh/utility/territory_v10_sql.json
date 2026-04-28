@@ -1,0 +1,48 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "utility",
+        "table": "territory",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "display_name TEXT",
+          "iso_code_a2 TEXT",
+          "iso_code_a2_ext TEXT UNIQUE",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "utility",
+        "table": "territory",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "display_name",
+            "iso_code_a2",
+            "iso_code_a2_ext"
+          ],
+          "values": [
+            [
+              "0",
+              "none",
+              "No territory",
+              "00",
+              "00000"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

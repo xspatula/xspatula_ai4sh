@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "setup_db",
+    "process_sub_folder": "json_ai4sh",
+    "pilot_file": "db_xspatula_ai4sh_setup.txt"
+  }
+}

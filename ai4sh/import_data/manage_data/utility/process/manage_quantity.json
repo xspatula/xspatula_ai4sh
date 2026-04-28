@@ -1,0 +1,586 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "spectra",
+        "alias": "spectra",
+        "display_name": "Spectra",
+        "abstract": "Undetermined spectral type"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "reflectance",
+        "alias": "reflectance",
+        "display_name": "Reflectance",
+        "abstract": "Measure of the proportion of light or other radiation striking a surface which is reflected off it."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "absorbance",
+        "alias": "absorbance",
+        "display_name": "Absorbance",
+        "abstract": "Measure of light that is absorbed by a surface of a solid or lliquid, or though a "
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "transmittance",
+        "alias": "transmittance",
+        "display_name": "Transmittance",
+        "abstract": "The ratio of the light energy falling on a body to that transmitted through it."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "salinity",
+        "alias": "salinity",
+        "display_name": "Salinity",
+        "abstract": "The quality or degree of being saline."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "salt content",
+        "alias": "salt content",
+        "display_name": "Salt content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "electrical conductivity",
+        "alias": "ec",
+        "display_name": "Electrical conductivity"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "total dissolved solids",
+        "alias": "tds",
+        "display_name": "Total dissolved solids"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "soil moisture",
+        "alias": "sm",
+        "display_name": "Soil moisture",
+        "abstract": "Soil moisture volumetric content as percent or ratio of total soil volume (volume*volume^-1)"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "temperature",
+        "alias": "temp",
+        "display_name": "Temperature",
+        "abstract": "The degree or intensity of heat present in a substance or object"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hydrogen ion concentration",
+        "alias": "ph",
+        "display_name": "Hydrogen ion concentration"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "total nitrogen content",
+        "alias": "n-tot",
+        "display_name": "Total nitrogen content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "total phosphorus content",
+        "alias": "p-tot",
+        "display_name": "Total phosphorus content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "total potassium content",
+        "alias": "k-tot",
+        "display_name": "Total potassium content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "extractable nitrogen content",
+        "alias": "n-ext",
+        "display_name": "Extractable nitrogen content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "extractable phosphorus content",
+        "alias": "p-ext",
+        "display_name": "Extractable phosphorus content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "extractable potassium content",
+        "alias": "k-ext",
+        "display_name": "Extractable potassium content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "total carbon content",
+        "alias": "c-tot",
+        "display_name": "Total carbon content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "organic carbon content",
+        "alias": "c-org",
+        "display_name": "Organic carbon content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "carbonate content",
+        "alias": "caco3",
+        "display_name": "Carbonate content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "cation exchange capacity",
+        "alias": "cec",
+        "display_name": "Cation exchange capacity"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "particle size distribution",
+        "alias": "psd",
+        "display_name": "Particle size distribution"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "clay (<0.002 mm) content",
+        "alias": "clay",
+        "display_name": "Clay (<0.002 mm) content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fine silt (0.002-0.02 mm) content",
+        "alias": "fine silt ",
+        "display_name": "Fine silt (0.002-0.02 mm) content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "coarse silt (0.02-0.06 mm) content",
+        "alias": "coarse silt",
+        "display_name": "Coarse silt (0.02-0.06 mm) content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fine sand (0.06-0.2 mm) content",
+        "alias": "fine sand",
+        "display_name": "Fine sand (0.06-0.2 mm) content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "coarse sand (0.2 - 2.0 mm) content",
+        "alias": "coarse sand",
+        "display_name": "Coarse sand (0.2 - 2.0 mm) content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "silt (0.002-0.06 mm) content",
+        "alias": "silt",
+        "display_name": "Silt (0.002-0.06 mm) content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "sand (0.06-2.0 mm) content",
+        "alias": "sand",
+        "display_name": "Sand (0.06-2.0 mm) content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "aggregate stability",
+        "alias": "aggstab",
+        "display_name": "Aggregate stability"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "calcium ion concentration",
+        "alias": "ca2+",
+        "display_name": "Calcium ion concentration"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "magnesium ion concentration",
+        "alias": "mg2+",
+        "display_name": "Magnesium ion concentration"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "potassium ion concentration",
+        "alias": "k+",
+        "display_name": "Potassium ion concentration"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "sodium ion concentration",
+        "alias": "na+",
+        "display_name": "Sodium ion concentration"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "biological richness",
+        "alias": "species richness",
+        "display_name": "Biological richness",
+        "abstract": "Total number of distinct groups/species present in a defined habitat, ecosystem, or region, serving as a fundamental measure of biodiversity and ecological health."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "ecological dominance",
+        "alias": "species dominance",
+        "display_name": "Ecological dominance",
+        "abstract": "Measure of groups/species dominating ecological influence on a community due to high abundance or large size."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "biological evenness",
+        "alias": "species evenness",
+        "display_name": "Biological evenness",
+        "abstract": "The relative abundance of individuals among different groups/species in a community, determining how close in numbers each group/species is."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "biological diversity",
+        "alias": "species diversity",
+        "display_name": "Biological diversity"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "microbial genomics functional annotation",
+        "alias": "microbial genomics functional annotation",
+        "display_name": "Microbial genomics functional annotation"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "microbial genomics pathogen characterization",
+        "alias": "microbial genomics pathogen characterization",
+        "display_name": "Microbial genomics pathogen characterization"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "enzymatic activity rate",
+        "alias": "enzymatic activity rate",
+        "display_name": "Enzymatic activity rate"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "soil water content",
+        "alias": "soil water content",
+        "display_name": "Soil water content"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "bulk density",
+        "alias": "bulk density",
+        "display_name": "Bulk density"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "porosity",
+        "alias": "porspace",
+        "display_name": "Porosity"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "infiltration rate",
+        "alias": "infiltration rate",
+        "display_name": "Infiltration rate"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "sorptivity ",
+        "alias": "sorptivity",
+        "display_name": "Sorptivity "
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hydraulic conductivity",
+        "alias": "hydraulic conductivity",
+        "display_name": "Hydraulic conductivity"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hg water pressure head scale parameter",
+        "alias": "hg water pressure head scale parameter",
+        "display_name": "Hg water pressure head scale parameter"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "n shape parameter of retention curve",
+        "alias": "n shape parameter of retention curve",
+        "display_name": "n shape parameter of retention curve"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "m shape parameter of retention curve",
+        "alias": "m shape parameter of retention curve",
+        "display_name": "m shape parameter of retention curve"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "proportion",
+        "alias": "unitless proportion",
+        "display_name": "Proportion"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_quantity",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "biomass",
+        "alias": "biomass",
+        "display_name": "Biomass"
+      }
+    }
+  ]
+}

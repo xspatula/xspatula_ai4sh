@@ -1,0 +1,964 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_simple_sample",
+        "min_user_stratum": 4,
+        "title": "Manage a sample",
+        "label": "Insert, update or delete a sample"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the sampling log to which this sample belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The tag of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto_name",
+              "hint": "The name of the sample is set automatically but can be overridden. For profile samples this is risky and better leave it to automatic naming",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              },
+              "auto_name": {
+                "concat": "'%s' %(tag)"
+              }
+            },
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the species (genus, family or order) of the sample, if the sampling_log is for a single leave empty",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "specimen",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The specimen of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "sampling_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": "",
+              "hint": "The date of the sampling",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "abstract for sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "timestamp",
+              "parameter_type": "timestamp",
+              "required": false,
+              "default_value": 0,
+              "hint": "The timestamp of obtaining the sample, leave empty to set the registration timestamp",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_geo_sample",
+        "min_user_stratum": 4,
+        "title": "Manage a sample",
+        "label": "Insert, update or delete a sample"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "The name of the sampling log to which this sample belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The tag of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto_name",
+              "hint": "The name of the sample is set automatically but can be overridden. For profile samples this is risky and better leave it to automatic naming",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              },
+              "auto_name": {
+                "concat": "'%s' %(tag)"
+              }
+            },
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the species (genus, family or order) of the sample, if the sampling_log is for a single leave empty",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "specimen",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The specimen of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "sampling_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": "",
+              "hint": "The date of the sampling",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "juxtaposition_id__juxtaposition_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The juxtaposition or setting of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_juxtaposition",
+                "write": true
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "abstract for sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "timestamp",
+              "parameter_type": "timestamp",
+              "required": false,
+              "default_value": 0,
+              "hint": "The timestamp of obtaining the sample, leave empty to set the registration timestamp",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "x-coordinate",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0,
+              "hint": "The x-coordinate of the sample, in the spatial reference system defined for the campaign.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            },
+            {
+              "parameter": "y-coordinate",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0,
+              "hint": "The y-coordinate of the sample, in the spatial reference system defined for the campaign.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            },
+            {
+              "parameter": "y-coordinate",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0,
+              "hint": "The y-coordinate of the sample, in the spatial reference system defined for the campaign.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            },
+            {
+              "parameter": "area_coverage",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The area representing the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            },
+            {
+              "parameter": "area_unit_id__area_unit_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "m^2",
+              "hint": "The unit in which area coverage is stated, default = m2",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_geolocated_sample",
+        "min_user_stratum": 4,
+        "title": "Manage a sample",
+        "label": "Insert, update or delete a sample that already has a geolocation id set before."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "The name of the sampling log to which this sample belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The tag of the sample.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto_name",
+              "hint": "The name of the sample is set automatically but can be overridden. For profile samples this is risky and better leave it to automatic naming",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              },
+              "auto_name": {
+                "concat": "'%s' %(tag)"
+              }
+            },
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the species (genus, family or order) of the sample, if the sampling_log is for a single leave empty",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "specimen",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The specimen of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "sampling_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": "",
+              "hint": "The date of the sampling",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "juxtaposition_id__juxtaposition_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The juxtaposition or setting of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_juxtaposition",
+                "write": true
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "abstract for sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "timestamp",
+              "parameter_type": "timestamp",
+              "required": false,
+              "default_value": 0,
+              "hint": "The timestamp of obtaining the sample, leave empty to set the registration timestamp",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "geolocation_id__geolocation_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The geolocation id of the sample.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            },
+            {
+              "parameter": "area_coverage",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The area representing the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            },
+            {
+              "parameter": "area_unit_id__area_unit_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "m^2",
+              "hint": "The unit in which area coverage is stated, default = m2",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_geo_profile_sample",
+        "min_user_stratum": 4,
+        "title": "Manage a sample",
+        "label": "Insert, update or delete a sample"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "The name of the sampling log to which this sample belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The (geo)tag is the key identifier (e.g. position id) of the sample, it is automatically converted to a sample name by adding @profile_min-profile_max.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto_name",
+              "hint": "The name is the key identifier (e.g. position id) of the sample, it is automatically created from tag@profile_min-profile_max",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              },
+              "auto_name": {
+                "concat": "'%s@%s-%s' %(tag,profile_min,profile_max)"
+              }
+            },
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the species (genus, family or order) of the sample, if the sampling_log is for a single leave empty",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "specimen",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The specimen of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "profile_min",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The z-dimension min value",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": true
+              }
+            },
+            {
+              "parameter": "profile_max",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The z-dimension max value",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": true
+              }
+            },
+            {
+              "parameter": "profile_obstacle",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": 0,
+              "hint": "If the intended max profile was not reached.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": true
+              }
+            },
+            {
+              "parameter": "sampling_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": "",
+              "hint": "The date of the sampling",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "setting_system_id__setting_system_name_array",
+              "parameter_type": "text array",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "If the campaign contains observations with differnt juxtaposition settings (for example inside/outside), select the type of settings in a comma separated list",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_setting_system",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "setting_system_id__setting_system_name_array",
+                "src_schema": "observation",
+                "src_table": "sampling_log_setting_system",
+                "src_column": "setting_system_id",
+                "search_column": "id",
+                "search_object": "sampling_log_id"
+              }
+            },
+            {
+              "parameter": "juxtaposition_id__juxtaposition_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The juxtaposition or setting of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_juxtaposition",
+                "write": true
+              },
+              "foreign_key": {
+                "schema": "'schema",
+                "table": "table",
+                "column": "column"
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "abstract for sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "timestamp",
+              "parameter_type": "timestamp",
+              "required": false,
+              "default_value": 0,
+              "hint": "The timestamp of obtaining the sample, leave empty to set the registration timestamp",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "x-coordinate",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0,
+              "hint": "The x-coordinate of the sample, in the spatial reference system defined for the campaign.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            },
+            {
+              "parameter": "y-coordinate",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0,
+              "hint": "The y-coordinate of the sample, in the spatial reference system defined for the campaign.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            },
+            {
+              "parameter": "area_coverage",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The area representing the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            },
+            {
+              "parameter": "area_unit_id__area_unit_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "m^2",
+              "hint": "The unit in which area coverage is stated, default = m2",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_geolocated_profile_sample",
+        "min_user_stratum": 4,
+        "title": "Manage a sample",
+        "label": "Insert, update or delete a sample that already has a geolocation id set before and that has profile (z-dimension)."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "The name of the sampling log to which this sample belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The (geo)tag) is the key identifier (e.g. position id) of the sample, it is automatically created from tag@profile_min-profile_max",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto_name",
+              "hint": "The name is the key identifier (e.g. position id) of the sample, it is automatically created from tag@profile_min-profile_max",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              },
+              "auto_name": {
+                "concat": "'%s@%s-%s' %(tag,profile_min,profile_max)"
+              }
+            },
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the species (genus, family or order) of the sample, if the sampling_log is for a single leave empty",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "specimen",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The specimen of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "profile_min",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The z-dimension min value",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": true
+              }
+            },
+            {
+              "parameter": "profile_max",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The z-dimension max value",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": true
+              }
+            },
+            {
+              "parameter": "sampling_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": "",
+              "hint": "The date of the sampling",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "setting_system_id__setting_system_name_array",
+              "parameter_type": "text array",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "If the sample contains observations with different juxtaposition settings (for example inside/outside), select the type of settings in a comma separated list",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_juxtaposition",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "setting_system_id__setting_system_name_array",
+                "src_schema": "observation",
+                "src_table": "sampling_log_setting_system",
+                "src_column": "setting_system_id",
+                "search_column": "sampling_log_id",
+                "search_object": "sampling_log_id__sampling_log_name"
+              }
+            },
+            {
+              "parameter": "juxtaposition_id__juxtaposition_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The juxtaposition or setting of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_juxtaposition",
+                "write": true
+              }
+            },
+
+            {
+              "parameter": "composition_id__composition_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "unknown",
+              "hint": "If the sample is a single sample or a composite of subsamples, or unknown.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_composition",
+                "write": true
+              }
+            },
+            {
+              "parameter": "proximity_id__proximity_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "unknwon",
+              "hint": "If the sample represent the center,  periphery or has a general coverage of the sampled object.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_proximity",
+                "write": true
+              }
+            },
+
+
+
+
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "abstract for sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "timestamp",
+              "parameter_type": "timestamp",
+              "required": false,
+              "default_value": 0,
+              "hint": "The timestamp of obtaining the sample, leave empty to set the registration timestamp",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": true
+              }
+            },
+            {
+              "parameter": "geolocation_id__geolocation_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The geolocation id of the sample.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            },
+            {
+              "parameter": "area_coverage",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The area representing the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            },
+            {
+              "parameter": "area_unit_id__area_unit_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "m^2",
+              "hint": "The unit in which area coverage is stated, default = m2",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

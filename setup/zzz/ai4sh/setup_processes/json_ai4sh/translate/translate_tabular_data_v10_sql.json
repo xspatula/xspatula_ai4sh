@@ -1,0 +1,44 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "translate_data",
+        "process": "translate_tabular_data",
+        "min_user_stratum": 3,
+        "title": "Translate tabular data from spreadsheet to json process",
+        "label": "Translate tabular data recorded as csv or excel files to xSpatula json command process files."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "process",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The target process."
+            },
+            {
+              "parameter": "tabular_data_path",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Absolute or relative path of the spreadsheet source data"
+            },
+            {
+              "parameter": "dst_path",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Absolute or relative destination path for writing the json process file"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

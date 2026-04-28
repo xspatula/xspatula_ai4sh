@@ -1,0 +1,212 @@
+{
+  "process": [
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "root_process",
+        "command": {
+          "columns": [
+            "id",
+            "root_process",
+            "title",
+            "label",
+            "creator_id"
+          ],
+          "values": [
+            [
+              "0",
+              "universal",
+              "Universal root_process for common settings across all processes",
+              "Universal root_process for common settings across all processes",
+              "1"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "root_process",
+        "command": {
+          "columns": [
+            "root_process",
+            "title",
+            "label",
+            "creator_id"
+          ],
+          "values": [
+            [
+              "manage_process",
+              "Manage database defined process",
+              "Mangaging a processes requires data on all parameters and their type and default values",
+              "1"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter",
+        "command": {
+          "columns": [
+            "process_id",
+            "parent",
+            "element",
+            "parameter",
+            "parameter_type",
+            "required",
+            "default_value",
+            "hint"
+          ],
+          "values": [
+            [
+              "1",
+              "process",
+              "parameters",
+              "root_process",
+              "text",
+              "True",
+              "",
+              "Root process id"
+            ],
+            [
+              "1",
+              "process",
+              "parameters",
+              "title",
+              "text",
+              "False",
+              "",
+              "Process title"
+            ],
+            [
+              "1",
+              "process",
+              "parameters",
+              "label",
+              "text",
+              "False",
+              "",
+              "Process label"
+            ],
+            [
+              "1",
+              "process",
+              "parameters",
+              "min_user_stratum",
+              "integer",
+              "True",
+              "5",
+              "minimum user stratum for using the process"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter",
+        "command": {
+          "columns": [
+            "process_id",
+            "parent",
+            "element",
+            "parameter",
+            "parameter_type",
+            "required",
+            "default_value",
+            "hint"
+          ],
+          "values": [
+            [
+              "0",
+              "root",
+              "user_project",
+              "user_id",
+              "text",
+              "False",
+              "view",
+              "User id"
+            ],
+            [
+              "0",
+              "root",
+              "user_project",
+              "project_id",
+              "text",
+              "False",
+              "view",
+              "User project"
+            ],
+            [
+              "0",
+              "root",
+              "user_project",
+              "user_password",
+              "text",
+              "False",
+              "",
+              "User password"
+            ],
+            [
+              "0",
+              "root",
+              "user_project",
+              "tract_id",
+              "text",
+              "False",
+              "*",
+              "User project tract id"
+            ],
+            [
+              "0",
+              "root",
+              "user_project",
+              "site_id",
+              "text",
+              "False",
+              "*",
+              "User project site id"
+            ],
+            [
+              "0",
+              "root",
+              "user_project",
+              "plot_id",
+              "text",
+              "False",
+              "*",
+              "User project plot id"
+            ],
+            [
+              "0",
+              "root",
+              "user_project",
+              "schemata",
+              "text",
+              "True",
+              "",
+              "User project schemata (coordinate settings)"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

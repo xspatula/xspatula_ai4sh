@@ -1,0 +1,50 @@
+{
+  "process": [
+
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "license",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "url TEXT",
+          "doi TEXT",
+          "registration_date DATE DEFAULT CURRENT_DATE",
+          "latest_update_date DATE DEFAULT CURRENT_DATE",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "license",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "display_name"
+          ],
+          "values": [
+            [
+              "0",
+              "No license",
+              "none",
+              "No license"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sample_profile",
+        "command": [
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "profile_min SMALLINT",
+          "profile_max SMALLINT",
+          "PRIMARY KEY (sample_id)"
+        ]
+      }
+    }
+  ]
+}

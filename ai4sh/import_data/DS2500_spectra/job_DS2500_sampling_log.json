@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "import_data/DS2500_spectra/sampling_log",
+    "process_sub_folder": "process",
+    "pilot_file": "xspatula_add_sampling_log_pilot.txt"
+  }
+}

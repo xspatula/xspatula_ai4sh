@@ -1,0 +1,118 @@
+{
+  "targetFeatureSymbols": {
+    "caco3": {
+      "color": "whitesmoke",
+      "alpha": 0.1,
+      "label": "CaCo3",
+      "unit": "percent"
+    },
+    "cec": {
+      "color": "seagreen",
+      "alpha": 0.1,
+      "label": "Cation Exc. Cap.",
+      "unit": "mol*kg-1"
+    },
+    "cf": {
+      "color": "sienna",
+      "alpha": 0.1,
+      "label": "Coarse fraction",
+      "unit": "percent"
+    },
+    "clay": {
+      "color": "tan",
+      "alpha": 0.1,
+      "label": "Clay cont.",
+      "unit": "percent"
+    },
+    "ec": {
+      "color": "dodgerblue",
+      "alpha": 0.1,
+      "label": "Electric cond.",
+      "unit": "ms*m'-1"
+    },
+    "k-ext": {
+      "color": "lightcyan",
+      "alpha": 0.1,
+      "label": "Potassion (K)",
+      "unit": "mol*kg-1"
+    },
+    "n-to": {
+      "color": "darkcyan",
+      "alpha": 0.1,
+      "label": "Nitrogen (N) [tot]",
+      "unit": "percent"
+    },
+    "c-org": {
+      "color": "dimgray",
+      "alpha": 0.1,
+      "label": "Organic carbon (C)",
+      "unit": "percent"
+    },
+    "p-ext": {
+      "color": "firebrick",
+      "alpha": 0.1,
+      "label": "Phosphorus (P)",
+      "unit": "mg*kg-1"
+    },
+    "ph-cacl2": {
+      "color": "lemonchiffon",
+      "alpha": 0.1,
+      "label": "pH (CaCl)",
+      "unit": "pH"
+    },
+    "ph-h2o": {
+      "color": "lightyellow",
+      "alpha": 0.1,
+      "label": "pH (H20)",
+      "unit": "pH"
+    },
+    "sand": {
+      "color": "orange",
+      "alpha": 0.1,
+      "label": "Sand cont.",
+      "unit": "percent"
+    },
+    "fine sand": {
+      "color": "orange",
+      "alpha": 0.1,
+      "label": "Sand cont.",
+      "unit": "percent"
+    },
+    "coarse sand": {
+      "color": "orange",
+      "alpha": 0.1,
+      "label": "Sand cont.",
+      "unit": "percent"
+    },
+    "silt": {
+      "color": "khaki",
+      "alpha": 0.1,
+      "label": "Silt cont.",
+      "unit": "percent"
+    },
+    "fine silt": {
+      "color": "khaki",
+      "alpha": 0.1,
+      "label": "Silt cont.",
+      "unit": "percent"
+    },
+    "coarse silt": {
+      "color": "khaki",
+      "alpha": 0.1,
+      "label": "Silt cont.",
+      "unit": "percent"
+    }
+  },
+  "featureImportancePlot": {
+    "comment": "Set any xticks arguments: https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.tick_params.html",
+    "xticks": {
+      "labelrotation": 45,
+      "labelcolor": "black",
+      "direction": "in",
+      "labelsize": "small"
+    }
+  },
+  "subtitlePlot": {
+    "fontsize": "normal"
+  }
+}

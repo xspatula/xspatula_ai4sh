@@ -1,0 +1,119 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_analysis_method_translate",
+        "min_user_stratum": 4,
+        "title": "Manage analysis method translate",
+        "label": "Insert, update or delete numerial translation between two analysis methods that reveal the same property and have a documented translation for a particular species of substances."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of substance species for which the translation is valid.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method_translate",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "src_method_id__method_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the source method that can be translated from.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method_translate",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "dst_method_id__method_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the destination method that can be translated to.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method_translate",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "factor",
+              "parameter_type": "float",
+              "required": true,
+              "default_value": "",
+              "hint": "The multiplication factor to apply for the translation",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method_translate",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "addon",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": "",
+              "hint": "The addend to be added to the translation after the multiplication",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method_translate",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "exponent",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": "",
+              "hint": "Any exponential function applied after the multiplication and addon",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method_translate",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,241 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "order",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "abstract TEXT",
+          "convert_to_id INTEGER",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "order",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "unknown",
+              "none",
+              "Unknown",
+              "Unknown or undisclosed classification order."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "family",
+        "command": [
+          "id SERIAL",
+          "order_id INTEGER REFERENCES observation_utility.order (id)",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "abstract TEXT",
+          "convert_to_id INTEGER",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "family",
+        "command": {
+          "columns": [
+            "id",
+            "order_id",
+            "name",
+            "alias",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "0",
+              "unknown",
+              "none",
+              "Unknown",
+              "Unknown or undisclosed classification family."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "genus",
+        "command": [
+          "id SERIAL",
+          "family_id INTEGER REFERENCES observation_utility.family (id)",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "abstract TEXT",
+          "convert_to_id INTEGER",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "genus",
+        "command": {
+          "columns": [
+            "id",
+            "family_id",
+            "name",
+            "alias",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "0",
+              "unknown",
+              "none",
+              "Unknown",
+              "Unknown or undisclosed classification genus."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "species",
+        "command": [
+          "id SERIAL",
+          "genus_id INTEGER REFERENCES observation_utility.genus (id)",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "abstract TEXT",
+          "convert_to_id INTEGER",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "species",
+        "command": {
+          "columns": [
+            "id",
+            "genus_id",
+            "name",
+            "alias",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "0",
+              "unknown",
+              "none",
+              "Unknown",
+              "Unknown or undisclosed classification species."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "specimen",
+        "command": [
+          "id SERIAL",
+          "species_id INTEGER REFERENCES observation_utility.species (id)",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "abstract TEXT",
+          "convert_to_id INTEGER",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "specimen",
+        "command": {
+          "columns": [
+            "id",
+            "species_id",
+            "name",
+            "alias",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "0",
+              "unknown",
+              "none",
+              "Unknown",
+              "Unknown or undisclosed classification specimen."
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

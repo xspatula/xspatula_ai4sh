@@ -1,0 +1,135 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "major_landform",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "slope_position",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "sky_condition",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "ground_condition",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "cultivation_species",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "genus TEXT",
+          "species TEXT",
+          "sub_species TEXT",
+          "UNIQUE (genus, species, sub_species)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "soil_preparation",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "crop_growth_stage",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "erosion_conservation_measure",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

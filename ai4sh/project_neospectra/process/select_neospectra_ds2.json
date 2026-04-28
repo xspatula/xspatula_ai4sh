@@ -1,0 +1,23 @@
+{
+  "process": [
+    {
+      "process": "select_spectra",
+      "overwrite": false,
+      "parameters": {
+        "dataset_name": "ai4sh",
+        "campaign_name": "",
+        "provision_name": "neospectra",
+        "preparation_name": "ds2",
+        "begin_wavelength": 1350,
+        "end_wavelength": 2550,
+        "output_bandwidth": 5,
+        "min_profile": 0,
+        "max_profile": 20,
+        "indicator_array": ["cec", "clay", "coarse sand", "c-org"],
+        "data_range": "",
+        "as_absorbance": true,
+        "output_root_fp": "./project_neospectra/data"
+      }
+    }
+  ]
+}

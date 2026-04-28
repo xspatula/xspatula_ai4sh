@@ -1,0 +1,12 @@
+{
+  "moving_average": {
+    "kernel": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "mode": "nearest"
+  }
+}

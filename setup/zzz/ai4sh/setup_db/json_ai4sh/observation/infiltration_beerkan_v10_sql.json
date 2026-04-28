@@ -1,0 +1,42 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "infiltration_beerkan",
+        "command": [
+          "id SERIAL",
+          "observation_id INTEGER",
+          "initial_soil_moisture_volume_percent INTEGER",
+          "final_soil_moisture_volume_percent INTEGER",
+          "soil_moisture_method_id INTEGER REFERENCES observation_utility.analysis_method (id)",
+          "single_ring_diameter FLOAT",
+          "single_ring_diameter_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "unit_water_volume FLOAT",
+          "unit_water_volume_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "infiltration_beerkan_time",
+        "command": [
+          "id SERIAL",
+          "beerkan_infiltration_id INTEGER REFERENCES observation.infiltration_beerkan (id)",
+          "unit_water_volume_sequence_nr SMALLINT",
+          "duration FLOAT",
+          "duration_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "data_source",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "url TEXT",
+          "address1 TEXT",
+          "address2 TEXT",
+          "postal_address VARCHAR",
+          "postal_zip_code VARCHAR",
+          "state VARCHAR",
+          "territory_id INTEGER REFERENCES utility.territory (id)",
+          "telephone VARCHAR",
+          "contact_name VARCHAR",
+          "contact_email VARCHAR",
+          "create_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "PRIMARY KEY(id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "data_source",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "display_name",
+            "territory_id"
+          ],
+          "values": [
+            [
+              "0",
+              "unknown",
+              "none",
+              "Unknwon",
+              "0"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

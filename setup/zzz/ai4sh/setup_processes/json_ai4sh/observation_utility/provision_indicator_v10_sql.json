@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_provision_indicator",
+        "min_user_stratum": 4,
+        "title": "Manage provision indicator",
+        "label": "Insert, update or delete indicator for an already registered provision (e.g. service or observation instrument)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "provision_id__provision_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the provision (instrument, laboratory service) from which measurements are retrieved.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_indicator",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "indicator_id__indicator_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the indicator retrieved from the provision (a provision can generate one or more indicators)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_indicator",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "analysis_method_id__analysis_method_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The analysis method applied by the provision for determining the indicator.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_indicator",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "unit_id__unit_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unit of the indicator observed by the provision.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_indicator",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

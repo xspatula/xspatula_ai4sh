@@ -1,0 +1,51 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "ward_clustering",
+        "min_user_stratum": 3,
+        "title": "Ward clustering of spectra",
+        "label": "Ward clustering of spectral band to reduce dimensionality, can be applied with k-fold tuning to define an optimal set of bands to retain."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
+            },
+            {
+              "parameter": "ward_clustering_fp",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "none",
+              "hint": "The ward clustering to apply, if set to none, no ward clustering will be applied even if the process is called. You have to define the ward clustering to apply and set the relative or absolute path to the ward_clustering.JSON file as the parameter."
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "jet",
+              "hint": "Name of the matplotlib colormap to use"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "overwrite": false,
+      "process": "translate_tabular_data",
+      "parameters": {
+        "process": "manage_juxtaposition",
+        "tabular_data_path": "../../../excel_src_data/observation_utility/juxtaposition.xlsx",
+        "dst_path": "../../../manage_data/utility/process"
+      }
+    }
+  ]
+}

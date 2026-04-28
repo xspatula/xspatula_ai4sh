@@ -1,0 +1,65 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "person",
+        "command": [
+          "id SERIAL",
+          "data_source_id INTEGER REFERENCES observation.data_source (id)",
+          "first_name VARCHAR",
+          "middle_name VARCHAR",
+          "last_name VARCHAR",
+          "email VARCHAR UNIQUE",
+          "address1 VARCHAR",
+          "address2 VARCHAR",
+          "postal_address VARCHAR",
+          "postal_zip_code VARCHAR",
+          "state VARCHAR",
+          "territory_id INTEGER REFERENCES utility.territory (id)",
+          "telephone VARCHAR",
+          "department VARCHAR",
+          "section VARCHAR",
+          "position VARCHAR",
+          "create_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "person",
+        "command": {
+          "columns": [
+            "id",
+            "data_source_id",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "email",
+            "territory_id"
+          ],
+          "values": [
+            [
+              "0",
+              "0",
+              "None",
+              "None",
+              "None",
+              "none@example.com",
+              "0"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

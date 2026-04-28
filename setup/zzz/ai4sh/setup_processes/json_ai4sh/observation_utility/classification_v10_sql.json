@@ -1,0 +1,485 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_order",
+        "min_user_stratum": 4,
+        "title": "Manage substance order",
+        "label": "Insert, update or delete a substance order, the highest, most generic, classification level used for defining datasets, campaigns and samples (e.g. soil, wine)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Top level generic name of the substance to sample and analyse.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "order",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Common language or thematic jargon that unequivocal identifies the order, usually the same as the class itself but can be a complement.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "order",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the order.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "order",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the generic order in layperson terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "order",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_family",
+        "min_user_stratum": 4,
+        "title": "Manage substance family",
+        "label": "Insert, update or delete a substance family, a mid-layer classification level used for defining datasets, campaigns and samples (e.g. topsoil, red wine, white wine)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "order_id__order_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The order name or alias under which this family falls.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Family level generic name of the substance to sample and analyse.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Common language or thematic jargon that unequivocal identifies the family of substances, usually the same as the class itself but can be a complement, e.g. with alterantive spelling",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the family.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the family of substances in layperson terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "family",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_genus",
+        "min_user_stratum": 4,
+        "title": "Manage substance genus",
+        "label": "Insert, update or delete a substance genus, a lower-layer classification level used for defining datasets, campaigns and samples (e.g. acrisol, malbec, shiraz, chardonnay)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "family_id__family_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The family name or alias under which this genus falls.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Family level generic name of the substance to sample and analyse.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Common language or thematic jargon that unequivocal identifies the family of substances, usually the same as the class itself but can be a complement, e.g. with alterantive spelling",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the genus.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the genus of substances in layperson terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "genus",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_species",
+        "min_user_stratum": 4,
+        "title": "Manage substance species",
+        "label": "Insert, update or delete a substance species, the lowest classification level used for defining samples (this is usually done in association with acquiring or analysing a sample, for example cornfield 4, Mullineux Syrah)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "genus_id__genus_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The genus name or alias under which this genus falls. Can be omitted if the sampling log covers only a single genus",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "species",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Species level name of the substance to sample and analyse.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "species",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "ALternative name of species, e.g. in common language, can be omitted",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "species",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the species.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "species",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the species in layperson terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "species",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_specimen",
+        "min_user_stratum": 4,
+        "title": "Manage specimen",
+        "label": "Insert, update or delete the specimen that is sampled or analysed (this is always done in association with acquiring or analysing a sample, for example point 8, 2020 Nr 90153)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "auto",
+              "hint": "The species name or alias for the specimen. Can be omitted if the dataset/sampling log covers only a single species, genus, family or order",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "specimen",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false,
+                "write": true
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Specimen name, for instace any local/private identification or a particular model/type and year for a (species) product.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "specimen",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false,
+                "write": true
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "ALternative name of specimen.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "specimen",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the specimen.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "specimen",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the specimen, including notes from the sampling or analysis",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "specimen",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

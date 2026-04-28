@@ -1,0 +1,187 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_sampling_log",
+        "min_user_stratum": 2,
+        "title": "Manage sampling log",
+        "label": "Insert, update or delete a campaign sampling log for defining sample collection event"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "campaign_id__campaign_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the campaign to which this sampling log belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "contact_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Contact name for the sampling log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "contact_email",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The email contact address for the campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the sampling log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract summarising the sampling log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "sampling_tool_array",
+              "parameter_type": "text_array",
+              "required": false,
+              "default_value": "",
+              "hint": "Comma separated list of the sampling tools (freely written) used for sampling (not observing)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              }
+            },
+            {
+              "parameter": "setting_system_id__setting_system_name_array",
+              "parameter_type": "text array",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "If the sampling_log contains observations with differnt juxtaposition settings (for example inside/outside), select the type of settings in a comma separated list",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log_setting_system",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "setting_system_id__setting_system_name_array",
+                "src_schema": "observation",
+                "src_table": "campaign_setting_system",
+                "src_column": "setting_system_id",
+                "search_column": "campaign_id",
+                "search_object": "campaign_id__campaign_name"
+              }
+            },
+            {
+              "parameter": "time_series",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "True if the sampling_log is part of a time series analysis (the dataset and campaign must then be set to have time series data)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "begin_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": 0,
+              "hint": "The first date (written as YYYYMMDD) of the sampling log, leave empty to set the date of registering the sampling log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "end_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": 0,
+              "hint": "The last date (written as YYYYMMDD) of the sample log, leave empty to set the date of the last entry to the sample log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

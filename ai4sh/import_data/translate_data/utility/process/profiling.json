@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      
+      "process": "translate_tabular_data",
+      "parameters": {
+        "process": "manage_profiling",
+        "tabular_data_path": "../../../excel_src_data/observation_utility/profiling.xlsx",
+        "dst_path": "../../../manage_data/utility/process"
+      }
+    }
+  ]
+}

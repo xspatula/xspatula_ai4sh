@@ -1,0 +1,40 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_transportation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "ambient",
+        "alias": "amb",
+        "display_name": "ambient",
+        "abstract": "Ambient temperaure and environment"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_transportation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "cold",
+        "alias": "cd",
+        "display_name": "cold",
+        "abstract": "Cold environment above 0 C"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_transportation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "frozen",
+        "alias": "fr",
+        "display_name": "frozen",
+        "abstract": "Freezing conditions at about -18 C"
+      }
+    }
+  ]
+}

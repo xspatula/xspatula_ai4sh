@@ -1,0 +1,65 @@
+{
+  "modelPlot": {
+    "apply": true,
+    "tightLayout": false,
+    "singles": {
+      "apply": true,
+      "figSize": {
+        "x": 0,
+        "y": 0,
+        "xadd": 0.25,
+        "yadd": 0.25
+      },
+      "screenShow": false,
+      "savePng": true
+    },
+    "rows": {
+      "apply": true,
+      "subFigSize": {
+        "x": 3,
+        "y": 3,
+        "xadd": 0.1,
+        "yadd": 0.1
+      },
+      "screenShow": false,
+      "savePng": true,
+      "targetFeatures": {
+        "apply": true,
+        "figSize": {
+          "x": 0,
+          "y": 0,
+          "xadd": 0,
+          "yadd": 0
+        },
+        "hwspace": {
+          "hspace": 0.25,
+          "wspace": 0.25
+        },
+        "columns": [
+          "permutationImportance",
+          "treeBasedImportance",
+          "featureImportance",
+          "trainTest"
+        ]
+      },
+      "regressionModels": {
+        "apply": true,
+        "figSize": {
+          "x": 0,
+          "y": 0,
+          "xadd": 0.25,
+          "yadd": 0.25
+        },
+        "hwspace": {
+          "hspace": 0.25,
+          "wspace": 0.25
+        },
+        "columns": [
+          "permutationImportance",
+          "treeBasedImportance",
+          "trainTest"
+        ]
+      }
+    }
+  }
+}

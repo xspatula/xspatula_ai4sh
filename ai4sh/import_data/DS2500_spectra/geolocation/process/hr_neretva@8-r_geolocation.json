@@ -1,0 +1,10 @@
+{
+  "process": [
+    {
+      "process": "manage_geolocation",
+      "parameters": {
+        "name": "hr_neretva@8-r"
+      }
+    }
+  ]
+}

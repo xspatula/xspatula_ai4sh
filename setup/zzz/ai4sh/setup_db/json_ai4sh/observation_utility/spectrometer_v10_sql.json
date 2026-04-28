@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "spectrometer",
+        "command": [
+          "id SERIAL",
+          "provision_id INTEGER REFERENCES observation_utility.provision",
+          "provision_serial_nr_id INTEGER REFERENCES observation_utility.provision_serial_nr DEFAULT 0",
+          "wavelength_array REAL[]",
+          "wavelength_unit_id SMALLINT",
+          "UNIQUE (provision_id, provision_serial_nr_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

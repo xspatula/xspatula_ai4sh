@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "overwrite": true,
+      "process": "translate_tabular_data",
+      "parameters": {
+        "process": "manage_provision_indicator",
+        "tabular_data_path": "../../../excel_src_data/observation_utility/provision_indicator.xlsx",
+        "dst_path": "../../../manage_data/utility/process"
+      }
+    }
+  ]
+}

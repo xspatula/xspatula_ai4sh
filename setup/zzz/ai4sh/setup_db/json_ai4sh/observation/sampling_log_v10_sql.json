@@ -1,0 +1,43 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sampling_log",
+        "command": [
+          "id SERIAL",
+          "campaign_id INTEGER REFERENCES observation.campaign (id)",
+          "contact_name VARCHAR",
+          "contact_email VARCHAR",
+          "name TEXT",
+          "abstract TEXT",
+          "sampling_tool_array TEXT[]",
+          "time_series BOOLEAN DEFAULT FALSE",
+          "begin_date DATE DEFAULT CURRENT_DATE",
+          "end_date DATE DEFAULT CURRENT_DATE",
+          "create_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "UNIQUE (campaign_id, name)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sampling_log_setting_system",
+        "command": [
+          "sampling_log_id INTEGER REFERENCES observation.sampling_log (id)",
+          "setting_system_id INTEGER REFERENCES observation_utility.setting_system (id)",
+          "PRIMARY KEY (sampling_log_id, setting_system_id)"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_profiling",
+        "min_user_stratum": 4,
+        "title": "Manage profiling system",
+        "label": "Insert, update or delete profiling system for z-dimension and its units"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "unit_id__unit_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unit of the profiling system.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "profiling",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the profiling system",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "profiling",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "An alias that summarises the profiling system.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "profiling",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name of the profiling system.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "profiling",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the profiling system.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "profiling",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

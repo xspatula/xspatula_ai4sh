@@ -1,0 +1,19 @@
+{
+  "process": [
+    {
+      "process": "plot_spectra",
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/neospectra/ai4sh_1350-2550_5",
+        "filter": "lowess",
+        "chemometrics": "default",
+        "chemometrics_array": [
+          "derivative"
+        ],
+        "colormap": "jet",
+        "max_spectra": 100,
+        "show": true,
+        "save": true
+      }
+    }
+  ]
+}

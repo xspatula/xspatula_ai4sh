@@ -1,0 +1,20 @@
+{
+  "process": [
+    {
+      "process": "manage_geolocated_profile_sample",
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_gr_ktima-gerovassiliou_2023",
+        "tag": "461",
+        "name": "461@20-50",
+        "sampling_date": 20231201,
+        "species_id__species_name": "soil",
+        "geolocation_id__geolocation_name": "gr_ktima-gerovassiliou@461",
+        "profile_min": "20",
+        "profile_max": "50",
+        "juxtaposition_id__juxtaposition_name": "furrow",
+        "proximity_id__proximity_name": "general",
+        "composition_id__composition_name": "composite"
+      }
+    }
+  ]
+}

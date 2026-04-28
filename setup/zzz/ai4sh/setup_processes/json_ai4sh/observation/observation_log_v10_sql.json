@@ -1,0 +1,358 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_observation_log",
+        "min_user_stratum": 2,
+        "title": "Manage observation log",
+        "label": "Insert, update or delete a campaign observation log for defining sample analysis"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the sampling_log that define the collection of data to analyse in this observation log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "provision_id__provision_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the provision",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "contact_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Contact name for the observation log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "contact_email",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The email contact address for the observation log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "auto",
+              "hint": "The name of the observation log, auto = sampling_log+@+provision",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "auto_name": {
+                "concat": "'%s@%s' %(sampling_log_id__sampling_log_name, provision_id__provision_name)"
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract summarising the observation log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "sampling_tool_array",
+              "parameter_type": "text_array",
+              "required": false,
+              "default_value": "",
+              "hint": "Comma separated list of the sampling tools (freely written) used for sampling (not observing)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log",
+                "write": false
+              }
+            },
+            {
+              "parameter": "time_series",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "True if the sampling_log is part of a time series analysis (the dataset and campaign must then be set to have time series data)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "preparation_id__preparation_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "none",
+              "hint": "The preparation of the samples analysed in this observation log (excluding preparation as part of method) ",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_meta",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "preservation_id__preservation_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "none",
+              "hint": "If the samples analysed in this session were preserved over time, enter the name of the preservation method, leave empty for no preservation",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_meta",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "storage_id__storage_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "none",
+              "hint": "If the samples analysed in this session were stored over time, enter the name of the storage method, leave empty for no storage.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_meta",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "transportation_id__transportation_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "none",
+              "hint": "If the samples analysed are sensitive to ambient condition, enter the name of transportation method, leave empty for no special transport.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_meta",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "transportation_duration_h",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "If the samples analysed are sensitive to ambient condition and transported, enter the duration of the transportation in hours.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_meta",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "field",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains field (direct or in-field) observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "home",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains in-home (e.g. kithen) observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "laboratory",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains laboratory observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "drone",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains drone observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "satellite",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains satellite observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "document",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains documenteted observation, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "senses",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains human bodily senses faculty, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "auxiliary",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains auxiliary observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

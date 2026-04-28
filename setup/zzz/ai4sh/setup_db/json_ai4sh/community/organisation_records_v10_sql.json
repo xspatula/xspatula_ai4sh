@@ -1,0 +1,82 @@
+{
+  "process": [
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "community",
+        "table": "organisation",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "url",
+            "contact_email",
+            "address1",
+            "postal_address",
+            "postal_zip_code",
+            "territory_id"
+          ],
+          "values": [
+            [
+              "0",
+              "None",
+              "None",
+              "https://example.com",
+              "none@example.com",
+              "None",
+              "None",
+              "None",
+              "0"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "community",
+        "table": "organisation",
+        "command": {
+          "columns": [
+            "name",
+            "alias",
+            "url",
+            "contact_email",
+            "address1",
+            "postal_address",
+            "postal_zip_code",
+            "territory_id"
+          ],
+          "values": [
+            [
+              "Stockholm University",
+              "SU",
+              "https://su.se",
+              "thomas.gumbricht@natgeo.su.se",
+              "Frescativägen",
+              "Stockholm",
+              "11419",
+              "0"
+            ],
+            [
+              "University of Zagreb Faculty of Electrical Engineering and Computing",
+              "FER",
+              "https://www.fer.unizg.hr/en",
+              "Andrej.Slapnicar@fer.hr",
+              " Ulica grada Vukovara 39",
+              "Zagreb",
+              "10000",
+              "0"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

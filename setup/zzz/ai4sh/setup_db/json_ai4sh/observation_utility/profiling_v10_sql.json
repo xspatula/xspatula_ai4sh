@@ -1,0 +1,49 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "profiling",
+        "command": [
+          "id SERIAL",
+          "unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "profiling",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "no profiling",
+              "none",
+              "No profiling",
+              "No profiling (z-dimension) of relevance for observation results"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

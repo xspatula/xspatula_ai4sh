@@ -1,0 +1,125 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "campaign",
+        "command": [
+          "id SERIAL",
+          "dataset_id INTEGER REFERENCES observation.dataset (id)",
+          "name TEXT",
+          "display_name TEXT",
+          "contact_name VARCHAR",
+          "contact_email VARCHAR",
+          "begin_date DATE DEFAULT CURRENT_DATE",
+          "end_date DATE DEFAULT CURRENT_DATE",
+          "status_code SMALLINT DEFAULT 10",
+          "UNIQUE (dataset_id, name)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "campaign_meta",
+        "command": [
+          "campaign_id INTEGER REFERENCES observation.campaign (id)",
+          "species_id INTEGER REFERENCES observation_utility.species (id)",
+          "license_id INTEGER REFERENCES observation_utility.license (id)",
+          "profiling_id INTEGER REFERENCES observation_utility.profiling (id)",
+          "substance_array TEXT[]",
+          "keyword_array TEXT[]",
+          "url TEXT",
+          "doi TEXT",
+          "abstract TEXT",
+          "time_series BOOLEAN DEFAULT FALSE",
+          "create_date DATE DEFAULT CURRENT_DATE",
+          "last_update_date DATE DEFAULT CURRENT_DATE",
+          "PRIMARY KEY (campaign_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "campaign_method_tier",
+        "command": [
+          "campaign_id INTEGER REFERENCES observation.campaign (id)",
+          "field BOOLEAN DEFAULT FALSE",
+          "home BOOLEAN DEFAULT FALSE",
+          "laboratory BOOLEAN DEFAULT FALSE",
+          "drone BOOLEAN DEFAULT FALSE",
+          "satellite BOOLEAN DEFAULT FALSE",
+          "document BOOLEAN DEFAULT FALSE",
+          "senses BOOLEAN DEFAULT FALSE",
+          "auxiliary BOOLEAN DEFAULT FALSE",
+          "PRIMARY KEY (campaign_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "campaign_location",
+        "command": [
+          "campaign_id INTEGER REFERENCES observation.campaign (id)",
+          "territory_id INTEGER REFERENCES utility.territory (id)",
+          "site TEXT",
+          "spatial_reference_id INTEGER REFERENCES observation_utility.spatial_reference (id)",
+          "location_method_id INTEGER REFERENCES observation_utility.location_method (id)",
+          "location_error INTEGER",
+          "location_error_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "latitude_dd_wgs84_min REAL",
+          "latitude_dd_wgs84_max REAL",
+          "longitude_dd_wgs84_min REAL",
+          "longitude_dd_wgs84_max REAL",
+          "elevation_min REAL",
+          "elevation_max REAL",
+          "elevation_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "PRIMARY KEY (campaign_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "campaign_provision",
+        "command": [
+          "campaign_id INTEGER REFERENCES observation.campaign (id)",
+          "provision_id INTEGER REFERENCES observation_utility.provision (id)",
+          "PRIMARY KEY (campaign_id, provision_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "campaign_setting_system",
+        "command": [
+          "campaign_id INTEGER REFERENCES observation.campaign (id)",
+          "setting_system_id INTEGER REFERENCES observation_utility.setting_system (id)",
+          "PRIMARY KEY (campaign_id, setting_system_id)"
+        ]
+      }
+    }
+  ]
+}

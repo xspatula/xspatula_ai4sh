@@ -1,0 +1,21 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "provision_indicator",
+        "command": [
+          "id SERIAL",
+          "provision_id INTEGER REFERENCES observation_utility.provision (id)",
+          "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
+          "analysis_method_id INTEGER REFERENCES observation_utility.analysis_method (id)",
+          "unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

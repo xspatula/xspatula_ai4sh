@@ -1,0 +1,623 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_campaign",
+        "min_user_stratum": 3,
+        "title": "Manage a campaign.",
+        "label": "Insert update or delete a dataset campaign"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "dataset_id__dataset_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the dataset to which this campaign belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "auto",
+              "hint": "Name of the campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "autonaming": {
+                "geocampign": "#%s_%s_%s_%s_%s#  %(dataset_id__dataset_alias, begin_date)",
+                "non_geocampaign": "%()"
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "Display name of the campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "autonaming": {
+                "geocampign": "#%s_%s_%s_%s_%s#  %(dataset_id__dataset_alias, begin_date)",
+                "non_geocampaign": "%()"
+              }
+            },
+            {
+              "parameter": "contact_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Contact name for the campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "contact_email",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The email contact address for the campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "begin_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": 0,
+              "hint": "The first date of the dataset, leave empty to set the date of registering the campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "end_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": 0,
+              "hint": "The last date of the dataset, leave empty to set automatically with the latest added observation",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "The classification species (any order, family or genus in the database will also be recorded as a species, thus you can enter anyone of order, family, genus or species)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "species_id__species_name",
+                "src_schema": "observation",
+                "src_table": "dataset_meta",
+                "src_column": "species_id",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
+              }
+            },
+            {
+              "parameter": "profiling_id__profiling_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "Profile is the third dimension (height, depth or similar) of an observation. If left empty no profiling measure will be recorded for this campaign.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "profiling_id__profiling_name",
+                "src_schema": "observation",
+                "src_table": "dataset_meta",
+                "src_column": "profiling_id",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
+              }
+            },
+            {
+              "parameter": "setting_system_id__setting_system_name_array",
+              "parameter_type": "text array",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "If the campaign contains observations with differnt juxtaposition settings (for example inside/outside), select the type of settings in a comma separated list",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_setting_system",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "setting_system_id__setting_system_name_array",
+                "src_schema": "observation",
+                "src_table": "dataset_setting_system",
+                "src_column": "setting_system_id",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
+              }
+            },
+            {
+              "parameter": "license_id__license_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "license of the campaign, leave blank to copy the dataset url",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "license_id__license_name",
+                "src_schema": "observation",
+                "src_table": "dataset_meta",
+                "src_column": "license_id",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
+              }
+            },
+            {
+              "parameter": "substance_array",
+              "parameter_type": "text_array",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "Substance array, leave blank to copy the dataset substance array",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "substance_array",
+                "src_schema": "observation",
+                "src_table": "dataset_meta",
+                "src_column": "substance_array",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
+              }
+            },
+            {
+              "parameter": "keyword_array",
+              "parameter_type": "text_array",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "Keyword array, leave blank to copy the dataset keyword array",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "keyword_array",
+                "src_schema": "observation",
+                "src_table": "dataset_meta",
+                "src_column": "keyword_array",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "url of the campaign, leave blank to copy the dataset url",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "url",
+                "src_schema": "observation",
+                "src_table": "dataset_meta",
+                "src_column": "url",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
+              }
+            },
+            {
+              "parameter": "doi",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "doi of the campaign, leave blank to copy the dataset url",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "url",
+                "src_schema": "observation",
+                "src_table": "dataset_meta",
+                "src_column": "doi",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "Abstract summarising the campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "abstract",
+                "src_schema": "observation",
+                "src_table": "dataset_meta",
+                "src_column": "abstract",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
+              }
+            },
+            {
+              "parameter": "time_series",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "True if the campaign is part of a time series analysis (the dataset must then be set to have time series data)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "field",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains field (direct or in-field) observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "home",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains in-home (e.g. kithen) observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "laboratory",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains laboratory observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "drone",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains drone observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "satellite",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains satellite observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "document",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains documenteted observation, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "senses",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains human bodily senses faculty, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "auxiliary",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains auxiliary observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "territory_id__territory_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the territory for geographic campaigns",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_location",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "site",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the site for geographic campaigns",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_location",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "spatial_reference_id__spatial_reference_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "If the dataset contains observations with spatial reference corrdinates (geographic or local), set the name or code for the spatial reference",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_location",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "spatial_reference_id__spatial_reference_name",
+                "src_schema": "observation",
+                "src_table": "dataset_meta",
+                "src_column": "spatial_reference_id",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
+              }
+            },
+            {
+              "parameter": "location_method_id__location_method_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the location method used for identify geographic position (gps, map)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_location",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "location_error",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The estimated location error for the method used for identify geographic position.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_location",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "location_error_unit_id__unit_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "m",
+              "hint": "The unit name of the estimated location error for the method used for identify geographic position ",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_location",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "provision_id__provision_name_array",
+              "parameter_type": "text_array",
+              "required": true,
+              "default_value": "",
+              "hint": "Comma separated list of the observation provisions applied in the campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_provision",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

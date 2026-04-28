@@ -1,0 +1,261 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_observation",
+        "min_user_stratum": 2,
+        "title": "Manage observation",
+        "label": "Insert, update or delete a observation for defining sample analysis"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "observation_log_id__observation_log_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the observation log to which this observation belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "sample_id__sample_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "provision_id__provision_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "The name of the provision",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "provision_id__provision_name",
+                "src_schema": "observation",
+                "src_table": "observation_log",
+                "src_column": "provision_id",
+                "search_column": "id",
+                "search_object": "observation_log_id__observation_log_name"
+              }
+            },
+            {
+              "parameter": "provision_serial_nr_id__provision_serial_nr_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "0",
+              "hint": "The serial number as text (name) of the provision (tool, instrument or service) applied for this observation, leave empty or enter 0 for no specific serial nr",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_provision_serial_nr",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "subsample",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "a",
+              "hint": "Subsample name (only accpets values in a, b, c, ... h), applicable if the same sample is divided and observed more than once in the same log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "set_value": [
+                {
+                  "value": "a",
+                  "label": "A"
+                },
+                {
+                  "value": "b",
+                  "label": "B"
+                },
+                {
+                  "value": "c",
+                  "label": "C"
+                },
+                {
+                  "value": "d",
+                  "label": "D"
+                },
+                {
+                  "value": "e",
+                  "label": "E"
+                },
+                {
+                  "value": "f",
+                  "label": "F"
+                },
+                {
+                  "value": "g",
+                  "label": "G"
+                },
+                {
+                  "value": "h",
+                  "label": "H"
+                }
+              ]
+            },
+            {
+              "parameter": "replicate",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "Replicate name (only accpets values in 0-9, applicable if the same sample/subsamble observation is replicated more than once in the same log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "minmax": {
+                "min": 0,
+                "max": 9
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Any notation related to the observation",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "observation_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": 0,
+              "hint": "The date of the observation, leave blank to set today as date",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "@",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0,
+              "hint": "Any value from an obervation measurement must be given @+indicator",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_measurement",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "@%",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0,
+              "hint": "Any standard deviation from an obervation measurement must be given @%+indicator",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_measurement",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "n_repeat",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The number of repeats that value and standard deviation are based upon",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_measurement",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "timestamp",
+              "parameter_type": "timestamp",
+              "required": false,
+              "default_value": "",
+              "hint": "The timestamp of the observation, leave blank to set now (1/10 of second precision)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

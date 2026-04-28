@@ -1,0 +1,477 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_dataset",
+        "min_user_stratum": 3,
+        "title": "Manage dataset",
+        "label": "Insert, update or delete a dataset"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the dataset - must be unique",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Alias of the dataset - must be unique",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "format": {
+                "underscore": false,
+                "at": false,
+                "capital": false,
+                "blank": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name of the dataset",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "data_source_id__data_source_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the data source (organisation or individual) that controls the datasets",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "contact_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Contact name for the dataset (organisation general contact or individual)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "contact_email",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The email contact address for the dataset",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "begin_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": 0,
+              "hint": "The first date of the dataset, leave empty to set the date of registering the campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "end_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": 0,
+              "hint": "The last date of the dataset, leave empty to set automatically with the latest added observation",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "species_id can be set for any ...",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "profiling_id__profiling_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "none",
+              "hint": "Profile is the third dimension (height, depth or similar) of an observation. If left empty no profiling measure will be recorded for this dataset.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "setting_system_id__setting_system_name_array",
+              "parameter_type": "text array",
+              "required": false,
+              "default_value": "",
+              "hint": "If the dataset contains observations with differnt juxtaposition setting systems (for example inside/outside), select the type of setting systems in a comma separated list",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_setting_system",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "license_id__license_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "If the dataset comes with a well known licence, select the licence that apply from a predefined set. If Empty field or none = no license",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "substance_array",
+              "parameter_type": "text_array",
+              "required": false,
+              "default_value": "none",
+              "hint": "Substance array can contain a list of comma separated substances that the dataset covers. The substances can be set freely. If Empty field or none = no particular substance",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "keyword_array",
+              "parameter_type": "text_array",
+              "required": false,
+              "default_value": "none",
+              "hint": "Keyword array can contain a list of comma separated keywords (no need to add substances)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "url of the dataset",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "doi",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "If the dataset if published in other fora the doi of this publication can be entered",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract summarising the dataset",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "time_series",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset include time series data",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_meta",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "field",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains field (direct or in-field) observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "home",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains in-home (e.g. kithen) observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "laboratory",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains laboratory observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "drone",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains drone observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "satellite",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains satellite observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "document",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains documenteted observation, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "senses",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains human bodily senses faculty, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "auxiliary",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the dataset contains auxiliary observations, set to true",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "territory_id__territory_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the territory for geographic datasets",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_location",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "spatial_reference_id__spatial_reference_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "none",
+              "hint": "If the dataset contains observations with spatial reference corrdinates (geographic or local), set the name or code for the spatial reference",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset_location",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

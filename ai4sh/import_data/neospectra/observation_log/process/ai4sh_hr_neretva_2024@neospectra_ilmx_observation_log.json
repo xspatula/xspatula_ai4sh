@@ -1,0 +1,16 @@
+{
+  "process": [
+    {
+      "process": "manage_observation_log",
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_hr_neretva_2024",
+        "provision_id__provision_name": "neospectra",
+        "name": "ai4sh_hr_neretva_2024@neospectra_ilmx",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "robert.minarik@opengeohub.org",
+        "preparation_id__preparation_name": "ilmx",
+        "home": 1
+      }
+    }
+  ]
+}

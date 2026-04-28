@@ -1,0 +1,58 @@
+{
+  "process": [
+    {
+      "process_id": "create_schema",
+      "parameters": {
+        "schema": "utility"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
+        "schema": "community"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
+        "schema": "process"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
+        "schema": "landscape_utility"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
+        "schema": "landscape"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
+        "schema": "observation_utility"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
+        "schema": "observation"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
+        "schema": "edna_utility"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
+        "schema": "edna"
+      }
+    }
+  ]
+}

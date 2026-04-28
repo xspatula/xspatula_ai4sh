@@ -1,0 +1,14 @@
+{
+  "regressionModelSymbols": {
+    "ols":       {"marker": ".",  "size": 100},
+    "theil_sen": {"marker": "v",  "size": 50},
+    "huber":     {"marker": "^",  "size": 50},
+    "knn":       {"marker": "s",  "size": 50},
+    "dectree":   {"marker": "P",  "size": 50},
+    "svr":       {"marker": "*",  "size": 50},
+    "randfor":   {"marker": "h",  "size": 50},
+    "mlp":       {"marker": "D",  "size": 50},
+    "plsr":      {"marker": "X",  "size": 50},
+    "cubist":    {"marker": "8",  "size": 50}
+  }
+}

@@ -1,0 +1,263 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_person",
+        "min_user_stratum": 1,
+        "title": "Manage contributing person",
+        "label": "Insert, update or delete person actively contributing to dataset, campaign, sampling or observation"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "data_source_id__data_source_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the data source the person is associated with",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "first_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The first name of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "middle_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The middle name of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "last_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The last name of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "email",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Email address of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "address1",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The physical address, first line, of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "address2",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The physical address, second line, of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "postal_address",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The postal address (city, town, parch etc) of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "postal_zip_code",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The postal zip code of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "state",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The state (full or code) of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "territory_id__territory_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The territory (country) name of where the person reside",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "telephone",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The telephone number of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "department",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The department to which the person belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "section",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The section to which the person belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "position",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The professional position of the person",
+              "schema_table": {
+                "schema": "observation",
+                "table": "person",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

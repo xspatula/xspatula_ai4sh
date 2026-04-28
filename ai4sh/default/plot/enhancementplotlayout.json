@@ -1,0 +1,219 @@
+{
+  "enhancementPlotLayout": {
+    "filterExtraction": {
+      "apply": true,
+      "supTitle": "Filtering",
+      "subplotTitles": "auto",
+      "annotate": {
+        "x": 0.1,
+        "y": 0.8,
+        "original": "auto",
+        "filtered": "auto"
+      },
+      "figSize": {
+        "x": 8,
+        "y": 8
+      },
+      "ylabels": [
+        "reflectance",
+        "reflectance"
+      ]
+    },
+    "scatterCorrection": {
+      "apply": true,
+      "supTitle": "Scatter correction OSSL data, Sweden",
+      "subplotTitles": "auto",
+      "annotate": {
+        "x": 0.1,
+        "y": 0.8,
+        "input": "auto",
+        "firstcorrect": "auto",
+        "secondcorrect": "auto"
+      },
+      "ylabels": [
+        "reflectance",
+        "normalised reflectance",
+        "normalised reflectance"
+      ]
+    },
+    "standardisation": {
+      "apply": true,
+      "supTitle": "Scaled OSSL data, Sweden",
+      "subplotTitles": "auto",
+      "annotate": {
+        "x": 0.1,
+        "y": 0.8,
+        "input": "auto",
+        "standard": "auto"
+      },
+      "ylabels": [
+        "reflectance",
+        "standardised reflectance"
+      ]
+    },
+    "derivative": {
+      "apply": true,
+      "supTitle": "Derivated OSSL data, Sweden",
+      "subplotTitles": "auto",
+      "annotate": {
+        "x": 0.1,
+        "y": 0.8,
+        "input": "auto",
+        "derivative": "auto"
+      },
+      "ylabels": [
+        "Norm-L2 scaled reflectance",
+        "derivative"
+      ]
+    },
+    "pca": {
+      "apply": true,
+      "supTitle": "Decomposed OSSL data, Sweden",
+      "subplotTitles": "auto",
+      "annotate": {
+        "x": 0.1,
+        "y": 0.8,
+        "input": "auto",
+        "output": "auto"
+      },
+      "ylabels": [
+        "Reflectance",
+        "Eigen values"
+      ]
+    },
+    "varianceThreshold": {
+      "apply": true,
+      "supTitle": "Variance threshold covariate selection, OSSL data, Sweden",
+      "subplotTitles": "auto",
+      "annotate": {
+        "x": 0.1,
+        "y": 0.8,
+        "input": "auto",
+        "output": "auto"
+      },
+      "ylabels": [
+        "auto",
+        "auto"
+      ]
+    },
+    "wardClustering": {
+      "apply": true,
+      "supTitle": "Ward clustering of covariates (%s), OSSL data, Sweden",
+      "subplotTitles": "auto",
+      "annotate": {
+        "x": 0.1,
+        "y": 0.8,
+        "input": "auto",
+        "output": "auto"
+      },
+      "ylabels": [
+        "auto",
+        "auto"
+      ]
+    },
+    "univariateSelection": {
+      "apply": true,
+      "supTitle": "Univarate selection of covariates (%s), OSSL data, Sweden",
+      "subplotTitles": "auto",
+      "annotate": {
+        "x": 0.1,
+        "y": 0.8,
+        "input": "auto",
+        "output": "auto"
+      },
+      "ylabels": [
+        "auto",
+        "auto"
+      ]
+    },
+    "permutationSelector": {
+      "apply": true,
+      "supTitle": "Permutation selection of covariates (%s), OSSL data, Sweden",
+      "subplotTitles": "auto",
+      "annotate": {
+        "x": 0.1,
+        "y": 0.8,
+        "input": "auto",
+        "output": "auto"
+      },
+      "ylabels": [
+        "auto",
+        "auto"
+      ]
+    },
+    "RFE": {
+      "apply": true,
+      "supTitle": "RFE selection of covariates (%s), OSSL data, Sweden",
+      "subplotTitles": "auto",
+      "annotate": {
+        "x": 0.1,
+        "y": 0.8,
+        "input": "auto",
+        "output": "auto"
+      },
+      "ylabels": [
+        "auto",
+        "auto"
+      ]
+    },
+    "outlierDetection": {
+      "apply": true,
+      "supTitle": "Inliers/outliers OSSL data (%s), Sweden",
+      "subplotTitles": {
+        "train": "auto",
+        "test": "auto"
+      },
+      "annotate": {
+        "apply": true,
+        "x": 0.1,
+        "y": 0.8,
+        "train": "auto",
+        "test": "auto"
+      },
+      "isolines": {
+        "width": 1,
+        "color": "blue"
+      },
+      "scatter": {
+        "inliers": {
+          "color": "green",
+          "size": 20,
+          "alpha": 0.1
+        },
+        "outliers": {
+          "color": "red",
+          "size": 20,
+          "alpha": 0.1
+        }
+      },
+      "ylabel": "auto",
+      "xlabel": "auto"
+    },
+    "maxSpectra": 50,
+    "axvspan": {
+      "apply": true,
+      "color": "lightgrey",
+      "alpha": 0.8,
+      "ymin": 0,
+      "ymax": 1
+    },
+    "colorRamp": "jet",
+    "linewidth": 1,
+    "linestyle": "-",
+    "pointsize": 2,
+    "pointstyle": "o",
+    "screenShow": false,
+    "savePng": true,
+    "tightLayout": true,
+    "subFigSize": {
+      "x": 3,
+      "y": 3,
+      "xadd": 0.1,
+      "yadd": 0.1
+    },
+    "hwspace": {
+      "hspace": 0.25,
+      "wspace": 0.25
+    }
+  }
+}

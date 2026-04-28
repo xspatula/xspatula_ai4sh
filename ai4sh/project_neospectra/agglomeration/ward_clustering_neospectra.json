@@ -1,0 +1,22 @@
+{
+  "ward_clustering": {
+      "n_clusters": 0,
+      "affinity": "euclidean",
+      "tune_ward_clustering": {
+        "apply": true,
+        "kfolds": 3,
+        "clusters": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ]
+      }
+    }
+  }

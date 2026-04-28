@@ -1,0 +1,16 @@
+{
+  "process": [
+    {
+      "process": "detect_outliers",
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/neospectra/ai4sh_1350-2550_5",
+        "indicator_array": [
+          "coarse sand",
+          "c-org"
+        ],
+        "detector": "iforest",
+        "threshold": 0.1
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "indicator_default_unit",
+        "command": [
+          "id SERIAL",
+          "species_id INTEGER REFERENCES observation_utility.species (id)",
+          "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
+          "unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "UNIQUE (species_id, indicator_id)",
+          "system VARCHAR",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

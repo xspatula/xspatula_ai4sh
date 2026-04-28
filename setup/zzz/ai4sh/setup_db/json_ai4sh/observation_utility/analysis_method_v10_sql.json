@@ -1,0 +1,52 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "analysis_method",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "display_name TEXT",
+          "standard_schema TEXT",
+          "standard_code TEXT",
+          "url TEXT",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "analysis_method",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "display_name",
+            "standard_schema",
+            "standard_code",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "unknown",
+              "Unknown",
+              "unknown",
+              "unknown",
+              "Unknown method used for analysis."
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "process": [
+    {
+      "process_id": "delete_table",
+      "overwrite": false,
+      "verbose": 2,
+      "schema": "community",
+      "table": "user_media"
+    }
+  ]
+}

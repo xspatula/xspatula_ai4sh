@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_spectrometer",
+        "min_user_stratum": 4,
+        "title": "Manage spectrometer",
+        "label": "Insert, update or delete a spectral sensor with wavelengths"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "provision_id__provision_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the spectrometer as a provision",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spectrometer",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "provision_serial_nr_id__provision_serial_nr_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Name of the apparatus type (for example penetrometer, wetlab, metabarcoding)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spectrometer",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "wavelength_array",
+              "parameter_type": "float_array",
+              "required": true,
+              "default_value": "",
+              "hint": "Wavelengths recorded by the spectrometer/spectral sensor",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spectrometer",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "wavelength_unit_id__wavelength_unit_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The unit of the recorded wavelengths.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spectrometer",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

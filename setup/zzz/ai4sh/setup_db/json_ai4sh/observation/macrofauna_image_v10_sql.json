@@ -1,0 +1,25 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "macrofauna_image_setting",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "image_approach_id INTEGER REFERENCES observation_utility.image_approach",
+          "image_substrate_id INTEGER REFERENCES observation_utility.image_substrate",
+          "image_camera_id INTEGER REFERENCES observation_utility.image_camera",
+          "image_setup_id INTEGER REFERENCES observation_utility.image_setup",
+          "image_lightsource_id INTEGER REFERENCES observation_utility.image_lightsource",
+          "UNIQUE (name)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

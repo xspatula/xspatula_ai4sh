@@ -1,0 +1,327 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_provision",
+        "min_user_stratum": 4,
+        "title": "Manage provision",
+        "label": "Insert, update or delete provision service that generate observation data (e.g tool, instrument, laboratory service etc)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "provider_id__provider_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the provider (for example measuring device manufactor, laboratory)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "apparatus_id__apparatus_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the apparatus type (for example penetrometer, wetlab, metabarcoding)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "method_tier_id__method_tier_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the method tier (for example lab, home, field)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Full name of the provision (instrument model name, laboratory name + unique code for identifying the properties reported).",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unequivocal abbreviation or short code for the provision used for referring to this provision when observing/analysing samples",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name for the provision.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "url of the provision if it exists",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract describing the provision in laymen terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "contact_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "Name of contact person at provider",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "contact_name",
+                "src_schema": "observation_utility",
+                "src_table": "provider",
+                "src_column": "contact_name",
+                "search_column": "id",
+                "search_object": "provider_id__provider_name"
+              }
+            },
+            {
+              "parameter": "contact_email",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "inherit",
+              "hint": "Email of contact person at provider",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              },
+              "inherit": {
+                "process_parameter": "contact_email",
+                "src_schema": "observation_utility",
+                "src_table": "provider",
+                "src_column": "contact_email",
+                "search_column": "id",
+                "search_object": "provider_id__provider_name"
+              }
+            },
+            {
+              "parameter": "field",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the provision is capable of field(direct or in-field) observations, set to true",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "home",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the provision is capable of in-home (e.g. kithen) observations, set to true",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "laboratory",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the provision is capable of laboratory observations, set to true",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "drone",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the provision is capable of drone observations, set to true",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "satellite",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the provision is capable of satellite observations, set to true",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "document",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the provision is capable of documenteted observation, set to true",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "senses",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the provision is capable of human bodily senses faculty, set to true",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "auxiliary",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If the provision is capable of auxiliary observations, set to true",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

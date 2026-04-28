@@ -1,0 +1,292 @@
+{
+  "process": [
+    {
+      "process": "add_root_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "plot",
+        "title": "Plot data",
+        "label": "Root for plotting data"
+      }
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "plot",
+        "process": "plot_indicators",
+        "min_user_stratum": 1,
+        "title": "Plot indicators",
+        "label": "Plot indicators."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "indicator_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Comma separated list of the indicators to plot"
+            },
+            {
+              "parameter": "targetfeaturesymbols",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "The name of JSON file defining the symbolisation of the indicators"
+            },
+            {
+              "parameter": "standardisation",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Indicator standardisation applied before plotting, default applies a predefined standardisation set for each indicator, none skips all standardisation."
+            },
+            {
+              "parameter": "transformation",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Indicator transformation applied before plotting, default applies a predefined transformation set for each indicator, none skips all transformations."
+            },
+            {
+              "parameter": "boxplot",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "True for plotting boxplot diagrams, false not to"
+            },
+            {
+              "parameter": "histogram",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "True or false if you want a histogram plot"
+            },
+            {
+              "parameter": "show",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "True or false if you want to show the plot on screen"
+            },
+            {
+              "parameter": "save",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "True or false if you want to save the plot to file"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "plot",
+        "process": "plot_spectra",
+        "min_user_stratum": 1,
+        "title": "Plot indicators",
+        "label": "Plot indicators."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "multi_filter",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "none",
+              "hint": "A multi_filter can apply different filters and filter definitions for different ranges in the spectra and requires a customized definition in a JSON file, to run a multi_filter set filter to none and give the relative or absolute path to the JSON file with the multi_filter definition."
+            },
+            {
+              "parameter": "filter",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The filter to apply"
+            },
+            {
+              "parameter": "chemometrics",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Chemometric methods applied before plotting, default applies a predefined methods set for each type of chemometric method (derivatives, scattercorrection,  scaling and decomposition)."
+            },
+            {
+              "parameter": "chemometrics_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Array of chemometric methods to actually apply, leave empty for none; if multiple methods are selected, the methods will be applied in the listed order."
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "jet",
+              "hint": "Name of the matplotlib colormap to use"
+            },
+            {
+              "parameter": "max_spectra",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The maximum number of spectra to include in the plot"
+            },
+            {
+              "parameter": "show",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "True or false if you want to show the plot on screen"
+            },
+            {
+              "parameter": "save",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "True or false if you want to save the plot to file"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "plot",
+        "process": "plot_spectra_scattercorrection_scalers",
+        "min_user_stratum": 1,
+        "title": "Plot scatter corrections",
+        "label": "Plot a comparison of scatter correction scaler results."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "jet",
+              "hint": "Name of the matplotlib colormap to use"
+            },
+            {
+              "parameter": "max_spectra",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The maximum number of spectra to include in the plot"
+            },
+            {
+              "parameter": "show",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "True or false if you want to show the plot on screen"
+            },
+            {
+              "parameter": "save",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "True or false if you want to save the plot to file"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "plot",
+        "process": "plot_spectra_scaling_methods",
+        "min_user_stratum": 1,
+        "title": "Plot scatter corrections",
+        "label": "Plot a comparison of scatter correction scaler results."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "filter",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "none",
+              "hint": "Set path to the JSON file defining the filter. Available filter options: moving-average, gauss, savitszky-golay. To run the default settings of any of these filter set the parameter to the filter name"
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "jet",
+              "hint": "Name of the matplotlib colormap to use"
+            },
+            {
+              "parameter": "max_spectra",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The maximum number of spectra to include in the plot"
+            },
+            {
+              "parameter": "show",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "True or false if you want to show the plot on screen"
+            },
+            {
+              "parameter": "save",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "True or false if you want to save the plot to file"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

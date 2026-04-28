@@ -1,0 +1,113 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape",
+        "table": "sampling_weather",
+        "command": [
+          "id SERIAL",
+          "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
+          "timestamp timestamp DEFAULT to_timestamp(to_char(current_timestamp, 'YYYY-MM-DD HH24:MI'), 'YYYY-MM-DD HH24:MI')",
+          "sky_condition_id INTEGER REFERENCES landscape_utility.sky_condition",
+          "ground_condition_id INTEGER REFERENCES landscape_utility.ground_condition",
+          "precipitation_mm_24h INTEGER",
+          "temperature_c_24h_mean INTEGER",
+          "temperature_c_24h_max INTEGER",
+          "temperature_c_24h_min INTEGER",
+          "UNIQUE (geolocation_id, timestamp)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape",
+        "table": "cultivation",
+        "command": [
+          "id SERIAL",
+          "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
+          "cultivation_season_start_date DATE",
+          "cultivation_season_end_date DATE",
+          "baresoil_entire_season BOOLEAN",
+          "organic_cultivation BOOLEAN",
+          "regenerative_cultivation BOOLEAN",
+          "soil_preparation_id_array BOOLEAN[]",
+          "irrigation_mm FLOAT",
+          "fertilisation_manure_kg_ha FLOAT",
+          "fertilisation_chemical_kg_ha FLOAT",
+          "pesticide_kg_ha FLOAT",
+          "main_crop_id INTEGER[]",
+          "catch_crop_id INTEGER[]",
+          "cover_crop_id INTEGER[]",
+          "main_crop_yield FLOAT",
+          "catch_crop_yield FLOAT",
+          "yield_unit_id INTEGER",
+          "perennial_main_crop BOOLEAN",
+          "perennial_catch_crop BOOLEAN",
+          "perennial_cover_crop BOOLEAN",
+          "observation_date DATE DEFAULT CURRENT_DATE",
+          "UNIQUE (geolocation_id, cultivation_season_start_date)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape",
+        "table": "landscape_state",
+        "command": [
+          "id SERIAL",
+          "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
+          "observation_date DATE",
+          "tree_presence BOOLEAN",
+          "shrub_presence BOOLEAN",
+          "forb_presence BOOLEAN",
+          "grass_presence BOOLEAN",
+          "lichen_moss_presence BOOLEAN",
+          "crop_growth_stage_id INTEGER REFERENCES landscape_utility.crop_growth_stage (id)",
+          "visible_sheet_erosion BOOLEAN",
+          "visible_rill_erosion BOOLEAN",
+          "visible_gully_erosion BOOLEAN",
+          "visible_wind_erosion BOOLEAN",
+          "erosion_conservation_measure_id INTEGER REFERENCES landscape_utility.erosion_conservation_measure",
+          "bedrock_cover_percent SMALLINT",
+          "rock_cover_percent SMALLINT",
+          "stone_cover_percent SMALLINT",
+          "gravel_cover_percent SMALLINT",
+          "UNIQUE (geolocation_id, observation_date)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape",
+        "table": "landscape_geomorphology",
+        "command": [
+          "id SERIAL",
+          "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
+          "observation_date DATE",
+          "slope SMALLINT",
+          "slope_unit INTEGER REFERENCES observation_utility.unit (id)",
+          "aspect SMALLINT",
+          "major_landform_id INTEGER REFERENCES landscape_utility.major_landform (id)",
+          "slope_position_id INTEGER REFERENCES landscape_utility.slope_position (id)",
+          "UNIQUE (geolocation_id,observation_date)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

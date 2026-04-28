@@ -1,0 +1,45 @@
+{
+  "ols": {
+    "hyper_parameters": {
+      "fit_intercept": false
+    }
+  },
+  "theil_sen": {
+    "hyper_parameters": {}
+  },
+  "huber": {
+    "hyper_parameters": {}
+  },
+  "knn": {
+    "hyper_parameters": {}
+  },
+  "dectree": {
+    "hyper_parameters": {}
+  },
+  "svr": {
+    "hyper_parameters": {
+      "kernel": "linear",
+      "C": 1.5,
+      "epsilon": 0.05
+    }
+  },
+  "randfor": {
+    "hyper_parameters": {
+      "n_estimators": 30
+    }
+  },
+  "mlp": {
+    "hyper_parameters": {
+      "hidden_layer_sizes": [
+        100,
+        100
+      ],
+      "max_iter": 200,
+      "tol": 0.001,
+      "epsilon": 1e-8
+    }
+  },
+  "cubist": {
+    "hyper_parameters": {}
+  }
+}

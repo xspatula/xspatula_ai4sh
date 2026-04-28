@@ -1,0 +1,135 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_metabarcoding_pipeline",
+        "min_user_stratum": 4,
+        "title": "Manage eDNA metabarcoding pipeline",
+        "label": "Insert, update or delete eDNA metabarcoding pipeline with extraction, forward amplificatio, reverse amplification, purification and sequencing"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unique name of the meta barcoding pipeline.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "metabarcoding_pipeline",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "extraction_id__extraction_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the DNA/RNA extraction method applied in the metabarcoding pipeline.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "metabarcoding_pipeline",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "forward_amplification_id__amplificaion_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the DNA/RNA forward amplification method applied in the metabarcoding pipeline.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "metabarcoding_pipeline",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "reverse_amplification_id__amplificaion_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the DNA/RNA reverse amplification method applied in the metabarcoding pipeline.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "metabarcoding_pipeline",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "purification_id__purification_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the DNA/RNA purification method applied in the metabarcoding pipeline.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "metabarcoding_pipeline",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "sequencing_id__sequencing_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the DNA/RNA sequencing method applied in the metabarcoding pipeline.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "metabarcoding_pipeline",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the eDNA metabarcoding pipeline.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "metabarcoding_pipeline",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

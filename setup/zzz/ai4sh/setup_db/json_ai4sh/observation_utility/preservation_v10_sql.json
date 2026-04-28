@@ -1,0 +1,48 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "preservation",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "preservation",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "no preservation",
+              "none",
+              "No preservation",
+              "No sample preservation of relevance for observation results"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "project_path": "../ai4sh",
+  "user_project": {
+    "user_id": "thomasg",
+    "user_netrc_id": "thomasg_ai4sh"
+  },
+  "process": [
+    {
+      "execute": true,
+      "verbose": 0,
+      "overwrite": false,
+      "delete": false
+    }
+  ]
+}

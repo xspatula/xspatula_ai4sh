@@ -1,0 +1,51 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "multi_filter_spectra",
+        "min_user_stratum": 3,
+        "title": "Filter spectral data with a multi filter",
+        "label": "Filter spectral data with a multi filter  that applies different filtering along the spectral range: Available filters: moving-average, gauss, savitzky-golay and LOWESS."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
+            },
+            {
+              "parameter": "multi_filter_fp",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "none",
+              "hint": "The multi filter to apply, if set to none, no filter will be applied even if the process is called. You have to define the multi filter to apply and set the relative or absolute path to the multi_filter.JSON file as the parameter."
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "jet",
+              "hint": "Name of the matplotlib colormap to use"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

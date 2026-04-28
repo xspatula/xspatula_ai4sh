@@ -1,0 +1,12 @@
+{
+  "process": [
+    {
+      "process": "manage_geolocation",
+      "parameters": {
+        "name": "eu_europe@43623562",
+        "x_coordinate": 10.6406478949058,
+        "y_coordinate": 55.1658190954057
+      }
+    }
+  ]
+}

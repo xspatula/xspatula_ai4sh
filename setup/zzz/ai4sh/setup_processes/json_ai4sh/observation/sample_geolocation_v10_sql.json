@@ -1,0 +1,162 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_geolocation",
+        "min_user_stratum": 3,
+        "title": "Manage a geolocation",
+        "label": "Insert, update or delete a geolocation"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the geoposition",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            },
+            {
+              "parameter": "x_coordinate",
+              "parameter_type": "float",
+              "required": true,
+              "default_value": 0,
+              "hint": "The geolocation x_coordinate in the spatial reference system.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            },
+            {
+              "parameter": "y_coordinate",
+              "parameter_type": "float",
+              "required": true,
+              "default_value": 0,
+              "hint": "The geolocation y_coordinate in the spatial reference system.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            },
+            {
+              "parameter": "spatial_reference_id__spatial-reference_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "geographic",
+              "hint": "The geolocation y_coordinate in the spatial reference system.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            },
+            {
+              "parameter": "latitude",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0,
+              "hint": "The geolocation latitude in EPSG:4326 (geographic coordinates based on WGS 84)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            },
+            {
+              "parameter": "longitude",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0,
+              "hint": "The geolocation logitude in EPSG:4326 (geographic coordinates based on WGS 84)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "geolocation",
+                "write": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_sample_geotag",
+        "min_user_stratum": 3,
+        "title": "Manage a sample geotag",
+        "label": "Insert, update or delete a sample geotag"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sample_id__sample_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the sample with a geotag",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            },
+            {
+              "parameter": "geolocation_id__geolocation_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": 0,
+              "hint": "The name of the geolocation",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            },
+            {
+              "parameter": "area_coverage",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "The area representing the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            },
+            {
+              "parameter": "area_unit_id__area_unit_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "m^2",
+              "hint": "The unit in which area coverage is stated, default = m2",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_geotag",
+                "write": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

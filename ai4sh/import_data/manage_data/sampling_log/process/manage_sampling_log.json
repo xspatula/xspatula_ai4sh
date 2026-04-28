@@ -1,0 +1,196 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_se_loennstorp",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_se_loennstorp_2024",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20240910,
+        "end_date": 20240913
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_fi_jokioinen",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_fi_jokioinen_2024",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20241008,
+        "end_date": 20241012
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_gr_ktima-gerovassiliou",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_gr_ktima-gerovassiliou_2023",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20231129,
+        "end_date": 20231201
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_gr_zazari",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_gr_zazari_2025",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20251020,
+        "end_date": 20251023
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_hr_neretva",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_hr_neretva_2024",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20241014,
+        "end_date": 20241015
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_nl_boermarke-zeijen",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_nl_boermarke-zeijen_2025",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20250412,
+        "end_date": 20250414
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_dk_foulum",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_dk_foulum_2024",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20241020,
+        "end_date": 20241030
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_es_arkaute",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_es_arkaute_2024",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20241020,
+        "end_date": 20241030
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_gb-eng_woodoaks",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_gb-eng_woodoaks_2025",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20241020,
+        "end_date": 20241030
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_gb-wls_plynlimon",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_gb-wls_plynlimon_2025",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20241020,
+        "end_date": 20241030
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_fr_estrees-mons",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_fr_estrees-mons_2025",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20251020,
+        "end_date": 20251030
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_sampling_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "campaign_id__campaign_name": "ai4sh_ch_lens",
+        "contact_name": "thomasg",
+        "contact_email": "thomas.gumbricht@natgeo.us.se",
+        "name": "ai4sh_ch_lens_2025",
+        "abstract": "AI4SH in-situ sampling",
+        "sampling_tool_array": "spade,auger",
+        "begin_date": 20251020,
+        "end_date": 20251030
+      }
+    }
+  ]
+}

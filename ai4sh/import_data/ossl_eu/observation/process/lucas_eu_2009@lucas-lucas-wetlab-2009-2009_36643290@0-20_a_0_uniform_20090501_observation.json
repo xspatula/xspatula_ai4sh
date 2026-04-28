@@ -1,0 +1,27 @@
+{
+  "process": [
+    {
+      "process": "manage_observation",
+      "parameters": {
+        "observation_log_id__observation_log_name": "lucas_eu_2009@lucas-lucas-wetlab-2009-2009",
+        "sample_id__sample_name": "36643290@0-20",
+        "provision_id__provision_name": "lucas-wetlab-2009",
+        "subsample": "a",
+        "replicate": 0,
+        "observation_date": "20090501",
+        "@ph-h2o": 7.71,
+        "@ph-cacl2": 7.3,
+        "@c-org": 2.88,
+        "@n-tot": 0.26,
+        "@cec": 22.7,
+        "@k-ext": 1.27218783569492,
+        "@p-ext": 28.3,
+        "@clay": 20.0,
+        "@sand": 60.0,
+        "@silt": 20.0,
+        "@caco3": 3.3,
+        "@cf": 8.0
+      }
+    }
+  ]
+}

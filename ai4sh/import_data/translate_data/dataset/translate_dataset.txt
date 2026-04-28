@@ -1,0 +1,30 @@
+###############################################
+############ translate_dataset.txt ############
+##### translates DATA FROM EXCEL TO JSON ######
+###############################################
+
+##### IMPORT OBSERVATION DATA IN THE FOLLOWING ORDER #####
+# 1. Dataset source and persons involved
+# 2. Dataset (name, license, substance, geographic region if applicable)
+# 3. Campaign (name, responsible person, geographic region if applicable)
+# 4. Sampling log (name, responsible person, location site i applicable)
+# 5. Samples (name, position and z-profile if applicable)
+# 6. Observation log (provision for analysis, responsible person)
+# 7. Measurement (observed values)
+
+###=====================================###
+### DATASET SOURCE AND PERSONS INVOLVED ###
+###=====================================###
+
+# Data source, can be either an organisation or a private person
+data_source.json
+
+# Person(s) responsible and involved in data collection and analysis
+person.json
+
+###=========###
+### DATASET ###
+###=========###
+
+# Dataset, umbrella for data observations from a source, usually with a distinct thematic content
+dataset.json

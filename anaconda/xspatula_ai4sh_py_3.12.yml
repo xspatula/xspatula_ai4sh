@@ -1,0 +1,20 @@
+name: xspatula_ai4sh_py_3.12
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy
+  - pandas
+  - openpyxl
+  - matplotlib
+  - pyserial
+  - psycopg2
+  - scipy
+  - python-dotenv
+  - tabulate
+  - pyarrow
+  - matplotlib
+  - scikit-learn
+  - scipy
+  - seaborn

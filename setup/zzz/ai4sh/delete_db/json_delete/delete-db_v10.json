@@ -1,0 +1,12 @@
+{
+  "process": [
+    {
+      "process_id": "delete_database",
+      "overwrite": false,
+      "parameters": {
+        "database": "ai4sh"
+      },
+      "verbose": 2
+    }
+  ]
+}

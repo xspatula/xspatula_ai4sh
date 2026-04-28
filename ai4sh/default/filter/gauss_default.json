@@ -1,0 +1,6 @@
+{
+  "gauss": {
+    "sigma": 2,
+    "mode": "nearest"
+  }
+}

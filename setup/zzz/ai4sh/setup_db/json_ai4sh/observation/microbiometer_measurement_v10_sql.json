@@ -1,0 +1,24 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "microbiometer_measurement",
+        "command": [
+          "id SERIAL",
+          "observation_id INTEGER REFERENCES observation.observation (id) UNIQUE",
+          "microbiometer_version_id SMALLINT REFERENCES observation_utility.microbiometer_version (id)",
+          "carbon_content FLOAT",
+          "carbon_content_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "fungi FLOAT",
+          "bacteria FLOAT",
+          "fungi_bacteria_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

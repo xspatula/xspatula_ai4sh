@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "taxa",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "latin_name TEXT UNIQUE",
+          "taxa_level_id INTEGER REFERENCES observation_utility.taxa_level (id)",
+          "taxa_status_id INTEGER REFERENCES observation_utility.taxa_status (id)",
+          "replacement_taxa_id INTEGER",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

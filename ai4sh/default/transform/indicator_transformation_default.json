@@ -1,0 +1,340 @@
+{
+  "transformation": {
+    "caco3": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "carbonate": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "cec": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "cation exchange capacity": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "cf": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "coarse fraction": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "clay": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "clay (<0.002 mm)": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "ec": {
+      "log": true,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "electrical conductivity": {
+      "log": true,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "k-ext": {
+      "log": true,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "extractable pottassium": {
+      "log": true,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "n-tot": {
+      "log": true,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "total nitrogen": {
+      "log": true,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "c-org": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "organic carbon": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "p-ext": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "extractable phosphorus": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "ph-cacl2": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "ph-calcium-chloride": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "ph-h2o": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "ph-water": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "sand": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "sand (0.06-2.0 mm)": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "silt": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "silt (0.002-0.06 mm)": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "coarse sand": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "coarse sand (0.2 - 2.0 mm)": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "fine sand": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "fine sand (0.06-0.2 mm)": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "coarse silt": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "coarse silt (0.02-0.06 mm)": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "fine silt": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "fine silt (0.002-0.02 mm)": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "ca2+": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "calcium ion": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "k+": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "potassium ion": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "na+": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "sodium ion": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "mg2+": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "magnesium ion": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    }
+  }
+}

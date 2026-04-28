@@ -1,0 +1,83 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_spatial_reference",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "local",
+        "alias": "arbitrary",
+        "display_name": "local",
+        "epsg": "xy_",
+        "abstract": "undefined local system"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_spatial_reference",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "xy coordinates in mm",
+        "alias": "xy mm",
+        "display_name": "xy coordinates in mm",
+        "epsg": "xy_mm",
+        "abstract": "x and y coordinates in mm"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_spatial_reference",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "xy coordinates in cm",
+        "alias": "xy cm",
+        "display_name": "xy coordinates in cm",
+        "epsg": "xy_cm",
+        "abstract": "x and y coordinates in cm"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_spatial_reference",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "xy coordinates in dm",
+        "alias": "xy dm",
+        "display_name": "xy coordinates in dm",
+        "epsg": "xy_dm",
+        "abstract": "x and y coordinates in dm"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_spatial_reference",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "xy coordinates in m",
+        "alias": "xy m",
+        "display_name": "xy coordinates in m",
+        "epsg": "xy_m",
+        "abstract": "x and y coordinates in m"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_spatial_reference",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "geographic",
+        "alias": "wgs84",
+        "display_name": "geographic",
+        "epsg": "epsg:4326",
+        "url": "https://spatialreference.org/ref/epsg/4326/",
+        "abstract": "+proj=longlat +datum=WGS84 +no_defs +type=crs"
+      }
+    }
+  ]
+}

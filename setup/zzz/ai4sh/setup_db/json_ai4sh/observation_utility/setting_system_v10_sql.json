@@ -1,0 +1,47 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "setting_system",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "abstract TEXT",
+          "display_name TEXT",
+          "reference TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "setting_system",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "no setting",
+              "No setting",
+              "No spatial setting of relevance for observation results."
+            ]
+          ]
+        }
+      }
+    }
+
+  ]
+}

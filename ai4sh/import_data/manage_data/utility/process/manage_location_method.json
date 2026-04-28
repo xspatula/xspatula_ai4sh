@@ -1,0 +1,28 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_location_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "global positioning system",
+        "alias": "gps",
+        "display_name": "GPS",
+        "abstract": "Global Positioning System (GPS) localisation"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_location_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "map",
+        "alias": "map",
+        "display_name": "map",
+        "abstract": "Traditional map localisation"
+      }
+    }
+  ]
+}

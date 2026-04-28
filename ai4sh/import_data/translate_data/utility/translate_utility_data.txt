@@ -1,0 +1,245 @@
+###############################################
+###### translate_utility_data.txt ######
+##### translates DATA FROM EXCEL TO JSON ######
+###############################################
+
+##### IMPORT BASIC INDEPENDENT UTILITY DATA #####
+##### MUST BE DONE BEFORE THE DEPENDENT DATA WITH FOREIGN KEYS #####
+
+# TG TODO skippa na for None i alla
+
+###===================###
+### GENERAL UTILITIES ###
+###===================###
+
+# Territory for source, person, dataset, campaign, sampling_log.
+# You can add territory in territory.xls and rerun this translation.
+territory.json
+
+###===========================================###
+### OBSERVATION UTILITIES ###
+###===========================================###
+#!!!!! observation utilities contain all catalogues required for adding observation related data.
+#!!!!! Do not change order of translations as some catalogues have foreign keys for others
+
+#===========================================#
+#==== Observation utilities without foreign key dependencies (but all are foreign keys for other tables) ====#
+#===========================================#
+
+# Analysis method must be defined in the database in order for registering an observation done with that particular method.
+# You can add more methods in analysis_method.xls and rerun this translation.
+analysis_method.json
+
+# Apparatus is a very generalised description of anything that can deliver data.
+# You can add apparatus in apparatus.xls and rerun this translation.
+apparatus.json
+
+# Classification order is the most general level of thematic feature definition
+# The order "unknown" is predefined and can be used for any sample, but you can then not use Xspatula for analysis and modelling.
+# When a classification order is added, the same feature is copied down the classification tree -> family -> genus --> species.
+# You can add classification order in classification_order.xls and rerun this translation.
+classification_order.json
+
+# TG TODO Image does not exists
+
+# License to attach to either dataset or campaign
+# You can add a license in license.xls and rerun this translation.
+license.json
+
+# Location method for determining geolocation
+# You can add a location method in location_method.xls and rerun this translation.
+location_method.json
+
+# TG TODO
+# -macrofauna_extraction_method,
+# -life_cycle_stage
+
+# Method tier is the level of professionality.
+# You can add method tiers method in method_tier.xls and rerun this translation.
+method_tier.json
+
+# TG TODO
+# Micobiometer kit version.
+# microbiometer_version.json
+
+# TG TODO
+# Monolith extraction method (e.g. block of soil, sediment or ice-core).
+#monolith_extraction.json
+
+# Preparation method prior to sample analysis (that is not part of a standard method itself).
+# You can add preparation methods in preparation.xls and rerun this translation.
+preparation.json
+
+# Preservation method for acquired samples (e.g. cold, frozen, shield substance).
+# You can add preparation methods in preparation.xls and rerun this translation.
+preservation.json
+
+# Provider can be any tool, instrument, sensing or service (laboratory) etc providing observation results.
+# For e.g. laboratories that can provide a multitude of observations you need to specify the lab as a provider for your particular project and then list the actual observations acquired from that lab under provisions.
+# You can add providers in provider.xls and rerun this translation.
+provider.json
+
+# # Quantity - unambiguous definition of the quantitates that observation values represent.
+# You can add quantitates in quantity.xls and rerun this translation.
+quantity.json
+
+# TG TODO
+# Reference proprietor - any source of external archive or library used for deriving observation values
+# You can add reference proprietor in reference_proprietor.xls and rerun this translation.
+#reference_proprietor.json
+
+# Setting system for defining local juxtapositions.
+# Where system is a thematic frame for defining specific juxtapositions (e.g. for fields, forests, lakes etc).
+# You can add setting systems in setting_system.xls and rerun this translation.
+setting_system.json
+
+# TG TODO
+# Soil horizon for defining scientific soil horizons.
+
+# TG TODO
+# Sound includes tables for:
+# -sound_setup,
+# -sound_mic.
+
+# Spatial reference systems used for geolocation, mainly based on EPSG standard codes.
+# You can add spatial reference systems in spatial_reference.xls and rerun this translation.
+spatial_reference.json
+
+# TG TODO
+# Spectroscopy method for defining type of spectral analysis.
+# You can add spectroscopy methods systems in spectroscopy_method.xls and rerun this translation.
+#spectroscopy_method.json
+
+# Storage method for acquired samples before analysis.
+# You can add storage methods in storage.xls and rerun this translation.
+storage.json
+
+# TG TODO
+# Taxa levels in the Linnean classification system.
+# Taxa status to handle outdated and redundant taxa definitions.
+
+# Transportation method/conditions for acquired samples before analysis (e.g. cold, frozen).
+# You can add transportation methods in transportation.xls and rerun this translation.
+transportation.json
+
+# Unit of reported observation value.
+# You can add units in unit.xls and rerun this translation.
+unit.json
+
+#===========================================#
+#==== Observation utilities dependent on foreign keys in other observation utilities ====#
+#===========================================#
+
+# TG TODO
+# Analysis method translate for converting analysis results between comparable methods.
+
+# Classification family is the second level of thematic feature definition
+# The family "unknown" is predefined and can be used for any sample, but you can then not use Xspatula for analysis and modelling.
+# When a classification family is added, the same feature is copied down the classification tree  -> genus --> species.
+# require: classification_order.
+# You can add classification family in classification_family.xls and rerun this translation.
+classification_family.json
+
+# Classification genus is the third level of thematic feature definition
+# The genus "unknown" is predefined and can be used for any sample, but you can then not use Xspatula for analysis and modelling.
+# When a classification genus is added, the same feature is copied to classification species.
+# require: classification_family.
+# You can add classification genus in classification_genus.xls and rerun this translation.
+classification_genus.json
+
+# Classification species is the most details level of thematic feature definition
+# The species "unknown" is predefined and can be used for any sample, but you can then not use Xspatula for analysis and modelling.
+# require: classification_genus.
+# You can add classification species in classification_species.xls and rerun this translation.
+# TG TODO species does not yet exist
+#classification_species.json
+
+# Indicators refine quantitates to more detailed definitions that are then used for reporting observation values.
+# require: quantity.
+# You can add indicators in indicator.xls and rerun this translation.
+indicator.json
+
+# Juxtaposition is the thematic local setting of a sample (e.g. in a field, forest, lake etc).
+# require: setting_system.
+# You can add juxtaposition in juxtaposition.xls and rerun this translation.
+juxtaposition.json
+
+# Profiling for samples with z-dimension (e.g. soil, sediment or ice cores).
+# require: unit.
+# You can add profiling in profiling.xls and rerun this translation.
+profiling.json
+
+# Provision combines an apparatus, a provider and a method_tier - it is a prerequisite for defining the indicators obtained from an observation.
+# require: apparatus, provider, method_tier.
+# You can add provisions in provision.xls and rerun this translation.
+provision.json
+
+# Provision indicator links observation values delivered by a specific provision to quantities and an indicators.
+# require: provision, indicator, method, unit.
+# You can add provision indicators in provision_indicator.xls and rerun this translation.
+provision_indicator.json
+
+# TG TODO
+# Provision serial number can be used for e.g. comparing individual instruments.
+# require: provision
+# You can add provision indicators in provision_indicator.xls and rerun this translation.
+provision_serial_nr.json
+
+# TG TODO
+# Quantity default unit is the default unit for a particular quantity and species, with the option of setting a metric (default) or imperial system.
+# require: quantity, species, unit.
+# You can add quantity default units in quantity_default_unit.xls and rerun this translation.
+#quantity_default_unit.json
+
+# TG TODO
+# Taxa defines arbitrary taxa with its Linnean classification level
+# require: taxa_level, taxa_status
+
+# TG TODO
+# Taxa function defines ecosystem functions related to a taxa
+# require: taxa_level, taxa_status.
+
+#TG TODO
+# Unit translate defines the mathematical translation between different units.
+# require: unit.
+# You can add unit translations in unit_translate.xls and rerun this translation.
+#unit_translate.json
+
+#=======================================#
+#====== Dataset generic utilities ======#
+#==== Required dependent on dataset ====#
+#=======================================#
+#!!!!! Before you can add datasets, campaigns, sampling and observation logs, observation and measured vales,
+# you have to make sure that all relevant utility data is defined.
+
+###===========================================###
+### LANDSCAPE UTILITIES ###
+###===========================================###
+
+# TG TODO
+# Crop growth stage
+#crop_growth_stage.json
+
+
+# TG TODO
+# cultivation species
+# ersosions_conservation_measures
+# ground conditions
+# major_landform
+# sky_conditions
+# slope_position
+# field_preparation
+
+###=================###
+### EDNA UTILITIES ###
+###=================###
+# metabarcoding_amplification
+# metabarcoding_bioinformatics
+# metabarcoding_extraction
+# metabarcoding_purification
+# metabarcoding_sequencing_data_requirements
+
+# metabarcoding_platform
+# metabarcoding_strategy
+### DEPENDENT
+# metabarcoding_pipeline

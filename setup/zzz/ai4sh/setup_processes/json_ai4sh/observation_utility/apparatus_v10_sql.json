@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_apparatus",
+        "min_user_stratum": 4,
+        "title": "Manage apparatus type",
+        "label": "Insert, update or delete a generic apparatus type used for observing properties"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Generic name of the apparatus (can be anything from a home made tool, via any type of instrument, to a type of laboratory or even a chain of laboratory analysis)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "apparatus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Common language or thematic jargon that unequivocal identifies the apparatus (e.g. wetlab for traditional wet chemicophysical laboratory)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "apparatus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the apparatus.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "apparatus",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the apparatus in layperson terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "apparatus",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

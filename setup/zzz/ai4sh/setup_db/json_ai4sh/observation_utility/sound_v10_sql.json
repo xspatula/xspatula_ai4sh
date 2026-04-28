@@ -1,0 +1,81 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "sound_mic",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "url TEXT",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "sound_mic",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "Not known",
+              "Unknown microphone"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "sound_setup",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "sound_setup",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "Not known",
+              "Unknown microphone setup"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

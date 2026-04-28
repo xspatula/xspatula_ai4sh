@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "quantity_default_unit",
+        "command": [
+          "id SERIAL",
+          "quantity_id INTEGER REFERENCES observation_utility.quantity (id)",
+          "species_id INTEGER REFERENCES observation_utility.species (id)",
+          "unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "system TEXT DEFAULT 'metric'",
+          "UNIQUE (quantity_id, species_id, system)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

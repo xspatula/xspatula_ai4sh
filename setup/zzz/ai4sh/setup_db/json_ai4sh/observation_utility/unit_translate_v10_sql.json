@@ -1,0 +1,24 @@
+{
+  "process": [
+
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "unit_translate",
+        "command": [
+          "id SERIAL",
+          "src_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "dst_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "factor REAL",
+          "addon REAL",
+          "exponent REAL DEFAULT 1",
+          "UNIQUE (src_unit_id, dst_unit_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

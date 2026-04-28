@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process": "add_root_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "title": "Manage table data",
+        "label": "Root for processes for insterting, updating and deleting table table "
+      }
+    },
+    {
+      "process": "add_root_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "translate_data",
+        "title": "Translate data",
+        "label": "Root for processes translating data between different formats - note that translate data processes does not affect the database, it prepares data in different formats to be handled by other processes."
+      }
+    }
+  ]
+}

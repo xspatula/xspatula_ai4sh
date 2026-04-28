@@ -1,0 +1,181 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "root_process",
+        "command": [
+          "id SERIAL",
+          "root_process TEXT UNIQUE",
+          "title TEXT",
+          "label TEXT",
+          "creator TEXT REFERENCES community.user (user_name)",
+          "create_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process",
+        "command": [
+          "id SERIAL",
+          "root_process TEXT REFERENCES process.root_process (root_process)",
+          "process TEXT UNIQUE",
+          "min_user_stratum SMALLINT NOT NULL DEFAULT 5",
+          "title TEXT",
+          "label TEXT",
+          "creator TEXT REFERENCES community.user (user_name)",
+          "create_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter",
+        "command": [
+          "id SERIAL",
+          "process TEXT REFERENCES process.process (process)",
+          "parent TEXT",
+          "element TEXT",
+          "parameter TEXT",
+          "parameter_type TEXT NOT NULL",
+          "required BOOLEAN NOT NULL DEFAULT False",
+          "default_value TEXT",
+          "hint TEXT",
+          "UNIQUE (process,parent,element,parameter)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_set_value",
+        "command": [
+          "id SERIAL",
+          "process TEXT REFERENCES process.process (process)",
+          "parent TEXT",
+          "element TEXT",
+          "parameter TEXT",
+          "value TEXT",
+          "label TEXT",
+          "UNIQUE (process,parent,element,parameter,value)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_minmax",
+        "command": [
+          "id SERIAL",
+          "process TEXT REFERENCES process.process (process)",
+          "parent TEXT",
+          "element TEXT",
+          "parameter TEXT",
+          "minval REAL NOT NULL",
+          "maxval REAL NOT NULL",
+          "UNIQUE (process, parent,element,parameter)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_schema_table",
+        "command": [
+          "id SERIAL",
+          "process TEXT REFERENCES process.process (process)",
+          "parameter TEXT NOT NULL",
+          "in_schema TEXT NOT NULL",
+          "in_table TEXT NOT NULL",
+          "write BOOLEAN NOT NULL DEFAULT False",
+          "UNIQUE (process, parameter)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_permission",
+        "command": [
+          "id SERIAL",
+          "process TEXT REFERENCES process.process (process)",
+          "parameter TEXT NOT NULL",
+          "column_update BOOLEAN",
+          "column_delete BOOLEAN",
+          "UNIQUE (process, parameter)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_inherit",
+        "command": [
+          "id SERIAL",
+          "process TEXT REFERENCES process.process (process)",
+          "parameter TEXT NOT NULL",
+          "process_parameter TEXT",
+          "src_schema TEXT",
+          "src_table TEXT",
+          "src_column TEXT",
+          "search_column TEXT",
+          "search_object TEXT",
+          "UNIQUE (process, parameter)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_auto_name",
+        "command": [
+          "id SERIAL",
+          "process TEXT REFERENCES process.process (process)",
+          "parameter TEXT NOT NULL",
+          "concat TEXT NOT NULL",
+          "UNIQUE (process, parameter)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "community",
+        "table": "user_categories",
+        "command": [
+          "stratum_code SMALLINT DEFAULT 1",
+          "title VARCHAR",
+          "label VARCHAR",
+          "max_campaign SMALLINT DEFAULT 1",
+          "max_sampling_log SMALLINT DEFAULT 1",
+          "max_observation_log SMALLINT DEFAULT 2",
+          "max_sample INTEGER DEFAULT 24",
+          "max_spectra INTEGER DEFAULT 96",
+          "max_measurement INTEGER DEFAULT 96",
+          "max_preprocessing_step SMALLINT DEFAULT 2",
+          "max_stored_preprocessing SMALLINT DEFAULT 1",
+          "max_ml_model_test SMALLINT DEFAULT 1",
+          "max_stored_ml_model SMALLINT DEFAULT 1",
+          "hyperparameterisation_level SMALLINT DEFAULT 1",
+          "ml_model_access_level SMALLINT DEFAULT 1",
+          "max_MB SMALLINT DEFAULT 1",
+          "PRIMARY KEY (stratum_code)"
+        ]
+      }
+    }
+  ]
+}

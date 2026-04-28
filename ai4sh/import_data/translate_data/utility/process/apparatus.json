@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "process": "translate_tabular_data",
+      "overwrite": false,
+      "parameters": {
+        "process": "manage_apparatus",
+        "tabular_data_path": "../../../excel_src_data/observation_utility/apparatus.xlsx",
+        "dst_path": "../../../manage_data/utility/process"
+      }
+    }
+  ]
+}

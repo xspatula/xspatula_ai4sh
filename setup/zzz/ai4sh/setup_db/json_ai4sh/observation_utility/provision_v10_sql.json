@@ -1,0 +1,141 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "provision",
+        "command": [
+          "id SERIAL",
+          "apparatus_id INTEGER REFERENCES observation_utility.apparatus (id)",
+          "provider_id INTEGER REFERENCES observation_utility.provider (id)",
+          "method_tier_id INTEGER REFERENCES observation_utility.method_tier (id)",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "url TEXT",
+          "abstract TEXT",
+          "contact_name VARCHAR",
+          "contact_email VARCHAR",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "provision",
+        "command": {
+          "columns": [
+            "id",
+            "provider_id",
+            "apparatus_id",
+            "method_tier_id",
+            "name",
+            "alias",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "0",
+              "0",
+              "0",
+              "unknown",
+              "none",
+              "Unknown",
+              "Unknown or undisclosed provision."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "provision_method_tier",
+        "command": [
+          "id SERIAL",
+          "provision_id INTEGER REFERENCES observation_utility.provision (id)",
+          "field BOOLEAN DEFAULT FALSE",
+          "home BOOLEAN DEFAULT FALSE",
+          "laboratory BOOLEAN DEFAULT FALSE",
+          "drone BOOLEAN DEFAULT FALSE",
+          "satellite BOOLEAN DEFAULT FALSE",
+          "document BOOLEAN DEFAULT FALSE",
+          "senses BOOLEAN DEFAULT FALSE",
+          "auxiliary BOOLEAN DEFAULT FALSE",
+          "UNIQUE (provision_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "provision_serial_nr",
+        "command": [
+          "id SERIAL",
+          "provision_id INTEGER REFERENCES observation_utility.provision (id)",
+          "serial_nr TEXT",
+          "UNIQUE (provision_id,serial_nr)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "provision_serial_nr",
+        "command": {
+          "columns": [
+            "id",
+            "provision_id",
+            "serial_nr"
+          ],
+          "values": [
+            [
+              "0",
+              "0",
+              "0"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "provision_calibration",
+        "command": [
+          "id SERIAL",
+          "provision_id INTEGER REFERENCES observation_utility.provision (id)",
+          "provision_serial_nr_id  INTEGER REFERENCES observation_utility.provision_serial_nr (id) DEFAULT 0",
+          "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
+          "gain REAL",
+          "add REAL",
+          "UNIQUE (provision_id,provision_serial_nr_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

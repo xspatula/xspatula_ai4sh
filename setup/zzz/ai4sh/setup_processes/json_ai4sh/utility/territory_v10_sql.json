@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_territory",
+        "min_user_stratum": 5,
+        "title": "Manage territory",
+        "label": "Insert, update or delete a territory, default is to use iso 3166 naming convention and abbreviations."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Territory name",
+              "schema_table": {
+                "schema": "utility",
+                "table": "territory",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Territory name to display",
+              "schema_table": {
+                "schema": "utility",
+                "table": "territory",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "iso_code_a2",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The 2 letter country code, or other accepted 2 letter code (EU for Europe).",
+              "schema_table": {
+                "schema": "utility",
+                "table": "territory",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "iso_code_a2_ext",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the transport method in layperson terms",
+              "schema_table": {
+                "schema": "utility",
+                "table": "territory",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

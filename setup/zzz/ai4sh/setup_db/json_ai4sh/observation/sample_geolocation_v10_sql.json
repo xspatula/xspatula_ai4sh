@@ -1,0 +1,46 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "geolocation",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "x_coordinate REAL",
+          "y_coordinate REAL",
+          "spatial_reference_id INTEGER REFERENCES observation_utility.spatial_reference (id)",
+          "elevation REAL",
+          "elevation_unit INTEGER REFERENCES observation_utility.unit (id)",
+          "latitude REAL",
+          "longitude REAL",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "geolocation",
+        "command": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "values": [
+            [
+              "0",
+              "None"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_setting_system",
+        "min_user_stratum": 4,
+        "title": "Manage setting system category",
+        "label": "Insert, update or delete a setting system category for defining the local juxtaposition of samples taken from both natural/manmade environments (e.g. agriculture, forest) or from defined segments of any other object (e.g. arm, leg)."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Generic name of the setting category",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "setting_system",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name for the setting category.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "setting_system",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the setting category in layperson terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "setting_system",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "reference",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Scientific reference to the setting category.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "setting_system",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "spatial_reference",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "epsg TEXT UNIQUE",
+          "url TEXT",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "spatial_reference",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "display_name",
+            "epsg",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "unknown",
+              "none",
+              "Unknown",
+              "None",
+              "Unknown or undisclosed spatial reference system."
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

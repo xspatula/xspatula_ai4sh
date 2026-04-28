@@ -1,0 +1,10 @@
+{
+  "process": [
+    {
+      "process": "manage_geolocation",
+      "parameters": {
+        "name": "fi_jokioinen@25-r"
+      }
+    }
+  ]
+}

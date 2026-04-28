@@ -1,0 +1,103 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_license",
+        "min_user_stratum": 4,
+        "title": "Manage standard license record",
+        "label": "Insert, update or delete an existing standard license agreement for sharing and using data. The license added must be available as a url or doi. No license is available by default."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Well known, official name of the licence",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "license",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abbreviation or other term commonly used to denote this license agreement (e.g. MIT).",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "license",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Dipslayy name for the license (e.g. MIT).",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "license",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The url where the full license is available",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "license",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "doi",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "DOI of the license, if available",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "license",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

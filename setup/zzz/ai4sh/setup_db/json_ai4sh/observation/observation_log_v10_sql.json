@@ -1,0 +1,83 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "observation_log",
+        "command": [
+          "id SERIAL",
+          "sampling_log_id INTEGER REFERENCES observation.sampling_log (id)",
+          "provision_id INTEGER REFERENCES observation_utility.provision (id)",
+          "contact_name VARCHAR",
+          "contact_email VARCHAR",
+          "name TEXT",
+          "abstract TEXT",
+          "time_series BOOLEAN DEFAULT FALSE",
+          "last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "UNIQUE (sampling_log_id, name)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "observation_log_meta",
+        "command": [
+          "id SERIAL",
+          "observation_log_id INTEGER REFERENCES observation.observation_log (id)",
+          "preparation_id INTEGER REFERENCES observation_utility.preparation (id)",
+          "preservation_id INTEGER REFERENCES observation_utility.preservation (id)",
+          "storage_id INTEGER REFERENCES observation_utility.storage (id)",
+          "transportation_id INTEGER REFERENCES observation_utility.transportation (id)",
+          "transportation_duration_h INTEGER",
+          "UNIQUE (observation_log_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "observation_log_method_tier",
+        "command": [
+          "observation_log_id INTEGER REFERENCES observation.observation_log (id)",
+          "field BOOLEAN DEFAULT FALSE",
+          "home BOOLEAN DEFAULT FALSE",
+          "laboratory BOOLEAN DEFAULT FALSE",
+          "drone BOOLEAN DEFAULT FALSE",
+          "satellite BOOLEAN DEFAULT FALSE",
+          "document BOOLEAN DEFAULT FALSE",
+          "senses BOOLEAN DEFAULT FALSE",
+          "auxiliary BOOLEAN DEFAULT FALSE",
+          "PRIMARY KEY (observation_log_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "observation_log_provision",
+        "command": [
+          "id SERIAL",
+          "observation_log_id INTEGER REFERENCES observation.observation_log (id)",
+          "provision_id INTEGER REFERENCES observation_utility.provision (id)",
+          "UNIQUE (observation_log_id, provision_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

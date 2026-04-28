@@ -1,0 +1,8 @@
+############################################
+##### XSPATULA ADD SAMPLING_LOG #####
+############################################
+ai4sh_dk_foulum_2024_sampling_log.json
+ai4sh_fi_jokioinen_2024_sampling_log.json
+ai4sh_hr_neretva_2024_sampling_log.json
+ai4sh_nl_boermarke-zeijen_2025_sampling_log.json
+ai4sh_se_loennstorp_2024_sampling_log.json

@@ -1,0 +1,163 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "juxtaposition",
+        "command": [
+          "id SERIAL",
+          "setting_system_id INTEGER REFERENCES observation_utility.setting_system (id)",
+          "name TEXT",
+          "abstract TEXT",
+          "display_name TEXT",
+          "UNIQUE (setting_system_id, name)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "juxtaposition",
+        "command": {
+          "columns": [
+            "id",
+            "setting_system_id",
+            "name",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "0",
+              "no juxtaposition",
+              "no juxtaposition",
+              "No spatial juxtaposition of relevance for observation results."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "composition",
+        "command": [
+          "id SERIAL",
+          "name TEXT",
+          "abstract TEXT",
+          "display_name TEXT",
+          "UNIQUE (name)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "composition",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "unknown",
+              "Unknown composition",
+              "Unknown if the sample is an individual or composite sample."
+            ],
+            [
+              "1",
+              "individual",
+              "Individual sample",
+              "Individual sample."
+            ],
+            [
+              "2",
+              "composite",
+              "Composite sample",
+              "Composite sample collected from several subsamples."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "proximity",
+        "command": [
+          "id SERIAL",
+          "name TEXT",
+          "abstract TEXT",
+          "display_name TEXT",
+          "UNIQUE (name)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "proximity",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "unknown",
+              "Unknown proximity",
+              "Unknown if the sample is from the geometric center or periphery."
+            ],
+            [
+              "1",
+              "central",
+              "Geometric central sample",
+              "Sample representing the geometric center of the observed object."
+            ],
+            [
+              "2",
+              "peripheral",
+              "Geometric peripheral sample",
+              "Sample representing the geometric periphery of the observed object."
+            ],
+            [
+              "3",
+              "general",
+              "Geometric general sample",
+              "Sample representing both geometric center and periphery."
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

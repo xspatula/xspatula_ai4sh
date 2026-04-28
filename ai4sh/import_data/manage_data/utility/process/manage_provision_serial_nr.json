@@ -1,0 +1,74 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_provision_serial_nr",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "provision_id__provision_name": "xspectre npkphcth-s",
+        "serial_nr": "x0001"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_provision_serial_nr",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "provision_id__provision_name": "xspectre npkphcth-s",
+        "serial_nr": "x0002"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_provision_serial_nr",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "provision_id__provision_name": "xspectre npkphcth-s",
+        "serial_nr": "x0003"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_provision_serial_nr",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "provision_id__provision_name": "xspectre npkphcth-s",
+        "serial_nr": "x0004"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_provision_serial_nr",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "provision_id__provision_name": "foss ds2500 l",
+        "serial_nr": "au"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_provision_serial_nr",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "provision_id__provision_name": "neospectra",
+        "serial_nr": "neoscanner_23040128"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_provision_serial_nr",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "provision_id__provision_name": "neospectra",
+        "serial_nr": "neoscanner_auth"
+      }
+    }
+  ]
+}

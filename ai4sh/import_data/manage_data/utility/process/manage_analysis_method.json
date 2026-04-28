@@ -1,0 +1,646 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "reflectance",
+        "display_name": "Reflectance",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "none"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda_caco3",
+        "display_name": "CaCO<sub>3</sub> (USDA)",
+        "standard_schema": "usda",
+        "standard_code": "a54",
+        "url": "none",
+        "abstract": "volumetric method, standard method, sample sieved<2mm base "
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "caco3 iso 10693:1994",
+        "display_name": "CaCO<sub>3</sub> iso 10693:1994",
+        "standard_schema": "iso",
+        "standard_code": "10693:1994",
+        "url": "none",
+        "abstract": "volumetric method, standard method, sample sieved<2mm base "
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda_a273",
+        "display_name": "usda_a273",
+        "standard_schema": "usda",
+        "standard_code": "a273",
+        "url": "none",
+        "abstract": "Barium chloride (0.1 M) buffered solution, acid treatment, measurement of CO2 evolution, sample sieved<2mm base"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "cec iso 11260:1994",
+        "display_name": "cec iso 11260:1994",
+        "standard_schema": "iso",
+        "standard_code": "11260:1994",
+        "url": "none",
+        "abstract": "Barium chloride (0.1 M) buffered solution, acid treatment, measurement of CO2 evolution, sample sieved<2mm base"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda_cf",
+        "display_name": "usda_cf",
+        "standard_schema": "usda",
+        "standard_code": "c236",
+        "url": "none",
+        "abstract": "Dry sieving"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "cf iso 11464:2006",
+        "display_name": "cf iso 11464:2006",
+        "standard_schema": "iso",
+        "standard_code": "11464:2006",
+        "url": "none",
+        "abstract": "Dry sieving"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda_clay",
+        "display_name": "usda_clay",
+        "standard_schema": "usda",
+        "standard_code": "a334",
+        "url": "none",
+        "abstract": "Total clay is the soil separate with <0.002 mm particle diameter. Clay size carbonate is included. It is reported on a <2 mm base."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "clay iso 13320:2009",
+        "display_name": "clay iso 13320:2009",
+        "standard_schema": "iso",
+        "standard_code": "13320:2009",
+        "url": "none",
+        "abstract": "Laser diffraction, sample sieved<2 mm base"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda_ec",
+        "display_name": "usda_ec",
+        "standard_schema": "usda",
+        "standard_code": "a364",
+        "url": "none",
+        "abstract": "Electrical conductivity. It is reported of a 1:2 soil:water mixture."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "ec iso 11265:1994",
+        "display_name": "ec iso 11265:1994",
+        "standard_schema": "iso",
+        "standard_code": "11265:1994",
+        "url": "none",
+        "abstract": "Extraction with a barium chloride solution buffered at pH 8.2 and ICP-OES (Inductively Coupled Plasma Optical Emission Spectrometry)"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda_k-ext",
+        "display_name": "usda_k-ext",
+        "standard_schema": "usda",
+        "standard_code": "a725",
+        "url": "none",
+        "abstract": "Potassium, Extractable, NH4OAc, 2M KCl displacement"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda-nrcs 2004 k.ext",
+        "display_name": "USDA k.ext",
+        "standard_schema": "usda",
+        "standard_code": "usda-nrcs 2004 k.ext",
+        "url": "none",
+        "abstract": "Atomic absorption spectrometry after extraction with NH\u2084OAc"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "k-ext iso 11885:2007",
+        "display_name": "K-ext iso 11885:2007",
+        "standard_schema": "iso",
+        "standard_code": "11885:2007",
+        "url": "none"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda_n-tot",
+        "display_name": "usda_n-tot",
+        "standard_schema": "usda",
+        "standard_code": "a263",
+        "url": "none",
+        "abstract": "Total nitrogen is a measure of all organic and inorganic nitrogen."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "n-tot iso 11261:1995",
+        "display_name": "n-tot iso 11261:1995",
+        "standard_schema": "iso",
+        "standard_code": "11261:1995",
+        "url": "none",
+        "abstract": "Modified Kjeldahl method, which measures total nitrogen including organic N, ammonium-N, nitrate-N, and nitrite-N"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "n-tot iso 13878:1998",
+        "display_name": "n-tot iso 13878:1998",
+        "standard_schema": "iso",
+        "standard_code": "13878:1998",
+        "url": "none",
+        "abstract": "Dry combustion, Dumas method"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "c-org iso 10694:1995",
+        "display_name": "c-org iso 10694:1995",
+        "standard_schema": "iso",
+        "standard_code": "10694:1995",
+        "url": "none",
+        "abstract": "Dry combustion, Dumas method"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "ca2+ iso 11260:2018",
+        "display_name": "ca2+ iso 11260:2018",
+        "standard_schema": "iso",
+        "standard_code": "11260:2018",
+        "url": "none",
+        "abstract": "Barium chloride (BaCl2) extraction"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "mg2+ iso 11260:2018",
+        "display_name": "mg2+ iso 11260:2018",
+        "standard_schema": "iso",
+        "standard_code": "11260:2019",
+        "url": "none",
+        "abstract": "Barium chloride (BaCl2) extraction"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "k+ iso 11260:2018",
+        "display_name": "k+ iso 11260:2018",
+        "standard_schema": "iso",
+        "standard_code": "11260:2020",
+        "url": "none",
+        "abstract": "Barium chloride (BaCl2) extraction"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "na+ iso 11260:2018",
+        "display_name": "na+ iso 11260:2018",
+        "standard_schema": "iso",
+        "standard_code": "11260:2021",
+        "url": "none",
+        "abstract": "Barium chloride (BaCl2) extraction"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda_soc",
+        "display_name": "usda_soc",
+        "standard_schema": "usda",
+        "standard_code": "c729",
+        "url": "none",
+        "abstract": "Total C without CaCO3, S prep."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "p-ext iso 11263:1994",
+        "display_name": "p-ext iso 11263:1994",
+        "standard_schema": "iso",
+        "standard_code": "11263:1994",
+        "url": "none",
+        "abstract": "0.5 M bicarbonate extraction and spectroscopy (Olsen method)"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda_p-ext",
+        "display_name": "usda_p-ext",
+        "standard_schema": "usda",
+        "standard_code": "a274",
+        "url": "none",
+        "abstract": "Olsen method"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "iso ph 10390:2005",
+        "display_name": "iso ph 10390:2005",
+        "standard_schema": "iso",
+        "standard_code": "10390:2005",
+        "url": "none",
+        "abstract": "0.01 M CaCl2 at a 1:2 soil:solution ratio"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "usda_ph-cacl2",
+        "display_name": "usda_ph-cacl2",
+        "standard_schema": "usda",
+        "standard_code": "a481",
+        "url": "none",
+        "abstract": "0.01 M CaCl2 at a 1:2 soil:solution ratio"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "iso sand 13320:2009",
+        "display_name": "iso sand 13320:2009",
+        "standard_schema": "iso",
+        "standard_code": "13320:2009",
+        "url": "none",
+        "abstract": "Laser diffraction, sample sieved<2 mm base"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "iso silt 13320:2009",
+        "display_name": "iso silt 13320:2009",
+        "standard_schema": "iso",
+        "standard_code": "13320:2009",
+        "url": "none",
+        "abstract": "Laser diffraction, sample sieved<2 mm base"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "iso sand 13320:2020",
+        "display_name": "iso sand 13320:2020",
+        "standard_schema": "iso",
+        "standard_code": "13320:2009",
+        "url": "none",
+        "abstract": "Laser diffraction, sample sieved<2 mm base"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "iso silt 13320:2020",
+        "display_name": "iso silt 13320:2020",
+        "standard_schema": "iso",
+        "standard_code": "13320:2009",
+        "url": "none",
+        "abstract": "Laser diffraction, sample sieved<2 mm base"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "iso sand 11277:1998",
+        "display_name": "iso sand 11277:1998",
+        "standard_schema": "iso",
+        "standard_code": "11277:1998",
+        "url": "none",
+        "abstract": "Sedimentation method, sample sieved<2 mm base"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "iso silt 11277:1998",
+        "display_name": "iso silt 11277:1998",
+        "standard_schema": "iso",
+        "standard_code": "11277:1998",
+        "url": "none",
+        "abstract": "Sedimentation method, sample sieved<2 mm base"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "mcu physciochemical soil penetrometer",
+        "display_name": "mcu physciochemical soil penetrometer",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "none",
+        "abstract": "Microntroller unit controlled penetrometer with 2 to 5 steel pins about 10 cm long using 5 to 20 Volt "
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "slakes soil aggregate stability",
+        "display_name": "Slakes soil aggregate stability",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "none",
+        "abstract": "Smartphone app observing the disintegration of dried soil aggregates soaked in water over time"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "moulder soil aggregate stability",
+        "display_name": "Moulder soil aggregate stability",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "none",
+        "abstract": "Smartphone app observing the disintegration of dried soil aggregates soaked in water over time"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "microbiometer classic",
+        "display_name": "Microbiometer classic",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "none",
+        "abstract": "Commercial analysis kit for soil, sludge, manure etc determining the ratio of fungi and bacteria and the total organic carbon biomass of these. "
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "microbiometer pro",
+        "display_name": "Microbiometer pro",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "none",
+        "abstract": "Commercial analysis kit for soil, sludge, manure etc determining the ratio of fungi and bacteria and the total organic carbon biomass of these. "
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "digitsoil soil enzymatic activity reader",
+        "display_name": "Digitsoil Soil Enzymatic Activity Reader",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "none",
+        "abstract": "Commercial analysis kit for soil, sludge, manure etc determining the extracellular matrix enzymatic activity of key enzymes. "
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "soil cylinder water volumetric content",
+        "display_name": "Soil cylinder water volumetric content",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "none",
+        "abstract": "Undisturbed soil sample taken in a cylinder of known volume dried at 105 C, water content is the weight loss divided by the cylinder volume"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "soil cylinder bulk density",
+        "display_name": "Soil cylinder bulk density",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "none",
+        "abstract": "Undisturbed soil sample taken in a cylinder of known volume dried at 105 C, bulk density is the net weight of the dried soil divided by the cylinder volume."
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "ai4sh prokaryotes metabarcoding bioinfo",
+        "display_name": "AI4SH prokaryotes metabarcoding bioinfo",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "https://ai4sh.github.io/in-situ_data_docs/docs/in-situ_methods/edna/",
+        "abstract": "Extraction (ZymoBIOMICS DNA Miniprep Kit), forward amplification (515f Modified GTGYCAGCMGCCGCGGTAA), reverse amplification (806r Modified GGACTACNVGGGTWTCTAAT), purification (magnetic bead), sequencing (platform: Illumina; strategy: 2x250; data requirement: 30K tags), reference library (Silva), bioinformatics(Qiime2-DADA2, FLASH, vsearch package)"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "ai4sh fungi metabarcoding bioinfo",
+        "display_name": "AI4SH fungi metabarcoding bioinfo",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "https://ai4sh.github.io/in-situ_data_docs/docs/in-situ_methods/edna/",
+        "abstract": "Extraction (ymoBIOMICS DNA Miniprep Kit), forward amplification (515f Modified GTGYCAGCMGCCGCGGTAA), reverse amplification (806r Modified GGACTACNVGGGTWTCTAAT), purification (magnetic bead), sequencing (platform: Illumina; strategy: 2x250; data requirement: 30K tags), reference library (Silva), bioinformatics(Qiime2-DADA2, FLASH, vsearch package), functional prediction (Faprotax), nucleotide sequence library (Sequence Read Archive)"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "ai4sh prokaryotes metabarcoding function",
+        "display_name": "AI4SH prokaryotes metabarcoding function",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "https://ai4sh.github.io/in-situ_data_docs/docs/in-situ_methods/edna/",
+        "abstract": "Extraction (ymoBIOMICS DNA Miniprep Kit), forward amplification (gITS7 GTGARTCATCGARTCTTTG), reverse amplification (ITS4 TCCTCCGCTTATTGATATGC), purification (magnetic bead), sequencing (platform: Illumina; strategy: 2x250; data requirement: 30K tags), reference library (Unite), bioinformatics(Qiime2-DADA2, FLASH, vsearch package)"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "ai4sh fungi metabarcoding function",
+        "display_name": "AI4SH fungi metabarcoding function",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "https://ai4sh.github.io/in-situ_data_docs/docs/in-situ_methods/edna/",
+        "abstract": "Extraction (ymoBIOMICS DNA Miniprep Kit), forward amplification (gITS7 GTGARTCATCGARTCTTTG), reverse amplification (ITS4 TCCTCCGCTTATTGATATGC), purification (magnetic bead), sequencing (platform: Illumina; strategy: 2x250; data requirement: 30K tags), reference library (Unite), bioinformatics(Qiime2-DADA2, FLASH, vsearch package), functional prediction (Fungild), nucleotide sequence library (Sequence Read Archive)"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_analysis_method",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "beerkan estimation of soil transfer parameters",
+        "display_name": "BeerKan estimation of soil transfer parameters",
+        "standard_schema": "none",
+        "standard_code": "none",
+        "url": "https://bestsoilhydro.net",
+        "abstract": "Simple field procedure that utilizes single-ring infiltration tests, along with basic soil physical data (texture, bulk density), to estimate both the soil water retention curve and the hydraulic conductivity function."
+      }
+    }
+  ]
+}

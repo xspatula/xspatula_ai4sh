@@ -1,0 +1,10 @@
+{
+  "process": [
+    {
+      "process": "manage_geolocation",
+      "parameters": {
+        "name": "dk_foulum@366-2"
+      }
+    }
+  ]
+}

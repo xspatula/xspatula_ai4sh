@@ -1,0 +1,18 @@
+{
+  "process": [
+    {
+      "process": "manage_observation_log",
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "lucas_eu_2015",
+        "provision_id__provision_name": "lucas-wetlab-2009",
+        "name": "lucas_eu_2015@lucas-lucas-wetlab-2009-2015",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@gmail.com",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "laboratory": 1
+      }
+    }
+  ]
+}

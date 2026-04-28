@@ -1,0 +1,103 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_unit_translate",
+        "min_user_stratum": 4,
+        "title": "Manage a  unit translation",
+        "label": "Insert, update or delete a amthematical translation function from one unit to another"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "src_unit_id__unit_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Scientific name or alias of the source unit",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit_translate",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "dst_unit_id__unit_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Scientific name or alias of the destination unit",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit_translate",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "factor",
+              "parameter_type": "float",
+              "required": true,
+              "default_value": 1,
+              "hint": "The translation factor",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit_translate",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "addon",
+              "parameter_type": "float",
+              "required": true,
+              "default_value": 1,
+              "hint": "The translation addon (after applying the factor)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit_translate",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "exponent",
+              "parameter_type": "float",
+              "required": true,
+              "default_value": 1,
+              "hint": "The translation exponent (after applying the factor and addon)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit_translate",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

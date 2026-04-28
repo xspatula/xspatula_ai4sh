@@ -1,0 +1,469 @@
+{
+  "process": [
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "root_process",
+        "command": {
+          "columns": [
+            "id",
+            "root_process",
+            "title",
+            "label",
+            "creator"
+          ],
+          "values": [
+            [
+              "0",
+              "universal",
+              "Universal root_process for common settings across all processes",
+              "Universal root_process for common settings across all processes",
+              "thomasg"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "root_process",
+        "command": {
+          "columns": [
+            "root_process",
+            "title",
+            "label",
+            "creator"
+          ],
+          "values": [
+            [
+              "manage_process",
+              "Manage database defined process",
+              "Mangaging a processes requires data on all parameters and their type and default values",
+              "thomasg"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process",
+        "command": {
+          "columns": [
+            "id",
+            "root_process",
+            "process",
+            "min_user_stratum",
+            "title",
+            "label",
+            "creator"
+          ],
+          "values": [
+            [
+              "0",
+              "universal",
+              "universal",
+              "1",
+              "Universal process for common settings across all processes",
+              "Universal process for common settings across all processes",
+              "thomasg"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process",
+        "command": {
+          "columns": [
+            "root_process",
+            "process",
+            "min_user_stratum",
+            "title",
+            "label",
+            "creator"
+          ],
+          "values": [
+            [
+              "manage_process",
+              "add_root_process",
+              "5",
+              "Add root process to database",
+              "Root processes are containers for processes having similar input/output requirements",
+              "thomasg"
+            ],
+            [
+              "manage_process",
+              "add_process",
+              "4",
+              "Add sub process to database",
+              "Adding a process requires data on all parameters and their type and default values",
+              "thomasg"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter",
+        "command": {
+          "columns": [
+            "process",
+            "parent",
+            "element",
+            "parameter",
+            "parameter_type",
+            "required",
+            "default_value",
+            "hint"
+          ],
+          "values": [
+            [
+              "add_root_process",
+              "process",
+              "parameters",
+              "root_process",
+              "text",
+              "True",
+              "",
+              "Root process name"
+            ],
+            [
+              "add_root_process",
+              "process",
+              "parameters",
+              "title",
+              "text",
+              "False",
+              "",
+              "Process title"
+            ],
+            [
+              "add_root_process",
+              "process",
+              "parameters",
+              "label",
+              "text",
+              "False",
+              "",
+              "Process label"
+            ],
+            [
+              "add_root_process",
+              "process",
+              "parameters",
+              "min_user_stratum",
+              "integer",
+              "False",
+              "5",
+              "minimum user stratum for using the process"
+            ],
+            [
+              "add_process",
+              "process",
+              "parameters",
+              "root_process",
+              "text",
+              "True",
+              "",
+              "Root process to which this process belongs"
+            ],
+            [
+              "add_process",
+              "process",
+              "parameters",
+              "process",
+              "text",
+              "True",
+              "",
+              "The name of the process to add"
+            ],
+            [
+              "add_process",
+              "process",
+              "parameters",
+              "min_user_stratum",
+              "integer",
+              "False",
+              "4",
+              "minimum user stratum for using the process"
+            ],
+            [
+              "add_process",
+              "process",
+              "parameters",
+              "title",
+              "text",
+              "False",
+              "",
+              "Process title"
+            ],
+            [
+              "add_process",
+              "process",
+              "parameters",
+              "label",
+              "text",
+              "False",
+              "",
+              "Process label"
+            ],
+            [
+              "add_process",
+              "process",
+              "node",
+              "parameter",
+              "element",
+              "True",
+              "",
+              "Process node (parameter defintion)"
+            ],
+            [
+              "add_process",
+              "process",
+              "node",
+              "parent",
+              "text",
+              "True",
+              "",
+              "Process node parent"
+            ],
+            [
+              "add_process",
+              "process",
+              "node",
+              "element",
+              "text",
+              "True",
+              "",
+              "Process node element"
+            ],
+            [
+              "add_process",
+              "node",
+              "parameter",
+              "parameter",
+              "text",
+              "True",
+              "",
+              "Process node parameter id"
+            ],
+            [
+              "add_process",
+              "node",
+              "parameter",
+              "parameter_type",
+              "text",
+              "True",
+              "",
+              "Process node parameter type"
+            ],
+            [
+              "add_process",
+              "node",
+              "parameter",
+              "required",
+              "text",
+              "True",
+              "",
+              "Boolean variable defining if parameter is required or not"
+            ],
+            [
+              "add_process",
+              "node",
+              "parameter",
+              "default_value",
+              "text",
+              "True",
+              "",
+              "Parameter default value"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter",
+        "command": {
+          "columns": [
+            "process",
+            "parent",
+            "element",
+            "parameter",
+            "parameter_type",
+            "required",
+            "default_value",
+            "hint"
+          ],
+          "values": [
+            [
+              "universal",
+              "root",
+              "user_project",
+              "user_id",
+              "text",
+              "False",
+              "view",
+              "User id"
+            ],
+            [
+              "universal",
+              "root",
+              "user_project",
+              "project_id",
+              "text",
+              "False",
+              "view",
+              "User project"
+            ],
+            [
+              "universal",
+              "root",
+              "user_project",
+              "user_password",
+              "text",
+              "False",
+              "",
+              "User password"
+            ],
+            [
+              "universal",
+              "root",
+              "user_project",
+              "tract_id",
+              "text",
+              "False",
+              "*",
+              "User project tract id"
+            ],
+            [
+              "universal",
+              "root",
+              "user_project",
+              "site_id",
+              "text",
+              "False",
+              "*",
+              "User project site id"
+            ],
+            [
+              "universal",
+              "root",
+              "user_project",
+              "plot_id",
+              "text",
+              "False",
+              "*",
+              "User project plot id"
+            ],
+            [
+              "universal",
+              "root",
+              "user_project",
+              "schemata",
+              "text",
+              "True",
+              "",
+              "User project schemata (coordinate settings)"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_set_value",
+        "command": {
+          "columns": [
+            "process",
+            "parameter",
+            "parent",
+            "element",
+            "value",
+            "label"
+          ],
+          "values": [
+            [
+              "add_process",
+              "parameter_type",
+              "node",
+              "parameter",
+              "text",
+              "text or string"
+            ],
+            [
+              "add_process",
+              "parameter_type",
+              "node",
+              "parameter",
+              "real",
+              "real number"
+            ],
+            [
+              "add_process",
+              "parameter_type",
+              "node",
+              "parameter",
+              "int",
+              "integer number"
+            ],
+            [
+              "add_process",
+              "parameter_type",
+              "node",
+              "parameter",
+              "intlist",
+              "list of integer numbers"
+            ],
+            [
+              "add_process",
+              "parameter_type",
+              "node",
+              "parameter",
+              "textlist",
+              "list of text strings"
+            ],
+            [
+              "add_process",
+              "parameter_type",
+              "node",
+              "parameter",
+              "bool",
+              "boolean"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "observation",
+        "command": [
+          "id BIGSERIAL",
+          "observation_log_id INTEGER REFERENCES observation.observation_log",
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "provision_id INTEGER REFERENCES observation_utility.provision (id)",
+          "subsample TEXT",
+          "replicate SMALLINT",
+          "abstract TEXT",
+          "observation_date DATE",
+          "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "UNIQUE (observation_log_id,provision_id,sample_id,subsample,replicate)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "observation_temperature",
+        "command": [
+          "observation_id BIGINT REFERENCES observation.observation (id)",
+          "initial_temperature FLOAT",
+          "final_temperature FLOAT",
+          "temperature_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "duration FLOAT",
+          "duration_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "UNIQUE (observation_id)",
+          "PRIMARY KEY (observation_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "observation_provision_serial_nr",
+        "command": [
+          "observation_id BIGINT REFERENCES observation.observation (id)",
+          "provision_serial_nr_id INTEGER",
+          "UNIQUE (observation_id,provision_serial_nr_id)",
+          "PRIMARY KEY (observation_id,provision_serial_nr_id)"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,231 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_data_source",
+        "min_user_stratum": 2,
+        "title": "Manage data source",
+        "label": "Insert, update and delete data source"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the data source - must be unique",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Alias of the data source - must be unique",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name of the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The url of the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "address1",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The physical address, first line, of the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "address2",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The physical address, second line, of the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "postal_address",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The postal address (city, town, parch etc) of the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "postal_zip_code",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The postal zip code of the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "state",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The state (full or code) of the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "territory_id__territory_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The territory (country) name of the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "telephone",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The telephone number of the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "contact_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Contact name for the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "contact_email",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The email contact address for the data source",
+              "schema_table": {
+                "schema": "observation",
+                "table": "data_source",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

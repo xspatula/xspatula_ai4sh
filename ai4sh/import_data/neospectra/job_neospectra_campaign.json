@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "import_data/neospectra/campaign",
+    "process_sub_folder": "process",
+    "pilot_file": "xspatula_add_campaign_pilot.txt"
+  }
+}

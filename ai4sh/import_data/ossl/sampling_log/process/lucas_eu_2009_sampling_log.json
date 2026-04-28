@@ -1,0 +1,16 @@
+{
+  "process": [
+    {
+      "process": "manage_sampling_log",
+      "parameters": {
+        "campaign_id__campaign_name": "lucas_eu_2009",
+        "name": "lucas_eu_2009",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@gmail.com",
+        "abstract": "Sampling log for lucas eu 2009",
+        "begin_date": 20090101,
+        "end_date": 20141231
+      }
+    }
+  ]
+}

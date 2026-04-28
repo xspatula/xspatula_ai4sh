@@ -1,0 +1,103 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_unit",
+        "min_user_stratum": 4,
+        "title": "Manage a unit",
+        "label": "Insert, update or delete a scientific unequivocal unit that an observation can report"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Scientific notation of the unit",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Alternative (mathematical) notation that unequivocal identifies the unit.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the unit.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the unit",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "system",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "metric",
+              "hint": "The system to which this unit refers (e.g. emtric or imperial).",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

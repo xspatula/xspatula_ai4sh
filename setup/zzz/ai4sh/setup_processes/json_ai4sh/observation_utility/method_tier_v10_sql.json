@@ -1,0 +1,71 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_method_tier",
+        "min_user_stratum": 4,
+        "title": "Manage method tier",
+        "label": "Insert, update or delete a method tier."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of method tier, for example field.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name of the method tier, for example field.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Explanation of the method tier.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "method_tier",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

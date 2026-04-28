@@ -1,0 +1,108 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sample",
+        "command": [
+          "id SERIAL",
+          "sampling_log_id INTEGER REFERENCES observation.sampling_log (id)",
+          "tag TEXT",
+          "name TEXT",
+          "species_id INTEGER REFERENCES observation_utility.species (id)",
+          "specimen TEXT",
+          "abstract TEXT",
+          "sampling_date DATE",
+          "time_series_id INTEGER DEFAULT 0",
+          "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "UNIQUE (sampling_log_id, name)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sample_juxtaposition",
+        "command": [
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "setting_system_id INTEGER REFERENCES observation_utility.setting_system (id)",
+          "juxtaposition_id INTEGER REFERENCES observation_utility.juxtaposition (id)",
+          "PRIMARY KEY (sample_id,setting_system_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sample_profile",
+        "command": [
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "profile_min SMALLINT",
+          "profile_max SMALLINT",
+          "profile_obstacle BOOLEAN DEFAUlT FALSE",
+          "PRIMARY KEY (sample_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sample_geotag",
+        "command": [
+          "id SERIAL",
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
+          "area_coverage INTEGER",
+          "area_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "UNIQUE (sample_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sample_composition",
+        "command": [
+          "id SERIAL",
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "composition_id INTEGER REFERENCES observation_utility.composition (id)",
+          "UNIQUE (sample_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "sample_proximity",
+        "command": [
+          "id SERIAL",
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "proximity_id INTEGER REFERENCES observation_utility.proximity (id)",
+          "UNIQUE (sample_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

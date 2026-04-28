@@ -1,0 +1,16 @@
+############################################
+##### XSPATULA ADD OBSERVATION_LOG #####
+############################################
+ai4sh_dk_foulum_2024@neospectra_ds2_observation_log.json
+ai4sh_dk_foulum_2024@neospectra_ilmx_observation_log.json
+ai4sh_fi_jokioinen_2024@neospectra_ds2_observation_log.json
+ai4sh_fi_jokioinen_2024@neospectra_ilmx_observation_log.json
+ai4sh_gr_ktima-gerovassiliou_2023@neospectra_ds2_observation_log.json
+ai4sh_gr_ktima-gerovassiliou_2023@neospectra_ilmx_observation_log.json
+ai4sh_hr_neretva_2024@neospectra_ds2_observation_log.json
+ai4sh_hr_neretva_2024@neospectra_ilmx_observation_log.json
+ai4sh_nl_boermarke-zeijen_2025@neospectra_ds2_observation_log.json
+ai4sh_nl_boermarke-zeijen_2025@neospectra_ilmx_observation_log.json
+ai4sh_se_loennstorp_2024@neospectra_ds2_observation_log.json
+ai4sh_se_loennstorp_2024@neospectra_ilmx_observation_log.json
+ai4sh_dk_foulum_2024@neospectra_ds2_b_observation_log.json

@@ -1,0 +1,20 @@
+{
+  "process": [
+    {
+      "process": "manage_geolocated_profile_sample",
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_dk_foulum_2024",
+        "tag": "256-c5-wp3sub",
+        "name": "256-c5-wp3sub@20-50",
+        "sampling_date": "20241105",
+        "species_id__species_name": "soil",
+        "geolocation_id__geolocation_name": "dk_foulum@256",
+        "profile_min": "20",
+        "profile_max": "50",
+        "juxtaposition_id__juxtaposition_name": "uniform",
+        "proximity_id__proximity_name": "central",
+        "composition_id__composition_name": "individual"
+      }
+    }
+  ]
+}

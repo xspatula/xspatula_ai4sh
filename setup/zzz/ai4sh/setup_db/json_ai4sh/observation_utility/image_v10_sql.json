@@ -1,0 +1,209 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "image_approach",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "image_approach",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "Not known",
+              "unknown",
+              "Unknown image approach"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "image_substrate",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "image_substrate",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "Not known",
+              "unknown",
+              "Unknown image substrate/background"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "image_camera",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "image_camera",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "Not known",
+              "unknown",
+              "Unknown image camera"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "image_setup",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "image_setup",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "Not known",
+              "unknown",
+              "Unknown image setup"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "image_lightsource",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "image_lightsource",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "Not known",
+              "unknown",
+              "Unknown image lightsouce"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

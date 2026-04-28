@@ -1,0 +1,44 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "monolith",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
+          "area_coverage FLOAT",
+          "area_coverage_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "monolith_excavation_method_id INTEGER REFERENCES observation_utility.monolith_excavation_method (id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "macrofauna",
+        "command": [
+          "id SERIAL",
+          "observation_id INTEGER REFERENCES observation.observation (id)",
+          "macrofauna_extraction_method_id INTEGER REFERENCES observation_utility.macrofauna_extraction_method (id)",
+          "monolith_id INTEGER REFERENCES observation.monolith (id)",
+          "soil_horizon_id INTEGER REFERENCES observation_utility.soil_horizon (id)",
+          "taxa_id INTEGER REFERENCES observation_utility.taxa (id)",
+          "life_cycle_stage_id INTEGER REFERENCES observation_utility.life_cycle_stage (id)",
+          "specimen_quantity INTEGER",
+          "weight FLOAT",
+          "weight_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

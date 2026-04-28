@@ -1,0 +1,17 @@
+{
+  "project_path": "./ai4sh",
+  "postgresdb": {
+    "host": "localhost",
+    "port": 5432,
+    "db": "ai4soilhealth",
+    "host_netrc_id": "karttur"
+  },
+  "process": [
+    {
+      "execute": true,
+      "verbose": 1,
+      "overwrite": false,
+      "delete": true
+    }
+  ]
+}

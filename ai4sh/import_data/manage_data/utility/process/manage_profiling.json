@@ -1,0 +1,17 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_profiling",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "unit_id__unit_name": "cm",
+        "name": "depth in cm",
+        "alias": "depth_cm",
+        "display_name": "Depth in cm",
+        "abstract": "Depth in cm below reference surface"
+      }
+    }
+  ]
+}

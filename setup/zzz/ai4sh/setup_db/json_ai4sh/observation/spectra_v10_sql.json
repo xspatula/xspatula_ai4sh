@@ -1,0 +1,23 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "spectra_scan",
+        "command": [
+          "observation_id INTEGER REFERENCES observation.observation (id)",
+          "na_frequency SMALLINT",
+          "neg_frequency SMALLINT",
+          "ext_frequency SMALLINT",
+          "spectroscopy_method_id SMALLINT REFERENCES observation_utility.spectroscopy_method (id)",
+          "signal_mean REAL[]",
+          "signal_standard_deviation REAL[]",
+          "PRIMARY KEY (observation_id)"
+        ]
+      }
+    }
+  ]
+}

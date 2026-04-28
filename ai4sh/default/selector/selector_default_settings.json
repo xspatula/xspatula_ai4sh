@@ -1,0 +1,17 @@
+{
+  "k_best": {
+    "apply": true,
+    "n_features": 4
+  },
+  "permutation": {
+    "permutation_repeats": 6,
+    "step": 1
+  },
+  "rfe": {
+    "CV": 0,
+    "step": 1
+  },
+  "tree_based": {
+    "n_estimators": 20
+  }
+}

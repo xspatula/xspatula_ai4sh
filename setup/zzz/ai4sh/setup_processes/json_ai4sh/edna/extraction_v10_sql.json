@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_metabarcoding_extraction",
+        "min_user_stratum": 4,
+        "title": "Manage eDNA metabarcoding extract method",
+        "label": "Insert, update or delete eDNA metabarcoding extraction method."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unique name of the meta barcoding extraction method.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "extraction",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "doi",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The DOI of the metabarcoding extraction method.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "extraction",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The URL of the metabarcoding extraction method.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "extraction",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract of the metabarcoding extraction method.",
+              "schema_table": {
+                "schema": "edna_utility",
+                "table": "extraction",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

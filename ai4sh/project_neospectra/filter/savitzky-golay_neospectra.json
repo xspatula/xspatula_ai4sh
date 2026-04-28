@@ -1,0 +1,8 @@
+{
+  "savitzky-golay": {
+    "window_length": 7,
+    "polyorder": 2,
+    "deriv": 0,
+    "mode": "nearest"
+  }
+}

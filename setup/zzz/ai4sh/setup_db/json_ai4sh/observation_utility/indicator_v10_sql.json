@@ -1,0 +1,23 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "indicator",
+        "command": [
+          "id SERIAL",
+          "quantity_id INTEGER REFERENCES observation_utility.quantity (id)",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "abstract TEXT",
+          "equivalent_id INTEGER DEFAULT 0",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

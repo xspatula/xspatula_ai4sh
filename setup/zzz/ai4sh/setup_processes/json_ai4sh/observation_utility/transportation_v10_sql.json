@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_transportation",
+        "min_user_stratum": 4,
+        "title": "Manage sample transport method",
+        "label": "Insert, update or delete a sample transport method if of importanca for the analysis results."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Generic name of the transport method",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "transportation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Common language or thematic jargon that unequivocal identifies the transport.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "transportation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the transport.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "transportation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the transport method in layperson terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "transportation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

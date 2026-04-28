@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_juxtaposition",
+        "min_user_stratum": 4,
+        "title": "Manage juxtaposition",
+        "label": "Insert, update or delete a juxtaposition that is observed with a sample."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "setting_system_id__setting_system_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the setting system category under which this juxtaposition falls (the setting sytem must be registered in the database).",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "juxtaposition",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the juxtaposition",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "juxtaposition",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the juxtaposition",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "juxtaposition",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the juxtaposition in layperson terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "juxtaposition",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

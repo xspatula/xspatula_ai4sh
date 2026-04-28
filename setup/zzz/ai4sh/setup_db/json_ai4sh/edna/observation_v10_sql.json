@@ -1,0 +1,72 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "edna",
+        "table": "edna_nucleotide",
+        "command": [
+          "id SERIAL",
+          "sample_id INTEGER",
+          "nucleotide_archive_id INTEGER",
+          "accession_code TEXT",
+          "accession_url TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "edna",
+        "table": "taxa_bioinformatics",
+        "command": [
+          "id SERIAL",
+          "edna_id INTEGER",
+          "barcoding_pipeline_id INTEGER",
+          "bioninformatics_treatment_date DATE",
+          "taxa_id INTEGER",
+          "biodiverity_id INTEGER",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "edna",
+        "table": "edna_measurement",
+        "command": [
+          "id BIGSERIAL",
+          "observation_id INTEGER",
+          "indicator_id INTEGER",
+          "value REAL",
+          "standard_deviation REAL",
+          "n_repeat SMALLINT",
+          "PRIMARY KEY (observation_id,indicator_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "edna",
+        "table": "taxa_biodiversity_measurement",
+        "command": [
+          "id SERIAL",
+          "bioinformatics_id INTEGER",
+          "value REAL",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

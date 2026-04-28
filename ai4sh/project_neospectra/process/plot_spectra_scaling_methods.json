@@ -1,0 +1,14 @@
+{
+  "process": [
+    {
+      "process": "plot_spectra_scaling_methods",
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/neospectra/ai4sh_1350-2550_5",
+        "colormap": "jet",
+        "max_spectra": 100,
+        "show": true,
+        "save": true
+      }
+    }
+  ]
+}

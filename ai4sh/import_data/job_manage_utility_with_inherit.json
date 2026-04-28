@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "import_data/manage_data/utility",
+    "process_sub_folder": "process",
+    "pilot_file": "manage_utility_with_inherit.txt"
+  }
+}

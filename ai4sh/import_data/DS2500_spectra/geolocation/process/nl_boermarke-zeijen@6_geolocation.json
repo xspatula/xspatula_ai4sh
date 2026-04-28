@@ -1,0 +1,10 @@
+{
+  "process": [
+    {
+      "process": "manage_geolocation",
+      "parameters": {
+        "name": "nl_boermarke-zeijen@6"
+      }
+    }
+  ]
+}

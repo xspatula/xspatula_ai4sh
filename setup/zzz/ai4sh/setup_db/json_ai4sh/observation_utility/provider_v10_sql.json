@@ -1,0 +1,53 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "provider",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "full_name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "url VARCHAR",
+          "contact_name VARCHAR",
+          "contact_email VARCHAR",
+          "status_code SMALLINT DEFAULT 10",
+          "changed_into_id INTEGER",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "provider",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "display_name",
+            "full_name",
+            "alias"
+          ],
+          "values": [
+            [
+              "0",
+              "unknown",
+              "unknown",
+              "Unknown",
+              "none"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

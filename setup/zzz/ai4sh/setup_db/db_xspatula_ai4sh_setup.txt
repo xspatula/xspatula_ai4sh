@@ -1,0 +1,325 @@
+###############################################
+##### DEFINE AI4SH DB, SCHEMAS AND TABELS #####
+###############################################
+
+###===========================================###
+### SCHEMAS ###
+###===========================================###
+#!!!!! The schemas must be defined before the tables
+
+schema/schema_v10_sql.json
+
+###===========================================###
+### GENERAL UTILITIES AND TERRITORIES###
+###===========================================###
+#!!!!! Territory codes are required by community
+
+utility/utility_v10_sql.json
+
+utility/territory_v10_sql.json
+
+###===========================================###
+### COMMUNITY ###
+###===========================================###
+#!!!!! user categories required for adding users
+
+# User categories define privilege levels for different categories of users.
+community/user_categories_v10_sql.json
+
+# User categories records inserts predefined user categories.
+community/user_categories_records_v10_sql.json
+
+#!!!!! Organisations required for adding users
+community/organisation_v10_sql.json
+
+#!!!!! EDIT TO INCLUDE AT LEAST ONE ORGANISATION
+community/organisation_records_v10_sql.json
+
+#!!!!! Users required for adding processes
+community/user_v10_sql.json
+
+#!!!!! EDIT TO INCLUDE AT LEAST ONE USER THAT WILL BE THE CREATOR OF THE PROCESSES
+community/user_records_v10_sql.json
+
+###===========================================###
+### PROCESSES ###
+###===========================================###
+#!!!!! processes required for adding processes
+
+# Processes contains 8 tables:
+# - root_process (for grouping processes)
+# - process (actual processes linked to framework script functions)
+# - process_parameter (parameters expected and required for running a process)
+# - process_parameter_set_value (if a text parameter can only take a on a set of distinct values)
+# - process_parameter_minmax (if a numerical parameter can only take on a limited range)
+# - process_parameter_schema_table (the target schema.table for a parameter to be written to the database)
+# - process_parameter_permission (if the parameter is allowed to be updated or deleted)
+# - process_parameter_default (if a parameter can be automatically selected from another schema.table.record)
+process/processes_v10_sql.json
+
+# processes records adds the processes for adding all other processes
+process/processes_records_v10_sql.json
+
+###===========================================###
+### OBSERVATION UTILITIES ###
+###===========================================###
+#!!!!! observation utilities contain all catalogues
+#!!!!! required for adding observation related data.
+#!!!!! Do not change order of setup as some catalogues
+#!!!!! have foreign keys for others
+
+#===========================================#
+#==== Observation utilities without foreign key dependencies ====#
+#===========================================#
+
+# Analysis method
+observation_utility/analysis_method_v10_sql.json
+
+# Apparatus is a very generalised description of anything that can deliver data.
+# Inserted with id = 0 for unknown/undisclosed apparatus
+observation_utility/apparatus_v10_sql.json
+
+# Classification contains 5 hierarchies (tables) for substance classification:
+# -order,
+# -family,
+# -genus,
+# -species,
+# -specimen.
+# All are inserted with id = 0 for unknown/undisclosed substance.
+observation_utility/classification_v10_sql.json
+
+# image includes tables for:
+# -image_approach,
+# -image_substrate (or background),
+# -image_camera,
+# -image_setup,
+# -image_lightsource.
+# All are Inserted with id = 0 for unknown/undisclosed.
+observation_utility/image_v10_sql.json
+
+# License attached to either dataset or campaign
+# Inserted with id = 0 for no license
+observation_utility/license_v10_sql.json
+
+# Location method for determining geolocation
+# Inserted with id = 0 for unknown/undisclosed method
+observation_utility/location_method_v10_sql.json
+
+# Macrofauna contains two tables:
+# -macrofauna_extraction_method,
+# -life_cycle_stage
+observation_utility/macrofauna_v10_sql.json
+
+# Method tier is a classification of different observation/analysis types.
+# Inserted with id = 0 for unknown/undisclosed method tier.
+observation_utility/method_tier_v10_sql.json
+
+# Micobiometer kit version (microbiometer is citizen scientist tool for soil microbiota).
+observation_utility/microbiometer_version_v10_sql.json
+
+# Monolith extraction method (e.g. block of soil, sediment or ice-core).
+# Inserted with id = 0 for unknown/undisclosed method.
+observation_utility/monolith_extraction_v10_sql.json
+
+# Preparation method prior to sample analysis (that is not part of a standard method itself).
+# Inserted with id = 0 for no preparation.
+observation_utility/preparation_v10_sql.json
+
+# Preservation method for acquired samples (e.g. cold, frozen, shield substance).
+# Inserted with id = 0 for no preservation.
+observation_utility/preservation_v10_sql.json
+
+# Provider can be any tool, instrument, sensing or service etc providing observation results.
+# Inserted with id = 0 for unknown provider.
+observation_utility/provider_v10_sql.json
+
+# Quantity - unambiguous definition of the quantitites that observation values represent.
+observation_utility/quantity_v10_sql.json
+
+# Reference proprietor - any source of external archive or library used for deriving observation values
+observation_utility/reference_proprietor_v10_sql.json
+
+# Setting system for defining local juxtapositions.
+# Where system is a thematic frame for defining specific juxtapositions (e.g. for fields, forests, lakes etc).
+# Inserted with id = 0 for no setting_system.
+observation_utility/setting_system_v10_sql.json
+
+# Soil horizon for defining scientific soil horizons.
+observation_utility/soil_horizon_v10_sql.json
+
+# Sound includes tables for:
+# -sound_setup,
+# -sound_mic.
+# Both are inserted with id = 0 for unknown/undisclosed.
+observation_utility/sound_v10_sql.json
+
+# Spatial reference systems used for geolocation, mainly based on EPSG standard codes.
+# Inserted with id = 0 for unknown/undisclosed spatial reference.
+observation_utility/spatial_reference_v10_sql.json
+
+# Spectroscopy method for defining type of spectral analysis.
+observation_utility/spectroscopy_method_v10_sql.json
+
+# Storage method for acquired samples before analysis.
+# Inserted with id = 0 for no relevance.
+observation_utility/storage_v10_sql.json
+
+# Taxa levels in the Linnean classification system.
+observation_utility/taxa_level_v10_sql.json
+
+# Taxa status to handle outdated and redundant taxa definitions.
+observation_utility/taxa_status_v10_sql.json
+
+# transportation method/conditions for acquired samples before analysis (e.g. cold, frozen).
+# Inserted with id = 0 for no relevance.
+observation_utility/transportation_v10_sql.json
+
+# unit of reported observation value.
+observation_utility/unit_v10_sql.json
+
+#===========================================#
+#==== Observation utilities dependent on foreign keys in other observation utilities ====#
+#===========================================#
+
+# Analysis method translate for converting analysis results between comparable methods.
+# requires: species, method (source and destination).
+observation_utility/analysis_method_translate_v10_sql.json
+
+# Indicators refine quantitates to more detailed definitions used for reporting observation values.
+# requires: quantity.
+observation_utility/indicator_v10_sql.json
+
+# Indicator default unit is the default unit of an indicator.
+# requires: species, indicator, unit.
+observation_utility/indicator_default_unit_v10_sql.json
+
+# Juxtaposition is the thematic local setting of a sample (e.g. in a field, forest, lake etc).
+# requires: setting_system.
+observation_utility/juxtaposition_v10_sql.json
+
+# Profiling for samples with z-dimension (e.g. soil, sediment or ice cores).
+# requires: unit.
+observation_utility/profiling_v10_sql.json
+
+# Provision combines an apparatus, a provider and a method_tier - it is a prerequisite for defining the indicators obtained from an observation.
+# requires: apparatus, provider, method_tier.
+# Inserted with id = 0 for no unknown/undisclosed provision.
+observation_utility/provision_v10_sql.json
+
+# Provision indicator links observation values delivered by a specific provision to quantities and an indicators.
+# requires: provision, indicator, method, unit.
+observation_utility/provision_indicator_v10_sql.json
+
+# Spectrometer for spectral sensors and wavelength.
+# requires: provision
+observation_utility/spectrometer_v10_sql.json
+
+# Quantity default unit is the default unit for a particular quantity and species, with the option of setting a metric (default) or imperial system.
+# requires: quantity, species, unit.
+observation_utility/quantity_default_unit_v10_sql.json
+
+# Taxa defines arbitrary taxa with its Linnean classification level
+# requires: taxa_level, taxa_status
+observation_utility/taxa_v10_sql.json
+
+# Taxa function defines ecosystem functions related to a taxa
+# requires: taxa_level, taxa_status.
+observation_utility/taxa_function_v10_sql.json
+
+# Unit translate defines the mathematical translation between different units
+# requires: unit.
+observation_utility/unit_translate_v10_sql.json
+
+###===========================================###
+### OBSERVATION ###
+###===========================================###
+
+# Observation data source is a simplified copy of community.organisation.
+# Separated as data sources might only be passive suppliers.
+observation/data_source_v10_sql.json
+
+# Observation person is a simplified copy of community.user.
+# but with no user name, password or login -
+# a sort of GDPR adjustment to allow non-registered users to add data.
+observation/person_v10_sql.json
+
+# Dataset is a consistent set of data supplied by a defined source.
+# LUCAS is a dataaset, AI4SoilHealth is a dataset.
+observation/dataset_v10_sql.json
+
+# Campaign is a child to dataset where methods can vary in details between individual campaigns.
+# LUCAS 2009, 2015 are individual campaigns under the LUCAS dataset.
+# Each pilot site in AI4SoilHealth is a campaign.
+observation/campaign_v10_sql.json
+
+# Sampling log defines a sampling event belonging to a campaign.
+# It can be for a single sample or a set or samples taken
+# with the same methods and responsible person over a longer period.
+observation/sampling_log_v10_sql.json
+
+
+
+# Sample geolocation for samples with a spatial reference.
+observation/sample_geolocation_v10_sql.json
+
+# Sample defines individual samples acquired under a sampling_log
+observation/sample_v10_sql.json
+
+# Observation log references sampling log and defines a provision (instrument, service etc) and its method tier, and the sample logistics (preservation, preparation, storage etc)
+observation/observation_log_v10_sql.json
+
+# Observation links together:
+# -observation log,
+# -sample,
+# -provision (and provision serial nr if given).
+observation/observation_v10_sql.json
+
+
+# Infiltration BeerKan is an extension of observation.
+# The extension consists of 2 tables:
+# -infiltration_beerkan,
+# -infiltration_beerkan_time.
+observation/infiltration_beerkan_v10_sql.json
+
+# Macrofauna is an extension of observation.
+# The extension consists of 2 tables:
+# -monolith,
+# -macrofauna.
+observation/macrofauna_v10_sql.json
+
+# Macrofauna image defines images used for automated macrofauna detection.
+observation/macrofauna_image_v10_sql.json
+
+# Measurement links together an observation and an indicator
+observation/measurement_v10_sql.json
+
+###===========================================###
+### LANDSCAPE UTILITY
+###===========================================###
+
+
+# TG TODO complete
+landscape/utility_v10_sql.json
+
+###===========================================###
+### LANDSCAPE
+###===========================================###
+
+# TG TODO complete
+landscape/observation_v10_sql.json
+
+# TG TODO landscape indicator
+
+###===========================================###
+### EDNA UTILITY
+###===========================================###
+
+# TG TODO complete
+edna/utility_v10_sql.json
+
+###===========================================###
+### EDNA
+###===========================================###
+
+# TG TODO complete
+edna/observation_v10_sql.json

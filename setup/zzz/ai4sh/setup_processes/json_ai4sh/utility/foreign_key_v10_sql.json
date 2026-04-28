@@ -1,0 +1,103 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_foreign_key",
+        "min_user_stratum": 5,
+        "title": "Manage foreign key relations.",
+        "label": "Insert, update or delete  foreign key relations."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "foreign_key",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the foreign key",
+              "schema_table": {
+                "schema": "utility",
+                "table": "foreign_key",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "dst_schema",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The schema name of the destination key.",
+              "schema_table": {
+                "schema": "utility",
+                "table": "foreign_key",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "dst_table",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The table name of the destination key",
+              "schema_table": {
+                "schema": "utility",
+                "table": "foreign_key",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "dst_search_column",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The search column in the destination table with the key.",
+              "schema_table": {
+                "schema": "utility",
+                "table": "foreign_key",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "dst_alt_search_column",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Alternative search column in the destination table with the key.",
+              "schema_table": {
+                "schema": "utility",
+                "table": "foreign_key",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

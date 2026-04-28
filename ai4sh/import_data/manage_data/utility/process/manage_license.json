@@ -1,0 +1,40 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_license",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "mit license",
+        "alias": "mit",
+        "display_name": "MIT",
+        "url": "https://opensource.org/license/mit"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_license",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "jrc license agreement lucas",
+        "alias": "jrc-lucas",
+        "display_name": "JRC-LUCAS",
+        "url": "https://esdac.jrc.ec.europa.eu/resource-type/soil-point-data"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_license",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "creative commons attribution license by",
+        "alias": "cc-by",
+        "display_name": "CC-BY",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    }
+  ]
+}

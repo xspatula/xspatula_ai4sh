@@ -1,0 +1,119 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_analysis_method",
+        "min_user_stratum": 4,
+        "title": "Manage analysis method",
+        "label": "Insert, update or delete an analysis method."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unambiguous name of analysis method, for example an ISO standard method with both its number and year stated.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name of analysis method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "standard_schema",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "If the method belongs to a standardisation schema, else none.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "standard_code",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "For methods belonging to a standardisation schema give the code name of the method in this schema, else none.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The url where the full method is available",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Summarise the method, if possible in layperson terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "analysis_method",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

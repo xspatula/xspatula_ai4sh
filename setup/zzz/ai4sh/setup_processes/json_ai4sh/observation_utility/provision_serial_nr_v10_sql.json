@@ -1,0 +1,55 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_provision_serial_nr",
+        "min_user_stratum": 4,
+        "title": "Manage provision individual instrument serial nr",
+        "label": "Insert, update or delete provision individual instrument with a unique serial nr for an already registered provision of observation data."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "provision_id__provision_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the provision (instrument, laboratory service) from which measurements are retrieved and for whihc a serial nr is given.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_serial_nr",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "serial_nr",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "0",
+              "hint": "The serial number of the individual provision, default = 0, representing the general provision without serial nr",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision_serial_nr",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

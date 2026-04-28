@@ -1,0 +1,12 @@
+{
+  "process": [
+    {
+      "process": "ward_clustering",
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/neospectra/ai4sh_1350-2550_5",
+        "dataframe":"data-neospectra_1350-2550_5_sg",
+        "ward_clustering_fp": "./project_neospectra/agglomeration/ward_clustering_neospectra.json"
+      }
+    }
+  ]
+}

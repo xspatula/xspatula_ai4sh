@@ -1,0 +1,20 @@
+{
+  "derivative": {
+    "comment": "the derive integer defines which derivate to get, 0=none, 1= first, 2 = second etc, if append is set to true the derivatives will be appended to the original bands; this is not recommended but can be used to explore which is more significant, the orignal bands or the derivatives, and then select only one for the coninued modeling.",
+    "derivative": 1,
+    "append": false
+  },
+  "scatter_correction": {
+    "comment": "scattercorrection can apply the following: norm-1 (l1), norm-2 (l2) norm-max (max), snv (snv) or msc (msc). If two are given they will be done in series using output from the first as input to the second",
+    "scaler": ["snv","snv"]
+  },
+  "scaling": {
+    "comment": "Spectral scaling method options: meancentring, autoscaling, paretoscaling and poissonscaling",
+    "method": "autoscaling"
+  },
+  "decomposition": {
+    "comment": "Decomposition as a spectral compression/preparation process, method options: pca",
+    "method": "pca",
+    "n_components": 5
+  }
+}

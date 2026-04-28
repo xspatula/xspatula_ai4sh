@@ -1,0 +1,64 @@
+{
+  "project_path": "./ai4sh",
+  "postgresdb": {
+    "host": "localhost",
+    "port": 5432,
+    "db": "ai4soilhealth",
+    "user_name": "karttur",
+    "password": "weg-iK8-tng-w9k",
+    "db_users": [
+      {
+        "user_id": "community_admin",
+        "password": "guessing-rubble-garden-opera",
+        "role": "community_admin"
+      },
+      {
+        "user_id": "login_evaluation",
+        "password": "hippodrome-bicycle-concert-shuttle",
+        "role": "login_evaluation"
+      },
+      {
+        "user_id": "user_cat_0",
+        "password": "tablecloth-summerleaf-riverbasin-vacuumcleaner",
+        "role": "user_cat_1"
+      },
+      {
+        "user_id": "user_cat_1",
+        "password": "secret-parsimony-archipelago-hedgehog",
+        "role": "user_cat_1"
+      },
+      {
+        "user_id": "user_cat_2",
+        "password": "sailing-courageous-upsidedown-castle",
+        "role": "user_cat_2"
+      },
+      {
+        "user_id": "user_cat_3",
+        "password": "rollerscates-forever-skyline-coconut",
+        "role": "user_cat_3"
+      },
+      {
+        "user_id": "user_cat_4",
+        "password": "superfluid-altruistic-guitarplayer-climatechange",
+        "role": "user_cat_4"
+      },
+      {
+        "user_id": "user_cat_5",
+        "password": "fireplace-olympicgames-grassroot-luminescence",
+        "role": "user_cat_5"
+      }
+    ]
+  },
+  "process": [
+    {
+      "execute": true,
+      "verbose": 1,
+      "overwrite": false,
+      "delete": false,
+      "src_path": {
+        "volume": ".",
+        "ext": "json"
+      }
+    }
+  ]
+}

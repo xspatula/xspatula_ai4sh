@@ -1,0 +1,255 @@
+{
+  "process": [
+    {
+      "process": "add_root_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "select_data",
+        "title": "Select data",
+        "label": "Select data with options for filtering and saving locally."
+      }
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "select_data",
+        "process": "select_spectra",
+        "min_user_stratum": 1,
+        "title": "Select spectral data subset",
+        "label": "Filter and select a spectral data subset from the database and save locally as Parquet. Query spectra and indicator data from the database, apply filters, resample to output bandwidth, and save as a local Parquet file for downstream plotting and modelling."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "dataset_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name or alias of the dataset to query",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": false
+              }
+            },
+            {
+              "parameter": "campaign_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: restrict to a single campaign within the dataset",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": false
+              }
+            },
+            {
+              "parameter": "provision_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name or alias of the provision (spectrometer provision) identifying which spectral sensor data to select",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provision",
+                "write": false
+              }
+            },
+            {
+              "parameter": "preparation_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: restrict to a specific sample preparation (e.g. dried-sieved). Matches observation_utility.preparation name or alias.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "preparation",
+                "write": false
+              }
+            },
+            {
+              "parameter": "begin_wavelength",
+              "parameter_type": "integer",
+              "required": true,
+              "default_value": 460,
+              "hint": "Start of wavelength range to extract (nm)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spectrometer",
+                "write": false
+              }
+            },
+            {
+              "parameter": "end_wavelength",
+              "parameter_type": "integer",
+              "required": true,
+              "default_value": 1050,
+              "hint": "End of wavelength range to extract (nm)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spectrometer",
+                "write": false
+              }
+            },
+            {
+              "parameter": "output_bandwidth",
+              "parameter_type": "integer",
+              "required": true,
+              "default_value": 10,
+              "hint": "Desired output spectral resolution (nm); spectra are resampled to this spacing using the native wavelength array as input",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "spectrometer",
+                "write": false
+              }
+            },
+            {
+              "parameter": "min_profile",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "Minimum soil profile depth (cm); samples with profile_min shallower than this are excluded",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": false
+              }
+            },
+            {
+              "parameter": "max_profile",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 20,
+              "hint": "Maximum soil profile depth (cm); samples with profile_max deeper than this are excluded",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": false
+              }
+            },
+            {
+              "parameter": "indicator_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Array of indicator names to retrieve alongside spectra (e.g. [oc_usda.c729_w.pct, clay.tot_usda.a334_w.pct])",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator",
+                "write": false
+              }
+            },
+            {
+              "parameter": "data_range",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "JSON string with per-indicator min/max filters, e.g. {\"oc_usda.c729_w.pct\": {\"min\": 0, \"max\": 50}}. Samples outside the range are excluded.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator",
+                "write": false
+              }
+            },
+            {
+              "parameter": "output_root_fp",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Root directory for saving the Parquet subset. Saved under {output_root_fp}/{provision_name}/{dataset}_{begin}-{end}_{bw}/",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": false
+              }
+            },
+            {
+              "parameter": "as_absorbance",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "If set to true spectral signal are translated from reflectance to absorbance",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "select_data",
+        "process": "select_indicator",
+        "min_user_stratum": 1,
+        "title": "Select indicators associated with a dataset or campaign",
+        "label": "Query the database for all indicators recorded under a given dataset or campaign."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "dataset_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name or alias of the dataset to query",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": false
+              }
+            },
+            {
+              "parameter": "campaign_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: restrict to a single campaign within the dataset",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": false
+              }
+            },
+            {
+              "parameter": "min_profile",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "Minimum soil profile depth (cm); samples with profile_min shallower than this are excluded",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": false
+              }
+            },
+            {
+              "parameter": "max_profile",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 20,
+              "hint": "Maximum soil profile depth (cm); samples with profile_max deeper than this are excluded",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+
+  "single_filter": {
+    "comment": "filter spectra using moving average, weighted kernel, Salitzy-Golay or Gaussian filter",
+    "begin_wavelength": 550,
+    "end_wavelength": 1100,
+    "moving_average": {
+      "kernel": [],
+      "mode": "nearest"
+    },
+    "gauss": {
+      "sigma": 0,
+      "mode": "nearest"
+    },
+    "savitzky-golay": {
+      "window_length": 5,
+      "polyorder": 2,
+      "deriv": 1,
+      "mode": "nearest"
+    }
+  },
+  "multi_filter": {
+    "comment": "filter spectra using moving average, weighted kernel, Salitzy-Golay or Gaussian filter",
+    "apply": false,
+    "mode": "no_end_points",
+    "begin_wavelength": [
+      675,
+      725
+    ],
+    "end_wavelength": [
+      725,
+      775
+    ],
+    "output_bandwidth": [
+      25,
+      10
+    ],
+    "moving_average": {
+      "kernel": [
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ]
+    },
+    "savitzky-golay": {
+      "window_length": [
+        0,
+        0
+      ]
+    },
+    "gauss": {
+      "sigma": [
+        0,
+        0
+      ]
+    }
+  }
+}

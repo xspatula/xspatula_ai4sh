@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_indicator_default_unit",
+        "min_user_stratum": 4,
+        "title": "Manage indicator default unit",
+        "label": "Insert, update or delete the default unit to use for modelling and presenting indicators"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The classification species (any order, family or genus in the database will also be recorded as a species, thus you can enter anyone of order, family, genus or species)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator_default_unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "indicator_id__indicator_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Indicator name",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator_default_unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "unit_id__unit_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of unit to use as default for modeling and presentation.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator_default_unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "system",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "metric",
+              "hint": "Unit system (metric or imperial)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator_default_unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "process": [
+    {
+      "process": "add_root_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "machine_learning",
+        "title": "Machine learning preprocessing and modeling.",
+        "label": "Machine learning preprocessing and modeling"
+      }
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "detect_outliers",
+        "min_user_stratum": 3,
+        "title": "Detect and remove indicator outliers",
+        "label": "Detect and remove indicator outliers using one of the following machine learning models: iforest (isolationforest), ee (eenvelope,ellipticenvelope), lof (lofactor,localoutlierfactor), 1csvm (1c-svm, oneclasssvm)."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+            },
+            {
+              "parameter": "indicator_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Comma separated list of the indicators for which to detect outliers"
+            },
+            {
+              "parameter": "detector",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "none",
+              "hint": "Abbreviation of the outlier detector to apply"
+            },
+            {
+              "parameter": "threshold",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0.1,
+              "hint": "The threshold (contamination/nu) to set for detecting"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

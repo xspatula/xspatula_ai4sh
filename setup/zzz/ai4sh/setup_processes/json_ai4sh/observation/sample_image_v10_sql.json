@@ -1,0 +1,119 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_sample_image_orientation",
+        "min_user_stratum": 4,
+        "title": "Manage sample image orientation",
+        "label": "Insert, update or delete sample image orientation, the image itsalf must already be registered."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sample_image_id__image_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the sample image for whihc to set orientation.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_image_orientation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "horisontal_orientation",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "0",
+              "hint": "The horisontal orientation in degrees with north=0 or 360",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_image_orientation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "pitch",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "0",
+              "hint": "Pitch is the camera tilting angle along the lateral axis between the camera and the object (the front of the camera is higher or lower than the back and the image is to some degree showing the object from below or above).",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_image_orientation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "roll",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "0",
+              "hint": "Roll is the camera tilting angle along the longitudinal axis between the camera and the object (one side of the camera is higher than the other side snd the object is to some degree oblique).",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_image_orientation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "yaw",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "0",
+              "hint": "Yaw represents rotation around the vertical axis and corresponds to the horisontal orientation for geolocated images, for object images it can represent an arbitrary direction as long as all images related to the same object use the same baseline direction as reference (use the same north so to say).",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_image_orientation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "panorama",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "True if the sample images are intended for a panorama mosaic.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_image_orientation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

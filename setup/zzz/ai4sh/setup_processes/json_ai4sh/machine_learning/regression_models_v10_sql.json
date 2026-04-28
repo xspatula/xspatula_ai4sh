@@ -1,0 +1,123 @@
+{
+  "process": [
+    {
+      "process": "add_root_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "machine_learning",
+        "title": "Machine learning preprocessing and modeling.",
+        "label": "Machine learning preprocessing and modeling"
+      }
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "regression_modeling",
+        "min_user_stratum": 3,
+        "title": "Regression modeling of indicators from different covariates",
+        "label": "Regression modeling of indicators from different covariates using an array of the machine learning models. Available regression models include: ols (ordinary least square), theilsen (theilsen robust regressor), huber (huber robust regressor), knn (K-nearest neighbor regressor), detree (decision tree regressor), svr (support vector machine regressor), mlp (multi-layer perception), cubit (an expert based regressor) and plsr (partial least square regressor)."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+            },
+            {
+              "parameter": "indicator_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Comma separated list of the indicators to evaluate."
+            },
+            {
+              "parameter": "regressor_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Comma separated list of the regressor to apply, valid entries: ols, theilsen, huber, knn, detree, svr, mlp, cubit, plsr."
+            },
+            {
+              "parameter": "model_parameters_fp",
+              "parameter_type": "test",
+              "required": false,
+              "default_value": "",
+              "hint": "Relative or absolute path to the JSON file with the multi_filter definition. If not set or set to none the default settings in the sci-kit learn package will be used."
+            },
+            {
+              "parameter": "traintest",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "whether or not to apply regression modeling using a train- test division of the source data (dataframe)"
+            },
+            {
+              "parameter": "test_size",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0.3,
+              "hint": "whether or not to apply regression modeling using a train- test division of the source data (dataframe)"
+            },
+            {
+              "parameter": "kfold",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "whether or not to apply regression modeling using a k-fold approach"
+            },
+            {
+              "parameter": "folds",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 10,
+              "hint": "whether or not to apply regression modeling using a k-fold approach"
+            },
+            {
+              "parameter": "folds",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 10,
+              "hint": "whether or not to apply regression modeling using a k-fold approach"
+            },
+            {
+              "parameter": "targetfeaturesymbols",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "The symbolisation of indicators, if not set to default you have to give a relative or abolute path"
+            },
+            {
+              "parameter": "regressionmodelsymbols",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "The symbolisation of regressors, if not set to default you have to give a relative or abolute path"
+            },
+            {
+              "parameter": "n_top_features_in_plot",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "Maximum number of features to show in importance/permutation bar plots. 0 = show all. Y-axis labels are suppressed when showing more than 40 features."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

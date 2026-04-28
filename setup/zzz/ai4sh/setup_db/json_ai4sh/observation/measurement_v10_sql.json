@@ -1,0 +1,61 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "measurement",
+        "command": [
+          "id BIGSERIAL",
+          "observation_id INTEGER REFERENCES observation.observation (id)",
+          "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
+          "value REAL",
+          "standard_deviation REAL",
+          "n_repeat SMALLINT",
+          "UNIQUE (observation_id,indicator_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "observation_measurement_array",
+        "command": [
+          "id BIGSERIAL",
+          "observation_id INTEGER REFERENCES observation.observation (id)",
+          "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
+          "value REAL[]",
+          "standard_deviation REAL[]",
+          "n_repeat SMALLINT",
+          "UNIQUE (observation_id,indicator_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "observation_measurement",
+        "command": [
+          "id BIGSERIAL",
+          "observation_id INTEGER REFERENCES observation.observation (id)",
+          "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
+          "value REAL",
+          "standard_deviation REAL",
+          "n_repeat SMALLINT",
+          "UNIQUE (observation_id,indicator_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "permutation_selector": {
+    "repeats": 6,
+    "n_features_to_select": 8,
+    "step": 1
+  }
+}

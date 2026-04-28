@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_quantity_default_unit",
+        "min_user_stratum": 4,
+        "title": "Manage quantity default unit",
+        "label": "Insert, update or delete the default unit for a particlar species (order, family, genus) of subtances that apply to this default."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "species_id__species_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The classification species (any order, family or genus in the database will also be recorded as a species, thus you can enter anyone of order, family, genus or species)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "quantity_default_unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "quantity_id__quantity_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "quantity name",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "quantity_default_unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "unit_id__unit_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of unit to use as default for modeling and presentation.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "quantity_default_unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "system",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unit system (metric or imperial)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "quantity_default_unit",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

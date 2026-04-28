@@ -1,0 +1,12 @@
+{
+  "process": [
+    {
+      "process": "select_indicator",
+      "overwrite": false,
+      "parameters": {
+        "dataset_name": "ai4sh",
+        "campaign_name": ""
+      }
+    }
+  ]
+}

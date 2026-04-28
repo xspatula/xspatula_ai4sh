@@ -1,0 +1,48 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "location_method",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "abstract TEXT",
+          "display_name TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "location_method",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "0",
+              "unknown",
+              "none",
+              "Unknwon",
+              "Unknown method used for geolocation."
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

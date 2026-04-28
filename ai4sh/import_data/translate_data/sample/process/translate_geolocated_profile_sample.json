@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "process": "translate_tabular_data",
+      "overwrite": true,
+      "parameters": {
+        "process": "manage_geolocated_profile_sample",
+        "tabular_data_path": "../../../excel_src_data/sample/AI4SH_samples_geolocation-id.xlsx",
+        "dst_path": "../../../manage_data/sample/process"
+      }
+    }
+  ]
+}

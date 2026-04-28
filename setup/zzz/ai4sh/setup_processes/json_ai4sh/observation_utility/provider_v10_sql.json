@@ -1,0 +1,152 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_provider",
+        "min_user_stratum": 4,
+        "title": "Manage provider",
+        "label": "Insert, update or delete povider of observaion equipment, instruments or services that generate observation values"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the provider (for example measuring device manufactor, laboratory)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provider",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "full_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Full legal aame of the provider (for example measuring device manufactor, laboratory)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provider",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unequivocal abbreviation or short code for the provider",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provider",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name for the provider",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provider",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "url of the provider",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provider",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "contact_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Name of contact person at provider",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provider",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "contact_email",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Email of contact person at provider",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provider",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            }
+            ,
+            {
+              "parameter": "changed_into_id",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": "-1",
+              "hint": "If the provider changed (e.g. by being bought by another provider or reorganisation)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "provider",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
