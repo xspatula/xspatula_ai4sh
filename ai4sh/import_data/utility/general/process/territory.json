@@ -1,0 +1,12 @@
+{
+  "process": [
+    {
+      "process": "translate_tabular_data",
+      "parameters": {
+        "process": "manage_territory",
+        "tabular_data_path": "../../../utility/general/excel/territory.xlsx",
+        "dst_path": "../../../utility/general/manage_process"
+      }
+    }
+  ]
+}

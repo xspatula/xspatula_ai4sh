@@ -1,5 +1,0 @@
-############################################
-##### XSPATULA ADD SPECTROMETER #####
-############################################
-neospectra_neoscanner_23040128_spectrometer.json
-neospectra_neoscanner_auth_spectrometer.json

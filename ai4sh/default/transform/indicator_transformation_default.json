@@ -209,7 +209,7 @@
       "quantile": false
     },
     "coarse sand": {
-      "log": false,
+      "log": true,
       "sqrt": false,
       "reciprocal": false,
       "boxcox": false,

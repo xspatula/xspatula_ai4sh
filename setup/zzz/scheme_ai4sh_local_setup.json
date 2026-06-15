@@ -3,7 +3,7 @@
   "postgresdb": {
     "host": "localhost",
     "port": 5432,
-    "db": "ai4soilhealth",
+    "db": "ai4sh",
     "user_name": "karttur",
     "password": "weg-iK8-tng-w9k",
     "db_users": [

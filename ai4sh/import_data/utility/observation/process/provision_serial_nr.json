@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "overwrite": true,
+      "process": "translate_tabular_data",
+      "parameters": {
+        "process": "manage_provision_serial_nr",
+        "tabular_data_path": "../../../utility/observation/excel/provision_serial_nr.xlsx",
+        "dst_path": "../../../utility/observation/manage_process"
+      }
+    }
+  ]
+}

@@ -11,8 +11,7 @@
         "model_parameters_fp":"./project_neospectra/regressors/regression_model_parameters.json",
         "traintest": true,
         "test_size": 0.3,
-        "kfold": false,
-        "max_covariates_in_permutation_importance_plot": 8
+        "kfold": false
       }
     }
   ]

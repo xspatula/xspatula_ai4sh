@@ -65,10 +65,25 @@ setup/src_setup/postgres/environment/
 .claude/
 
 # =============================================================
-# Output data
+# Development data
 # =============================================================
 ai4sh/project-first_trial/
-ai4sh/project/
-notes/
+ai4sh/project_neospectra/
+ai4sh/project_neospectra_2nm/
+ai4sh/default/
 old_code/
 old_code_example/
+notes/
+
+# =============================================================
+# JSON data
+# =============================================================
+ai4sh/DS2500_spectra/
+ai4sh/FTIR_spectra/
+ai4sh/LIBS_spectra/
+ai4sh/neospectra/
+dataset/manage_process/
+sample/manage_process/
+utility/general/manage_process/
+utility/observation/manage_process/
+wetlab/agrolab/manage_process/

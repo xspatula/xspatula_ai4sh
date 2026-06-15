@@ -265,6 +265,118 @@ def _resolve_input_parquet(project_root_fp, dataframe_param):
     return fp
 
 
+def _prev_df_path(project_root_fp):
+    return os.path.join(project_root_fp, '.previous_dataframe')
+
+
+def _read_previous_df(project_root_fp):
+    fp = _prev_df_path(project_root_fp)
+    if not os.path.exists(fp):
+        return None
+    try:
+        with open(fp) as fh:
+            return json.load(fh)
+    except Exception:
+        return None
+
+
+def _write_previous_df(project_root_fp, process_name, entries):
+    from datetime import datetime
+    data = {
+        'process': process_name,
+        'timestamp': datetime.now().isoformat(timespec='seconds'),
+        'entries': entries,
+    }
+    with open(_prev_df_path(project_root_fp), 'w') as fh:
+        json.dump(data, fh, indent=2)
+
+
+def _resolve_single_previous(project_root_fp):
+    '''For simple processes: read .previous_dataframe, confirm interactively, return path or None.'''
+    prev = _read_previous_df(project_root_fp)
+    if prev is None:
+        print('    ERROR: no .previous_dataframe found in %s' % project_root_fp)
+        return None
+    entries = prev.get('entries', [])
+    if not entries:
+        print('    ERROR: .previous_dataframe has no entries.')
+        return None
+    entry = entries[0]
+    parquet_name = entry.get('dataframe', '')
+    parquet_fp = os.path.join(project_root_fp, parquet_name)
+    if not os.path.exists(parquet_fp):
+        print('    ERROR: previous dataframe not found: %s' % parquet_fp)
+        return None
+    print('    Previous: %s — %s' % (prev.get('process', '?'), parquet_name))
+    return parquet_fp
+
+
+def _resolve_previous_for_arrays(project_root_fp, indicator_cols, reg_keys, sel_keys):
+    '''For array processes: read .previous_dataframe, confirm, validate, return mapping or None.
+
+    Returns either {'_single': abs_path} when all combos share one parquet,
+    or {(indicator, regressor, selector): abs_path} for per-combo parquets.
+    reg_keys / sel_keys may be empty (pass [] for dimensions not applicable).
+    Returns None to abort.
+    '''
+    prev = _read_previous_df(project_root_fp)
+    if prev is None:
+        print('    ERROR: no .previous_dataframe found in %s' % project_root_fp)
+        return None
+    entries = prev.get('entries', [])
+    if not entries:
+        print('    ERROR: .previous_dataframe has no entries.')
+        return None
+
+    print('    Previous: %s  (%d entry/entries)' % (prev.get('process', '?'), len(entries)))
+
+    # Common case: single null-keyed entry — apply to all combos
+    if (len(entries) == 1 and
+            entries[0].get('indicator') is None and
+            entries[0].get('regressor') is None and
+            entries[0].get('selector') is None):
+        fp = os.path.join(project_root_fp, entries[0]['dataframe'])
+        if not os.path.exists(fp):
+            print('    ERROR: previous dataframe not found: %s' % fp)
+            return None
+        print('      %s  (shared for all combos)' % entries[0]['dataframe'])
+        return {'_single': fp}
+
+    # Per-combo entries: match requested combinations
+    for e in entries:
+        print('      %s  [ind=%s  reg=%s  sel=%s]' % (
+            e.get('dataframe', '?'), e.get('indicator'), e.get('regressor'), e.get('selector')))
+    req_regs = reg_keys if reg_keys else [None]
+    req_sels = sel_keys if sel_keys else [None]
+    lookup = {}
+    for e in entries:
+        k = (e.get('indicator'), e.get('regressor'), e.get('selector'))
+        fp = os.path.join(project_root_fp, e.get('dataframe', ''))
+        if os.path.exists(fp):
+            lookup[k] = fp
+    missing = []
+    found = {}
+    for ind in indicator_cols:
+        for reg in req_regs:
+            for sel in req_sels:
+                k = (ind, reg, sel)
+                if k in lookup:
+                    found[k] = lookup[k]
+                else:
+                    missing.append(k)
+    if missing:
+        print('    WARNING: %d requested combo(s) not in .previous_dataframe:' % len(missing))
+        for m in missing[:5]:
+            print('      indicator=%s  regressor=%s  selector=%s' % m)
+        ans = input('    Proceed with restricted set? [y/n]: ').strip().lower()
+        if ans != 'y':
+            return None
+    if not found:
+        print('    ERROR: no matching previous dataframes found.')
+        return None
+    return found
+
+
 def _spectra_x_axis_ml(columns):
     '''Return (x_values, x_label) appropriate for the column list.'''
     if not columns:
@@ -373,6 +485,7 @@ class Process_ml_preprocess(Get_schema_table):
 
     def _Plot_outliers(self, df, indicator_cols, masks, actual_detectors,
                        detector_name, threshold, show, save, plot_dir):
+        plt.close('all')
         n = len(indicator_cols)
         fig, axes = plt.subplots(nrows=n, ncols=1, figsize=(9, 2.5 * n))
         if n == 1:
@@ -437,11 +550,16 @@ class Process_ml_preprocess(Get_schema_table):
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
 
         # Load parquet
-        try:
-            parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-        except FileNotFoundError as e:
-            print('    ERROR: %s' % e)
-            return
+        if dataframe_param.lower() == 'previous':
+            parquet_fp = _resolve_single_previous(project_root_fp)
+            if parquet_fp is None:
+                return
+        else:
+            try:
+                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
+            except FileNotFoundError as e:
+                print('    ERROR: %s' % e)
+                return
         df = pd.read_parquet(parquet_fp)
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
@@ -449,9 +567,6 @@ class Process_ml_preprocess(Get_schema_table):
         # Derive _ol output path
         stem      = os.path.splitext(os.path.basename(parquet_fp))[0]
         ol_del_fp = os.path.join(project_root_fp, '%s_ol.parquet' % stem)
-
-        if os.path.exists(ol_del_fp) and not overwrite:
-            return
 
         # Determine which indicators to process
         requested = _parse_array_param(getattr(p, 'indicator_array', []))
@@ -483,42 +598,56 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: unknown detector "%s".' % detector_name)
             return
 
-        # Per-indicator outlier detection
-        masks            = {}
-        actual_detectors = {}
-        for col in indicator_cols:
-            vals  = df[col].values.astype(float)
-            valid = ~np.isnan(vals)
-            if valid.sum() < 5:
-                print('    WARNING: too few valid values for "%s" (%d), skipping.' % (col, valid.sum()))
-                masks[col]            = np.zeros(len(df), dtype=bool)
-                actual_detectors[col] = detector_name
-                continue
+        def _run_detection(thr):
+            m = {}; ad = {}
+            for col in indicator_cols:
+                vals  = df[col].values.astype(float)
+                valid = ~np.isnan(vals)
+                if valid.sum() < 5:
+                    print('    WARNING: too few valid values for "%s" (%d), skipping.' % (col, valid.sum()))
+                    m[col] = np.zeros(len(df), dtype=bool)
+                    ad[col] = detector_name
+                    continue
+                X   = vals[valid].reshape(-1, 1)
+                det = _build_detector(detector_name, thr)
+                used_name = detector_name
+                try:
+                    yhat = det.fit_predict(X)
+                except Exception:
+                    det = IsolationForest(contamination=thr)
+                    yhat = det.fit_predict(X)
+                    used_name = 'iforest'
+                ad[col] = used_name
+                full_mask = np.zeros(len(df), dtype=bool)
+                full_mask[np.where(valid)[0][yhat == -1]] = True
+                m[col] = full_mask
+            return m, ad
 
-            X   = vals[valid].reshape(-1, 1)
-            det = _build_detector(detector_name, threshold)
-            used_name = detector_name
-            try:
-                yhat = det.fit_predict(X)
-            except Exception:
-                # EllipticEnvelope can fail on near-degenerate 1D distributions
-                det       = IsolationForest(contamination=threshold)
-                yhat      = det.fit_predict(X)
-                used_name = 'iforest'
-
-            actual_detectors[col] = used_name
-            full_mask = np.zeros(len(df), dtype=bool)
-            full_mask[np.where(valid)[0][yhat == -1]] = True
-            masks[col] = full_mask
-
-        # Summary
-        summary = '  '.join('%s: %d' % (c, int(masks[c].sum())) for c in indicator_cols)
-        print('    Outliers detected — %s' % summary)
-
-        # Plot
+        # Interactive threshold loop — user can adjust until satisfied
         plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
-        self._Plot_outliers(df, indicator_cols, masks, actual_detectors,
-                            detector_name, threshold, show, save, plot_dir)
+        while True:
+            masks, actual_detectors = _run_detection(threshold)
+            summary = '  '.join('%s: %d' % (c, int(masks[c].sum())) for c in indicator_cols)
+            print('    Outliers detected (threshold=%.3f) — %s' % (threshold, summary))
+            self._Plot_outliers(df, indicator_cols, masks, actual_detectors,
+                                detector_name, threshold, show, save, plot_dir)
+            raw = input(
+                '\n    New threshold? (0=skip outlier detection, Enter=accept %.3f): ' % threshold
+            ).strip()
+            if raw == '':
+                break
+            try:
+                val = float(raw)
+            except ValueError:
+                print('    Invalid input — please enter a number or press Enter.')
+                continue
+            if val == 0:
+                print('    Outlier detection skipped.')
+                return
+            if not (0 < val < 1):
+                print('    Threshold must be between 0 and 1 (exclusive). Try again.')
+                continue
+            threshold = val
 
         # Interactive removal prompt
         total = sum(int(masks[c].sum()) for c in indicator_cols)
@@ -550,11 +679,23 @@ class Process_ml_preprocess(Get_schema_table):
             return
 
         # Apply NaN replacements and save
+        if os.path.exists(ol_del_fp) and not overwrite:
+            print('    Output already exists. Use overwrite=True to save. Skipping save.')
+            _write_previous_df(project_root_fp, 'detect_outliers', [
+                {'dataframe': os.path.basename(ol_del_fp),
+                 'indicator': None, 'regressor': None, 'selector': None}
+            ])
+            return
+
         df_out = df.copy()
         for col in approved:
             df_out.loc[masks[col], col] = np.nan
 
         df_out.to_parquet(ol_del_fp, index=False)
+        _write_previous_df(project_root_fp, 'detect_outliers', [
+            {'dataframe': os.path.basename(ol_del_fp),
+             'indicator': None, 'regressor': None, 'selector': None}
+        ])
 
         out_stem      = os.path.splitext(os.path.basename(ol_del_fp))[0]
         spectral_kept = [c for c in df.columns if _is_spectral_col(c)]
@@ -664,27 +805,19 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra = int(getattr(p, 'max_spectra', 100))
 
         # Resolve input parquet
-        if dataframe_param.lower() == 'raw':
-            candidates = [
-                f for f in glob.glob(os.path.join(project_root_fp, 'data-*.parquet'))
-                if '_ol' not in os.path.basename(f) and '_vt' not in os.path.basename(f)
-            ]
-            if not candidates:
-                print('    ERROR: no raw data-*.parquet found in %s' % project_root_fp)
+        if dataframe_param.lower() == 'previous':
+            parquet_fp = _resolve_single_previous(project_root_fp)
+            if parquet_fp is None:
                 return
-            parquet_fp = candidates[0]
-            df = pd.read_parquet(parquet_fp)
-            if self.verbose >= 1:
-                print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
         else:
-            name = dataframe_param if dataframe_param.endswith('.parquet') else dataframe_param + '.parquet'
-            parquet_fp = os.path.join(project_root_fp, name)
-            if not os.path.exists(parquet_fp):
-                print('    ERROR: dataframe file not found: %s' % parquet_fp)
+            try:
+                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
+            except FileNotFoundError as e:
+                print('    ERROR: %s' % e)
                 return
-            df = pd.read_parquet(parquet_fp)
-            if self.verbose >= 1:
-                print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
+        df = pd.read_parquet(parquet_fp)
+        if self.verbose >= 1:
+            print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
 
         # Derive _vt output path
         stem   = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -692,6 +825,10 @@ class Process_ml_preprocess(Get_schema_table):
 
         if os.path.exists(vt_fp) and not overwrite:
             print('    Variance threshold already applied. Use overwrite=True to rerun.')
+            _write_previous_df(project_root_fp, 'select_variance_threshold', [
+                {'dataframe': os.path.basename(vt_fp),
+                 'indicator': None, 'regressor': None, 'selector': None}
+            ])
             return
 
         # Extract spectral columns
@@ -749,6 +886,10 @@ class Process_ml_preprocess(Get_schema_table):
         df_out = df[non_spectral + retain_cols].copy()
 
         df_out.to_parquet(vt_fp, index=False)
+        _write_previous_df(project_root_fp, 'select_variance_threshold', [
+            {'dataframe': os.path.basename(vt_fp),
+             'indicator': None, 'regressor': None, 'selector': None}
+        ])
 
         out_stem = os.path.splitext(os.path.basename(vt_fp))[0]
         _write_companion_json(
@@ -781,11 +922,16 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra = int(getattr(p, 'max_spectra', 100))
         colormap    = str(getattr(p, 'colormap', 'jet')).strip() or 'jet'
 
-        try:
-            parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-        except FileNotFoundError as e:
-            print('    ERROR: %s' % e)
-            return None
+        if dataframe_param.lower() == 'previous':
+            parquet_fp = _resolve_single_previous(project_root_fp)
+            if parquet_fp is None:
+                return None
+        else:
+            try:
+                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
+            except FileNotFoundError as e:
+                print('    ERROR: %s' % e)
+                return None
 
         df = pd.read_parquet(parquet_fp)
         if self.verbose >= 1:
@@ -894,6 +1040,12 @@ class Process_ml_preprocess(Get_schema_table):
 
         if os.path.exists(out_fp) and not overwrite:
             print('    "%s" already applied. Use overwrite=True to rerun.' % abbrev)
+            _proc = (step_info[0].get('process', 'unknown') if isinstance(step_info, list)
+                     else step_info.get('process', 'unknown'))
+            _write_previous_df(project_root_fp, _proc, [
+                {'dataframe': os.path.basename(out_fp),
+                 'indicator': None, 'regressor': None, 'selector': None}
+            ])
             return out_fp, True
 
         ans = input('\n    Accept and save %s result? [y/n]: ' % abbrev).strip().lower()
@@ -912,6 +1064,12 @@ class Process_ml_preprocess(Get_schema_table):
             save_df.reset_index(drop=True),
         ], axis=1)
         df_save.to_parquet(out_fp, index=False)
+        _proc = (step_info[0].get('process', 'unknown') if isinstance(step_info, list)
+                 else step_info.get('process', 'unknown'))
+        _write_previous_df(project_root_fp, _proc, [
+            {'dataframe': os.path.basename(out_fp),
+             'indicator': None, 'regressor': None, 'selector': None}
+        ])
         _write_companion_json(project_root_fp, stem, out_stem, saved_cols, step_info)
         print('    Saved: %s' % out_fp)
         return out_fp, False
@@ -961,11 +1119,16 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = str(getattr(p, 'colormap', 'jet')).strip() or 'jet'
 
-        try:
-            parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-        except FileNotFoundError as e:
-            print('    ERROR: %s' % e)
-            return
+        if dataframe_param.lower() == 'previous':
+            parquet_fp = _resolve_single_previous(project_root_fp)
+            if parquet_fp is None:
+                return
+        else:
+            try:
+                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
+            except FileNotFoundError as e:
+                print('    ERROR: %s' % e)
+                return
 
         df   = pd.read_parquet(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -1035,11 +1198,16 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = str(getattr(p, 'colormap', 'jet')).strip() or 'jet'
 
-        try:
-            parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-        except FileNotFoundError as e:
-            print('    ERROR: %s' % e)
-            return
+        if dataframe_param.lower() == 'previous':
+            parquet_fp = _resolve_single_previous(project_root_fp)
+            if parquet_fp is None:
+                return
+        else:
+            try:
+                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
+            except FileNotFoundError as e:
+                print('    ERROR: %s' % e)
+                return
 
         df   = pd.read_parquet(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -1141,11 +1309,16 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = str(getattr(p, 'colormap', 'jet')).strip() or 'jet'
 
-        try:
-            parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-        except FileNotFoundError as e:
-            print('    ERROR: %s' % e)
-            return
+        if dataframe_param.lower() == 'previous':
+            parquet_fp = _resolve_single_previous(project_root_fp)
+            if parquet_fp is None:
+                return
+        else:
+            try:
+                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
+            except FileNotFoundError as e:
+                print('    ERROR: %s' % e)
+                return
 
         df   = pd.read_parquet(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -1310,11 +1483,16 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra         = int(getattr(p, 'max_spectra', 100))
         colormap            = str(getattr(p, 'colormap', 'jet')).strip() or 'jet'
 
-        try:
-            parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-        except FileNotFoundError as e:
-            print('    ERROR: %s' % e)
-            return
+        if dataframe_param.lower() == 'previous':
+            parquet_fp = _resolve_single_previous(project_root_fp)
+            if parquet_fp is None:
+                return
+        else:
+            try:
+                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
+            except FileNotFoundError as e:
+                print('    ERROR: %s' % e)
+                return
 
         df   = pd.read_parquet(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -1533,11 +1711,20 @@ class Process_ml_preprocess(Get_schema_table):
         tree_n_est   = int(sel_defaults.get('tree_based_selector', {}).get('n_estimators', 20))
 
         # Load parquet
-        try:
-            parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-        except FileNotFoundError as e:
-            print('    ERROR: %s' % e)
-            return
+        if dataframe_param.lower() == 'previous':
+            # Resolve after indicator_cols is known — use single-entry path for now;
+            # multi-combo resolution happens inside the loop if prev_map is returned.
+            prev_map = None  # resolved below after indicator_cols is determined
+            parquet_fp = _resolve_single_previous(project_root_fp)
+            if parquet_fp is None:
+                return
+        else:
+            prev_map = None
+            try:
+                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
+            except FileNotFoundError as e:
+                print('    ERROR: %s' % e)
+                return
         df   = pd.read_parquet(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
         if self.verbose >= 1:
@@ -1734,6 +1921,12 @@ class Process_ml_preprocess(Get_schema_table):
             out_fp   = os.path.join(project_root_fp, out_stem + '.parquet')
             if os.path.exists(out_fp) and not overwrite:
                 print('    "%s" already exists. Use overwrite=True to rerun.' % out_stem)
+                _prev_entries_acc.append({
+                    'dataframe': os.path.basename(out_fp),
+                    'indicator': indicator,
+                    'regressor': reg_key,
+                    'selector':  sel_key,
+                })
                 return
             non_spectral = [c for c in df.columns if not _is_spectral_col(c)]
             spec_out = df[top_cols].copy()
@@ -1755,7 +1948,17 @@ class Process_ml_preprocess(Get_schema_table):
             }
             _write_companion_json(project_root_fp, stem, out_stem,
                                    list(spec_out.columns), step_info)
+            # Accumulate entry — caller (_prompt_and_write wrapper) collects and writes all at end
+            _prev_entries_acc.append({
+                'dataframe': os.path.basename(out_fp),
+                'indicator': indicator,
+                'regressor': reg_key,
+                'selector':  sel_key,
+            })
             print('    Saved: %s  (%d bands)' % (out_fp, n_retain))
+
+        # Collects {dataframe, indicator, regressor, selector} for each saved parquet
+        _prev_entries_acc = []
 
         # ---- main loop: indicator × regressor × selector ----
         if separate_selections:
@@ -1837,6 +2040,10 @@ class Process_ml_preprocess(Get_schema_table):
                     plt.close(fig)
                     _save_scores_json(mean_scores, None, label, reg_key, sel_key, 'combined')
                     _prompt_and_write(order, label, reg_key, sel_key, suffix, 'combined')
+
+        if _prev_entries_acc:
+            _write_previous_df(project_root_fp, 'spectra_indicator_permutation_selection',
+                               _prev_entries_acc)
 
     # ------------------------------------------------------------------ individual steps
 

@@ -1,0 +1,23 @@
+##############################################
+### PROCESSES CREATED BY XSPATULA 20260518 ###
+##############################################
+manage_analysis_method.json
+manage_apparatus.json
+manage_order.json
+manage_license.json
+manage_location_method.json
+manage_method_tier.json
+manage_preparation.json
+manage_preservation.json
+manage_provider.json
+manage_quantity.json
+manage_setting_system.json
+manage_spatial_reference.json
+manage_storage.json
+manage_transportation.json
+manage_unit.json
+manage_family.json
+manage_genus.json
+manage_indicator.json
+manage_juxtaposition.json
+manage_profiling.json

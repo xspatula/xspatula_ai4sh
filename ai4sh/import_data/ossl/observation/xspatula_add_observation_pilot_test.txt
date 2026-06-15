@@ -1,5 +1,0 @@
-############################################
-##### XSPATULA ADD OBSERVATION #####
-############################################
-lucas_eu_2009@lucas-lucas-wetlab-2009-2009_47043994@0-20_a_0_uniform_20090501_observation.json
-lucas_eu_2009@lucas-lucas-wetlab-2009-2009_46604008@0-20_a_0_uniform_20090501_observation.json

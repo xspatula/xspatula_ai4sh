@@ -1,8 +1,0 @@
-##############################################
-### PROCESSES CREATED BY XSPATULA 20260406 ###
-##############################################
-/Users/thomasgumbricht/GitHub_xspatula/load_ai4sh_db/ai4sh/import_data/manage_data/utility/process/manage_provision.json
-
-/Users/thomasgumbricht/GitHub_xspatula/load_ai4sh_db/ai4sh/import_data/manage_data/utility/process/manage_provision_indicator.json
-
-/Users/thomasgumbricht/GitHub_xspatula/load_ai4sh_db/ai4sh/import_data/manage_data/utility/process/manage_provision_serial_nr.json

@@ -1,0 +1,7 @@
+##############################################
+### PROCESSES CREATED BY XSPATULA 20260518 ###
+##############################################
+
+manage_provision.json
+manage_provision_indicator.json
+manage_provision_serial_nr.json

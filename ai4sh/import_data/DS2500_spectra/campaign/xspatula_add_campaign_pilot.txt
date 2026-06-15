@@ -1,8 +1,0 @@
-############################################
-##### XSPATULA ADD CAMPAIGN #####
-############################################
-ai4sh_dk_foulum_campaign.json
-ai4sh_fi_jokioinen_campaign.json
-ai4sh_hr_neretva_campaign.json
-ai4sh_nl_boermarke-zeijen_campaign.json
-ai4sh_se_loennstorp_campaign.json

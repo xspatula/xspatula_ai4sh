@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+
+      "process": "translate_tabular_data",
+      "parameters": {
+        "process": "manage_foreign_key",
+        "tabular_data_path": "../../../excel_src_data/utility/foreign_key.xlsx",
+        "dst_path": "../../../utility/observation/manage_process"
+      }
+    }
+  ]
+}

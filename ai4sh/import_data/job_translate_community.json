@@ -1,7 +1,0 @@
-{
-  "process": {
-    "job_folder": "import_data/translate/community",
-    "process_sub_folder": "process",
-    "pilot_file": "translate_community_data.txt"
-  }
-}

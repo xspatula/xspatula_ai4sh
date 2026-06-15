@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "import_data/utility/observation",
+    "process_sub_folder": "process",
+    "pilot_file": "translate_observation_utility.txt"
+  }
+}

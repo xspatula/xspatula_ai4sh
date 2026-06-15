@@ -74,10 +74,78 @@ class PG_manage_AI4SH:
 
         if not rec:
 
-            msg = '⚠️ No sample found for sample name: %s and observation log name: %s' %(query_D['sample_id__sample_name'], query_D['observation_log_id__observation_log_name'])
-            print(msg)
-        
+            # Check if the sample name exists at all, if not, print a warning message and return None
+            sql = "SELECT OS.name from observation.sample AS OS\
+            WHERE OS.name = '%s';" %query_D['sample_id__sample_name']
+
+            recs_sample_name = pg_session_C._Execute_search_all_sql(sql)
+
+            if not recs_sample_name:
+
+                msg = '⚠️ No sample found for sample name: %s' %(query_D['sample_id__sample_name'])
+                print(msg)
+
+                return None
+            
+            # Check the sampling log associated with the sample name, if not, print a warning message and return None
+            sql = "SELECT OSL.name from observation.sampling_log AS OSL\
+            INNER JOIN observation.sample as OS\
+            ON OS.sampling_log_id = OSL.id\
+            WHERE OS.name = '%s';" %query_D['sample_id__sample_name']
+
+            recs_sampling_log = pg_session_C._Execute_search_all_sql(sql)
+
+            if not recs_sampling_log:
+
+                msg = '⚠️ No sampling log found for sample name: %s' %(query_D['sample_id__sample_name'])
+                print(msg)
+
+            else: # sample and sampling log are found, but the observation log is wrong
+                sql = "SELECT OSL.name, OOL.name from observation.observation_log AS OOL\
+                INNER JOIN observation.sampling_log AS OSL\
+                ON OSL.id = OOL.sampling_log_id\
+                INNER JOIN observation.sample as OS\
+                ON OS.sampling_log_id = OSL.id\
+                WHERE OS.name = '%s';" %query_D['sample_id__sample_name']
+
+                recs_logs_sample = pg_session_C._Execute_search_all_sql(sql)
+
+                if recs_logs_sample:
+
+                    msg = '⚠️ Sample %s exists for following observation log(s): %s' %(query_D['sample_id__sample_name'], [rec[1] for rec in recs_logs_sample])
+                    msg += '\n   but the json command states observation log %s' %(query_D['observation_log_id__observation_log_name'])
+                    print(msg)   
+
             return None
+
+            # Check which observation log names are associated with the sample name, if not, print a warning message and return None
+            sql = "SELECT OOL.name from observation.observation_log AS OOL\
+            INNER JOIN observation.sample as OS\
+            ON OS.observation_log_id = OOL.id\
+            WHERE OS.name = '%s';" %query_D['sample_id__sample_name']
+
+            recs_observation_log = pg_session_C._Execute_search_all_sql(sql)
+
+            if not recs_observation_log:
+
+                msg = '⚠️ No observation log found for sample name: %s ' %(query_D['sample_id__sample_name'])
+                print(msg)
+        
+            elif len(recs_observation_log) == 1:
+
+                msg = '⚠️ The sample name: %s is associated with the observation log: %s\n   but the json command states that it should be %s' %(query_D['sample_id__sample_name'], recs_observation_log[0][0], query_D['observation_log_id__observation_log_name'])
+
+            else:
+
+                msg = '⚠️ The sample name: %s is associated with multiple observation logs: %s\n   but the json command states that it should be %s' %(query_D['sample_id__sample_name'], [rec[0] for rec in recs_observation_log], query_D['observation_log_id__observation_log_name'])
+                print(msg)
+
+            return None
+            
+        #sql = "SELECT OOL.name from observation.observation_log AS OOL\
+        #    INNER JOIN observation.sample as OS\
+        #    ON OS.sampling_log_id = OOL.id\
+        #    WHERE OS.name = '%s' AND OOL.name = '%s';" %(query_D['sample_id__sample_name'], query_D['observation_log_id__observation_log_name'])
         
         return ('sample_id__sample_name','sample_id', rec[0])
     

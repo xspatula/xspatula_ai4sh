@@ -65,7 +65,7 @@
           "id SERIAL",
           "sample_id INTEGER REFERENCES observation.sample (id)",
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
-          "area_coverage INTEGER",
+          "area_coverage FLOAT",
           "area_unit_id INTEGER REFERENCES observation_utility.unit (id)",
           "UNIQUE (sample_id)",
           "PRIMARY KEY (id)"

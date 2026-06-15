@@ -1,5 +1,0 @@
-############################################
-##### XSPATULA ADD SAMPLING_LOG #####
-############################################
-lucas_eu_2009_sampling_log.json
-lucas_eu_2015_sampling_log.json

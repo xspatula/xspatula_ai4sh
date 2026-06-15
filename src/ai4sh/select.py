@@ -81,7 +81,7 @@ class Process_select(Get_schema_table):
         subset_dir = '%s_%s-%s_%s' % (p.dataset_name, p.begin_wavelength,
                                        p.end_wavelength, p.output_bandwidth)
 
-        out_dir = os.path.join(p.output_root_fp, p.provision_name, subset_dir)
+        out_dir = os.path.join(p.output_root_fp, subset_dir)
 
         fname_base = '%s_%s-%s_%s' % (p.provision_name, p.begin_wavelength,
                                        p.end_wavelength, p.output_bandwidth)

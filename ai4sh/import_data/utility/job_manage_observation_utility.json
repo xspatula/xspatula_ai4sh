@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "import_data/utility/observation",
+    "process_sub_folder": "manage_process",
+    "pilot_file": "manage_observation_utility.txt"
+  }
+}

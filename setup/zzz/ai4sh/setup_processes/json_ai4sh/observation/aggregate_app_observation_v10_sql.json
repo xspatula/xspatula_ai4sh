@@ -1,0 +1,252 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_aggregate_app_observation",
+        "min_user_stratum": 2,
+        "title": "Manage observation",
+        "label": "Insert, update or delete an aggregate app observation"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the sampling log to which this observation belongs",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "observation_log_id__observation_log_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "Let the observation_log_name be set automatically",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "auto_name": {
+                "concat": "'%s@slakes' %(sampling_log_id__sampling_log_name)"
+              }
+            },
+            {
+              "parameter": "sample_id__sample_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the sample",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "provision_id__provision_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "from_app",
+              "hint": "The name of the provision",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "subsample",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "a",
+              "hint": "Subsample name (only accpets values in a, b, c, ... h), applicable if the same sample is divided and observed more than once in the same log",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "set_value": [
+                {
+                  "value": "a",
+                  "label": "A"
+                },
+                {
+                  "value": "b",
+                  "label": "B"
+                },
+                {
+                  "value": "c",
+                  "label": "C"
+                },
+                {
+                  "value": "d",
+                  "label": "D"
+                },
+                {
+                  "value": "e",
+                  "label": "E"
+                },
+                {
+                  "value": "f",
+                  "label": "F"
+                },
+                {
+                  "value": "g",
+                  "label": "G"
+                },
+                {
+                  "value": "h",
+                  "label": "H"
+                }
+              ]
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Any notation related to the observation",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "observation_date",
+              "parameter_type": "date",
+              "required": false,
+              "default_value": 0,
+              "hint": "The date of the observation, leave blank to set today as date",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "@agg_si",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0,
+              "hint": "Any value from an observation measurement must be given @+indicator",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_measurement",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "n_repeat",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 3,
+              "hint": "The number of aggregates used in the observation",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_measurement",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "timestamp",
+              "parameter_type": "timestamp",
+              "required": false,
+              "default_value": "",
+              "hint": "The timestamp of the observation, leave blank to set now (1/10 of second precision)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "hardware_model_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "from_app",
+              "hint": "the smartphone or tablet model used",
+              "schema_table": {
+                "schema": "observation",
+                "table": "app_aggregate_stability",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "software_name_version",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "from_app",
+              "hint": "The software name and version",
+              "schema_table": {
+                "schema": "observation",
+                "table": "app_aggregate_stability",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "process": [
+    {
+      "process": "translate_tabular_data",
+      "parameters": {
+        "process": "manage_family",
+        "tabular_data_path": "../../../utility/observation/excel/classification_family.xlsx",
+        "dst_path": "../../../utility/observation/manage_process"
+      }
+    }
+  ]
+}

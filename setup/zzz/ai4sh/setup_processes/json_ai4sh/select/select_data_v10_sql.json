@@ -73,6 +73,18 @@
               }
             },
             {
+              "parameter": "out_prefix",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "The prefix to set to the output dataframe, if set to default it will be written as dataset+_+preparation_name_ or campaign+_+preparation_name_, where preparation_name is the alias of the preparation as given in the database, you can also set the prefix freely. To the prefix the band range and resolution will be autoamtically added.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "preparation",
+                "write": false
+              }
+            },
+            {
               "parameter": "begin_wavelength",
               "parameter_type": "integer",
               "required": true,

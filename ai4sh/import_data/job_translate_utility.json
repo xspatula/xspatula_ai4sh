@@ -1,7 +1,0 @@
-{
-  "process": {
-    "job_folder": "import_data/translate_data/utility",
-    "process_sub_folder": "process",
-    "pilot_file": "translate_utility_data.txt"
-  }
-}

@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "import_data/utility/general",
+    "process_sub_folder": "process",
+    "pilot_file": "translate_general_utility.txt"
+  }
+}

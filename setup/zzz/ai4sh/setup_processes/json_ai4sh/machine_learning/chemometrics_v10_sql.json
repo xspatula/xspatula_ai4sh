@@ -27,7 +27,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "raw",
-              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+              "hint": "The dataframe to use as input, raw = original spectra, previous = the latest saved parquet file(s), or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
             },
             {
               "parameter": "chemometrics",
@@ -81,7 +81,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "raw",
-              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+              "hint": "The dataframe to use as input, raw = original spectra, previous = the latest saved parquet file(s), or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
             },
             {
               "parameter": "derivative",
@@ -135,7 +135,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "raw",
-              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+              "hint": "The dataframe to use as input, raw = original spectra, previous = the latest saved parquet file(s), or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
             },
             {
               "parameter": "scaler",
@@ -184,7 +184,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "raw",
-              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+              "hint": "The dataframe to use as input, raw = original spectra, previous = the latest saved parquet file(s), or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
             },
             {
               "parameter": "method",
@@ -231,7 +231,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "raw",
-              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+              "hint": "The dataframe to use as input, raw = original spectra, previous = the latest saved parquet file(s), or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
             },
             {
               "parameter": "method",

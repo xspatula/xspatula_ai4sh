@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process": "translate_tabular_data",
+      "overwrite": true,
+      "parameters": {
+        "process": "manage_geolocation",
+        "tabular_data_path": "../../sample/excel/AI4SH_geolocation.xlsx",
+        "dst_path": "../../sample/manage_process"
+      }
+    },
+    {
+      "process": "translate_tabular_data",
+      "overwrite": true,
+      "parameters": {
+        "process": "manage_geolocated_profile_sample",
+        "tabular_data_path": "../../sample/excel/AI4SH_samples_geotag.xlsx",
+        "dst_path": "../../sample/manage_process"
+      }
+    }
+  ]
+}

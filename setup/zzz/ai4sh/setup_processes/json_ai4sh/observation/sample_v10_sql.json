@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_simple_sample",
@@ -120,7 +120,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_geo_sample",
@@ -282,7 +282,7 @@
             },
             {
               "parameter": "area_coverage",
-              "parameter_type": "integer",
+              "parameter_type": "float",
               "required": false,
               "default_value": 0,
               "hint": "The area representing the sample",
@@ -310,7 +310,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_geolocated_sample",
@@ -448,7 +448,7 @@
             },
             {
               "parameter": "area_coverage",
-              "parameter_type": "integer",
+              "parameter_type": "float",
               "required": false,
               "default_value": 0,
               "hint": "The area representing the sample",
@@ -476,7 +476,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_geo_profile_sample",
@@ -691,7 +691,7 @@
             },
             {
               "parameter": "area_coverage",
-              "parameter_type": "integer",
+              "parameter_type": "float",
               "required": false,
               "default_value": 0,
               "hint": "The area representing the sample",
@@ -719,7 +719,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_geolocated_profile_sample",
@@ -934,7 +934,7 @@
             },
             {
               "parameter": "area_coverage",
-              "parameter_type": "integer",
+              "parameter_type": "float",
               "required": false,
               "default_value": 0,
               "hint": "The area representing the sample",

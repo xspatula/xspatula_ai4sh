@@ -38,10 +38,12 @@ def Run_process(strcutured_process_D, scheme_params_D):
     for key in strcutured_process_D:
 
         json_file_name = path.split(key)[1]
-        
-        msg = '. Command file: %s\n. (%s ready processes to run)' %(key, len(strcutured_process_D[key]))
 
-        print (msg)
+        if scheme_params_D['process'][0]['verbose'] > 0:
+        
+            msg = '. Command file: %s\n.   (%s ready processes to run)' %(key, len(strcutured_process_D[key]))
+
+            print (msg)
 
         for p_nr, process_S in strcutured_process_D[key].items():
 
@@ -52,6 +54,8 @@ def Run_process(strcutured_process_D, scheme_params_D):
                 'process',
                 'process'
             )
+
+            
 
             process_stratum = rec[0] if rec else 0
    
@@ -64,22 +68,24 @@ def Run_process(strcutured_process_D, scheme_params_D):
         
             root_process = process_S.process.root_process
 
-            if process_S.process.overwrite:
+            if process_S.process.verbose > 0:
 
-                msg = '.   Running process nr: %s %s (overwriting)' %(p_nr, 
-                    process_S.process.process)
+                if process_S.process.overwrite: 
 
-            elif process_S.process.delete:
+                    msg = '.   Running process nr: %s %s (overwriting)' %(p_nr, 
+                        process_S.process.process)
 
-                msg = '.   Running process nr: %s %s (deleting)' %(p_nr, 
-                    process_S.process.process)
-                
-            else:
+                elif process_S.process.delete:
 
-                msg = '.   Running process nr: %s %s' %(p_nr,
-                    process_S.process.process)
+                    msg = '.   Running process nr: %s %s (deleting)' %(p_nr, 
+                        process_S.process.process)
                     
-            print (msg)
+                else:
+
+                    msg = '.   Running process nr: %s %s' %(p_nr,
+                        process_S.process.process)
+                        
+                print (msg)
 
             if root_process == 'translate_data':
 

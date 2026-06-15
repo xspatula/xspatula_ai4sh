@@ -1,0 +1,14 @@
+###############################################
+###### translate_general_utility.txt ######
+##### translates DATA FROM EXCEL TO JSON ######
+###############################################
+
+##### TRANSLATE GENERAL UTILITY DATA #####
+##### MUST BE DONE BEFORE DEPENDENT DATA WITH FOREIGN KEYS #####
+
+###===================###
+### GENERAL UTILITIES ###
+###===================###
+
+# You can add territory in territory.xlsx and rerun this translation.
+territory.json

@@ -116,7 +116,10 @@ class Process_import_JSON(Get_schema_table):
 
         if os.path.exists(self.dst_FPN) and not self.process_S.process.overwrite:
 
-            print ('    🟡 JSON destination file already exists. Use overwrite option to replace.')
+            if self.verbose > 1:
+            
+                print ('    🟡 JSON destination file already exists. Use overwrite option to replace.')
+                print ('    🟡 Existing JSON file: %s' %(self.dst_FPN))
 
             return None
         
@@ -668,7 +671,7 @@ class Process_import_JSON(Get_schema_table):
 
             self.pg_session_C._Delete_(schema, table, where_statement)
 
-        else:
+        elif self.process_S.process.verbose > 1:
 
             print ('.     ✅ Record already registered in table %s, use overwrite to update' %(table))
 

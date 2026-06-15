@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "overwrite": true,
+      "process": "translate_tabular_data",
+      "parameters": {
+        "process": "manage_indicator",
+        "tabular_data_path": "../../../utility/observation/excel/indicator.xlsx",
+        "dst_path": "../../../utility/observation/manage_process"
+      }
+    }
+  ]
+}

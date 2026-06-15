@@ -6,7 +6,7 @@
         "project_root_fp": "./project_neospectra/data/neospectra/ai4sh_1350-2550_5",
         "dataframe":"raw",
         "chemometrics": "default",
-        "chemometrics_array": ["scatter_correction","decomposition"]
+        "chemometrics_array": ["meancentring","scatter_correction","decomposition"]
       }
     }
   ]

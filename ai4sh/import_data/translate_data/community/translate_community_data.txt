@@ -1,8 +1,0 @@
-###===========================================###
-### COMMUNITY ###
-###===========================================###
-
-# TG TODO process for community categories, orgs and users
-#community_user_categories.json
-#community_user.json
-#including media etc

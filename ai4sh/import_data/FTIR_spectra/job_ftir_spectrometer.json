@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "import_data/FTIR_spectra/spectrometer",
+    "process_sub_folder": "process",
+    "pilot_file": "xspatula_add_spectrometer_pilot.txt"
+  }
+}

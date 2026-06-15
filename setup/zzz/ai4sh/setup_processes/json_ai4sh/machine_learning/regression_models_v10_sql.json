@@ -36,7 +36,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "raw",
-              "hint": "The dataframe to use as input, raw = original spectra, or state the name of the parquet file with spectra derived from the earlier step(s) to use as input."
+              "hint": "The dataframe to use as input, raw = original spectra, previous = the latest saved parquet file(s), or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
             },
             {
               "parameter": "indicator_array",
@@ -50,7 +50,7 @@
               "parameter_type": "array",
               "required": false,
               "default_value": "",
-              "hint": "Comma separated list of the regressor to apply, valid entries: ols, theilsen, huber, knn, detree, svr, mlp, cubit, plsr."
+              "hint": "Comma separated list of the regressor to apply, valid entries: ols, theilsen, huber, knn, detree, svr, mlp, cubist, plsr."
             },
             {
               "parameter": "model_parameters_fp",
@@ -112,8 +112,50 @@
               "parameter": "n_top_features_in_plot",
               "parameter_type": "integer",
               "required": false,
-              "default_value": 0,
+              "default_value": 8,
               "hint": "Maximum number of features to show in importance/permutation bar plots. 0 = show all. Y-axis labels are suppressed when showing more than 40 features."
+            },
+            {
+              "parameter": "show_observed_predicted",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "Show observed vs predicted plot on screen or not."
+            },
+            {
+              "parameter": "save_observed_predicted",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Save observed vs predicted plot to file or not."
+            },
+            {
+              "parameter": "show_permutation_importance",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Show permutation importance plot on screen or not.""
+            },
+            {
+              "parameter": "save_permutation_importance",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Save permutation importance plot to file or not."
+            },
+            {
+              "parameter": "show_feature_importance",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Show feature importance plot on screen or not."
+            },
+            {
+              "parameter": "save_feature_importance",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Save feature importance plot to file or not."
             }
           ]
         }

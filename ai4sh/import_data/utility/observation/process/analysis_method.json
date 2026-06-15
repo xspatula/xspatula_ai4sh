@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "process": "translate_tabular_data",
+      "overwrite": true,
+      "parameters": {
+        "process": "manage_analysis_method",
+        "tabular_data_path": "../../../utility/observation/excel/analysis_method.xlsx",
+        "dst_path": "../../../utility/observation/manage_process"
+      }
+    }
+  ]
+}

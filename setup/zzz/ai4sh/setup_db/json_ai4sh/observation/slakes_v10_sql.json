@@ -1,0 +1,20 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "app_aggregate_stability",
+        "command": [
+          "id SERIAL",
+          "observation_id INTEGER REFERENCES observation.observation (id)",
+          "hardware_model_name",
+          "software_name_version",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

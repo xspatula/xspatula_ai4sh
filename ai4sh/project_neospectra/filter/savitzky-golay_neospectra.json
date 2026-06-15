@@ -2,7 +2,7 @@
   "savitzky-golay": {
     "window_length": 7,
     "polyorder": 2,
-    "deriv": 0,
+    "deriv": 1,
     "mode": "nearest"
   }
 }

@@ -15,6 +15,18 @@ import joblib
 try:
     from cubist import Cubist
     _CUBIST_AVAILABLE = True
+    # Cubist's _make_data_string uses _escapes() which iterates over
+    # pd.Series.astype(str) and expects pure str elements. Pandas 3.0+
+    # returns ArrowStringArray where NaN stays as float — patch it once.
+    try:
+        import cubist._make_data_string as _cubist_mds
+        from cubist._make_names_string import _escapes as _cubist_escapes_orig
+        def _cubist_escapes_compat(x):
+            x = [c if isinstance(c, str) else str(c) for c in x]
+            return _cubist_escapes_orig(x)
+        _cubist_mds._escapes = _cubist_escapes_compat
+    except Exception:
+        pass
 except ImportError:
     _CUBIST_AVAILABLE = False
 
@@ -35,7 +47,7 @@ from sklearn.metrics import (mean_squared_error, r2_score, mean_absolute_error,
 
 from src.postgres import Get_schema_table
 from src.ai4sh.machine_learning_preprocess import (
-    _resolve_input_parquet, _load_companion_json,
+    _resolve_input_parquet, _resolve_single_previous, _load_companion_json,
     _is_spectral_col, _col_to_index, _parse_array_param, _METADATA_COLS,
 )
 
@@ -99,12 +111,14 @@ def _compute_metrics(obs, pred):
 
 # ------------------------------------------------------------------ feature importance
 
-def _feature_importance(model, key):
+def _feature_importance(model, key, feature_names=None):
     k = key.lower()
     if k in ('ols', 'theil_sen', 'huber'):
         return np.abs(model.coef_)
-    if k in ('dectree', 'randfor', 'cubist'):
+    if k in ('dectree', 'randfor'):
         return model.feature_importances_
+    if k == 'cubist':
+        return None   # permutation importance too slow for 600+ bands
     if k == 'svr':
         if hasattr(model, 'coef_'):
             return np.abs(model.coef_[0])
@@ -297,6 +311,12 @@ class Process_regression_model(Get_schema_table):
         regr_sym_param     = str(getattr(p, 'regressionmodelsymbols', 'default')).strip()
         tgt_sym_param      = str(getattr(p, 'targetfeaturesymbols',   'default')).strip()
         max_cov            = int(getattr(p, 'n_top_features_in_plot', 0))
+        show_scatter       = bool(getattr(p, 'show_observed_predicted',    True))
+        save_scatter       = bool(getattr(p, 'save_observed_predicted',    True))
+        show_perm          = bool(getattr(p, 'show_permutation_importance', False))
+        save_perm          = bool(getattr(p, 'save_permutation_importance', True))
+        show_feat          = bool(getattr(p, 'show_feature_importance',    False))
+        save_feat          = bool(getattr(p, 'save_feature_importance',    True))
 
         if not regressor_array:
             print('    ERROR: regressor_array is empty.')
@@ -305,11 +325,16 @@ class Process_regression_model(Get_schema_table):
             print('    ERROR: both traintest and kfold are false — nothing to run.')
             return
 
-        try:
-            parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-        except FileNotFoundError as e:
-            print('    ERROR: %s' % e)
-            return
+        if dataframe_param.lower() == 'previous':
+            parquet_fp = _resolve_single_previous(project_root_fp)
+            if parquet_fp is None:
+                return
+        else:
+            try:
+                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
+            except FileNotFoundError as e:
+                print('    ERROR: %s' % e)
+                return
         df   = pd.read_parquet(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
         if self.verbose >= 1:
@@ -322,7 +347,8 @@ class Process_regression_model(Get_schema_table):
             print('    ERROR: no spectral columns found.')
             return
         wavelengths = [_col_to_index(c) for c in spectral_cols]
-        X_all       = df[spectral_cols].values.astype(float)
+        col_names   = ['w_%d' % wl for wl in wavelengths]
+        X_all       = pd.DataFrame(df[spectral_cols].values.astype(float), columns=col_names)
 
         all_indicators = [
             c for c in df.columns
@@ -390,8 +416,18 @@ class Process_regression_model(Get_schema_table):
         def _ind_safe(ind):
             return ind.replace(' ', '-').replace('/', '-')
 
-        results_D      = {}
-        fig_save_pairs = []
+        results_D = {}
+
+        def _handle_fig(fig, fp, do_show, do_save):
+            if do_show:
+                plt.figure(fig.number)
+                plt.show()
+            if do_save:
+                os.makedirs(os.path.dirname(fp), exist_ok=True)
+                fig.savefig(fp, dpi=150, bbox_inches='tight')
+                if self.verbose >= 1:
+                    print('    Saved: %s' % fp)
+            plt.close(fig)
 
         for indicator in indicator_cols:
             valid_mask = ~df[indicator].isna()
@@ -409,6 +445,11 @@ class Process_regression_model(Get_schema_table):
             if self.verbose >= 1:
                 print('    Indicator: %s  (%d samples, %d bands)' % (indicator, n_valid, X.shape[1]))
 
+            # split once per indicator — deterministic with fixed random_state
+            if traintest:
+                X_tr, X_te, y_tr, y_te = train_test_split(
+                    X, y, test_size=test_size, random_state=42, shuffle=True)
+
             for model_key, model_proto in regressors.items():
 
                 if self.verbose >= 1:
@@ -416,8 +457,6 @@ class Process_regression_model(Get_schema_table):
 
                 # ---- train / test
                 if traintest:
-                    X_tr, X_te, y_tr, y_te = train_test_split(
-                        X, y, test_size=test_size, random_state=42, shuffle=True)
                     model_tt = clone(model_proto)
                     model_tt.fit(X_tr, y_tr)
                     pred_tt  = model_tt.predict(X_te).ravel()
@@ -431,28 +470,34 @@ class Process_regression_model(Get_schema_table):
                     joblib.dump(model_tt, jl_fp)
                     metrics_tt['model_fp'] = jl_fp
 
-                    fig = _plot_scatter(y_te, pred_tt, model_key, indicator,
-                                        'train/test', metrics_tt, regr_sym_D, tgt_sym_D)
-                    fig_save_pairs.append(
-                        (fig, os.path.join(plot_dir_tt,
-                                           'scatter_%s_%s_tt.png' % (ind_s, model_key))))
+                    if show_scatter or save_scatter:
+                        fig = _plot_scatter(y_te, pred_tt, model_key, indicator,
+                                            'train/test', metrics_tt, regr_sym_D, tgt_sym_D)
+                        _handle_fig(fig,
+                                    os.path.join(plot_dir_tt,
+                                                 'scatter_%s_%s_tt.png' % (ind_s, model_key)),
+                                    show_scatter, save_scatter)
 
-                    imp = _feature_importance(model_tt, model_key)
-                    if imp is not None:
-                        fig2 = _plot_importance(imp, wavelengths, model_key, indicator, 'tt',
-                                                color=ind_color)
-                        fig_save_pairs.append(
-                            (fig2, os.path.join(plot_dir_tt,
-                                                'importance_%s_%s_tt.png' % (ind_s, model_key))))
+                    if show_feat or save_feat:
+                        imp = _feature_importance(model_tt, model_key, col_names)
+                        if imp is not None:
+                            fig2 = _plot_importance(imp, wavelengths, model_key, indicator, 'tt',
+                                                    color=ind_color)
+                            _handle_fig(fig2,
+                                        os.path.join(plot_dir_tt,
+                                                     'importance_%s_%s_tt.png' % (ind_s, model_key)),
+                                        show_feat, save_feat)
 
-                    pi = sk_permutation_importance(
-                        model_tt, X_te, y_te, n_repeats=10, random_state=42)
-                    fig3 = _plot_permutation(pi, wavelengths, model_key, indicator, 'train/test',
-                                             color=ind_color, max_cov=max_cov)
-                    fig_save_pairs.append(
-                        (fig3, os.path.join(plot_dir_tt,
-                                            'permutation_%s_%s_tt.png' % (ind_s, model_key))))
-                    _save_permutation_data(pi, wavelengths, model_key, indicator, 'tt', cov_dir_tt)
+                    if (show_perm or save_perm) and model_key.lower() != 'cubist':
+                        pi = sk_permutation_importance(
+                            model_tt, X_te, y_te, n_repeats=10, random_state=42)
+                        fig3 = _plot_permutation(pi, wavelengths, model_key, indicator, 'train/test',
+                                                 color=ind_color, max_cov=max_cov)
+                        _handle_fig(fig3,
+                                    os.path.join(plot_dir_tt,
+                                                 'permutation_%s_%s_tt.png' % (ind_s, model_key)),
+                                    show_perm, save_perm)
+                        _save_permutation_data(pi, wavelengths, model_key, indicator, 'tt', cov_dir_tt)
 
                     results_D[indicator].setdefault('traintest', {})[model_key] = metrics_tt
                     if self.verbose >= 1:
@@ -490,28 +535,34 @@ class Process_regression_model(Get_schema_table):
                     joblib.dump(model_kf, jl_fp)
                     metrics_kf['model_fp'] = jl_fp
 
-                    fig = _plot_scatter(y, pred_kf, model_key, indicator,
-                                        'k-fold', metrics_kf, regr_sym_D, tgt_sym_D)
-                    fig_save_pairs.append(
-                        (fig, os.path.join(plot_dir_kf,
-                                           'scatter_%s_%s_kf.png' % (ind_s, model_key))))
+                    if show_scatter or save_scatter:
+                        fig = _plot_scatter(y, pred_kf, model_key, indicator,
+                                            'k-fold', metrics_kf, regr_sym_D, tgt_sym_D)
+                        _handle_fig(fig,
+                                    os.path.join(plot_dir_kf,
+                                                 'scatter_%s_%s_kf.png' % (ind_s, model_key)),
+                                    show_scatter, save_scatter)
 
-                    imp = _feature_importance(model_kf, model_key)
-                    if imp is not None:
-                        fig2 = _plot_importance(imp, wavelengths, model_key, indicator, 'kf',
-                                                color=ind_color)
-                        fig_save_pairs.append(
-                            (fig2, os.path.join(plot_dir_kf,
-                                                'importance_%s_%s_kf.png' % (ind_s, model_key))))
+                    if show_feat or save_feat:
+                        imp = _feature_importance(model_kf, model_key, col_names)
+                        if imp is not None:
+                            fig2 = _plot_importance(imp, wavelengths, model_key, indicator, 'kf',
+                                                    color=ind_color)
+                            _handle_fig(fig2,
+                                        os.path.join(plot_dir_kf,
+                                                     'importance_%s_%s_kf.png' % (ind_s, model_key)),
+                                        show_feat, save_feat)
 
-                    pi = sk_permutation_importance(
-                        model_kf, X, y, n_repeats=10, random_state=42)
-                    fig3 = _plot_permutation(pi, wavelengths, model_key, indicator, 'k-fold',
-                                             color=ind_color, max_cov=max_cov)
-                    fig_save_pairs.append(
-                        (fig3, os.path.join(plot_dir_kf,
-                                            'permutation_%s_%s_kf.png' % (ind_s, model_key))))
-                    _save_permutation_data(pi, wavelengths, model_key, indicator, 'kf', cov_dir_kf)
+                    if (show_perm or save_perm) and model_key.lower() != 'cubist':
+                        pi = sk_permutation_importance(
+                            model_kf, X, y, n_repeats=10, random_state=42)
+                        fig3 = _plot_permutation(pi, wavelengths, model_key, indicator, 'k-fold',
+                                                 color=ind_color, max_cov=max_cov)
+                        _handle_fig(fig3,
+                                    os.path.join(plot_dir_kf,
+                                                 'permutation_%s_%s_kf.png' % (ind_s, model_key)),
+                                    show_perm, save_perm)
+                        _save_permutation_data(pi, wavelengths, model_key, indicator, 'kf', cov_dir_kf)
 
                     results_D[indicator].setdefault('kfold', {})[model_key] = metrics_kf
                     if self.verbose >= 1:
@@ -520,20 +571,6 @@ class Process_regression_model(Get_schema_table):
 
         if results_D:
             self._print_summary(results_D, indicator_cols, list(regressors.keys()))
-
-        for fig, _ in fig_save_pairs:
-            plt.figure(fig.number)
-            plt.show()
-
-        if fig_save_pairs:
-            ans = input('\n    Save all %d plots? [y/n]: ' % len(fig_save_pairs)).strip().lower()
-            if ans == 'y':
-                for fig, fp in fig_save_pairs:
-                    fig.savefig(fp, dpi=150, bbox_inches='tight')
-                    if self.verbose >= 1:
-                        print('    Saved: %s' % fp)
-        for fig, _ in fig_save_pairs:
-            plt.close(fig)
 
         out_json = {
             'source_parquet':      os.path.basename(parquet_fp),
