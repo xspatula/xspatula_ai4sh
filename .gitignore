@@ -78,12 +78,14 @@ notes/
 # =============================================================
 # JSON data
 # =============================================================
-ai4sh/DS2500_spectra/
-ai4sh/FTIR_spectra/
-ai4sh/LIBS_spectra/
-ai4sh/neospectra/
-dataset/manage_process/
-sample/manage_process/
-utility/general/manage_process/
-utility/observation/manage_process/
-wetlab/agrolab/manage_process/
+#ai4sh/import_data/dataset/
+#ai4sh/import_data/digit_soil/
+#ai4sh/import_data/DS2500_spectra/
+#ai4sh/import_data/FTIR_spectra/
+#ai4sh/import_data/LIBS_spectra/
+#ai4sh/import_data/neospectra/
+#ai4sh/import_data/OSSL/
+#ai4sh/import_data/sample/
+#ai4sh/import_data/utility/
+#ai4sh/import_data/wetlab/
+ai4sh/import_data/

@@ -138,10 +138,6 @@ class Process_import_JSON(Get_schema_table):
             os.remove(self.dst_FPN)
         
         return True
-
-    def _Auto_naming_OLD(self, schema, table):
-
-        pass
     
     def _Extract_tabular_data(self, column_L, data_L_L):
         ''' Extract the site data from the tabular data file
@@ -384,7 +380,7 @@ class Process_import_JSON(Get_schema_table):
         # move the main table query from schema_table_query_D to main_query_D
         main_query_D = schema_table_query_D.pop(main_table_key)
 
-        if self.verbose >= 1:
+        if self.verbose > 1:
 
             print ('      Managing main schema.table: %s.%s' % (dst_schema, dst_main_table))
 
@@ -575,7 +571,7 @@ class Process_import_JSON(Get_schema_table):
             # Add record_id to the query 
             schema_table_query_D[schema_table][main_table_id] = record_id[0]
 
-            if self.verbose >= 1:
+            if self.verbose > 1:
 
                 print ('      Managing specifics in sub schema.table:', schema_table)
 

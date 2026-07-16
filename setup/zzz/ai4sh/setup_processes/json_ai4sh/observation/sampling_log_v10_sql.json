@@ -109,10 +109,10 @@
             },
             {
               "parameter": "setting_system_id__setting_system_name_array",
-              "parameter_type": "text array",
+              "parameter_type": "text_array",
               "required": false,
               "default_value": "inherit",
-              "hint": "If the sampling_log contains observations with differnt juxtaposition settings (for example inside/outside), select the type of settings in a comma separated list",
+              "hint": "If the sampling_log contains observations with juxtaposition settings (for example inside/outside), select the type of settings in a comma separated list, leave to use the same setting system as the campaign",
               "schema_table": {
                 "schema": "observation",
                 "table": "sampling_log_setting_system",

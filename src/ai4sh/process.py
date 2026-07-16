@@ -55,8 +55,6 @@ def Run_process(strcutured_process_D, scheme_params_D):
                 'process'
             )
 
-            
-
             process_stratum = rec[0] if rec else 0
    
             if process_stratum > user_status_D['stratum_code']:

@@ -621,7 +621,6 @@ class Scheme_params():
 
                     setattr(self.process_S.process.parameters, inherit_rec[0], inhereted_rec[0])
 
-        #HERE I THINK
         # Create a process dict from process struct
         process_D = dict( list( self.process_S.process.parameters.__dict__.items() ) )
 

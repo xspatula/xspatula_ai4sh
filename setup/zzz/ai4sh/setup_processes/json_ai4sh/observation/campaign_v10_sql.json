@@ -46,9 +46,8 @@
                 "update": false,
                 "delete": false
               },
-              "autonaming": {
-                "geocampign": "#%s_%s_%s_%s_%s#  %(dataset_id__dataset_alias, begin_date)",
-                "non_geocampaign": "%()"
+              "auto_name": {
+                "concat": "%s_%s  %(dataset_id__dataset_alias, begin_date)"
               }
             },
             {
@@ -66,9 +65,8 @@
                 "update": true,
                 "delete": false
               },
-              "autonaming": {
-                "geocampign": "#%s_%s_%s_%s_%s#  %(dataset_id__dataset_alias, begin_date)",
-                "non_geocampaign": "%()"
+              "auto_name": {
+                "concat": "%s_%s  %(dataset_id__dataset_alias, begin_date)"
               }
             },
             {
@@ -212,7 +210,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "inherit",
-              "hint": "license of the campaign, leave blank to copy the dataset url",
+              "hint": "license of the campaign, leave to copy the dataset license",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign_meta",
@@ -236,7 +234,7 @@
               "parameter_type": "text_array",
               "required": false,
               "default_value": "inherit",
-              "hint": "Substance array, leave blank to copy the dataset substance array",
+              "hint": "Substance array, leave to copy the dataset substance array",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign_meta",
@@ -260,7 +258,7 @@
               "parameter_type": "text_array",
               "required": false,
               "default_value": "inherit",
-              "hint": "Keyword array, leave blank to copy the dataset keyword array",
+              "hint": "Keyword array, leave to copy the dataset keyword array",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign_meta",
@@ -284,7 +282,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "inherit",
-              "hint": "url of the campaign, leave blank to copy the dataset url",
+              "hint": "url of the campaign, leave to copy the dataset url",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign_meta",
@@ -308,7 +306,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "inherit",
-              "hint": "doi of the campaign, leave blank to copy the dataset url",
+              "hint": "doi of the campaign, leave to copy the dataset doi",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign_meta",
@@ -332,7 +330,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "inherit",
-              "hint": "Abstract summarising the campaign",
+              "hint": "Abstract summarising the campaign, leave to copy the dataset abstract",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign_meta",
@@ -532,7 +530,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "inherit",
-              "hint": "If the dataset contains observations with spatial reference corrdinates (geographic or local), set the name or code for the spatial reference",
+              "hint": "If the dataset contains observations with spatial reference corrdinates (geographic or local), set the name or code for the spatial reference, leave to use the same spatial reference as the dataset",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign_location",
@@ -555,12 +553,20 @@
               "parameter": "location_method_id__location_method_name",
               "parameter_type": "text",
               "required": false,
-              "default_value": "",
+              "default_value": "inherit",
               "hint": "The name of the location method used for identify geographic position (gps, map)",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign_location",
                 "write": true
+              },
+              "inherit": {
+                "process_parameter": "location_method_id__location_method_name",
+                "src_schema": "observation",
+                "src_table": "dataset_meta",
+                "src_column": "location_method_id",
+                "search_column": "dataset_id",
+                "search_object": "dataset_id__dataset_name"
               },
               "permission": {
                 "update": true,

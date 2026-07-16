@@ -148,7 +148,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "inherit",
-              "hint": "Name of contact person at provider",
+              "hint": "Name of contact person at provider,leave to inherit the contact name of the provider",
               "schema_table": {
                 "schema": "observation_utility",
                 "table": "provision",
@@ -172,7 +172,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "inherit",
-              "hint": "Email of contact person at provider",
+              "hint": "Email of contact person at provider, leave to inherit the contact email of the provider",
               "schema_table": {
                 "schema": "observation_utility",
                 "table": "provision",
