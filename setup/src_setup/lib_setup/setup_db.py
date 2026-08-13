@@ -43,7 +43,10 @@ REVOKE_D = {'superuser': 'REVOKE ALL PRIVILEGES ON DATABASE {db} FROM {user};',
             'login_evaluation': 'REVOKE CONNECT ON DATABASE {db} FROM {user}; \
                                 REVOKE USAGE ON SCHEMA community FROM {user}; \
                                 REVOKE SELECT ON ALL TABLES IN SCHEMA community FROM {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA community REVOKE SELECT ON TABLES FROM {user};',
+                                ALTER DEFAULT PRIVILEGES IN SCHEMA community REVOKE SELECT ON TABLES FROM {user}; \
+                                REVOKE USAGE ON SCHEMA audit FROM {user}; \
+                                REVOKE SELECT ON ALL TABLES IN SCHEMA audit FROM {user}; \
+                                ALTER DEFAULT PRIVILEGES IN SCHEMA audit REVOKE SELECT ON TABLES FROM {user};',
             'user_cat_1': 'REVOKE CONNECT ON DATABASE {db} FROM {user};',
             'user_cat_2': 'REVOKE CONNECT ON DATABASE {db} FROM {user};',
             'user_cat_3': 'REVOKE CONNECT ON DATABASE {db} FROM {user};',
@@ -65,7 +68,10 @@ ROLES_D = {'community_admin': "CREATE USER {user} WITH LOGIN PASSWORD '{password
                                 GRANT CONNECT ON DATABASE {db} TO {user}; \
                                 GRANT USAGE ON SCHEMA community TO {user}; \
                                 GRANT SELECT ON ALL TABLES IN SCHEMA community TO {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA community GRANT SELECT ON TABLES TO {user};",
+                                ALTER DEFAULT PRIVILEGES IN SCHEMA community GRANT SELECT ON TABLES TO {user}; \
+                                GRANT USAGE ON SCHEMA audit TO {user}; \
+                                GRANT SELECT ON ALL TABLES IN SCHEMA audit TO {user}; \
+                                ALTER DEFAULT PRIVILEGES IN SCHEMA audit GRANT SELECT ON TABLES TO {user};",
            'user_cat_1': "CREATE USER {user} WITH LOGIN PASSWORD '{password}'; \
                                 GRANT CONNECT ON DATABASE {db} TO {user};",
            'user_cat_2': "CREATE USER {user} WITH LOGIN PASSWORD '{password}'; \
