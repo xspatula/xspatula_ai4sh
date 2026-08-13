@@ -10,7 +10,6 @@
         "trigger": "sequence_library_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -27,7 +26,6 @@
         "trigger": "nucleotide_archive_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -44,7 +42,6 @@
         "trigger": "extraction_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -61,7 +58,6 @@
         "trigger": "amplification_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -78,7 +74,6 @@
         "trigger": "purification_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -95,7 +90,6 @@
         "trigger": "sequencing_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -112,7 +106,6 @@
         "trigger": "metabarcoding_pipeline_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -129,7 +122,6 @@
         "trigger": "bioinformatics_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -146,7 +138,6 @@
         "trigger": "edna_nucleotide_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -163,7 +154,6 @@
         "trigger": "taxa_bioinformatics_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -180,7 +170,6 @@
         "trigger": "edna_measurement_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -197,7 +186,6 @@
         "trigger": "taxa_biodiversity_measurement_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],

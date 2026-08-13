@@ -10,7 +10,6 @@
         "trigger": "major_landform_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -27,7 +26,6 @@
         "trigger": "slope_position_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -44,7 +42,6 @@
         "trigger": "sky_condition_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -61,7 +58,6 @@
         "trigger": "ground_condition_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -78,7 +74,6 @@
         "trigger": "cultivation_species_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -95,7 +90,6 @@
         "trigger": "soil_preparation_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -112,7 +106,6 @@
         "trigger": "crop_growth_stage_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -129,7 +122,6 @@
         "trigger": "erosion_conservation_measure_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -146,7 +138,6 @@
         "trigger": "landuse_order_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -163,7 +154,6 @@
         "trigger": "landuse_family_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -180,7 +170,6 @@
         "trigger": "landuse_genus_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -197,7 +186,6 @@
         "trigger": "landcover_order_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -214,7 +202,6 @@
         "trigger": "landcover_family_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -231,7 +218,6 @@
         "trigger": "landcover_genus_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -248,7 +234,6 @@
         "trigger": "sampling_weather_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -265,7 +250,6 @@
         "trigger": "cultivation_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -282,7 +266,6 @@
         "trigger": "landscape_state_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -299,7 +282,6 @@
         "trigger": "landscape_geomorphology_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -316,7 +298,6 @@
         "trigger": "landuse_observation_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -333,7 +314,6 @@
         "trigger": "landcover_observation_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
