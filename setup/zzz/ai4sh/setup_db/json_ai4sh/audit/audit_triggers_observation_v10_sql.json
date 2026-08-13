@@ -10,7 +10,6 @@
         "trigger": "data_source_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -27,7 +26,6 @@
         "trigger": "person_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -44,7 +42,6 @@
         "trigger": "dataset_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -61,7 +58,6 @@
         "trigger": "dataset_meta_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -78,7 +74,6 @@
         "trigger": "dataset_method_tier_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -95,7 +90,6 @@
         "trigger": "dataset_location_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -112,7 +106,6 @@
         "trigger": "dataset_setting_system_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -129,7 +122,6 @@
         "trigger": "campaign_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -146,7 +138,6 @@
         "trigger": "campaign_meta_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -163,7 +154,6 @@
         "trigger": "campaign_method_tier_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -180,7 +170,6 @@
         "trigger": "campaign_location_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -197,7 +186,6 @@
         "trigger": "campaign_provision_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -214,7 +202,6 @@
         "trigger": "campaign_setting_system_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -231,7 +218,6 @@
         "trigger": "sampling_log_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -248,7 +234,6 @@
         "trigger": "sampling_log_setting_system_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -265,7 +250,6 @@
         "trigger": "geolocation_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -282,7 +266,6 @@
         "trigger": "sample_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -299,7 +282,6 @@
         "trigger": "sample_juxtaposition_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -316,7 +298,6 @@
         "trigger": "sample_profile_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -333,7 +314,6 @@
         "trigger": "sample_geotag_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -350,7 +330,6 @@
         "trigger": "sample_composition_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -367,7 +346,6 @@
         "trigger": "sample_proximity_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -384,7 +362,6 @@
         "trigger": "observation_log_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -401,7 +378,6 @@
         "trigger": "observation_log_meta_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -418,7 +394,6 @@
         "trigger": "observation_log_method_tier_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -435,7 +410,6 @@
         "trigger": "observation_log_provision_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -452,7 +426,6 @@
         "trigger": "observation_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -469,7 +442,6 @@
         "trigger": "observation_temperature_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -486,7 +458,6 @@
         "trigger": "observation_provision_serial_nr_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -503,7 +474,6 @@
         "trigger": "infiltration_beerkan_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -520,7 +490,6 @@
         "trigger": "infiltration_beerkan_time_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -537,7 +506,6 @@
         "trigger": "monolith_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -554,7 +522,6 @@
         "trigger": "macrofauna_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -571,7 +538,6 @@
         "trigger": "measurement_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -588,7 +554,6 @@
         "trigger": "observation_measurement_array_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -605,7 +570,6 @@
         "trigger": "observation_measurement_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],

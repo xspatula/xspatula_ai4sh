@@ -10,7 +10,6 @@
         "trigger": "analysis_method_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -27,7 +26,6 @@
         "trigger": "apparatus_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -44,7 +42,6 @@
         "trigger": "order_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -61,7 +58,6 @@
         "trigger": "family_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -78,7 +74,6 @@
         "trigger": "genus_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -95,7 +90,6 @@
         "trigger": "species_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -112,7 +106,6 @@
         "trigger": "specimen_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -129,7 +122,6 @@
         "trigger": "image_approach_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -146,7 +138,6 @@
         "trigger": "image_substrate_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -163,7 +154,6 @@
         "trigger": "image_camera_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -180,7 +170,6 @@
         "trigger": "image_setup_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -197,7 +186,6 @@
         "trigger": "image_lightsource_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -214,7 +202,6 @@
         "trigger": "license_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -231,7 +218,6 @@
         "trigger": "location_method_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -248,7 +234,6 @@
         "trigger": "macrofauna_extraction_method_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -265,7 +250,6 @@
         "trigger": "life_cycle_stage_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -282,7 +266,6 @@
         "trigger": "method_tier_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -299,7 +282,6 @@
         "trigger": "microbiometer_version_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -316,7 +298,6 @@
         "trigger": "monolith_excavation_method_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -333,7 +314,6 @@
         "trigger": "preparation_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -350,7 +330,6 @@
         "trigger": "preservation_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -367,7 +346,6 @@
         "trigger": "provider_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -384,7 +362,6 @@
         "trigger": "quantity_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -401,7 +378,6 @@
         "trigger": "reference_proprietor_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -418,7 +394,6 @@
         "trigger": "setting_system_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -435,7 +410,6 @@
         "trigger": "soil_horizon_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -452,7 +426,6 @@
         "trigger": "sound_mic_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -469,7 +442,6 @@
         "trigger": "sound_setup_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -486,7 +458,6 @@
         "trigger": "spatial_reference_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -503,7 +474,6 @@
         "trigger": "spectroscopy_method_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -520,7 +490,6 @@
         "trigger": "storage_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -537,7 +506,6 @@
         "trigger": "taxa_level_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -554,7 +522,6 @@
         "trigger": "taxa_status_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -571,7 +538,6 @@
         "trigger": "transportation_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -588,7 +554,6 @@
         "trigger": "unit_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -605,7 +570,6 @@
         "trigger": "analysis_method_translate_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -622,7 +586,6 @@
         "trigger": "indicator_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -639,7 +602,6 @@
         "trigger": "indicator_parity_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -656,7 +618,6 @@
         "trigger": "indicator_default_unit_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -673,7 +634,6 @@
         "trigger": "juxtaposition_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -690,7 +650,6 @@
         "trigger": "composition_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -707,7 +666,6 @@
         "trigger": "proximity_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -724,7 +682,6 @@
         "trigger": "profiling_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -741,7 +698,6 @@
         "trigger": "provision_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -758,7 +714,6 @@
         "trigger": "provision_method_tier_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -775,7 +730,6 @@
         "trigger": "provision_serial_nr_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -792,7 +746,6 @@
         "trigger": "provision_calibration_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -809,7 +762,6 @@
         "trigger": "provision_indicator_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -826,7 +778,6 @@
         "trigger": "spectrometer_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -843,7 +794,6 @@
         "trigger": "quantity_default_unit_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -860,7 +810,6 @@
         "trigger": "taxa_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -877,7 +826,6 @@
         "trigger": "taxa_parity_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -894,7 +842,6 @@
         "trigger": "taxa_function_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -911,7 +858,6 @@
         "trigger": "unit_translate_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -928,7 +874,6 @@
         "trigger": "macrofauna_image_setting_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
