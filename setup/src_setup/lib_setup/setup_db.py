@@ -176,6 +176,8 @@ class PG_session:
         - create_table: Creates a new table in a schema.
         - table_insert: Inserts records into a table.
         - table_update: Updates records in a table.
+        - execute_sql: Executes one or more raw SQL statements verbatim (e.g. CREATE FUNCTION).
+        - create_trigger: Creates a row-level trigger on a table, wired to an existing function.
         - grant: Grants user rights.
         - delete_database: Deletes the database.
         - delete_schema: Deletes a schema.
@@ -225,6 +227,15 @@ class PG_session:
 
                 self._Table_update(process.parameters.schema,process.parameters.table,
                                   process.parameters.command.where,process.parameters.command.columns,process.parameters.command.values)
+
+            elif process.process_id == 'execute_sql':
+
+                self._Execute_sql(process.parameters.sql)
+
+            elif process.process_id == 'create_trigger':
+
+                self._Create_trigger(process.parameters.schema, process.parameters.table, process.parameters.trigger,
+                                      process.parameters.timing, process.parameters.events, process.parameters.function)
 
             elif process.process_id == 'grant':
 
@@ -398,6 +409,112 @@ class PG_session:
                 pgsql.Identifier(schema),
                 pgsql.Identifier(table),
                 pgsql.SQL(cmd_str)
+            )
+        )
+
+        self.conn.commit()
+
+    def _Execute_sql(self, sql):
+        """
+        @brief Executes one or more raw SQL statements exactly as given.
+
+        @details Used for DDL that create_table cannot express, such as CREATE FUNCTION
+        bodies. Statements are trusted configuration content, not user input, and are
+        executed verbatim, in order, each in its own commit. overwrite/delete are not
+        interpreted here — idempotency (IF EXISTS / OR REPLACE) must be written into
+        the SQL itself.
+
+        @param sql A single SQL statement (str) or a list of SQL statements.
+
+        @return None
+        """
+
+        stmt_L = sql if isinstance(sql, list) else [sql]
+
+        for stmt in stmt_L:
+
+            if self.verbose > 2:
+
+                print ('            EXECUTE SQL', stmt.strip()[:80].replace('\n', ' '), '...')
+
+            self.cursor.execute(stmt)
+
+            self.conn.commit()
+
+    def _Create_trigger(self, schema, table, trigger, timing, events, function):
+        """
+        @brief Creates a row-level trigger on a table, with options to overwrite or delete if it exists.
+
+        @details Checks pg_trigger for an existing trigger with the given name on the given
+        table. If it exists and overwrite or delete is set, drops it first. If delete is set,
+        returns after dropping. Otherwise creates the trigger to call the given function for
+        each row on the given events. The function itself must already exist (created via
+        execute_sql) before this process runs.
+
+        @param schema Schema of the table the trigger is attached to.
+        @param table Table the trigger is attached to.
+        @param trigger Name of the trigger.
+        @param timing Trigger timing, "BEFORE" or "AFTER".
+        @param events List of trigger events, e.g. ["INSERT","UPDATE","DELETE"].
+        @param function Fully qualified trigger function name, e.g. "audit.if_modified_func".
+
+        @details
+        - timing, events and function are embedded as SQL keywords/identifiers from trusted
+          configuration files only, following the same trust model as create_table's cmd.
+
+        @return None
+        """
+
+        self.cursor.execute(
+            "SELECT 1 FROM pg_trigger WHERE tgname = %s AND tgrelid = %s::regclass;",
+            (trigger, '%s.%s' % (schema, table))
+        )
+
+        record = self.cursor.fetchone()
+
+        if record is not None:
+
+            if self.overwrite or self.delete:
+
+                if self.verbose > 1:
+
+                    print ('            DROP TRIGGER', trigger, 'ON', schema, table)
+
+                self.cursor.execute(
+                    pgsql.SQL("DROP TRIGGER {} ON {}.{};").format(
+                        pgsql.Identifier(trigger), pgsql.Identifier(schema), pgsql.Identifier(table)
+                    )
+                )
+
+                self.conn.commit()
+
+                if self.delete:
+
+                    return
+            else:
+
+                if self.verbose > 0:
+
+                    print ('.   trigger %s on %s.%s already exists' % (trigger, schema, table))
+
+                return
+
+        elif self.verbose:
+
+            print ('.   Creating trigger %s on %s.%s' % (trigger, schema, table))
+
+        events_str = " OR ".join(events)
+
+        if self.verbose > 2:
+
+            print ('            CREATE TRIGGER', trigger, timing, events_str, 'ON', schema, table)
+
+        self.cursor.execute(
+            pgsql.SQL("CREATE TRIGGER {trigger} " + timing + " " + events_str +
+                      " ON {schema}.{table} FOR EACH ROW EXECUTE FUNCTION " + function + "();").format(
+                trigger=pgsql.Identifier(trigger),
+                schema=pgsql.Identifier(schema),
+                table=pgsql.Identifier(table)
             )
         )
 

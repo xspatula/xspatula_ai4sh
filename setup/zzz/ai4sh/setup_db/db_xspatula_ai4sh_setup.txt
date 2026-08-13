@@ -42,6 +42,22 @@ community/user_v10_sql.json
 community/user_records_v10_sql.json
 
 ###===========================================###
+### AUDIT ###
+###===========================================###
+#!!!!! audit.logged_actions and the trigger function must exist
+#!!!!! before any create_trigger process runs against a table
+
+# audit.logged_actions stores one row per INSERT/UPDATE/DELETE, as JSONB old/new row images.
+audit/audit_table_v10_sql.json
+
+# audit.if_modified_func is the generic trigger function all audited tables share.
+audit/audit_function_v10_sql.json
+
+# Attaches the audit trigger to community.user and community.organisation.
+# Add one create_trigger process per additional table you want audited.
+audit/audit_triggers_community_v10_sql.json
+
+###===========================================###
 ### PROCESSES ###
 ###===========================================###
 #!!!!! processes required for adding processes
@@ -297,9 +313,29 @@ observation/measurement_v10_sql.json
 ### LANDSCAPE UTILITY
 ###===========================================###
 
-
 # TG TODO complete
+# Landscape utility includes tables for:
+# -major landform,
+# -slope position
+# -sky condition
+# -ground condition
+# -cultivation species
+# -soil preparation
+# -crop growth stage
+# -erosion conservation measure
 landscape/utility_v10_sql.json
+
+# Land use utility includes tables for:
+# -land use order
+# -land use family
+# -land use genus
+landscape/land_use_v10_sql.json
+
+# Land cover utility includes tables for:
+# -land cover order
+# -land cover family
+# -land cover genus
+landscape/land_cover_v10_sql.json
 
 ###===========================================###
 ### LANDSCAPE
@@ -309,6 +345,11 @@ landscape/utility_v10_sql.json
 landscape/observation_v10_sql.json
 
 # TG TODO landscape indicator
+
+# observation_lucc contains tables for:
+# - landuse observation
+# - landcover observation
+landscape/observation_lucc_v10_sql.json
 
 ###===========================================###
 ### EDNA UTILITY

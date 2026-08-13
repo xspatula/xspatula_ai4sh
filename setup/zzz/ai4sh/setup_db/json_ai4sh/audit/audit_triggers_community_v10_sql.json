@@ -1,0 +1,30 @@
+{
+  "process": [
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "community",
+        "table": "user",
+        "trigger": "user_audit",
+        "timing": "AFTER",
+        "events": ["INSERT", "UPDATE", "DELETE"],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "community",
+        "table": "organisation",
+        "trigger": "organisation_audit",
+        "timing": "AFTER",
+        "events": ["INSERT", "UPDATE", "DELETE"],
+        "function": "audit.if_modified_func"
+      }
+    }
+  ]
+}

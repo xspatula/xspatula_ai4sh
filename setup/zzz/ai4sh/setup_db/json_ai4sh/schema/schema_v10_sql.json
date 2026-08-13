@@ -21,6 +21,12 @@
     {
       "process_id": "create_schema",
       "parameters": {
+        "schema": "audit"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
         "schema": "landscape_utility"
       }
     },

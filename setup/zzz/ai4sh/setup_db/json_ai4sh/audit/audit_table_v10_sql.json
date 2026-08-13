@@ -1,0 +1,25 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "audit",
+        "table": "logged_actions",
+        "command": [
+          "id BIGSERIAL",
+          "schema_name TEXT NOT NULL",
+          "table_name TEXT NOT NULL",
+          "op CHAR(1) NOT NULL CHECK (op IN ('I','U','D'))",
+          "old_data JSONB",
+          "new_data JSONB",
+          "changed_by TEXT NOT NULL DEFAULT current_user",
+          "changed_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()",
+          "txid BIGINT NOT NULL DEFAULT txid_current()",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}
