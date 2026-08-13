@@ -59,6 +59,9 @@ audit/audit_function_v10_sql.json
 # with or deletion of existing audit rows.
 audit/audit_triggers_audit_v10_sql.json
 
+# Attaches the audit trigger to every table in the utility schema.
+audit/audit_triggers_utility_v10_sql.json
+
 # Attaches the audit trigger to every table in the community schema.
 audit/audit_triggers_community_v10_sql.json
 
