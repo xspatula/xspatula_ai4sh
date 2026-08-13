@@ -362,6 +362,9 @@ landscape/observation_v10_sql.json
 # - landcover observation
 landscape/observation_lucc_v10_sql.json
 
+# Attaches the audit trigger to every table in the landscape_utility and landscape schemas.
+audit/audit_triggers_landscape_v10_sql.json
+
 ###===========================================###
 ### EDNA UTILITY
 ###===========================================###
@@ -375,3 +378,6 @@ edna/utility_v10_sql.json
 
 # TG TODO complete
 edna/observation_v10_sql.json
+
+# Attaches the audit trigger to every table in the edna_utility and edna schemas.
+audit/audit_triggers_edna_v10_sql.json
