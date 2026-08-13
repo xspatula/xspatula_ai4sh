@@ -53,6 +53,12 @@ audit/audit_table_v10_sql.json
 # audit.if_modified_func is the generic trigger function all audited tables share.
 audit/audit_function_v10_sql.json
 
+# Audits audit.logged_actions itself, for UPDATE/DELETE only (never INSERT -
+# if_modified_func responds to every event with an INSERT into this table,
+# so an INSERT trigger here would recurse infinitely). Catches tampering
+# with or deletion of existing audit rows.
+audit/audit_triggers_audit_v10_sql.json
+
 # Attaches the audit trigger to every table in the community schema.
 audit/audit_triggers_community_v10_sql.json
 

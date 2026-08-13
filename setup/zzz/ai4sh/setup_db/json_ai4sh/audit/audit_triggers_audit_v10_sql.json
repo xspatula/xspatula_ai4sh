@@ -1,0 +1,17 @@
+{
+  "process": [
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "audit",
+        "table": "logged_actions",
+        "trigger": "logged_actions_audit",
+        "timing": "AFTER",
+        "events": ["UPDATE", "DELETE"],
+        "function": "audit.if_modified_func"
+      }
+    }
+  ]
+}
