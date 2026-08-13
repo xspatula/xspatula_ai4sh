@@ -53,8 +53,7 @@ audit/audit_table_v10_sql.json
 # audit.if_modified_func is the generic trigger function all audited tables share.
 audit/audit_function_v10_sql.json
 
-# Attaches the audit trigger to community.user and community.organisation.
-# Add one create_trigger process per additional table you want audited.
+# Attaches the audit trigger to every table in the community schema.
 audit/audit_triggers_community_v10_sql.json
 
 ###===========================================###
@@ -75,6 +74,9 @@ process/processes_v10_sql.json
 
 # processes records adds the processes for adding all other processes
 process/processes_records_v10_sql.json
+
+# Attaches the audit trigger to every table in the process schema.
+audit/audit_triggers_process_v10_sql.json
 
 ###===========================================###
 ### OBSERVATION UTILITIES ###
@@ -308,6 +310,15 @@ observation/macrofauna_image_v10_sql.json
 
 # Measurement links together an observation and an indicator
 observation/measurement_v10_sql.json
+
+# Attaches the audit trigger to every table in the observation_utility schema.
+# Placed here (not at the end of OBSERVATION UTILITIES above) because
+# observation_utility.macrofauna_image_setting is only created above, inside
+# observation/macrofauna_image_v10_sql.json.
+audit/audit_triggers_observation_utility_v10_sql.json
+
+# Attaches the audit trigger to every table in the observation schema.
+audit/audit_triggers_observation_v10_sql.json
 
 ###===========================================###
 ### LANDSCAPE UTILITY

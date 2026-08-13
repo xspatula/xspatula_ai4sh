@@ -1,0 +1,157 @@
+{
+  "process": [
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "root_process",
+        "trigger": "root_process_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process",
+        "trigger": "process_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter",
+        "trigger": "process_parameter_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_set_value",
+        "trigger": "process_parameter_set_value_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_minmax",
+        "trigger": "process_parameter_minmax_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_schema_table",
+        "trigger": "process_parameter_schema_table_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_permission",
+        "trigger": "process_parameter_permission_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_inherit",
+        "trigger": "process_parameter_inherit_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "process",
+        "table": "process_parameter_auto_name",
+        "trigger": "process_parameter_auto_name_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    }
+  ]
+}

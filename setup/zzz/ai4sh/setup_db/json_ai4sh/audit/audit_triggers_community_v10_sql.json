@@ -9,7 +9,11 @@
         "table": "user",
         "trigger": "user_audit",
         "timing": "AFTER",
-        "events": ["INSERT", "UPDATE", "DELETE"],
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
         "function": "audit.if_modified_func"
       }
     },
@@ -22,7 +26,62 @@
         "table": "organisation",
         "trigger": "organisation_audit",
         "timing": "AFTER",
-        "events": ["INSERT", "UPDATE", "DELETE"],
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "community",
+        "table": "user_categories",
+        "trigger": "user_categories_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "community",
+        "table": "user_media",
+        "trigger": "user_media_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "community",
+        "table": "user_activity",
+        "trigger": "user_activity_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
         "function": "audit.if_modified_func"
       }
     }
