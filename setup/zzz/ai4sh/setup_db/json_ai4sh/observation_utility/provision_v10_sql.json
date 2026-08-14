@@ -19,6 +19,8 @@
           "abstract TEXT",
           "contact_name VARCHAR",
           "contact_email VARCHAR",
+          "status_code SMALLINT DEFAULT 10",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -132,6 +134,7 @@
           "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
           "gain REAL",
           "add REAL",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (provision_id,provision_serial_nr_id)",
           "PRIMARY KEY (id)"
         ]

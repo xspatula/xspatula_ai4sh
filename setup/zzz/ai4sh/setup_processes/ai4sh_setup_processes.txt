@@ -98,6 +98,12 @@ observation/sample_geolocation_v10_sql.json
 
 observation/sampling_log_v10_sql.json
 
+### landscape utility ###
+
+landscape/land_use_v10_sql.json
+
+landscape/land_cover_v10_sql.json
+
 ### SELECT SPECTRA ###
 
 select/select_data_v10_sql.json

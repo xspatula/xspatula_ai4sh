@@ -15,9 +15,9 @@
           "subsample TEXT",
           "replicate SMALLINT",
           "abstract TEXT",
-          "observation_date DATE",
-          "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-          "UNIQUE (observation_log_id,provision_id,sample_id,subsample,replicate)",
+          "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "UNIQUE (observation_log_id,provision_id,sample_id,subsample,replicate,observed_at)",
           "PRIMARY KEY (id)"
         ]
       }

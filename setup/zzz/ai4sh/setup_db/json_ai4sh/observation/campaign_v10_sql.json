@@ -14,8 +14,8 @@
           "display_name TEXT",
           "contact_name VARCHAR",
           "contact_email VARCHAR",
-          "begin_date DATE DEFAULT CURRENT_DATE",
-          "end_date DATE DEFAULT CURRENT_DATE",
+          "begun_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "ended_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "status_code SMALLINT DEFAULT 10",
           "UNIQUE (dataset_id, name)",
           "PRIMARY KEY (id)"
@@ -40,8 +40,8 @@
           "doi TEXT",
           "abstract TEXT",
           "time_series BOOLEAN DEFAULT FALSE",
-          "create_date DATE DEFAULT CURRENT_DATE",
-          "last_update_date DATE DEFAULT CURRENT_DATE",
+          "created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (campaign_id)"
         ]
       }

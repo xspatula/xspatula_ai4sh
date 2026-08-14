@@ -15,9 +15,9 @@
           "species_id INTEGER REFERENCES observation_utility.species (id)",
           "specimen TEXT",
           "abstract TEXT",
-          "sampling_date DATE",
           "time_series_id INTEGER DEFAULT 0",
-          "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "sampled_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (sampling_log_id, name)",
           "PRIMARY KEY (id)"
         ]

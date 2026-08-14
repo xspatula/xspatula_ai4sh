@@ -13,6 +13,7 @@
           "species_id INTEGER REFERENCES observation_utility.species (id)",
           "unit_id INTEGER REFERENCES observation_utility.unit (id)",
           "system TEXT DEFAULT 'metric'",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (quantity_id, species_id, system)",
           "PRIMARY KEY (id)"
         ]

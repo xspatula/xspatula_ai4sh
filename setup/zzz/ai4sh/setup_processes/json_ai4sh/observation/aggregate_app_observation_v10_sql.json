@@ -197,7 +197,7 @@
               }
             },
             {
-              "parameter": "timestamp",
+              "parameter": "observed_at",
               "parameter_type": "timestamp",
               "required": false,
               "default_value": "",

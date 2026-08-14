@@ -10,14 +10,14 @@
         "command": [
           "id SERIAL",
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
-          "timestamp timestamp DEFAULT to_timestamp(to_char(current_timestamp, 'YYYY-MM-DD HH24:MI'), 'YYYY-MM-DD HH24:MI')",
+          "observed_at TIMESTAMPTZ DEFAULT DEFAULT CURRENT_TIMESTAMP(1)",
           "sky_condition_id INTEGER REFERENCES landscape_utility.sky_condition",
           "ground_condition_id INTEGER REFERENCES landscape_utility.ground_condition",
           "precipitation_mm_24h INTEGER",
           "temperature_c_24h_mean INTEGER",
           "temperature_c_24h_max INTEGER",
           "temperature_c_24h_min INTEGER",
-          "UNIQUE (geolocation_id, timestamp)",
+          "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -32,11 +32,11 @@
         "command": [
           "id SERIAL",
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
-          "cultivation_season_start_date DATE",
-          "cultivation_season_end_date DATE",
+          "season_start_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "season_ended_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "baresoil_entire_season BOOLEAN",
-          "organic_cultivation BOOLEAN",
-          "regenerative_cultivation BOOLEAN",
+          "organic BOOLEAN",
+          "regenerative BOOLEAN",
           "soil_preparation_id_array BOOLEAN[]",
           "irrigation_mm FLOAT",
           "fertilisation_manure_kg_ha FLOAT",
@@ -51,8 +51,8 @@
           "perennial_main_crop BOOLEAN",
           "perennial_catch_crop BOOLEAN",
           "perennial_cover_crop BOOLEAN",
-          "observation_date DATE DEFAULT CURRENT_DATE",
-          "UNIQUE (geolocation_id, cultivation_season_start_date)",
+          "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "UNIQUE (geolocation_id, season_start_at)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -67,7 +67,7 @@
         "command": [
           "id SERIAL",
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
-          "observation_date DATE",
+          "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "tree_presence BOOLEAN",
           "shrub_presence BOOLEAN",
           "forb_presence BOOLEAN",
@@ -83,7 +83,7 @@
           "rock_cover_percent SMALLINT",
           "stone_cover_percent SMALLINT",
           "gravel_cover_percent SMALLINT",
-          "UNIQUE (geolocation_id, observation_date)",
+          "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -98,13 +98,13 @@
         "command": [
           "id SERIAL",
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
-          "observation_date DATE",
+          "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "slope SMALLINT",
           "slope_unit INTEGER REFERENCES observation_utility.unit (id)",
           "aspect SMALLINT",
           "major_landform_id INTEGER REFERENCES landscape_utility.major_landform (id)",
           "slope_position_id INTEGER REFERENCES landscape_utility.slope_position (id)",
-          "UNIQUE (geolocation_id,observation_date)",
+          "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
       }

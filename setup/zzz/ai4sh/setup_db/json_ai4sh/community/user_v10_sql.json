@@ -28,8 +28,7 @@
           "department VARCHAR",
           "section VARCHAR",
           "position VARCHAR",
-          "create_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
-          "last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "status_code INTEGER DEFAULT 10",
           "PRIMARY KEY (id)"
         ]
@@ -50,6 +49,7 @@
           "snapchat VARCHAR",
           "instagram VARCHAR",
           "lnikedin VARCHAR",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (user_id)"
         ]
       }
@@ -64,7 +64,7 @@
         "command": [
           "user_id INTEGER REFERENCES community.user (id)",
           "total_minutes INTEGER DEFAULT 0",
-          "last_activity_date DATE DEFAULT CURRENT_DATE",
+          "last_activity_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (user_id)"
         ]
       }

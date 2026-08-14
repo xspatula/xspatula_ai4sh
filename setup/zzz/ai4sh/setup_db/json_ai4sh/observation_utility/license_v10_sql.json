@@ -16,7 +16,7 @@
           "url TEXT",
           "doi TEXT",
           "registration_date DATE DEFAULT CURRENT_DATE",
-          "latest_update_date DATE DEFAULT CURRENT_DATE",
+          "update_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

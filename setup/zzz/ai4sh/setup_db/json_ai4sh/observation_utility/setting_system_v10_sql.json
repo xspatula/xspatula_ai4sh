@@ -13,6 +13,7 @@
           "abstract TEXT",
           "display_name TEXT",
           "reference TEXT",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

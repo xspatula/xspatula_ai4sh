@@ -16,7 +16,7 @@
           "name TEXT",
           "abstract TEXT",
           "time_series BOOLEAN DEFAULT FALSE",
-          "last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (sampling_log_id, name)",
           "PRIMARY KEY (id)"
         ]

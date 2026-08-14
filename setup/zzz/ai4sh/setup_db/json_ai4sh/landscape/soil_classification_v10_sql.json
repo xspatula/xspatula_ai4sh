@@ -5,15 +5,14 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "observation_utility",
-        "table": "macrofauna_extraction_method",
+        "schema": "landscape_utility",
+        "table": "soil_texture_usda",
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -23,18 +22,33 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "observation_utility",
-        "table": "life_cycle_stage",
+        "schema": "landscape_utility",
+        "table": "soil_texture_isss",
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
-      }
+      },
+      {
+        "process_id": "create_table",
+        "overwrite": false,
+        "delete": false,
+        "parameters": {
+          "schema": "landscape_utility",
+          "table": "reference_soil_groups",
+          "command": [
+            "id SERIAL",
+            "name TEXT UNIQUE",
+            "alias TEXT UNIQUE",
+            "display_name TEXT",
+            "abstract TEXT",
+            "PRIMARY KEY (id)"
+          ]
+        }
     }
   ]
 }

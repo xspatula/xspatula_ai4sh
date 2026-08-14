@@ -14,7 +14,24 @@
           "alias TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
-          "equivalent_id INTEGER DEFAULT 0",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "indicator_parity",
+        "command": [
+          "id SERIAL",
+          "src_indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
+          "dst_indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
+          "UNIQUE (src_indicator_id, dst_indicator_id)",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

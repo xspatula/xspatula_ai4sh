@@ -103,7 +103,7 @@
               }
             },
             {
-              "parameter": "timestamp",
+              "parameter": "sampled_at",
               "parameter_type": "timestamp",
               "required": false,
               "default_value": 0,
@@ -233,7 +233,7 @@
               }
             },
             {
-              "parameter": "timestamp",
+              "parameter": "sampled_at",
               "parameter_type": "timestamp",
               "required": false,
               "default_value": 0,
@@ -423,7 +423,7 @@
               }
             },
             {
-              "parameter": "timestamp",
+              "parameter": "sampled_at",
               "parameter_type": "timestamp",
               "required": false,
               "default_value": 0,
@@ -654,7 +654,7 @@
               }
             },
             {
-              "parameter": "timestamp",
+              "parameter": "sampled_at",
               "parameter_type": "timestamp",
               "required": false,
               "default_value": 0,
@@ -909,7 +909,7 @@
               }
             },
             {
-              "parameter": "timestamp",
+              "parameter": "sampled_at",
               "parameter_type": "timestamp",
               "required": false,
               "default_value": 0,

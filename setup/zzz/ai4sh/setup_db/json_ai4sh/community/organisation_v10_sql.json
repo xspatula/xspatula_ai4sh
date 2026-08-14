@@ -21,12 +21,12 @@
           "telephone VARCHAR",
           "contact_name VARCHAR",
           "contact_email VARCHAR",
-          "create_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
-          "last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
+          "updated_by INTEGER REFERENCES community.user (id)",
           "status_code SMALLINT DEFAULT 10",
           "PRIMARY KEY(id)"
         ]
       }
-    }  
+    }     
   ]
 }

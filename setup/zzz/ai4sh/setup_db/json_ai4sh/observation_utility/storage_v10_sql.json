@@ -13,6 +13,7 @@
           "alias TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

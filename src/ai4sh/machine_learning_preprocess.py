@@ -284,7 +284,7 @@ def _write_previous_df(project_root_fp, process_name, entries):
     from datetime import datetime
     data = {
         'process': process_name,
-        'timestamp': datetime.now().isoformat(timespec='seconds'),
+        'created_at': datetime.now().isoformat(timespec='seconds'),
         'entries': entries,
     }
     with open(_prev_df_path(project_root_fp), 'w') as fh:

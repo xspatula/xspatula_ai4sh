@@ -17,6 +17,7 @@
           "single_ring_diameter_unit_id INTEGER REFERENCES observation_utility.unit (id)",
           "unit_water_volume FLOAT",
           "unit_water_volume_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

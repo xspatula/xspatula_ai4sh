@@ -8,6 +8,7 @@
         "schema": "utility",
         "table": "foreign_key",
         "command": [
+          "id SERIAL",
           "foreign_key TEXT",
           "dst_schema TEXT",
           "dst_table TEXT",

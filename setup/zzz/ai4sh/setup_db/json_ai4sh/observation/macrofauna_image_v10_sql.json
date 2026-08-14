@@ -16,6 +16,7 @@
           "image_camera_id INTEGER REFERENCES observation_utility.image_camera",
           "image_setup_id INTEGER REFERENCES observation_utility.image_setup",
           "image_lightsource_id INTEGER REFERENCES observation_utility.image_lightsource",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (name)",
           "PRIMARY KEY (id)"
         ]

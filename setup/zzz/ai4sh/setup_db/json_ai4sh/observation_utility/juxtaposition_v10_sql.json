@@ -14,6 +14,7 @@
           "abstract TEXT",
           "display_name TEXT",
           "UNIQUE (setting_system_id, name)",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -58,6 +59,7 @@
           "abstract TEXT",
           "display_name TEXT",
           "UNIQUE (name)",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -111,6 +113,7 @@
           "name TEXT",
           "abstract TEXT",
           "display_name TEXT",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (name)",
           "PRIMARY KEY (id)"
         ]

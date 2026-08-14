@@ -13,6 +13,8 @@
           "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
           "analysis_method_id INTEGER REFERENCES observation_utility.analysis_method (id)",
           "unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "UNIQUE (provision_id)",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

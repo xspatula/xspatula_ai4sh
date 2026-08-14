@@ -14,6 +14,7 @@
           "unit_id INTEGER REFERENCES observation_utility.unit (id)",
           "UNIQUE (species_id, indicator_id)",
           "system VARCHAR",
+          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

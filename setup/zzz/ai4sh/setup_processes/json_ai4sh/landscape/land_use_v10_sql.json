@@ -1,0 +1,285 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_landuse_order",
+        "min_user_stratum": 4,
+        "title": "Manage land use order",
+        "label": "Insert, update or delete a land use order, the highest, most generic, classification level used for defining land use (e.g. primary production, industrial production)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Top level generic name of land use.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_order",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Code for land use as used by the EU.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_order",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the land use order.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_order",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract describing the generic land use in layperson terms",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_order",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_landuse_family",
+        "min_user_stratum": 4,
+        "title": "Manage land use family",
+        "label": "Insert, update or delete a land use family, a mid-layer classification level used for defining land use (e.g. agriculture, forestry)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "landuse_order_id__landuse_order_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The order name or code under which this land use family falls.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Family level generic name of the land use.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Code for land use as used by the EU.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the land use family.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract describing the land use family in layperson terms",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_family",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_landuse_genus",
+        "min_user_stratum": 4,
+        "title": "Manage land use genus",
+        "label": "Insert, update or delete a land use genus, the lowest classification level used for defining land use (e.g. agricultural fields, kitchen gardens)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "landuse_family_id__landuse_family_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The family name under which this genus falls.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Family level generic name of the land use.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Code of the land use used by the EU.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the genus.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract describing the genus of substances in layperson terms",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse_genus",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
