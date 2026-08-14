@@ -1001,7 +1001,7 @@ class PG_session:
         print ("    deleting schema", schema)
 
         self.cursor.execute(
-            pgsql.SQL("DROP SCHEMA {}").format(pgsql.Identifier(schema))
+            pgsql.SQL("DROP SCHEMA {} CASCADE").format(pgsql.Identifier(schema))
         )
 
         self.conn.commit()
