@@ -229,6 +229,54 @@
       "overwrite": true,
       "delete": false,
       "parameters": {
+        "schema": "landscape_utility",
+        "table": "soil_texture_usda",
+        "trigger": "soil_texture_usda_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "soil_texture_isss",
+        "trigger": "soil_texture_isss_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "reference_soil_groups",
+        "trigger": "reference_soil_groups_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
         "schema": "landscape",
         "table": "sampling_weather",
         "trigger": "sampling_weather_audit",

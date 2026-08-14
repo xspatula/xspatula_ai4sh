@@ -3,7 +3,7 @@
   "postgresdb": {
     "host": "localhost",
     "port": 5432,
-    "db": "ai4soilhealth",
+    "db": "ai4sh",
     "host_netrc_id": "karttur"
   },
   "process": [

@@ -14,6 +14,7 @@
           "value REAL",
           "standard_deviation REAL",
           "n_repeat SMALLINT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (observation_id,indicator_id)",
           "PRIMARY KEY (id)"
         ]
@@ -33,6 +34,7 @@
           "value REAL[]",
           "standard_deviation REAL[]",
           "n_repeat SMALLINT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (observation_id,indicator_id)",
           "PRIMARY KEY (id)"
         ]
@@ -52,6 +54,7 @@
           "value REAL",
           "standard_deviation REAL",
           "n_repeat SMALLINT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (observation_id,indicator_id)",
           "PRIMARY KEY (id)"
         ]

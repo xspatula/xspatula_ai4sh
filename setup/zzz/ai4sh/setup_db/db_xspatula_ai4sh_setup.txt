@@ -257,6 +257,14 @@ observation_utility/taxa_function_v10_sql.json
 # requires: unit.
 observation_utility/unit_translate_v10_sql.json
 
+# eDNA utility (sequence_library, nucleotide_archive, extraction, amplification,
+# purification, sequencing, metabarcoding_pipeline, bioinformatics). Folded into
+# observation_utility (was a separate edna_utility schema) - structurally it's
+# just more reference/lookup data, same as the rest of this section, and it
+# already leans on observation_utility.reference_proprietor/analysis_method/taxa.
+# requires: reference_proprietor, analysis_method, taxa, taxa_function.
+observation_utility/edna_v10_sql.json
+
 ###===========================================###
 ### OBSERVATION ###
 ###===========================================###
@@ -320,6 +328,13 @@ observation/macrofauna_image_v10_sql.json
 # Measurement links together an observation and an indicator
 observation/measurement_v10_sql.json
 
+# eDNA observation data (edna_nucleotide, taxa_bioinformatics, edna_measurement,
+# taxa_biodiversity_measurement). Folded into observation (was a separate edna
+# schema) - structurally the same pattern as macrofauna/spectra/infiltration_beerkan
+# above: purpose-built tables hanging off observation.observation.
+# requires: observation, observation_utility.indicator.
+observation/edna_v10_sql.json
+
 # Attaches the audit trigger to every table in the observation_utility schema.
 # Placed here (not at the end of OBSERVATION UTILITIES above) because
 # observation_utility.macrofauna_image_setting is only created above, inside
@@ -357,6 +372,12 @@ landscape/land_use_v10_sql.json
 # -land cover genus
 landscape/land_cover_v10_sql.json
 
+# Soil classification utility includes tables for:
+# -soil texture (USDA)
+# -soil texture (ISSS)
+# -reference soil groups
+landscape/soil_classification_v10_sql.json
+
 ###===========================================###
 ### LANDSCAPE
 ###===========================================###
@@ -373,20 +394,3 @@ landscape/observation_lucc_v10_sql.json
 
 # Attaches the audit trigger to every table in the landscape_utility and landscape schemas.
 audit/audit_triggers_landscape_v10_sql.json
-
-###===========================================###
-### EDNA UTILITY
-###===========================================###
-
-# TG TODO complete
-edna/utility_v10_sql.json
-
-###===========================================###
-### EDNA
-###===========================================###
-
-# TG TODO complete
-edna/observation_v10_sql.json
-
-# Attaches the audit trigger to every table in the edna_utility and edna schemas.
-audit/audit_triggers_edna_v10_sql.json

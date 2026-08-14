@@ -56,10 +56,14 @@ def Get_set_database_session(scheme_params_D):
     # Set user status
     scheme_params_D['user_status'] = user_status_D
 
-    # Login to the database with the user assigned stratum and get a session object
+    # Login to the database with the user assigned stratum and get a session object.
+    # app_user_id carries the individual community.user.id into the session (as the
+    # audit.app_user_id GUC) so audit.if_modified_func can record who - not just which
+    # shared stratum role - made a change.
     try:
         #pg_session_C = PG_session(scheme_params_D['postgresdb']['db'], scheme_params_D['process'][0]['verbose'])
-        pg_session_C = PG_session(dot_env_var, scheme_params_D['process'][0]['verbose'])
+        pg_session_C = PG_session(dot_env_var, scheme_params_D['process'][0]['verbose'],
+                                   app_user_id=user_status_D.get('id'))
 
     except Exception as e:
         print('❌ ERROR - Could not connect to Postgres server, exiting')

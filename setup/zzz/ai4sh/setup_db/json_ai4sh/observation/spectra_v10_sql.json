@@ -15,6 +15,7 @@
           "spectroscopy_method_id SMALLINT REFERENCES observation_utility.spectroscopy_method (id)",
           "signal_mean REAL[]",
           "signal_standard_deviation REAL[]",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (observation_id)"
         ]
       }

@@ -19,6 +19,7 @@
           "status_code SMALLINT DEFAULT 10",
           "changed_into_id INTEGER",
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

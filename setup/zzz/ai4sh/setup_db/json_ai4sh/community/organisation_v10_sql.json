@@ -22,7 +22,6 @@
           "contact_name VARCHAR",
           "contact_email VARCHAR",
           "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
-          "updated_by INTEGER REFERENCES community.user (id)",
           "status_code SMALLINT DEFAULT 10",
           "PRIMARY KEY(id)"
         ]

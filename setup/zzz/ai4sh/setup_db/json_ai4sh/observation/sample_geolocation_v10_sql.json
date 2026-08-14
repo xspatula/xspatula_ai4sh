@@ -17,6 +17,7 @@
           "elevation_unit INTEGER REFERENCES observation_utility.unit (id)",
           "latitude REAL",
           "longitude REAL",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

@@ -16,6 +16,7 @@
           "fungi FLOAT",
           "bacteria FLOAT",
           "fungi_bacteria_unit_id INTEGER REFERENCES observation_utility.unit (id)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

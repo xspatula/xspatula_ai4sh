@@ -17,6 +17,7 @@
           "abstract TEXT",
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "updated_by INTEGER REFERENCES community.user (id)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -49,6 +50,6 @@
           ]
         }
       }
-    }    
+    }
   ]
 }

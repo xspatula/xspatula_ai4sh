@@ -12,6 +12,7 @@
           "observation_id INTEGER REFERENCES observation.observation (id)",
           "hardware_model_name",
           "software_name_version",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

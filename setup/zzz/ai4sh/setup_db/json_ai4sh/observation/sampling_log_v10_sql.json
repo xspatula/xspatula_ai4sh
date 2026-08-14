@@ -18,7 +18,7 @@
           "time_series BOOLEAN DEFAULT FALSE",
           "begun_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "ended_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (campaign_id, name)",
           "PRIMARY KEY (id)"
@@ -35,6 +35,7 @@
         "command": [
           "sampling_log_id INTEGER REFERENCES observation.sampling_log (id)",
           "setting_system_id INTEGER REFERENCES observation_utility.setting_system (id)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (sampling_log_id, setting_system_id)"
         ]
       }

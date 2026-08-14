@@ -15,6 +15,7 @@
           "old_data JSONB",
           "new_data JSONB",
           "changed_by TEXT NOT NULL DEFAULT current_user",
+          "changed_by_user_id INTEGER",
           "changed_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()",
           "txid BIGINT NOT NULL DEFAULT txid_current()",
           "PRIMARY KEY (id)"

@@ -5,7 +5,7 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "edna_utility",
+        "schema": "observation_utility",
         "table": "sequence_library",
         "command": [
           "id SERIAL",
@@ -13,6 +13,7 @@
           "proprietor_id INTEGER REFERENCES observation_utility.reference_proprietor (id)",
           "url TEXT",
           "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -22,7 +23,7 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "edna_utility",
+        "schema": "observation_utility",
         "table": "nucleotide_archive",
         "command": [
           "id SERIAL",
@@ -30,6 +31,7 @@
           "proprietor_id INTEGER REFERENCES observation_utility.reference_proprietor (id)",
           "url TEXT",
           "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -39,7 +41,7 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "edna_utility",
+        "schema": "observation_utility",
         "table": "extraction",
         "command": [
           "id SERIAL",
@@ -47,6 +49,7 @@
           "doi TEXT",
           "url TEXT",
           "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -56,7 +59,7 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "edna_utility",
+        "schema": "observation_utility",
         "table": "amplification",
         "command": [
           "id SERIAL",
@@ -64,6 +67,7 @@
           "doi TEXT",
           "url TEXT",
           "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -73,7 +77,7 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "edna_utility",
+        "schema": "observation_utility",
         "table": "purification",
         "command": [
           "id SERIAL",
@@ -81,6 +85,7 @@
           "doi TEXT",
           "url TEXT",
           "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -90,7 +95,7 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "edna_utility",
+        "schema": "observation_utility",
         "table": "sequencing",
         "command": [
           "id SERIAL",
@@ -101,6 +106,7 @@
           "doi TEXT",
           "url TEXT",
           "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -110,17 +116,18 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "edna_utility",
+        "schema": "observation_utility",
         "table": "metabarcoding_pipeline",
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
-          "extraction_id INTEGER REFERENCES edna_utility.extraction (id)",
-          "forward_amplification_id INTEGER REFERENCES edna_utility.amplification (id)",
-          "reverse_amplification_id INTEGER REFERENCES edna_utility.amplification (id)",
-          "purification_id INTEGER REFERENCES edna_utility.purification (id)",
-          "sequencing_id INTEGER REFERENCES edna_utility.sequencing (id)",
+          "extraction_id INTEGER REFERENCES observation_utility.extraction (id)",
+          "forward_amplification_id INTEGER REFERENCES observation_utility.amplification (id)",
+          "reverse_amplification_id INTEGER REFERENCES observation_utility.amplification (id)",
+          "purification_id INTEGER REFERENCES observation_utility.purification (id)",
+          "sequencing_id INTEGER REFERENCES observation_utility.sequencing (id)",
           "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (extraction_id, forward_amplification_id, reverse_amplification_id, sequencing_id)",
           "PRIMARY KEY (id)"
         ]
@@ -131,7 +138,7 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "edna_utility",
+        "schema": "observation_utility",
         "table": "bioinformatics",
         "command": [
           "id SERIAL",
@@ -139,6 +146,7 @@
           "analysis_method_id INTEGER REFERENCES observation_utility.analysis_method (id)",
           "taxa_id INTEGER REFERENCES observation_utility.taxa (id)",
           "taxa_function_id INTEGER REFERENCES observation_utility.taxa_function (id)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (analysis_method_id,taxa_id,taxa_function_id)",
           "PRIMARY KEY (id)"
         ]

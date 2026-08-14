@@ -16,6 +16,7 @@
           "addon REAL",
           "exponent REAL DEFAULT 1",
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (species_id, src_analysis_method_id, dst_analysis_method_id)",
           "PRIMARY KEY (id)"
         ]

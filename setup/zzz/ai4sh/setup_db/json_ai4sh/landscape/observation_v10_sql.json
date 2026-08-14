@@ -10,13 +10,14 @@
         "command": [
           "id SERIAL",
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
-          "observed_at TIMESTAMPTZ DEFAULT DEFAULT CURRENT_TIMESTAMP(1)",
+          "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "sky_condition_id INTEGER REFERENCES landscape_utility.sky_condition",
           "ground_condition_id INTEGER REFERENCES landscape_utility.ground_condition",
           "precipitation_mm_24h INTEGER",
           "temperature_c_24h_mean INTEGER",
           "temperature_c_24h_max INTEGER",
           "temperature_c_24h_min INTEGER",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
@@ -52,6 +53,7 @@
           "perennial_catch_crop BOOLEAN",
           "perennial_cover_crop BOOLEAN",
           "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (geolocation_id, season_start_at)",
           "PRIMARY KEY (id)"
         ]
@@ -83,6 +85,7 @@
           "rock_cover_percent SMALLINT",
           "stone_cover_percent SMALLINT",
           "gravel_cover_percent SMALLINT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
@@ -104,6 +107,7 @@
           "aspect SMALLINT",
           "major_landform_id INTEGER REFERENCES landscape_utility.major_landform (id)",
           "slope_position_id INTEGER REFERENCES landscape_utility.slope_position (id)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]

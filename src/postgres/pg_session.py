@@ -47,17 +47,25 @@ class PG_session(PG_common):
     and lightweight logging used throughout PostgreSQL workflows.
     """
 
-    def __init__(self, environment_dot_file, verbose=0, session_id='unknown'):
+    def __init__(self, environment_dot_file, verbose=0, session_id='unknown', app_user_id=None):
         """
         @brief Connect to PostgreSQL and initialize session parameters.
 
         @param environment_dot_file Name of the environment file containing connection settings.
         @param verbose Verbosity level for logging and output (default: 0).
         @param session_id Identifier for the session (default: 'unknown').
+        @param app_user_id community.user.id of the logged-in individual (default: None). The
+            Postgres login role is shared per user stratum (user_cat_0..5), so it cannot identify
+            which individual made a change - only audit.if_modified_func's changed_by (current_user)
+            can. Setting this GUC lets the trigger also record changed_by_user_id, so per-row
+            individual attribution comes from the audit trail instead of needing created_by/updated_by
+            columns on every table.
 
         @details
             - Loads environment variables for the specified database.
             - Establishes a connection and cursor to the PostgreSQL database using psycopg2.
+            - If app_user_id is given, sets it as the audit.app_user_id session GUC so
+              audit.if_modified_func can attribute changes to the individual, not just the role.
             - Initializes session ID and verbosity.
             - Calls initializers for PG_common and Log classes.
         """
@@ -69,6 +77,10 @@ class PG_session(PG_common):
             raise RuntimeError('❌ ERROR - Could not load environment <%s>' % environment_dot_file)
 
         self.conn, self.cursor = PG_psycopg2_connect( env_query_D )
+
+        if app_user_id is not None:
+
+            self.cursor.execute("SET SESSION audit.app_user_id = %s", (str(app_user_id),))
 
         self.session_id = session_id
 

@@ -13,6 +13,7 @@
           "alias TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
@@ -30,25 +31,28 @@
           "alias TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
-      },
-      {
-        "process_id": "create_table",
-        "overwrite": false,
-        "delete": false,
-        "parameters": {
-          "schema": "landscape_utility",
-          "table": "reference_soil_groups",
-          "command": [
-            "id SERIAL",
-            "name TEXT UNIQUE",
-            "alias TEXT UNIQUE",
-            "display_name TEXT",
-            "abstract TEXT",
-            "PRIMARY KEY (id)"
-          ]
-        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "reference_soil_groups",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "display_name TEXT",
+          "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "PRIMARY KEY (id)"
+        ]
+      }
     }
   ]
 }

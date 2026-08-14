@@ -10,6 +10,7 @@
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }
