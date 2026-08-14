@@ -137,10 +137,9 @@ A freshly seeded AI4SoilHealth database contains:
 | `utility` | Territory codes and shared lookup tables |
 | `community` | `organisation`, `user`, `user_categories`, `user_media`, `user_activity` |
 | `process` | `root_process`, `process`, `process_parameter`, parameter constraints and defaults |
-| `observation` | Field observations and measurements |
-| `observation_utility` | Lookup tables: indicators, units, methods, apparatus, taxa, spectroscopy, storage, and more |
+| `observation` | Field observations and measurements, including eDNA (metabarcoding, taxa bioinformatics) |
+| `observation_utility` | Lookup tables: indicators, units, methods, apparatus, taxa, spectroscopy, storage, eDNA sequencing/extraction/amplification methods, and more |
 | `landscape` | Landscape observations and utility |
-| `edna` | Environmental DNA observations and utility |
 
 ---
 

@@ -22,7 +22,7 @@
               "default_value": "",
               "hint": "Unique name of the meta barcoding pipeline.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "metabarcoding_pipeline",
                 "write": true
               },
@@ -38,7 +38,7 @@
               "default_value": "",
               "hint": "The name of the DNA/RNA extraction method applied in the metabarcoding pipeline.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "metabarcoding_pipeline",
                 "write": true
               },
@@ -54,7 +54,7 @@
               "default_value": "",
               "hint": "The name of the DNA/RNA forward amplification method applied in the metabarcoding pipeline.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "metabarcoding_pipeline",
                 "write": true
               },
@@ -70,7 +70,7 @@
               "default_value": "",
               "hint": "The name of the DNA/RNA reverse amplification method applied in the metabarcoding pipeline.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "metabarcoding_pipeline",
                 "write": true
               },
@@ -86,7 +86,7 @@
               "default_value": "",
               "hint": "The name of the DNA/RNA purification method applied in the metabarcoding pipeline.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "metabarcoding_pipeline",
                 "write": true
               },
@@ -102,7 +102,7 @@
               "default_value": "",
               "hint": "The name of the DNA/RNA sequencing method applied in the metabarcoding pipeline.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "metabarcoding_pipeline",
                 "write": true
               },
@@ -118,7 +118,7 @@
               "default_value": "",
               "hint": "Abstract describing the eDNA metabarcoding pipeline.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "metabarcoding_pipeline",
                 "write": true
               },

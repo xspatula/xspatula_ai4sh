@@ -47,18 +47,6 @@
       "parameters": {
         "schema": "observation"
       }
-    },
-    {
-      "process_id": "create_schema",
-      "parameters": {
-        "schema": "edna_utility"
-      }
-    },
-    {
-      "process_id": "create_schema",
-      "parameters": {
-        "schema": "edna"
-      }
     }
   ]
 }

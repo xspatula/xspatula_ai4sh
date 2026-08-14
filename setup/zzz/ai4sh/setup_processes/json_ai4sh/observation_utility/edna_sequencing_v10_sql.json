@@ -22,7 +22,7 @@
               "default_value": "",
               "hint": "Unique name of the meta barcoding sequencing method.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "sequencing",
                 "write": true
               },
@@ -38,7 +38,7 @@
               "default_value": "",
               "hint": "Platform applied for eDNA sequencing.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "sequencing",
                 "write": true
               },
@@ -54,7 +54,7 @@
               "default_value": "",
               "hint": "The DOI of the metabarcoding sequencing method.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "sequencing",
                 "write": true
               },
@@ -70,7 +70,7 @@
               "default_value": "",
               "hint": "The URL of the metabarcoding sequencing method.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "sequencing",
                 "write": true
               },
@@ -86,7 +86,7 @@
               "default_value": "",
               "hint": "Abstract of the metabarcoding sequencing method.",
               "schema_table": {
-                "schema": "edna_utility",
+                "schema": "observation_utility",
                 "table": "sequencing",
                 "write": true
               },
