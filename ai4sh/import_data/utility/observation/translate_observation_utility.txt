@@ -149,6 +149,11 @@ classification_genus.json
 # You can add indicators in indicator.xls and rerun this translation.
 indicator.json
 
+# Indicator parity links two indicators that are equivalent (e.g. across data sources).
+# require: indicator.
+# You can add indicator parities in indicator_parity.xls and rerun this translation.
+indicator_parity.json
+
 # Juxtaposition is the thematic local setting of a sample (e.g. in a field, forest, lake etc).
 # require: setting_system.
 # You can add juxtaposition in juxtaposition.xls and rerun this translation.

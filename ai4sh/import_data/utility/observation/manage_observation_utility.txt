@@ -19,5 +19,6 @@ manage_unit.json
 manage_family.json
 manage_genus.json
 manage_indicator.json
+manage_indicator_parity.json
 manage_juxtaposition.json
 manage_profiling.json

@@ -75,6 +75,20 @@
               "unit",
               "name",
               "alias"
+            ],
+            [
+              "src_indicator_id",
+              "observation_utility",
+              "indicator",
+              "name",
+              "alias"
+            ],
+            [
+              "dst_indicator_id",
+              "observation_utility",
+              "indicator",
+              "name",
+              "alias"
             ]
           ]
         }

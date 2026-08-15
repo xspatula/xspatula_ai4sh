@@ -94,22 +94,6 @@
                 "update": true,
                 "delete": false
               }
-            },
-            {
-              "parameter": "equivalent_id",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "0",
-              "hint": "Indicator that is exactly equivalent, but with a duplicate name",
-              "schema_table": {
-                "schema": "observation_utility",
-                "table": "indicator",
-                "write": true
-              },
-              "permission": {
-                "update": true,
-                "delete": true
-              }
             }
           ]
         }

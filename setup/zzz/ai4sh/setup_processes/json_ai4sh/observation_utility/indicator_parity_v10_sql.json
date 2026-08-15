@@ -1,0 +1,55 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_indicator_parity",
+        "min_user_stratum": 4,
+        "title": "Manage indicator parity",
+        "label": "Insert, update or delete an observed indicator parity"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "src_indicator_id__src_indicator_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The source indicator of this parity, must be pre-registered in the indicator table",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator_parity",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "dst_indicator_id__dst_indicator_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The destination indicator of this parity, must be pre-registered in the indicator table",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator_parity",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

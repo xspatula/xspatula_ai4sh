@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "overwrite": true,
+      "process": "translate_tabular_data",
+      "parameters": {
+        "process": "manage_indicator_parity",
+        "tabular_data_path": "import_data/utility/observation/excel/indicator_parity.xlsx",
+        "dst_path": "import_data/utility/observation/manage_process"
+      }
+    }
+  ]
+}

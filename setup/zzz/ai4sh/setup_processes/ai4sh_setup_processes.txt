@@ -38,6 +38,8 @@ observation_utility/indicator_default_unit_v10_sql.json
 
 observation_utility/indicator_v10_sql.json
 
+observation_utility/indicator_parity_v10_sql.json
+
 observation_utility/juxtaposition_v10_sql.json
 
 observation_utility/license_v10_sql.json
