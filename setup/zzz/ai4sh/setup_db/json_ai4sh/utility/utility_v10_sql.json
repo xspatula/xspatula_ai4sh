@@ -51,7 +51,7 @@
             [
               "territory_id",
               "utility",
-              "name",
+              "territory",
               "name",
               "iso_code_a2_ext"
             ],

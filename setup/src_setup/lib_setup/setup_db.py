@@ -610,6 +610,104 @@ class PG_session:
 
         return {row[0].lower(): row[1] for row in self.cursor.fetchall()}
 
+    def _Resolve_foreign_key_columns(self, columns, valueL):
+        """
+        @brief Resolves '<col>__<lookup>' columns in a table_insert command to plain
+        foreign-key id columns/values, via the utility.foreign_key catalog.
+
+        @details Same catalog table and lookup convention as
+        src.postgres.pg_common.PG_common._Check_get_foreign_key (used by the
+        process-driven manage_<table> insert pipeline): a value that is all digits is
+        treated as an id already; otherwise it's looked up by dst_search_column (falling
+        back to dst_alt_search_column) in dst_schema.dst_table. Reimplemented minimally
+        here rather than reused, since this bootstrap-time PG_session predates the
+        process-registration system and does not inherit PG_common - only the single-value
+        lookup case is supported (no '__code'/'__array' variants), which is all a static
+        table_insert seed row needs.
+
+        @param columns List of column name strings, as given in the table_insert command.
+        @param valueL List of value lists, one per row, positionally matching columns.
+
+        @return (columns, valueL) with any '<col>__<lookup>' columns replaced by their
+        resolved '<col>' id columns and values. Unresolvable lookups are left as-is (with
+        a warning) rather than aborting the whole insert.
+        """
+
+        fk_indices = [i for i, col in enumerate(columns) if '__' in col]
+
+        if not fk_indices:
+
+            return columns, valueL
+
+        resolved_columns = list(columns)
+
+        fk_targets = {}
+
+        for i in fk_indices:
+
+            fk_key = columns[i].split('__')[0]
+
+            self.cursor.execute(
+                "SELECT dst_schema, dst_table, dst_search_column, dst_alt_search_column "
+                "FROM utility.foreign_key WHERE foreign_key = %s;",
+                (fk_key,)
+            )
+
+            rec = self.cursor.fetchone()
+
+            if not rec:
+
+                print('❌ ERROR - no utility.foreign_key entry for %s, leaving column as-is' % fk_key)
+
+                continue
+
+            fk_targets[i] = (fk_key,) + rec
+
+            resolved_columns[i] = fk_key
+
+        resolved_valueL = []
+
+        for values in valueL:
+
+            row = list(values)
+
+            for i, (fk_key, dst_schema, dst_table, dst_search_column, dst_alt_search_column) in fk_targets.items():
+
+                value = row[i]
+
+                if isinstance(value, str) and value.isdigit():
+
+                    row[i] = value
+
+                    continue
+
+                # Case-insensitive: unique text columns are lowercased on write elsewhere
+                # in this same pipeline (see text_unique_cols in _Table_insert), so a seed
+                # value typed in natural case (e.g. "Stockholm University") must still match.
+                self.cursor.execute(
+                    pgsql.SQL("SELECT id FROM {}.{} WHERE LOWER({}) = LOWER(%s) OR LOWER({}) = LOWER(%s);").format(
+                        pgsql.Identifier(dst_schema), pgsql.Identifier(dst_table),
+                        pgsql.Identifier(dst_search_column), pgsql.Identifier(dst_alt_search_column)
+                    ),
+                    (value, value)
+                )
+
+                rec = self.cursor.fetchone()
+
+                if not rec:
+
+                    print('❌ ERROR - could not resolve %s=%s via %s.%s' % (fk_key, value, dst_schema, dst_table))
+
+                    row[i] = None
+
+                else:
+
+                    row[i] = rec[0]
+
+            resolved_valueL.append(row)
+
+        return resolved_columns, resolved_valueL
+
     def _Table_insert(self,schema,table,columns,valueL):
         """
         @brief Inserts, replaces, or deletes records in a specified schema table.
@@ -620,7 +718,10 @@ class PG_session:
 
         @param schema Name of the schema where the table is located.
         @param table Name of the table to insert records into.
-        @param columns List of column name strings.
+        @param columns List of column name strings. A column may use the '<col>__<lookup>'
+               convention (e.g. 'territory_id__territory_name') to resolve a foreign key by
+               name via utility.foreign_key instead of requiring the raw id - see
+               _Resolve_foreign_key_columns.
         @param valueL List of lists containing Python-native values to insert (str, int, float, bool).
                IMPORTANT: values must be plain Python types, NOT SQL-formatted strings.
                JSON example: [["Alice", 30, true]] not [["'Alice'", "30", "TRUE"]]
@@ -635,6 +736,8 @@ class PG_session:
 
         @return None
         """
+
+        columns, valueL = self._Resolve_foreign_key_columns(columns, valueL)
 
         # schema and table names as query parameters
         self.cursor.execute(

@@ -9,26 +9,26 @@
         "table": "user",
         "command": {
           "columns": [
-            "organisation_id",
+            "organisation_id__organisation_name",
             "email",
             "email_alt",
             "password",
             "first_name",
             "last_name",
             "user_name",
-            "territory_id",
+            "territory_id__territory_name",
             "stratum_code"
           ],
           "values": [   
             [
-              "1",
+              "Stockholm University",
               "thomas.gumbricht@natgeo.su.se",
               "thomas.gumbricht@gmail.com",
               "$2b$12$mFiOySDOOWakJMnKaBysieAgPT6JoZ8E41QuWTT0UUtWiNjh2EmN6",
               "Thomas",
               "Gumbricht",
               "thomasg",
-              "0",
+              "none",
               "5"
             ]         
           ]

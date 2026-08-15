@@ -17,7 +17,7 @@
             "address1",
             "postal_address",
             "postal_zip_code",
-            "territory_id"
+            "territory_id__territory_name"
           ],
           "values": [
             [
@@ -29,7 +29,7 @@
               "None",
               "None",
               "None",
-              "0"
+              "none"
             ]
           ]
         }
@@ -51,7 +51,7 @@
             "address1",
             "postal_address",
             "postal_zip_code",
-            "territory_id"
+            "territory_id__territory_name"
           ],
           "values": [
             [
@@ -62,7 +62,7 @@
               "Frescativägen",
               "Stockholm",
               "11419",
-              "0"
+              "none"
             ]          
           ]
         }
