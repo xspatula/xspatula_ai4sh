@@ -16,7 +16,7 @@
           "first_name VARCHAR",
           "middle_name VARCHAR",
           "last_name VARCHAR",
-          "email VARCHAR",
+          "email VARCHAR NOT NULL UNIQUE",
           "email_alt VARCHAR",
           "address1 VARCHAR",
           "address2 VARCHAR",

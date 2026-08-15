@@ -19,73 +19,18 @@
             "territory_id",
             "stratum_code"
           ],
-          "values": [
-            [
-              "0",
-              "jane_doe@example.com",
-              "jane_doe_alt@example.com",
-              "hello-framework",
-              "Jane",
-              "Doe",
-              "jane_doe",
-              "0",
-              "5"
-            ],
-            [
-              "0",
-              "no_true_email@example.com",
-              "no_true_email_alt@example.com",
-              "cuttingedge-railway-precipitation-cumbersome",
-              "user",
-              "manager",
-              "user_manager",
-              "0",
-              "6"
-            ],
+          "values": [   
             [
               "1",
               "thomas.gumbricht@natgeo.su.se",
               "thomas.gumbricht@gmail.com",
-              "tarzana22",
+              "$2b$12$mFiOySDOOWakJMnKaBysieAgPT6JoZ8E41QuWTT0UUtWiNjh2EmN6",
               "Thomas",
               "Gumbricht",
               "thomasg",
               "0",
               "5"
-            ],
-            [
-              "2",
-              "Andrej.Slapnicar@fer.hr",
-              "andrej.slapnicar@gmail.com",
-              "aslapnicar",
-              "Andrej",
-              "Slapnicar",
-              "andrejs",
-              "0",
-              "5"
-            ],
-            [
-              "2",
-              "vedran.mornar@fer.hr",
-              "vedranmornar@gmail.com",
-              "vmornar",
-              "Vedran",
-              "Mornar",
-              "vedranm",
-              "0",
-              "5"
-            ],
-            [
-              "2",
-              "danijel.mlinaric@fer.hr",
-              "unknown@example.com",
-              "dmlinaric",
-              "Danijel",
-              "Mlinarić",
-              "mlinaricd",
-              "0",
-              "5"
-            ]
+            ]         
           ]
         }
       }

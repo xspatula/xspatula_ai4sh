@@ -89,3 +89,10 @@ ai4sh/import_data/sample/
 ai4sh/import_data/utility/
 ai4sh/import_data/wetlab/
 ai4sh/import_data/
+
+# Registration intake and generated output contain real applicant PII (names, emails) -
+# unlike ai4sh/import_data/*, never tracked, not even a filled template.
+ai4sh/user_management/organisation/excel/
+ai4sh/user_management/organisation/manage_process/
+ai4sh/user_management/user/excel/
+ai4sh/user_management/user/manage_process/

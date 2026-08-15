@@ -11,6 +11,7 @@
  - Updated: 2025-09-09 (Separated common and logging helpers, added documentation)
  - Updated: 2026-03-11 (Parameterized queries and password handling fixes)
  - Updated: 2026-03-15 (Updated PG_user_status)
+ - Updated: 2026-08-14 (PG_user_status verifies a bcrypt hash instead of comparing plaintext)
 
  @author Thomas Gumbricht
 
@@ -18,6 +19,7 @@
  @date Updated: 2025-09-09 (Separated common and logging helpers, added documentation)
  @date Updated: 2026-03-11 (Parameterized queries and password handling fixes)
  @date Updated: 2026-03-15 (Updated PG_user_status)
+ @date Updated: 2026-08-14 (PG_user_status verifies a bcrypt hash instead of comparing plaintext)
 """
 
 # Standard library imports
@@ -38,6 +40,8 @@ from psycopg2 import sql as pgsql
 from src.postgres.pg_common import PG_common
 
 from src.utils import Log
+
+from src.community.password import Verify_password
 
 class PG_session(PG_common):
     """
@@ -196,13 +200,15 @@ def PG_user_status(environment_dot_file, user_netrc_id, user_name=None, user_psw
     @details
         - Connects to the PostgreSQL server using the provided database name.
         - Retrieves user credentials either from the .netrc file or from explicit parameters.
-        - Executes a parameterized SQL query to fetch user details from the community.user
-          table using either email or username. The password is NEVER embedded in the SQL
-          string — it is always passed as a query parameter to prevent injection and avoid
-          appearing in query logs or pg_stat_activity.
+        - Looks up the row by email or username only (never by password - community.user.password
+          holds a bcrypt hash, not a value the database can match with a plain equality check),
+          then verifies the supplied plaintext password against the stored hash in Python via
+          src.community.password.Verify_password.
+        - A row that doesn't exist and a row whose password doesn't match both return None,
+          so callers can't distinguish "unknown user" from "wrong password".
         - Closes the database session after the query.
 
-    @return Tuple containing user information (id, email, first_name, middle_name, last_name, user_name, stratum_code, status_code), or None if connection or credentials fail.
+    @return Tuple containing user information (id, email, first_name, middle_name, last_name, user_name, stratum_code, status_code), or None if connection, credentials, or password verification fail.
     """
 
     try:
@@ -239,23 +245,32 @@ def PG_user_status(environment_dot_file, user_netrc_id, user_name=None, user_psw
     # Decode password — kept as a Python value, NEVER embedded in the SQL string
     plaintext_password = b64decode(user_login_query_D['pswd']).decode('ascii')
 
-    select_cols = 'id, email, first_name, middle_name, last_name, user_name, stratum_code, status_code'
+    select_cols = 'id, email, first_name, middle_name, last_name, user_name, stratum_code, status_code, password'
 
     if '@' in user_login_query_D['user_name']:
 
         sql = pgsql.SQL(
-            'SELECT {} FROM community.user WHERE email = %s AND password = %s;'
+            'SELECT {} FROM community.user WHERE email = %s;'
         ).format(pgsql.SQL(select_cols))
 
     else:
 
         sql = pgsql.SQL(
-            'SELECT {} FROM community.user WHERE user_name = %s AND password = %s;'
+            'SELECT {} FROM community.user WHERE user_name = %s;'
         ).format(pgsql.SQL(select_cols))
 
-    session.cursor.execute(sql, (user_login_query_D['user_name'], plaintext_password))
+    session.cursor.execute(sql, (user_login_query_D['user_name'],))
 
-    rec = session.cursor.fetchone()
+    row = session.cursor.fetchone()
+
+    if row is None or not Verify_password(plaintext_password, row[-1]):
+
+        rec = None
+
+    else:
+
+        # Drop the trailing password hash so the returned shape matches the documented columns
+        rec = row[:-1]
 
     session._Close()
 

@@ -1,0 +1,9 @@
+###############################################
+############ translate_user.txt ###############
+##### translates DATA FROM EXCEL TO JSON ######
+###############################################
+
+# Users submitted for registration (community.user). No password column here -
+# a password is generated and emailed by the registration notebook, not entered
+# by the applicant.
+user.json

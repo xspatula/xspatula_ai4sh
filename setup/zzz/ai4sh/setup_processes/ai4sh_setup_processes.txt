@@ -18,6 +18,12 @@ utility/foreign_key_v10_sql.json
 
 utility/territory_v10_sql.json
 
+### COMMUNITY ###
+
+community/organisation_v10_sql.json
+
+community/user_v10_sql.json
+
 ### OBSERVATION UTILITIES ###
 
 observation_utility/analysis_method_translate_v10_sql.json

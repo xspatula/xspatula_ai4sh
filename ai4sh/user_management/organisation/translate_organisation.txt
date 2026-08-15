@@ -1,0 +1,7 @@
+###############################################
+######## translate_organisation.txt ###########
+##### translates DATA FROM EXCEL TO JSON ######
+###############################################
+
+# Organisations submitted for registration (community.organisation).
+organisation.json

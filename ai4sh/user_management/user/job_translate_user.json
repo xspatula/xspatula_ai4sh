@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "user_management/user",
+    "process_sub_folder": "process",
+    "pilot_file": "translate_user.txt"
+  }
+}

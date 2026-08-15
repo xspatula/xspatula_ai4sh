@@ -1,0 +1,327 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_user",
+        "min_user_stratum": 1,
+        "title": "Manage user",
+        "label": "Insert, update or delete a community.user account"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "organisation_id__organisation_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The name of the organisation the user is affiliated with",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "user_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The unique login name of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "password",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Bcrypt hash of the user's password - never a plaintext value; set by the registration workflow, not entered by hand",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "stratum_code",
+              "parameter_type": "int",
+              "required": false,
+              "default_value": "0",
+              "hint": "The user category / access tier stratum code (default 0, free)",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "first_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The first name of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "middle_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The middle name of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "last_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The last name of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "email",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The unique email address of the user - also where the initial generated password is sent",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "email_alt",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "An alternate email address of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "address1",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The physical address, first line, of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "address2",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The physical address, second line, of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "postal_address",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The postal address (city, town, parish etc) of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "postal_zip_code",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The postal zip code of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "state",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The state (full or code) of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "territory_id__territory_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The territory (country) name of where the user resides",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "telephone",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The telephone number of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "department",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The department to which the user belongs",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "section",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The section to which the user belongs",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            },
+            {
+              "parameter": "position",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The professional position of the user",
+              "schema_table": {
+                "schema": "community",
+                "table": "user",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
