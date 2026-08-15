@@ -60,8 +60,6 @@
           "species_id INTEGER REFERENCES observation_utility.species (id)",
           "license_id INTEGER REFERENCES observation_utility.license (id)",
           "profiling_id INTEGER REFERENCES observation_utility.profiling (id)",
-          "substance_array TEXT[]",
-          "keyword_array TEXT[]",
           "url TEXT",
           "doi TEXT",
           "abstract TEXT",
@@ -70,6 +68,24 @@
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (dataset_id)",
           "PRIMARY KEY (dataset_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "dataset_tag",
+        "command": [
+          "id SERIAL",
+          "dataset_id INTEGER REFERENCES observation.dataset (id)",
+          "tag TEXT NOT NULL",
+          "tag_type TEXT NOT NULL CHECK (tag_type IN ('substance','keyword'))",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "UNIQUE (dataset_id, tag, tag_type)",
+          "PRIMARY KEY (id)"
         ]
       }
     },

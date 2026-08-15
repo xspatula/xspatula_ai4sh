@@ -1,0 +1,71 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_cultivation_crop",
+        "min_user_stratum": 4,
+        "title": "Manage cultivation crop",
+        "label": "Insert, update or delete a crop (main, catch or cover) grown in a cultivation event"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "cultivation_id",
+              "parameter_type": "int",
+              "required": true,
+              "default_value": "",
+              "hint": "The id of the cultivation event this crop belongs to (landscape.cultivation.id - cultivation has no single-name lookup yet, its natural key is geolocation + season_start_at)",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "cultivation_crop",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "taxa_id__taxa_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the crop's taxon, must be pre-registered in the taxa table",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "cultivation_crop",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "role",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "One of: main, catch, cover",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "cultivation_crop",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

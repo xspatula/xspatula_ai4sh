@@ -1,0 +1,71 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_campaign_tag",
+        "min_user_stratum": 4,
+        "title": "Manage campaign tag",
+        "label": "Insert, update or delete a free-text substance or keyword tag on a campaign"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "campaign_id__campaign_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the campaign this tag belongs to",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_tag",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Free-text tag value",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_tag",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "tag_type",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "One of: substance, keyword",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign_tag",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -104,11 +104,21 @@ observation/sample_geolocation_v10_sql.json
 
 observation/sampling_log_v10_sql.json
 
+observation/campaign_tag_v10_sql.json
+
+observation/dataset_tag_v10_sql.json
+
 ### landscape utility ###
 
 landscape/land_use_v10_sql.json
 
 landscape/land_cover_v10_sql.json
+
+### landscape ###
+
+landscape/cultivation_crop_v10_sql.json
+
+landscape/cultivation_soil_preparation_v10_sql.json
 
 ### SELECT SPECTRA ###
 

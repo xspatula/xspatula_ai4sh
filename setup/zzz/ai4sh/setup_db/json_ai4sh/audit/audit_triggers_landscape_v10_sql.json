@@ -327,6 +327,38 @@
       "delete": false,
       "parameters": {
         "schema": "landscape",
+        "table": "cultivation_crop",
+        "trigger": "cultivation_crop_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape",
+        "table": "cultivation_soil_preparation",
+        "trigger": "cultivation_soil_preparation_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape",
         "table": "landscape_state",
         "trigger": "landscape_state_audit",
         "timing": "AFTER",

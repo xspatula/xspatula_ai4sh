@@ -35,8 +35,6 @@
           "species_id INTEGER REFERENCES observation_utility.species (id)",
           "license_id INTEGER REFERENCES observation_utility.license (id)",
           "profiling_id INTEGER REFERENCES observation_utility.profiling (id)",
-          "substance_array TEXT[]",
-          "keyword_array TEXT[]",
           "url TEXT",
           "doi TEXT",
           "abstract TEXT",
@@ -44,6 +42,24 @@
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (campaign_id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "campaign_tag",
+        "command": [
+          "id SERIAL",
+          "campaign_id INTEGER REFERENCES observation.campaign (id)",
+          "tag TEXT NOT NULL",
+          "tag_type TEXT NOT NULL CHECK (tag_type IN ('substance','keyword'))",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "UNIQUE (campaign_id, tag, tag_type)",
+          "PRIMARY KEY (id)"
         ]
       }
     },

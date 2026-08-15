@@ -38,14 +38,10 @@
           "baresoil_entire_season BOOLEAN",
           "organic BOOLEAN",
           "regenerative BOOLEAN",
-          "soil_preparation_id_array BOOLEAN[]",
           "irrigation_mm FLOAT",
           "fertilisation_manure_kg_ha FLOAT",
           "fertilisation_chemical_kg_ha FLOAT",
           "pesticide_kg_ha FLOAT",
-          "main_crop_id INTEGER[]",
-          "catch_crop_id INTEGER[]",
-          "cover_crop_id INTEGER[]",
           "main_crop_yield FLOAT",
           "catch_crop_yield FLOAT",
           "yield_unit_id INTEGER",
@@ -55,6 +51,41 @@
           "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (geolocation_id, season_start_at)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape",
+        "table": "cultivation_crop",
+        "command": [
+          "id SERIAL",
+          "cultivation_id INTEGER REFERENCES landscape.cultivation (id)",
+          "taxa_id INTEGER REFERENCES observation_utility.taxa (id)",
+          "role TEXT NOT NULL CHECK (role IN ('main','catch','cover'))",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "UNIQUE (cultivation_id, taxa_id, role)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape",
+        "table": "cultivation_soil_preparation",
+        "command": [
+          "id SERIAL",
+          "cultivation_id INTEGER REFERENCES landscape.cultivation (id)",
+          "soil_preparation_id INTEGER REFERENCES landscape_utility.soil_preparation (id)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "UNIQUE (cultivation_id, soil_preparation_id)",
           "PRIMARY KEY (id)"
         ]
       }

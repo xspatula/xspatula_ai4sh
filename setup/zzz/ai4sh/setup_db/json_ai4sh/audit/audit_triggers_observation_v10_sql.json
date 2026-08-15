@@ -118,6 +118,22 @@
       "delete": false,
       "parameters": {
         "schema": "observation",
+        "table": "dataset_tag",
+        "trigger": "dataset_tag_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
         "table": "campaign",
         "trigger": "campaign_audit",
         "timing": "AFTER",
@@ -200,6 +216,22 @@
         "schema": "observation",
         "table": "campaign_setting_system",
         "trigger": "campaign_setting_system_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "campaign_tag",
+        "trigger": "campaign_tag_audit",
         "timing": "AFTER",
         "events": [
           "UPDATE",

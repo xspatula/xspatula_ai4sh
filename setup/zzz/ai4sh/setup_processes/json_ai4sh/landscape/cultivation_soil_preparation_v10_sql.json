@@ -1,0 +1,55 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_cultivation_soil_preparation",
+        "min_user_stratum": 4,
+        "title": "Manage cultivation soil preparation",
+        "label": "Insert, update or delete a soil preparation method used in a cultivation event"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "cultivation_id",
+              "parameter_type": "int",
+              "required": true,
+              "default_value": "",
+              "hint": "The id of the cultivation event this preparation method belongs to (landscape.cultivation.id - cultivation has no single-name lookup yet, its natural key is geolocation + season_start_at)",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "cultivation_soil_preparation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "soil_preparation_id__soil_preparation_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the soil preparation method, must be pre-registered in the landscape_utility.soil_preparation table",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "cultivation_soil_preparation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
