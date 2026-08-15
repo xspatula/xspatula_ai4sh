@@ -54,11 +54,7 @@
       "execute": true,
       "verbose": 1,
       "overwrite": false,
-      "delete": false,
-      "src_path": {
-        "volume": ".",
-        "ext": "json"
-      }
+      "delete": false
     }
   ]
 }

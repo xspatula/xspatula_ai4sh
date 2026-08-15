@@ -7,11 +7,19 @@
  absolute, and home-based notations, then loads configuration inputs for package
  workflows.
 
+ Rule: every relative path anywhere in the scheme -> job(project) -> pilot -> process
+ chain is relative to the project root (see the "Path resolution" section in
+ .claude/CLAUDE.md for the full explanation and the two upstream exceptions -
+ scheme_file itself and project_path inside it).
+
  *Version History*:
  - Created: 2024-01-04
  - Updated: 2025-09-01 (Home directory resolution improvements)
  - Updated: 2026-03-14 (Home path and documentation cleanup)
  - Updated: 2026-03-15 (Notebook-relative path handling)
+ - Updated: 2026-08-15 (Single project-root anchor for job/pilot resolution;
+   tabular_data_path/dst_path in process files also moved to this anchor, see
+   src/ai4sh/import_data/import_data.py)
 
  @author Thomas Gumbricht
 
@@ -19,6 +27,7 @@
  @date Updated: 2025-09-01 (Home directory resolution improvements)
  @date Updated: 2026-03-14 (Home path and documentation cleanup)
  @date Updated: 2026-03-15 (Notebook-relative path handling)
+ @date Updated: 2026-08-15 (Single project-root anchor for job/pilot resolution)
 """
 
 # Standard library imports
@@ -194,16 +203,18 @@ def Clean_pilot_list(user_json_process_file_FPN_L, project_root_FP, project_D):
     @note Prints an error message and returns None if the constructed JSON path does not exist.
     """
 
-    json_path = path.join(project_root_FP, project_D["process"]["job_folder"],project_D["process"]["process_sub_folder"])
-    
+    job_folder_FP = Get_project_path(project_root_FP, project_D["process"]["job_folder"])
+
+    json_path = Get_project_path(job_folder_FP, project_D["process"]["process_sub_folder"])
+
     if not path.exists(json_path):
 
         print('    ❌ ERROR the path to the json process file(s) does not exist:', json_path)
 
         return None
-    
+
     # Clean the list of json objects from comments and white space and too short names
-    cleaned_L = [path.join(json_path,x.strip())  for x in user_json_process_file_FPN_L if len(x) > 5 and x[0] != '#']
+    cleaned_L = [Get_project_path(json_path,x.strip())  for x in user_json_process_file_FPN_L if len(x) > 5 and x[0] != '#']
 
     return cleaned_L
 
@@ -272,8 +283,13 @@ def Get_scheme_project_path_setup(scheme_file, project_file):
 
         return None
 
+    # Make project_root_FP available to downstream consumers (e.g. process files whose own
+    # parameters contain relative paths, which are resolved relative to the project root -
+    # see the "Path resolution" section in .claude/CLAUDE.md) - not just used locally here.
+    scheme_params_D['project_root_FP'] = project_root_FP
+
     # Get the full path to the project file
-    project_file_FPN = path.join(project_root_FP, project_file)
+    project_file_FPN = Get_project_path(project_root_FP, project_file)
 
     if not path.exists(project_file_FPN):
 
@@ -325,7 +341,9 @@ def Get_scheme_project_path_setup(scheme_file, project_file):
 
     elif "pilot_file" in proj_proc_D["process"]:
 
-        pilot_FPN = path.join(project_root_FP, proj_proc_D["process"]["job_folder"], proj_proc_D["process"]["pilot_file"])
+        job_folder_FP = Get_project_path(project_root_FP, proj_proc_D["process"]["job_folder"])
+
+        pilot_FPN = Get_project_path(job_folder_FP, proj_proc_D["process"]["pilot_file"])
 
         if verbose > 0:
 

@@ -1,12 +1,11 @@
 {
   "process": [
     {
-      
       "process": "translate_tabular_data",
       "parameters": {
         "process": "manage_provider",
-        "tabular_data_path": "../../../utility/observation/excel/provider.xlsx",
-        "dst_path": "../../../utility/observation/manage_process"
+        "tabular_data_path": "import_data/utility/observation/excel/provider.xlsx",
+        "dst_path": "import_data/utility/observation/manage_process"
       }
     }
   ]

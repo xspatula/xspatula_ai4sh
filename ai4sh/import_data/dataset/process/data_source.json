@@ -5,8 +5,8 @@
       "overwrite": false,
       "parameters": {
         "process": "manage_data_source",
-        "tabular_data_path": "../../dataset/excel/data_source.xlsx",
-        "dst_path": "../../dataset/manage_process"
+        "tabular_data_path": "import_data/dataset/excel/data_source.xlsx",
+        "dst_path": "import_data/dataset/manage_process"
       }
     }
   ]

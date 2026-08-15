@@ -87,7 +87,7 @@ def Run_process(strcutured_process_D, scheme_params_D):
 
             if root_process == 'translate_data':
 
-                import_C = Process_import_JSON(process_S,pg_session_C)
+                import_C = Process_import_JSON(process_S,pg_session_C,scheme_params_D['project_root_FP'])
 
                 result = import_C._Sub_process(key)
 
@@ -97,7 +97,7 @@ def Run_process(strcutured_process_D, scheme_params_D):
 
             elif root_process == 'manage_table_data':
 
-                import_C = Process_import_JSON(process_S,pg_session_C)
+                import_C = Process_import_JSON(process_S,pg_session_C,scheme_params_D['project_root_FP'])
 
                 result = import_C._Sub_process(key)
 

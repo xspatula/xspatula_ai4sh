@@ -19,7 +19,7 @@
             "territory_id__territory_name",
             "stratum_code"
           ],
-          "values": [   
+          "values": [
             [
               "Stockholm University",
               "thomas.gumbricht@natgeo.su.se",
@@ -28,9 +28,9 @@
               "Thomas",
               "Gumbricht",
               "thomasg",
-              "none",
+              "sweden",
               "5"
-            ]         
+            ]
           ]
         }
       }

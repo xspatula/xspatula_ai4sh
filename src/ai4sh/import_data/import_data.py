@@ -45,12 +45,13 @@ SPECIAL_SEARCH_TABLES_D = {'observation.campaign': '_Retrieve_dataset_alias',
 class Process_import_JSON(Get_schema_table):
     '''class for managing processes'''
 
-    def __init__(self, process_S, pg_session_C):
+    def __init__(self, process_S, pg_session_C, project_root_FP):
         '''
         '''
         self.verbose = process_S.process.verbose
         self.process_S = process_S
         self.pg_session_C = pg_session_C
+        self.project_root_FP = project_root_FP
 
         self.verbose = process_S.process.verbose
 
@@ -221,7 +222,7 @@ class Process_import_JSON(Get_schema_table):
         '''
         '''
 
-        tabular_data_path = Full_path_locate(os.path.split(json_file_key)[0],self.process_S.process.parameters.tabular_data_path)
+        tabular_data_path = Full_path_locate(self.project_root_FP,self.process_S.process.parameters.tabular_data_path)
 
         if not tabular_data_path:
 
@@ -229,7 +230,7 @@ class Process_import_JSON(Get_schema_table):
 
             return None
         
-        self.dst_FP = Full_path_locate(os.path.split(json_file_key)[0],self.process_S.process.parameters.dst_path, True)
+        self.dst_FP = Full_path_locate(self.project_root_FP,self.process_S.process.parameters.dst_path, True)
         
         if not self._Set_dst_FPN(json_file_key):
 
