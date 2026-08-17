@@ -941,8 +941,8 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "sequence_library",
-        "trigger": "sequence_library_audit",
+        "table": "edna_sequence_library",
+        "trigger": "edna_sequence_library_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
@@ -958,8 +958,8 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "nucleotide_archive",
-        "trigger": "nucleotide_archive_audit",
+        "table": "edna_nucleotide_archive",
+        "trigger": "edna_nucleotide_archive_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
@@ -975,8 +975,8 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "extraction",
-        "trigger": "extraction_audit",
+        "table": "edna_extraction",
+        "trigger": "edna_extraction_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
@@ -992,8 +992,8 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "amplification",
-        "trigger": "amplification_audit",
+        "table": "edna_amplification",
+        "trigger": "edna_amplification_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
@@ -1009,8 +1009,8 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "purification",
-        "trigger": "purification_audit",
+        "table": "edna_purification",
+        "trigger": "edna_purification_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
@@ -1026,8 +1026,8 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "sequencing",
-        "trigger": "sequencing_audit",
+        "table": "edna_sequencing",
+        "trigger": "edna_sequencing_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
