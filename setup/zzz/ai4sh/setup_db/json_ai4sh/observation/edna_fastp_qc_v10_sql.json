@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_fastp_qc",
+        "command": [
+          "id SERIAL",
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "software_id INTEGER REFERENCES observation_utility.software (id)",
+          "min_phred_score INTEGER",
+          "clean_tag_count INTEGER",
+          "UNIQUE (sample_id, software_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

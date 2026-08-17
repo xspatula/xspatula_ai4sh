@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_functional_abundance",
+        "command": [
+          "id SERIAL",
+          "feature_id VARCHAR REFERENCES observation.edna_feature_abundance (id)",
+          "taxa_function_id INTEGER REFERENCES observation_utility.taxa_function (id)",
+          "abundance INTEGER",
+          "confidence FLOAT",
+          "UNIQUE (feature_id, taxa_function_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

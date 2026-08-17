@@ -6,10 +6,14 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "taxa_level",
+        "table": "edna_purification",
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
+          "doi TEXT",
+          "url TEXT",
+          "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

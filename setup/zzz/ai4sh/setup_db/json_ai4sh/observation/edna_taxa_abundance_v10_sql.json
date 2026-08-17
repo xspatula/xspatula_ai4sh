@@ -5,14 +5,15 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "observation_utility",
-        "table": "taxa_function",
+        "schema": "observation",
+        "table": "edna_taxa_abundance",
         "command": [
           "id SERIAL",
-          "name TEXT UNIQUE",
-          "abstract TEXT",
+          "feature_id VARCHAR REFERENCES observation.edna_feature_abundance (id)",
           "taxa_id INTEGER REFERENCES observation_utility.taxa (id)",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
+          "abundance INTEGER",
+          "confidence FLOAT",
+          "UNIQUE (feature_id, taxa_id)",
           "PRIMARY KEY (id)"
         ]
       }

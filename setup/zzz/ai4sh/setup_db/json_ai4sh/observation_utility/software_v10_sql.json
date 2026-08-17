@@ -6,10 +6,15 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "taxa_level",
+        "table": "software",
         "command": [
           "id SERIAL",
-          "name TEXT UNIQUE",
+          "name TEXT",
+          "version TEXT",
+          "url TEXT",
+          "doi TEXT",
+          "abstract TEXT",
+          "UNIQUE (name, version)",
           "PRIMARY KEY (id)"
         ]
       }

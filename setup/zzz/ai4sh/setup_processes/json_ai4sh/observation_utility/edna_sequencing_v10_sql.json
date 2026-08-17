@@ -5,10 +5,10 @@
       "overwrite": false,
       "parameters": {
         "root_process": "manage_table_data",
-        "process": "manage_metabarcoding_sequencing",
+        "process": "manage_edna_sequencing",
         "min_user_stratum": 4,
-        "title": "Manage eDNA metabarcoding sequencing method",
-        "label": "Insert, update or delete eDNA metabarcoding sequencing method."
+        "title": "Manage eDNA sequencing method",
+        "label": "Insert, update or delete eDNA sequencing method."
       },
       "nodes": [
         {
@@ -20,10 +20,10 @@
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Unique name of the meta barcoding sequencing method.",
+              "hint": "Unique name of the eDNA sequencing method.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "sequencing",
+                "table": "edna_sequencing",
                 "write": true
               },
               "permission": {
@@ -39,11 +39,43 @@
               "hint": "Platform applied for eDNA sequencing.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "sequencing",
+                "table": "edna_sequencing",
                 "write": true
               },
               "permission": {
-                "update": false,
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "strategy",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Strategy applied for eDNA sequencing.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_sequencing",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "data_requirement",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Data requirement for eDNA sequencing.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_sequencing",
+                "write": true
+              },
+              "permission": {
+                "update": true,
                 "delete": false
               }
             },
@@ -52,14 +84,14 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "The DOI of the metabarcoding sequencing method.",
+              "hint": "The DOI of the eDNA sequencing method.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "sequencing",
+                "table": "edna_sequencing",
                 "write": true
               },
               "permission": {
-                "update": false,
+                "update": true,
                 "delete": false
               }
             },
@@ -68,14 +100,14 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "The URL of the metabarcoding sequencing method.",
+              "hint": "The URL of the eDNA sequencing method.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "sequencing",
+                "table": "edna_sequencing",
                 "write": true
               },
               "permission": {
-                "update": false,
+                "update": true,
                 "delete": false
               }
             },
@@ -84,14 +116,14 @@
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Abstract of the metabarcoding sequencing method.",
+              "hint": "Abstract of the eDNA sequencing method.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "sequencing",
+                "table": "edna_sequencing",
                 "write": true
               },
               "permission": {
-                "update": false,
+                "update": true,
                 "delete": false
               }
             }

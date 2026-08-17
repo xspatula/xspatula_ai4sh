@@ -5,10 +5,10 @@
       "overwrite": false,
       "parameters": {
         "root_process": "manage_table_data",
-        "process": "manage_metabarcoding_amplification",
+        "process": "manage_edna_amplification",
         "min_user_stratum": 4,
-        "title": "Manage eDNA metabarcoding amplification method",
-        "label": "Insert, update or delete eDNA metabarcoding forward or reverse amplification method."
+        "title": "Manage eDNA  amplification method",
+        "label": "Insert, update or delete eDNA forward or reverse amplification method."
       },
       "nodes": [
         {
@@ -20,10 +20,10 @@
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Unique name of the meta barcoding amplification method, whether forward or backward.",
+              "hint": "Unique name of the eDNA amplification method, whether forward or backward.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "amplification",
+                "table": "edna_amplification",
                 "write": true
               },
               "permission": {
@@ -36,10 +36,10 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "The DOI of the metabarcoding amplification method.",
+              "hint": "The DOI of the eDNA amplification method.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "amplification",
+                "table": "edna_amplification",,
                 "write": true
               },
               "permission": {
@@ -52,10 +52,10 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "The URL of the metabarcoding amplification method.",
+              "hint": "The URL of the eDNA amplification method.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "amplification",
+                "table": "edna_amplification",,
                 "write": true
               },
               "permission": {
@@ -71,7 +71,7 @@
               "hint": "Abstract of the metabarcoding amplification method.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "amplification",
+                "table": "edna_amplification",,
                 "write": true
               },
               "permission": {

@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_fastp_qc",
+        "command": [
+          "id SERIAL",
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "software_id INTEGER REFERENCES observation_utility.software (id)",
+          "edna_reference_db_id INTEGER REFERENCES observation_utility.edna_reference_db (id)",
+          "confidence_threshold FLOAT",
+          "UNIQUE (sample_id, software_id,edna_reference_db_id,confidence_threshold)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

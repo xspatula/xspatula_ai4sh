@@ -1,48 +1,14 @@
 {
   "process": [
+
+
     {
       "process_id": "create_table",
       "overwrite": false,
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "sequence_library",
-        "command": [
-          "id SERIAL",
-          "name TEXT UNIQUE",
-          "proprietor_id INTEGER REFERENCES observation_utility.reference_proprietor (id)",
-          "url TEXT",
-          "abstract TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
-          "PRIMARY KEY (id)"
-        ]
-      }
-    },
-    {
-      "process_id": "create_table",
-      "overwrite": false,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "nucleotide_archive",
-        "command": [
-          "id SERIAL",
-          "archive_name TEXT UNIQUE",
-          "proprietor_id INTEGER REFERENCES observation_utility.reference_proprietor (id)",
-          "url TEXT",
-          "abstract TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
-          "PRIMARY KEY (id)"
-        ]
-      }
-    },
-    {
-      "process_id": "create_table",
-      "overwrite": false,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "extraction",
+        "table": "edna_extraction",
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
@@ -60,7 +26,7 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "amplification",
+        "table": "edna_amplification",
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",

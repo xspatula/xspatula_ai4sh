@@ -1,0 +1,24 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_merge_count",
+        "command": [
+          "id SERIAL",
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "software_id INTEGER REFERENCES observation_utility.software (id)",
+          "raw_sequence_read_counts INTEGER",
+          "min_overlap INTEGER",
+          "max_overlap INTEGER",
+          "merged_tag_count INTEGER",
+          "UNIQUE (sample_id, software_id)",
+          "PRIMARY KEY (id)"
+        ]
+      }
+    }
+  ]
+}

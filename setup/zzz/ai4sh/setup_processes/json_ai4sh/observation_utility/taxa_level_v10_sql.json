@@ -1,0 +1,39 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_taxa_level",
+        "min_user_stratum": 4,
+        "title": "Manage Linnaean taxonomi levels method",
+        "label": "Insert, update or delete Linnaean taxonomic levels."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of taxonomic level.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "taxa_level",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

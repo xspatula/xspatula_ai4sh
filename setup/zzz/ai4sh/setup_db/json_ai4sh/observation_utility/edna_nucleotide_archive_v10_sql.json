@@ -1,15 +1,20 @@
 {
   "process": [
+
     {
       "process_id": "create_table",
       "overwrite": false,
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "taxa_level",
+        "table": "edna_nucleotide_archive",
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
+          "proprietor_id INTEGER REFERENCES observation_utility.reference_proprietor (id)",
+          "url TEXT",
+          "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

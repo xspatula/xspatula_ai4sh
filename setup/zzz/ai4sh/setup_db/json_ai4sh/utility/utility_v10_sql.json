@@ -16,6 +16,11 @@
           "dst_alt_search_column TEXT",
           "PRIMARY KEY (foreign_key)"
         ]
+      },
+      "audit":{
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true,
       }
     },
     {

@@ -6,10 +6,16 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "taxa_level",
+        "table": "edna_reference_db",
         "command": [
           "id SERIAL",
-          "name TEXT UNIQUE",
+          "name TEXT",
+          "version TEXT",
+          "marker_gene TEXT",
+          "url TEXT",
+          "doi TEXT",
+          "abstract TEXT",
+          "UNIQUE (name, version)",
           "PRIMARY KEY (id)"
         ]
       }

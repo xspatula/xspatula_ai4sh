@@ -6,10 +6,17 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "taxa_level",
+        "table": "edna_sequencing",
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
+          "platform TEXT",
+          "strategy TEXT",
+          "data_requirement TEXT",
+          "doi TEXT",
+          "url TEXT",
+          "abstract TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       }

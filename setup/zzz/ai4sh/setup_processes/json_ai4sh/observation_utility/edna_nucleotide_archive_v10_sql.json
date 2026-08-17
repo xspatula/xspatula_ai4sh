@@ -5,10 +5,10 @@
       "overwrite": false,
       "parameters": {
         "root_process": "manage_table_data",
-        "process": "manage_edna_purification",
+        "process": "manage_edna_nucleotide_archive",
         "min_user_stratum": 4,
-        "title": "Manage eDNA purification method",
-        "label": "Insert, update or delete eDNA purification method."
+        "title": "Manage eDNA nucleotide archive",
+        "label": "Insert, update or delete eDNA nucleotide archive."
       },
       "nodes": [
         {
@@ -20,26 +20,26 @@
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Unique name of the eDNA purification method.",
+              "hint": "Unique name of the nucleotide archive.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "edna_purification",
+                "table": "edna_nucleotide_archive",
                 "write": true
               },
               "permission": {
-                "update": false,
+                "update": true,
                 "delete": false
               }
             },
             {
-              "parameter": "doi",
+              "parameter": "proprietor_id__proprietor_name",
               "parameter_type": "text",
-              "required": false,
+              "required": true,
               "default_value": "",
-              "hint": "The DOI of the edna purification method.",
+              "hint": "The name of the proprietor pf the nucleotide archive.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "edna_purification",
+                "table": "edna_nucleotide_archive",
                 "write": true
               },
               "permission": {
@@ -52,10 +52,10 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "The URL of the edna purification method.",
+              "hint": "The url of the nucleotide archive.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "edna_purification",
+                "table": "edna_nucleotide_archive",
                 "write": true
               },
               "permission": {
@@ -68,10 +68,10 @@
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Abstract of the edna purification method.",
+              "hint": "Abstract of the edna nucleotide archive.",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "edna_purification",
+                "table": "edna_nucleotide_archive",
                 "write": true
               },
               "permission": {

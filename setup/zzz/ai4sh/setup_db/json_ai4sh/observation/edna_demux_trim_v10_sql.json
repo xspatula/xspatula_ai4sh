@@ -5,12 +5,13 @@
       "overwrite": false,
       "delete": false,
       "parameters": {
-        "schema": "observation_utility",
-        "table": "taxa_status",
+        "schema": "observation",
+        "table": "edna_feature_abundance",
         "command": [
           "id SERIAL",
-          "name TEXT UNIQUE",
-          "status TEXT",
+          "sample_id INTEGER REFERENCES observation.sample (id)",
+          "edna_metabarcoding_pipeline_id INTEGER",
+          "raw_sequence_read_counts INTEGER",
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
