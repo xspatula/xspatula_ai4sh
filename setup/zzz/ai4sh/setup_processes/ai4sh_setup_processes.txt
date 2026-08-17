@@ -110,6 +110,18 @@ observation/campaign_tag_v10_sql.json
 
 observation/dataset_tag_v10_sql.json
 
+### eDNA ###
+
+edna/edna_extraction_v10_sql.json
+
+edna/edna_purification_v10_sql.json
+
+edna/edna_amplification_v10_sql.json
+
+edna/edna_sequencing_v10_sql.json
+
+edna/edna_metabarcoding_pipeline_v10_sql.json
+
 ### landscape utility ###
 
 landscape/land_use_v10_sql.json
