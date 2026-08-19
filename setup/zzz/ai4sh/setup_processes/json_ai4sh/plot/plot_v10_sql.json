@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_root_process",
-      "overwrite": true,
+      "overwrite": false,
       "parameters": {
         "root_process": "plot",
         "title": "Plot data",
@@ -11,7 +11,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": true,
+      "overwrite": false,
       "parameters": {
         "root_process": "plot",
         "process": "plot_indicators",
@@ -93,7 +93,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": true,
+      "overwrite": false,
       "parameters": {
         "root_process": "plot",
         "process": "plot_spectra",
@@ -175,7 +175,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": true,
+      "overwrite": false,
       "parameters": {
         "root_process": "plot",
         "process": "plot_spectra_scattercorrection_scalers",
@@ -229,7 +229,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": true,
+      "overwrite": false,
       "parameters": {
         "root_process": "plot",
         "process": "plot_spectra_scaling_methods",
