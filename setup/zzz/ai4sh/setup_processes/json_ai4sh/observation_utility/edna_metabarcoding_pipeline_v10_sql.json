@@ -8,7 +8,7 @@
         "process": "manage_edna_metabarcoding_pipeline",
         "min_user_stratum": 4,
         "title": "Manage eDNA metabarcoding pipeline",
-        "label": "Insert, update or delete eDNA metabarcoding pipeline with extraction, forward amplificatio, reverse amplification, purification and sequencing"
+        "label": "Insert, update or delete eDNA metabarcoding pipeline with extraction, forward amplification, reverse amplification, purification and sequencing"
       },
       "nodes": [
         {

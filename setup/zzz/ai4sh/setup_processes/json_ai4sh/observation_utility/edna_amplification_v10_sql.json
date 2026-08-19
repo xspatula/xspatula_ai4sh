@@ -7,7 +7,7 @@
         "root_process": "manage_table_data",
         "process": "manage_edna_amplification",
         "min_user_stratum": 4,
-        "title": "Manage eDNA  amplification method",
+        "title": "Manage eDNA amplification method",
         "label": "Insert, update or delete eDNA forward or reverse amplification method."
       },
       "nodes": [
