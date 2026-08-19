@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_campaign",
@@ -47,7 +47,7 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "%s_%s  %(dataset_id__dataset_alias, begin_date)"
+                "concat": "%s_%s  %(dataset_id__dataset_alias, begun_at)"
               }
             },
             {
@@ -66,7 +66,7 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "%s_%s  %(dataset_id__dataset_alias, begin_date)"
+                "concat": "%s_%s  %(dataset_id__dataset_alias, begun_at)"
               }
             },
             {
@@ -102,7 +102,7 @@
               }
             },
             {
-              "parameter": "begin_date",
+              "parameter": "begun_at",
               "parameter_type": "date",
               "required": false,
               "default_value": 0,
@@ -118,7 +118,7 @@
               }
             },
             {
-              "parameter": "end_date",
+              "parameter": "ended_at",
               "parameter_type": "date",
               "required": false,
               "default_value": 0,
@@ -234,11 +234,14 @@
               "parameter_type": "text_array",
               "required": false,
               "default_value": "inherit",
-              "hint": "Substance array, leave to copy the dataset substance array",
+              "hint": "Substance array, leave to inherit all of the dataset's substance tags",
               "schema_table": {
                 "schema": "observation",
-                "table": "campaign_meta",
-                "write": true
+                "table": "campaign_tag",
+                "write": true,
+                "array_column": "tag",
+                "array_constant_column": "tag_type",
+                "array_constant_value": "substance"
               },
               "permission": {
                 "update": true,
@@ -247,10 +250,12 @@
               "inherit": {
                 "process_parameter": "substance_array",
                 "src_schema": "observation",
-                "src_table": "dataset_meta",
-                "src_column": "substance_array",
+                "src_table": "dataset_tag",
+                "src_column": "tag",
                 "search_column": "dataset_id",
-                "search_object": "dataset_id__dataset_name"
+                "search_object": "dataset_id__dataset_name",
+                "filter_column": "tag_type",
+                "filter_value": "substance"
               }
             },
             {
@@ -258,11 +263,14 @@
               "parameter_type": "text_array",
               "required": false,
               "default_value": "inherit",
-              "hint": "Keyword array, leave to copy the dataset keyword array",
+              "hint": "Keyword array, leave to inherit all of the dataset's keyword tags",
               "schema_table": {
                 "schema": "observation",
-                "table": "campaign_meta",
-                "write": true
+                "table": "campaign_tag",
+                "write": true,
+                "array_column": "tag",
+                "array_constant_column": "tag_type",
+                "array_constant_value": "keyword"
               },
               "permission": {
                 "update": true,
@@ -271,10 +279,12 @@
               "inherit": {
                 "process_parameter": "keyword_array",
                 "src_schema": "observation",
-                "src_table": "dataset_meta",
-                "src_column": "keyword_array",
+                "src_table": "dataset_tag",
+                "src_column": "tag",
                 "search_column": "dataset_id",
-                "search_object": "dataset_id__dataset_name"
+                "search_object": "dataset_id__dataset_name",
+                "filter_column": "tag_type",
+                "filter_value": "keyword"
               }
             },
             {

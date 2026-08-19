@@ -476,7 +476,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_geo_profile_sample",
@@ -608,7 +608,7 @@
               "hint": "If the campaign contains observations with differnt juxtaposition settings (for example inside/outside), select the type of settings in a comma separated list",
               "schema_table": {
                 "schema": "observation",
-                "table": "sample_setting_system",
+                "table": "sample_juxtaposition",
                 "write": true
               },
               "permission": {

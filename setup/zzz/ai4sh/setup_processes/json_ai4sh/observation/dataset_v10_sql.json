@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_dataset",
@@ -118,7 +118,7 @@
               }
             },
             {
-              "parameter": "begin_date",
+              "parameter": "begun_at",
               "parameter_type": "date",
               "required": false,
               "default_value": 0,
@@ -134,7 +134,7 @@
               }
             },
             {
-              "parameter": "end_date",
+              "parameter": "ended_at",
               "parameter_type": "date",
               "required": false,
               "default_value": 0,
@@ -221,8 +221,11 @@
               "hint": "Substance array can contain a list of comma separated substances that the dataset covers. The substances can be set freely. If Empty field or none = no particular substance",
               "schema_table": {
                 "schema": "observation",
-                "table": "dataset_meta",
-                "write": true
+                "table": "dataset_tag",
+                "write": true,
+                "array_column": "tag",
+                "array_constant_column": "tag_type",
+                "array_constant_value": "substance"
               },
               "permission": {
                 "update": true,
@@ -237,8 +240,11 @@
               "hint": "Keyword array can contain a list of comma separated keywords (no need to add substances)",
               "schema_table": {
                 "schema": "observation",
-                "table": "dataset_meta",
-                "write": true
+                "table": "dataset_tag",
+                "write": true,
+                "array_column": "tag",
+                "array_constant_column": "tag_type",
+                "array_constant_value": "keyword"
               },
               "permission": {
                 "update": true,

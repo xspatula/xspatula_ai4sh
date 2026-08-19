@@ -530,7 +530,7 @@ class Scheme_params():
 
                         setattr(self.process_S.process.parameters, auto_name_rec[0], format_string % tuple(values))
         # Check if this process has inherit parameters and if so fill in the inherit parameters, this is needed for the process to be able to get the inherited value for the parameter when it runs, but also for the type checking of the parameters as the inherited parameters are defined in the database as well and need to be included in the process parameters for the type checking to work
-        paramL =['process_parameter','src_schema', 'src_table', 'src_column', 'search_column', 'search_object']
+        paramL =['process_parameter','src_schema', 'src_table', 'src_column', 'search_column', 'search_object', 'filter_column', 'filter_value']
 
         inherit_recs = session._Multi_search(queryD, paramL, process_schema,'process_parameter_inherit')
 
@@ -550,6 +550,75 @@ class Scheme_params():
                         print('          ❌ ERROR: no foreign key found for %s.%s.%s = %s' % (inherit_rec[1], inherit_rec[2], inherit_rec[4], search_value))
 
                         continue
+
+                    if inherit_rec[6] or inherit_rec[0].endswith('_array'):
+
+                        # Multi-row inherit: fetch ALL matching source rows (optionally
+                        # filtered) and aggregate into the '{v1,v2,...}' shape the array
+                        # fan-out mechanism (_Define_specifics/Split_arrays) already
+                        # expects. Taken whenever a filter_column was set OR the target
+                        # parameter is itself array-typed (e.g.
+                        # setting_system_id__setting_system_name_array inheriting from the
+                        # multi-row observation.dataset_setting_system junction table) -
+                        # every scalar (non-array) inherit is unaffected and keeps the
+                        # single-row path below.
+                        query_D = {inherit_rec[4]: foreign_key[0]}
+
+                        if inherit_rec[6]:
+
+                            query_D[inherit_rec[6]] = inherit_rec[7]
+
+                        rows = session._Multi_search(query_D, [inherit_rec[3]], inherit_rec[1], inherit_rec[2])
+
+                        # If src_column is itself a FK integer id (e.g. dataset_setting_system's
+                        # setting_system_id), the array fan-out downstream expects NAME strings
+                        # to re-resolve, not raw ids - look up the referenced schema.table once
+                        # via information_schema, same technique as the single-row int branch
+                        # below, and resolve each row's id to its name.
+                        fk_ref = None
+
+                        if rows and isinstance(rows[0][0], int):
+
+                            fk_sql = """
+                                SELECT ccu.table_schema, ccu.table_name
+                                FROM information_schema.key_column_usage kcu
+                                JOIN information_schema.referential_constraints rc
+                                    ON rc.constraint_name = kcu.constraint_name
+                                   AND rc.constraint_schema = kcu.table_schema
+                                JOIN information_schema.constraint_column_usage ccu
+                                    ON ccu.constraint_name = rc.unique_constraint_name
+                                WHERE kcu.table_schema = '%s'
+                                  AND kcu.table_name   = '%s'
+                                  AND kcu.column_name  = '%s';
+                            """ % (inherit_rec[1], inherit_rec[2], inherit_rec[3])
+
+                            fk_ref = session._Execute_search_single_sql(fk_sql)
+
+                        values_L = []
+
+                        for row in (rows or []):
+
+                            v = row[0]
+
+                            if v is None or (isinstance(v, str) and v.strip().lower() in ('', 'none', 'null')):
+
+                                continue
+
+                            if isinstance(v, int) and fk_ref:
+
+                                name_rec = session._Single_search({'id': v}, ['name'], fk_ref[0], fk_ref[1])
+
+                                if not name_rec:
+
+                                    continue
+
+                                v = name_rec[0]
+
+                            values_L.append(str(v))
+
+                        setattr(self.process_S.process.parameters, inherit_rec[0], ','.join(values_L))
+
+                        continue
                     try:
                         inhereted_rec = session._Single_search( {inherit_rec[4]:foreign_key[0]}, [inherit_rec[3]], inherit_rec[1], inherit_rec[2])
                     except:
@@ -557,6 +626,13 @@ class Scheme_params():
                         print('          ❌ ERROR: no record found for %s.%s.%s = %s' % (inherit_rec[1], inherit_rec[2], inherit_rec[4], search_value))
 
                         continue
+
+                    if inhereted_rec is None:
+
+                        print('          ❌ ERROR: no record found for %s.%s.%s = %s' % (inherit_rec[1], inherit_rec[2], inherit_rec[4], foreign_key[0]))
+
+                        continue
+
                     if isinstance(inhereted_rec[0], int):
 
                         # inhereted_rec[0] is a FK integer id; use information_schema

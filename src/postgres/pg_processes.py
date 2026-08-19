@@ -430,7 +430,10 @@ class Pg_manage_process(PG_session):
             return {
                 'schema': param.schema_table.schema.lower(),
                 'table': param.schema_table.table.lower(),
-                'write': param.schema_table.write
+                'write': param.schema_table.write,
+                'array_column': getattr(param.schema_table, 'array_column', None),
+                'array_constant_column': getattr(param.schema_table, 'array_constant_column', None),
+                'array_constant_value': getattr(param.schema_table, 'array_constant_value', None)
             }
         return {}
 
@@ -456,7 +459,9 @@ class Pg_manage_process(PG_session):
                 'src_table': param.inherit.src_table.lower(),
                 'src_column': param.inherit.src_column.lower(),
                 'search_column': param.inherit.search_column.lower(),
-                'search_object': param.inherit.search_object.lower()
+                'search_object': param.inherit.search_object.lower(),
+                'filter_column': param.inherit.filter_column.lower() if hasattr(param.inherit, 'filter_column') else None,
+                'filter_value': param.inherit.filter_value.lower() if hasattr(param.inherit, 'filter_value') else None
             }
         return {}
     
@@ -618,10 +623,12 @@ class Pg_manage_process(PG_session):
 
             self._Execute_commit_sql(
                 "INSERT INTO process.process_parameter_schema_table "
-                "(process, parameter, in_schema, in_table, write) "
-                "VALUES (%s, %s, %s, %s, %s);",
+                "(process, parameter, in_schema, in_table, write, array_column, array_constant_column, array_constant_value) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
                 (qpD['process'], qpD['parameter'],
-                 schema_table_D['schema'], schema_table_D['table'], schema_table_D['write'])
+                 schema_table_D['schema'], schema_table_D['table'], schema_table_D['write'],
+                 schema_table_D.get('array_column'), schema_table_D.get('array_constant_column'),
+                 schema_table_D.get('array_constant_value'))
             )
 
     def _Process_parameter_permission(self, qpD, column_permission_D):
@@ -683,13 +690,14 @@ class Pg_manage_process(PG_session):
             self._Execute_commit_sql(
                 "INSERT INTO process.process_parameter_inherit "
                 "(process, parameter, process_parameter, src_schema, src_table, src_column, "
-                "search_column, search_object) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
+                "search_column, search_object, filter_column, filter_value) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);",
                 (
                     qpD['process'], param_id,
                     column_inherit_D['process_parameter'], column_inherit_D['src_schema'], column_inherit_D['src_table'],
                     column_inherit_D['src_column'], column_inherit_D['search_column'],
-                    column_inherit_D['search_object']
+                    column_inherit_D['search_object'], column_inherit_D['filter_column'],
+                    column_inherit_D['filter_value']
                 )
             )
 

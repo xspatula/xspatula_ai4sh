@@ -25,6 +25,8 @@ class Get_schema_table:
         """
         schema_table_query_D = {}
 
+        self.array_meta_D = {}
+
         # Get the parameter names and values from the process structure variable
         parameter_L = []
 
@@ -54,14 +56,26 @@ class Get_schema_table:
 
             schema_table_query_D[schema_table] = {}
 
+            self.array_meta_D[schema_table] = {}
+
             # create a query for selecting which schema and table each parameters belongs to
             queryD = {'s':record[0], 't':record[1], 'spid':self.process_S.process.process}
 
             # construct the sql for searching after the parameter id (parameter_id) that goes to this schema.table
-            sql = "SELECT parameter FROM process.process_parameter_schema_table WHERE process = '%(spid)s' \
+            sql = "SELECT parameter, array_column, array_constant_column, array_constant_value FROM process.process_parameter_schema_table WHERE process = '%(spid)s' \
                 AND in_schema = '%(s)s' AND in_table = '%(t)s';" %queryD
 
             recs = self.pg_session_C._Execute_search_all_sql(sql)
+
+            for rec in recs:
+
+                if rec[1] or rec[2]:
+
+                    self.array_meta_D[schema_table][rec[0]] = {
+                        'column': rec[1],
+                        'constant_column': rec[2],
+                        'constant_value': rec[3],
+                    }
 
             # loop over the complete list of parameters
             for key in list(parameter_value_D):

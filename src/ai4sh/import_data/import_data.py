@@ -570,50 +570,125 @@ class Process_import_JSON(Get_schema_table):
 
         self._Define_specifics(main_query_D,record_id, schema_table_query_D, main_table_id, name)
 
+    def _Legacy_array_alias(self, item):
+        ''' Original x_id__x_name[_array] -> x_id__x_name alias inference, kept for
+        parameters that never opted into array_column metadata (see _Resolve_array_column). '''
+
+        column_alias = item.split('__')[1].split('_array')[0].replace('name','id')
+
+        column_alias += '__%s' %(column_alias.replace('id','name'))
+
+        return column_alias
+
+    def _Resolve_array_column(self, schema_table, item):
+        ''' Resolve the destination column (and any parameter-baked constant column/value)
+        for one array-suffixed parameter key being fanned out into schema_table.
+        Falls back to the legacy alias inference when no explicit array_column metadata
+        was registered for this parameter. '''
+
+        meta = getattr(self, 'array_meta_D', {}).get(schema_table, {}).get(item)
+
+        if meta and meta.get('column'):
+
+            constant_D = {}
+
+            if meta.get('constant_column'):
+
+                constant_D[meta['constant_column']] = meta['constant_value']
+
+            return meta['column'], constant_D
+
+        return self._Legacy_array_alias(item), {}
+
     def _Define_specifics(self, main_query_D, record_id, schema_table_query_D, main_table_id, name):
         ''' Define device model specifics
         '''
 
         def Split_arrays():
 
-            updated_query_D =  deepcopy(schema_table_query_D[schema_table])
-
             return_bool = False
-            for item in schema_table_query_D[schema_table]:
 
-                if item.endswith('_array') and '__' in item:
+            keys = [k for k in schema_table_query_D[schema_table] if k != main_table_id]
 
-                    return_bool = True
+            meta_keys = [k for k in keys
+                         if isinstance(schema_table_query_D[schema_table][k], str) and k.endswith('_array')
+                         and getattr(self, 'array_meta_D', {}).get(schema_table, {}).get(k)]
 
-                    item_parts = item.split('__')
+            # Independent, metadata-driven fan-out (e.g. dataset_tag's substance_array/
+            # keyword_array: each array key produces its own rows via array_column/
+            # array_constant_column, with no relation to sibling keys).
+            for item in meta_keys:
 
-                    if item_parts[0].endswith('_array'):
+                return_bool = True
+
+                value = schema_table_query_D[schema_table][item]
+
+                value_csv = value[value.index("{") + 1:value.rindex("}")]
+
+                value_in_L = value_csv.split(',')
+
+                column_alias, constant_D = self._Resolve_array_column(schema_table, item)
+
+                for value_in in value_in_L:
+
+                    v = value_in.strip()
+
+                    if not v or v.lower() in ('none', 'null'):
 
                         continue
 
-                    the_item = schema_table_query_D[schema_table][item]
-                    
-                    value_csv = the_item[the_item.index("{") + 1:the_item.rindex("}")]
+                    item_query_D = {main_table_id: schema_table_query_D[schema_table][main_table_id]}
 
-                    value_in_L = value_csv.split(',')
+                    item_query_D[column_alias] = v
 
-                    # replace the old item with an item with '_array' removed in updated_query_D
-                    updated_query_D.pop(item)
+                    item_query_D.update(constant_D)
 
-                    new_item = item.removesuffix("_array")
+                    self._Define_specifics(main_query_D, record_id, {schema_table: item_query_D}, main_table_id, name)
 
-                    for value_in in value_in_L:
+            # Legacy lockstep zip: any remaining array key(s) with no array_column metadata
+            # get position-zipped together with every other remaining (non-meta) key in this
+            # schema_table, array or not - the original behaviour that e.g.
+            # sample_juxtaposition's setting_system_id__setting_system_name_array (array) +
+            # juxtaposition_id__juxtaposition_name (scalar) rely on to combine into one row.
+            zip_keys = [k for k in keys if k not in meta_keys]
 
-                        updated_query_D[new_item] = value_in
+            legacy_array_present = any(
+                isinstance(schema_table_query_D[schema_table][k], str) and k.endswith('_array') and '__' in k
+                for k in zip_keys
+            )
 
-                        self._Manage_specifics(updated_query_D, updated_query_D, main_table_id, schema, table, record_id[0], name)                    
-                
+            if legacy_array_present:
+
+                return_bool = True
+
+                new_query_D = {}
+
+                for key in zip_keys:
+
+                    raw = schema_table_query_D[schema_table][key]
+
+                    new_query_D[key] = raw.strip("{}").split(",") if isinstance(raw, str) else [raw]
+
+                for idx in range(len(new_query_D[zip_keys[0]])):
+
+                    item_query_D = {main_table_id: schema_table_query_D[schema_table][main_table_id]}
+
+                    for key in zip_keys:
+
+                        column_alias = self._Legacy_array_alias(key)
+
+                        v = new_query_D[key][idx]
+
+                        item_query_D[column_alias] = v.strip() if isinstance(v, str) else v
+
+                    self._Define_specifics(main_query_D, record_id, {schema_table: item_query_D}, main_table_id, name)
+
             return return_bool
 
-        # Loop over all devie model specific tables and insert/update/delete 
+        # Loop over all devie model specific tables and insert/update/delete
         for schema_table in schema_table_query_D:
 
-            # Add record_id to the query 
+            # Add record_id to the query
             schema_table_query_D[schema_table][main_table_id] = record_id[0]
 
             if self.verbose > 1:
@@ -622,39 +697,7 @@ class Process_import_JSON(Get_schema_table):
 
             # split the schema.table string into schema and table
             schema, table  = schema_table.split('.')
-            # TG TODO 
-            if len(schema_table_query_D[schema_table]) <= 3 and next(iter(schema_table_query_D[schema_table])).endswith('_array') and \
-                '__' in next(iter(schema_table_query_D[schema_table])):
-                # This is an array record that should be split into multiple records for a 1 to many relationship. The query_D should contain the id of the parent record and the array field with the values to be split into multiple records.
 
-                keys = list(schema_table_query_D[schema_table].keys())
-
-                keys.remove(main_table_id)
-
-                new_query_D = {}
-
-                for key in keys:
-
-                    new_query_D[key] = schema_table_query_D[schema_table][key].strip("{}").split(",")
-
-                for item in range(len(new_query_D[keys[0]])):
-
-                    item_query_D = {main_table_id: schema_table_query_D[schema_table][main_table_id]}
-
-                    for key in keys:
-
-                        column_alias = key.split('__')[1].split('_array')[0].replace('name','id')
-
-                        #column_alias = key.split('_array')[0]
-
-                        column_alias += '__%s' %(column_alias.replace('id','name'))
-
-                        item_query_D[column_alias] = new_query_D[key][item].strip()
-
-                    self._Define_specifics(main_query_D, record_id, {schema_table: item_query_D}, main_table_id, name)
-
-                continue
-            
             # Test if input arrays are also output arrays or should be split,
             # if it was split True is return, if not Manage specifics without split
             if not Split_arrays():

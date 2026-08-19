@@ -140,6 +140,9 @@
           "in_schema TEXT NOT NULL",
           "in_table TEXT NOT NULL",
           "write BOOLEAN NOT NULL DEFAULT False",
+          "array_column TEXT",
+          "array_constant_column TEXT",
+          "array_constant_value TEXT",
           "UNIQUE (process, parameter)",
           "PRIMARY KEY (id)"
         ]
@@ -190,6 +193,8 @@
           "src_column TEXT",
           "search_column TEXT",
           "search_object TEXT",
+          "filter_column TEXT",
+          "filter_value TEXT",
           "UNIQUE (process, parameter)",
           "PRIMARY KEY (id)"
         ]
