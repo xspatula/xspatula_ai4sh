@@ -16,6 +16,11 @@
           "create_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -37,6 +42,11 @@
           "last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -59,6 +69,11 @@
           "UNIQUE (process,parent,element,parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -79,6 +94,11 @@
           "UNIQUE (process,parent,element,parameter,value)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -99,6 +119,11 @@
           "UNIQUE (process, parent,element,parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -118,6 +143,11 @@
           "UNIQUE (process, parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -136,6 +166,11 @@
           "UNIQUE (process, parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -158,6 +193,11 @@
           "UNIQUE (process, parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -175,6 +215,11 @@
           "UNIQUE (process, parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

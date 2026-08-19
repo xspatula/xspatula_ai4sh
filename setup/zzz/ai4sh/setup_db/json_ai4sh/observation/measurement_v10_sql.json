@@ -18,6 +18,11 @@
           "UNIQUE (observation_id,indicator_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -38,6 +43,11 @@
           "UNIQUE (observation_id,indicator_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -58,6 +68,11 @@
           "UNIQUE (observation_id,indicator_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

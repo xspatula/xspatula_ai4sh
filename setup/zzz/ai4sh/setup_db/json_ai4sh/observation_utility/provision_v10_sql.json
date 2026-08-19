@@ -24,6 +24,11 @@
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -81,6 +86,11 @@
           "UNIQUE (provision_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -98,6 +108,11 @@
           "UNIQUE (provision_id,serial_nr)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -142,6 +157,11 @@
           "UNIQUE (provision_id,provision_serial_nr_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

@@ -18,6 +18,11 @@
           "UNIQUE (provision_id, provision_serial_nr_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

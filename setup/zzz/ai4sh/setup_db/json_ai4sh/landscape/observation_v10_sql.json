@@ -21,6 +21,11 @@
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -53,6 +58,11 @@
           "UNIQUE (geolocation_id, season_start_at)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -71,6 +81,11 @@
           "UNIQUE (cultivation_id, taxa_id, role)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -88,6 +103,11 @@
           "UNIQUE (cultivation_id, soil_preparation_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -120,6 +140,11 @@
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -142,6 +167,11 @@
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

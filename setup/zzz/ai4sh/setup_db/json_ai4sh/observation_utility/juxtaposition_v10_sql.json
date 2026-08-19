@@ -18,6 +18,11 @@
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -64,6 +69,11 @@
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -120,6 +130,11 @@
           "UNIQUE (name)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {

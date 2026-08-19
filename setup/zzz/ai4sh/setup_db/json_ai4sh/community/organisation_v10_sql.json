@@ -25,6 +25,11 @@
           "status_code SMALLINT DEFAULT 10",
           "PRIMARY KEY(id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

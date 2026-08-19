@@ -21,6 +21,11 @@
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -69,6 +74,11 @@
           "UNIQUE (dataset_id)",
           "PRIMARY KEY (dataset_id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -87,6 +97,11 @@
           "UNIQUE (dataset_id, tag, tag_type)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -137,6 +152,11 @@
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (dataset_id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -161,6 +181,11 @@
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (dataset_id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -177,6 +202,11 @@
           "UNIQUE (dataset_id,setting_system_id)",
           "PRIMARY KEY (dataset_id,setting_system_id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

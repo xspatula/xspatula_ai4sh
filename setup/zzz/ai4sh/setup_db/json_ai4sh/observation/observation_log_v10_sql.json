@@ -21,6 +21,11 @@
           "UNIQUE (sampling_log_id, name)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -42,6 +47,11 @@
           "UNIQUE (observation_log_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -64,6 +74,11 @@
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (observation_log_id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -81,6 +96,11 @@
           "UNIQUE (observation_log_id, provision_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

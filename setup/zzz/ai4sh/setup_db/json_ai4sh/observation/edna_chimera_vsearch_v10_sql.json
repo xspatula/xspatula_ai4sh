@@ -6,7 +6,7 @@
       "delete": false,
       "parameters": {
         "schema": "observation",
-        "table": "edna_fastp_qc",
+        "table": "edna_chimera_vsearch",
         "command": [
           "id SERIAL",
           "sample_id INTEGER REFERENCES observation.sample (id)",
@@ -16,6 +16,11 @@
           "UNIQUE (sample_id, software_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

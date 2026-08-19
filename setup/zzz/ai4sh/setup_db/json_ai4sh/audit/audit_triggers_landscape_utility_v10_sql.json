@@ -1,0 +1,293 @@
+{
+  "process": [
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "major_landform",
+        "trigger": "major_landform_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "slope_position",
+        "trigger": "slope_position_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "sky_condition",
+        "trigger": "sky_condition_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "ground_condition",
+        "trigger": "ground_condition_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "cultivation_species",
+        "trigger": "cultivation_species_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "soil_preparation",
+        "trigger": "soil_preparation_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "crop_growth_stage",
+        "trigger": "crop_growth_stage_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "erosion_conservation_measure",
+        "trigger": "erosion_conservation_measure_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "landuse_order",
+        "trigger": "landuse_order_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "landuse_family",
+        "trigger": "landuse_family_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "landuse_genus",
+        "trigger": "landuse_genus_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "landcover_order",
+        "trigger": "landcover_order_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "landcover_family",
+        "trigger": "landcover_family_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "landcover_genus",
+        "trigger": "landcover_genus_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "soil_texture_usda",
+        "trigger": "soil_texture_usda_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "soil_texture_isss",
+        "trigger": "soil_texture_isss_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "reference_soil_groups",
+        "trigger": "reference_soil_groups_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    }
+  ]
+}

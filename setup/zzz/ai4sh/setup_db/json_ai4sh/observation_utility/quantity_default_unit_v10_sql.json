@@ -18,6 +18,11 @@
           "UNIQUE (quantity_id, species_id, system)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

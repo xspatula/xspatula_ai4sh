@@ -28,7 +28,12 @@
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (stratum_code)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
-    }   
+    }
   ]
 }

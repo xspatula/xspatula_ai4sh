@@ -16,6 +16,11 @@
           "updated_by INTEGER REFERENCES community.user (id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -36,6 +41,11 @@
           "updated_by INTEGER REFERENCES community.user (id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -60,6 +70,11 @@
           "UNIQUE (process,parent,element,parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -82,6 +97,11 @@
           "UNIQUE (process,parent,element,parameter,value)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -104,6 +124,11 @@
           "UNIQUE (process, parent,element,parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -125,6 +150,11 @@
           "UNIQUE (process, parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -145,6 +175,11 @@
           "UNIQUE (process, parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -169,6 +204,11 @@
           "UNIQUE (process, parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -188,6 +228,11 @@
           "UNIQUE (process, parameter)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

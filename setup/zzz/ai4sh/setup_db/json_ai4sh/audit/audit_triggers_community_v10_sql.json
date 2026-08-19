@@ -6,8 +6,8 @@
       "delete": false,
       "parameters": {
         "schema": "community",
-        "table": "user",
-        "trigger": "user_audit",
+        "table": "user_categories",
+        "trigger": "user_categories_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
@@ -40,8 +40,8 @@
       "delete": false,
       "parameters": {
         "schema": "community",
-        "table": "user_categories",
-        "trigger": "user_categories_audit",
+        "table": "user",
+        "trigger": "user_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",

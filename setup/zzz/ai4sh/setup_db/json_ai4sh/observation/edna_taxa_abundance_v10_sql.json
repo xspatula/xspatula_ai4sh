@@ -9,13 +9,18 @@
         "table": "edna_taxa_abundance",
         "command": [
           "id SERIAL",
-          "feature_id VARCHAR REFERENCES observation.edna_feature_abundance (id)",
+          "feature_id INTEGER REFERENCES observation.edna_feature_abundance (id)",
           "taxa_id INTEGER REFERENCES observation_utility.taxa (id)",
           "abundance INTEGER",
           "confidence FLOAT",
           "UNIQUE (feature_id, taxa_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

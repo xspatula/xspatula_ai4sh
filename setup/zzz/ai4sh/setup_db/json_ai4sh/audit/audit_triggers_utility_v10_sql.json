@@ -9,7 +9,11 @@
         "table": "foreign_key",
         "trigger": "foreign_key_audit",
         "timing": "AFTER",
-        "events": ["INSERT", "UPDATE", "DELETE"],
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
         "function": "audit.if_modified_func"
       }
     },
@@ -22,7 +26,11 @@
         "table": "territory",
         "trigger": "territory_audit",
         "timing": "AFTER",
-        "events": ["INSERT", "UPDATE", "DELETE"],
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
         "function": "audit.if_modified_func"
       }
     }

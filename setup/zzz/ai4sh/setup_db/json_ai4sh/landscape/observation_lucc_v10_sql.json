@@ -16,6 +16,11 @@
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -34,6 +39,11 @@
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

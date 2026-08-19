@@ -19,6 +19,11 @@
           "UNIQUE (src_unit_id, dst_unit_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

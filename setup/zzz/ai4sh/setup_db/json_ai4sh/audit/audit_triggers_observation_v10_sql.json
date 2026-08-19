@@ -70,6 +70,22 @@
       "delete": false,
       "parameters": {
         "schema": "observation",
+        "table": "dataset_tag",
+        "trigger": "dataset_tag_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
         "table": "dataset_method_tier",
         "trigger": "dataset_method_tier_audit",
         "timing": "AFTER",
@@ -118,22 +134,6 @@
       "delete": false,
       "parameters": {
         "schema": "observation",
-        "table": "dataset_tag",
-        "trigger": "dataset_tag_audit",
-        "timing": "AFTER",
-        "events": [
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation",
         "table": "campaign",
         "trigger": "campaign_audit",
         "timing": "AFTER",
@@ -152,6 +152,22 @@
         "schema": "observation",
         "table": "campaign_meta",
         "trigger": "campaign_meta_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "campaign_tag",
+        "trigger": "campaign_tag_audit",
         "timing": "AFTER",
         "events": [
           "UPDATE",
@@ -216,22 +232,6 @@
         "schema": "observation",
         "table": "campaign_setting_system",
         "trigger": "campaign_setting_system_audit",
-        "timing": "AFTER",
-        "events": [
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation",
-        "table": "campaign_tag",
-        "trigger": "campaign_tag_audit",
         "timing": "AFTER",
         "events": [
           "UPDATE",
@@ -600,6 +600,134 @@
         "schema": "observation",
         "table": "observation_measurement",
         "trigger": "observation_measurement_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_feature_abundance",
+        "trigger": "edna_feature_abundance_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_annotation",
+        "trigger": "edna_annotation_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_chimera_vsearch",
+        "trigger": "edna_chimera_vsearch_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_denoise",
+        "trigger": "edna_denoise_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_fastp_qc",
+        "trigger": "edna_fastp_qc_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_merge_count",
+        "trigger": "edna_merge_count_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_functional_abundance",
+        "trigger": "edna_functional_abundance_audit",
+        "timing": "AFTER",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_taxa_abundance",
+        "trigger": "edna_taxa_abundance_audit",
         "timing": "AFTER",
         "events": [
           "UPDATE",

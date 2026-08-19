@@ -20,6 +20,11 @@
           "UNIQUE (analysis_method_id,taxa_id,taxa_function_id)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

@@ -21,6 +21,11 @@
           "UNIQUE (observation_log_id,provision_id,sample_id,subsample,replicate,observed_at)",
           "PRIMARY KEY (id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -41,6 +46,11 @@
           "UNIQUE (observation_id)",
           "PRIMARY KEY (observation_id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     },
     {
@@ -57,6 +67,11 @@
           "UNIQUE (observation_id,provision_serial_nr_id)",
           "PRIMARY KEY (observation_id,provision_serial_nr_id)"
         ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
       }
     }
   ]

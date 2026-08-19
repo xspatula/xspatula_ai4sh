@@ -18,8 +18,10 @@ from .version import __version__, VERSION, metadataD
 
 from .setup_db import Setup_prod_DB, Setup_schemas_tables
 
+from .setup_db_audit import Assemble_audit_config
+
 from .manage_process import Run_process
 
-from .setup_db_initiate import Initiate_database
+from .setup_db_initiate import Initiate_database, Initiate_audit
 
 __all__ = ['PGsession', 'parameter']

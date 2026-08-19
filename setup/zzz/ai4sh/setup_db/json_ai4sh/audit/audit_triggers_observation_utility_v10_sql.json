@@ -924,42 +924,8 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "macrofauna_image_setting",
-        "trigger": "macrofauna_image_setting_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "edna_sequence_library",
-        "trigger": "edna_sequence_library_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "edna_nucleotide_archive",
-        "trigger": "edna_nucleotide_archive_audit",
+        "table": "software",
+        "trigger": "software_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
@@ -1043,8 +1009,8 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "metabarcoding_pipeline",
-        "trigger": "metabarcoding_pipeline_audit",
+        "table": "edna_metabarcoding_pipeline",
+        "trigger": "edna_metabarcoding_pipeline_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
@@ -1060,8 +1026,76 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "bioinformatics",
-        "trigger": "bioinformatics_audit",
+        "table": "edna_bioinformatics",
+        "trigger": "edna_bioinformatics_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "edna_nucleotide_archive",
+        "trigger": "edna_nucleotide_archive_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "edna_reference_db",
+        "trigger": "edna_reference_db_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "edna_sequence_library",
+        "trigger": "edna_sequence_library_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "macrofauna_image_setting",
+        "trigger": "macrofauna_image_setting_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
