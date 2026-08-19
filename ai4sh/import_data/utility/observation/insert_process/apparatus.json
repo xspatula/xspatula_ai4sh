@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "overwrite": true,
+      "process": "insert_tabular_data",
+      "parameters": {
+        "process": "manage_apparatus",
+        "tabular_data_path": "import_data/utility/observation/excel/apparatus.xlsx",
+        "dst_path": "import_data/utility/observation/insert_process/staging"
+      }
+    }
+  ]
+}

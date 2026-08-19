@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "import_data/utility/general",
+    "process_sub_folder": "insert_process",
+    "pilot_file": "insert_general_utility.txt"
+  }
+}

@@ -1,0 +1,14 @@
+###############################################
+###### insert_general_utility.txt ######
+##### translates DATA FROM EXCEL AND INSERTS INTO THE DB IN ONE STEP ######
+###############################################
+
+##### INSERT GENERAL UTILITY DATA #####
+##### MUST BE DONE BEFORE DEPENDENT DATA WITH FOREIGN KEYS #####
+
+###===================###
+### GENERAL UTILITIES ###
+###===================###
+
+# You can add territory in territory.xlsx and rerun this insert.
+territory.json

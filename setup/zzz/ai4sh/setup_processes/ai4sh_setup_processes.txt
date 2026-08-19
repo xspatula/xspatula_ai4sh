@@ -10,7 +10,11 @@
 # Root processes
 root_process/root_processes_v10_sql.json
 
+### IMPORT DATA ###
+
 translate/translate_tabular_data_v10_sql.json
+
+translate/insert_tabular_data_v10_sql.json
 
 ### UTILITIES ###
 

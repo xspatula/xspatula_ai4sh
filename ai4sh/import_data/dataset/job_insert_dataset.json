@@ -1,0 +1,7 @@
+{
+  "process": {
+    "job_folder": "import_data/dataset",
+    "process_sub_folder": "insert_process",
+    "pilot_file": "insert_dataset.txt"
+  }
+}

@@ -12,6 +12,8 @@ from copy import deepcopy
 # Application package imports
 from src.lib.pilot import Full_path_locate
 
+from src.lib import Structure_processes
+
 from src.utils.json_read_write import Dump_json
 
 from src.utils.csv_read_write import Read_csv, Read_excel
@@ -45,13 +47,14 @@ SPECIAL_SEARCH_TABLES_D = {'observation.campaign': '_Retrieve_dataset_alias',
 class Process_import_JSON(Get_schema_table):
     '''class for managing processes'''
 
-    def __init__(self, process_S, pg_session_C, project_root_FP):
+    def __init__(self, process_S, pg_session_C, project_root_FP, scheme_params_D=None):
         '''
         '''
         self.verbose = process_S.process.verbose
         self.process_S = process_S
         self.pg_session_C = pg_session_C
         self.project_root_FP = project_root_FP
+        self.scheme_params_D = scheme_params_D
 
         self.verbose = process_S.process.verbose
 
@@ -75,6 +78,16 @@ class Process_import_JSON(Get_schema_table):
         if self.process_S.process.process.startswith('translate'):
 
             return self._Translate_tabular_data(json_file_key)
+
+        elif self.process_S.process.process.startswith('insert'):
+
+            if not self.pg_session_C:
+
+                print ('❌ ERROR - Inserting data to Postgres requires a database connection. Please define a Postgres database in scheme file.')
+
+                return None
+
+            return self._Insert_tabular_data(json_file_key)
 
         elif self.process_S.process.process.startswith('manage'):
 
@@ -276,6 +289,37 @@ class Process_import_JSON(Get_schema_table):
         self._Dump_translation()
 
         return self.dst_FPN
+
+    def _Insert_tabular_data(self, json_file_key):
+        ''' Translate tabular data to JSON and immediately apply it to the database
+        in a single step. The staged JSON is always generated with delete/overwrite
+        set to False per row (see _Structure_data), so this route is INSERT-only by
+        construction - existing records are left untouched, never updated.
+        '''
+
+        dst_FPN = self._Translate_tabular_data(json_file_key)
+
+        if not dst_FPN:
+
+            return None
+
+        structured_D = Structure_processes(self.scheme_params_D, [dst_FPN])
+
+        if not structured_D:
+
+            print ('❌ ERROR - could not structure generated process file for insert:\n   %s' %(dst_FPN))
+
+            return None
+
+        for sub_key in structured_D:
+
+            for p_nr, sub_process_S in structured_D[sub_key].items():
+
+                sub_import_C = Process_import_JSON(sub_process_S, self.pg_session_C, self.project_root_FP, self.scheme_params_D)
+
+                sub_import_C._Sub_process(sub_key)
+
+        return dst_FPN
 
     def _Insert(self, query_D, schema_S, table_S, model_name_S):
         ''' Insert record in table

@@ -1,0 +1,44 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "translate_data",
+        "process": "insert_tabular_data",
+        "min_user_stratum": 3,
+        "title": "Insert tabular data from spreadsheet directly into the database",
+        "label": "Translate tabular data recorded as csv or excel files to xSpatula json command process files, and immediately apply them to the database in one step."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "process",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The target process."
+            },
+            {
+              "parameter": "tabular_data_path",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Absolute or relative path of the spreadsheet source data"
+            },
+            {
+              "parameter": "dst_path",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Absolute or relative destination path for writing the staging json process file"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

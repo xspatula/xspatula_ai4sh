@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "process": "insert_tabular_data",
+      "overwrite": true,
+      "parameters": {
+        "process": "manage_data_source",
+        "tabular_data_path": "import_data/dataset/excel/data_source.xlsx",
+        "dst_path": "import_data/dataset/insert_process/staging"
+      }
+    }
+  ]
+}

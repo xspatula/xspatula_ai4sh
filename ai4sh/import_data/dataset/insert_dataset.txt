@@ -1,0 +1,47 @@
+###############################################
+############ insert_dataset.txt ############
+##### translates DATA FROM EXCEL AND INSERTS INTO THE DB IN ONE STEP ######
+###############################################
+
+##### OBSERVATION DATA ARE INSERTED IN THE FOLLOWING ORDER #####
+# 1. Dataset source
+# 2. persons involved
+# 3. Dataset (name, license, substance, geographic region if applicable)
+# 4. Campaign (name, responsible person, geographic region if applicable)
+# 5. Sampling_log (name, responsible person, location site i applicable)
+# 6. Sample (name, position and z-profile if applicable)
+# 7. Observation log (provision for analysis, responsible person)
+# 8. Observation (observed values)
+
+# This pilot file covers points 1 - 5.
+
+###=====================================###
+### DATASET SOURCE AND PERSONS INVOLVED ###
+###=====================================###
+
+# Data source, can be either an organisation or a private person
+data_source.json
+
+# Person(s) responsible and involved in data collection and analysis
+person.json
+
+###=========###
+### DATASET ###
+###=========###
+
+# Dataset, umbrella for data observations from a source, usually with a distinct thematic content
+dataset.json
+
+###==========###
+### CAMPAIGN ###
+###==========###
+
+# Campaign, limited sampling and observation operation for data collection belonging to a predefined dataset.
+campaign.json
+
+###==============###
+### SAMPLING_LOG ###
+###==============###
+
+# sampling_log, represent a sampling operation with a defined set of tools and person(s) belonging to a campaign.
+sampling_log.json

@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "overwrite": true,
+      "process": "insert_tabular_data",
+      "parameters": {
+        "process": "manage_territory",
+        "tabular_data_path": "import_data/utility/general/excel/territory.xlsx",
+        "dst_path": "import_data/utility/general/insert_process/staging"
+      }
+    }
+  ]
+}

@@ -25,6 +25,7 @@ def Run_process(strcutured_process_D, scheme_params_D):
     '''
     
     result_print_L = []
+    insert_result_L = []
 
     # Get user status and postgres session for process execution
     user_status_D, pg_session_C = Get_set_database_session(scheme_params_D)
@@ -87,17 +88,23 @@ def Run_process(strcutured_process_D, scheme_params_D):
 
             if root_process == 'translate_data':
 
-                import_C = Process_import_JSON(process_S,pg_session_C,scheme_params_D['project_root_FP'])
+                import_C = Process_import_JSON(process_S,pg_session_C,scheme_params_D['project_root_FP'],scheme_params_D)
 
                 result = import_C._Sub_process(key)
 
                 if result:
 
-                    result_print_L.append(result,)
+                    if process_S.process.process.startswith('insert'):
+
+                        insert_result_L.append(result)
+
+                    else:
+
+                        result_print_L.append(result,)
 
             elif root_process == 'manage_table_data':
 
-                import_C = Process_import_JSON(process_S,pg_session_C,scheme_params_D['project_root_FP'])
+                import_C = Process_import_JSON(process_S,pg_session_C,scheme_params_D['project_root_FP'],scheme_params_D)
 
                 result = import_C._Sub_process(key)
 
@@ -160,5 +167,14 @@ def Run_process(strcutured_process_D, scheme_params_D):
         print ('### PROCESSES CREATED BY XSPATULA %s ###' % Today_as_str_YYYYMMDD())
         print ('##############################################')   
         for row in result_print_L:
+
+            print (row)
+
+    if insert_result_L:
+
+        print ('\n✅ Data translated and inserted into the database in a single step.\n')
+        print ('   The following JSON process files were generated (staged) and applied:')
+
+        for row in insert_result_L:
 
             print (row)

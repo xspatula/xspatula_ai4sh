@@ -1,0 +1,31 @@
+###############################################
+###### insert_observation_utility_inherit.txt ######
+##### translates DATA FROM EXCEL AND INSERTS INTO THE DB IN ONE STEP ######
+###############################################
+
+##### INSERT DEPENDENT UTILITY DATA WITH INHERIT#####
+
+###===========================================###
+### OBSERVATION UTILITIES ###
+###===========================================###
+#!!!!! observation utilities contain all catalogues required for adding observation related data.
+#!!!!! Do not change order of inserts as some catalogues have foreign keys for others
+
+#===========================================#
+#==== Observation utilities dependent on registered foreign keys in other observation utilities ====#
+#===========================================#
+
+# Provision combines an apparatus, a provider and a method_tier - it is a prerequisite for defining the indicators obtained from an observation.
+# require: apparatus, provider, method_tier.
+# You can add provisions in provision.xls and rerun this insert.
+provision.json
+
+# Provision indicator links observation values delivered by a specific provision to quantities and an indicators.
+# require: provision, indicator, method, unit.
+# You can add provision indicators in provision_indicator.xls and rerun this insert.
+provision_indicator.json
+
+# Provision serial number can be used for e.g. comparing individual instruments.
+# require: provision
+# You can add provision indicators in provision_indicator.xls and rerun this insert.
+provision_serial_nr.json
