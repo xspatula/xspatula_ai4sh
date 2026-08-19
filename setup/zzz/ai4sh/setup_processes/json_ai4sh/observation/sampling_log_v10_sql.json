@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_sampling_log",
@@ -148,7 +148,7 @@
               }
             },
             {
-              "parameter": "begin_date",
+              "parameter": "begun_at",
               "parameter_type": "date",
               "required": false,
               "default_value": 0,
@@ -164,7 +164,7 @@
               }
             },
             {
-              "parameter": "end_date",
+              "parameter": "ended_at",
               "parameter_type": "date",
               "required": false,
               "default_value": 0,
