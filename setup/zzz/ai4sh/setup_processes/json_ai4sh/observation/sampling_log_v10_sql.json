@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": true,
+      "overwrite": false,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_sampling_log",
@@ -149,7 +149,7 @@
             },
             {
               "parameter": "begun_at",
-              "parameter_type": "date",
+              "parameter_type": "timestamp",
               "required": false,
               "default_value": 0,
               "hint": "The first date (written as YYYYMMDD) of the sampling log, leave empty to set the date of registering the sampling log",
@@ -165,7 +165,7 @@
             },
             {
               "parameter": "ended_at",
-              "parameter_type": "date",
+              "parameter_type": "timestamp",
               "required": false,
               "default_value": 0,
               "hint": "The last date (written as YYYYMMDD) of the sample log, leave empty to set the date of the last entry to the sample log",

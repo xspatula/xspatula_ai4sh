@@ -92,8 +92,8 @@
               }
             },
             {
-              "parameter": "observation_date",
-              "parameter_type": "date",
+              "parameter": "observed_at",
+              "parameter_type": "timestamp",
               "required": false,
               "default_value": 0,
               "hint": "The date of the observation, leave blank to set today as date",

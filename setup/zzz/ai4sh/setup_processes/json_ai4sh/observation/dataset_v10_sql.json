@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": true,
+      "overwrite": false,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_dataset",
@@ -119,7 +119,7 @@
             },
             {
               "parameter": "begun_at",
-              "parameter_type": "date",
+              "parameter_type": "timestamp",
               "required": false,
               "default_value": 0,
               "hint": "The first date of the dataset, leave empty to set the date of registering the campaign",
@@ -135,7 +135,7 @@
             },
             {
               "parameter": "ended_at",
-              "parameter_type": "date",
+              "parameter_type": "timestamp",
               "required": false,
               "default_value": 0,
               "hint": "The last date of the dataset, leave empty to set automatically with the latest added observation",

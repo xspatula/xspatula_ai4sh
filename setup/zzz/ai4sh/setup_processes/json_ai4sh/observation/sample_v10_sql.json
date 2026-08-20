@@ -79,8 +79,8 @@
               }
             },
             {
-              "parameter": "sampling_date",
-              "parameter_type": "date",
+              "parameter": "sampled_at",
+              "parameter_type": "timestamp",
               "required": false,
               "default_value": "",
               "hint": "The date of the sampling",
@@ -197,8 +197,8 @@
               }
             },
             {
-              "parameter": "sampling_date",
-              "parameter_type": "date",
+              "parameter": "sampled_at",
+              "parameter_type": "timestamp",
               "required": false,
               "default_value": "",
               "hint": "The date of the sampling",
@@ -387,8 +387,8 @@
               }
             },
             {
-              "parameter": "sampling_date",
-              "parameter_type": "date",
+              "parameter": "sampled_at",
+              "parameter_type": "timestamp",
               "required": false,
               "default_value": "",
               "hint": "The date of the sampling",
@@ -476,7 +476,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": true,
+      "overwrite": false,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_geo_profile_sample",
@@ -589,8 +589,8 @@
               }
             },
             {
-              "parameter": "sampling_date",
-              "parameter_type": "date",
+              "parameter": "sampled_at",
+              "parameter_type": "timestamp",
               "required": false,
               "default_value": "",
               "hint": "The date of the sampling",
@@ -820,8 +820,8 @@
               }
             },
             {
-              "parameter": "sampling_date",
-              "parameter_type": "date",
+              "parameter": "sampled_at",
+              "parameter_type": "timestamp",
               "required": false,
               "default_value": "",
               "hint": "The date of the sampling",
