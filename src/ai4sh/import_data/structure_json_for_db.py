@@ -308,10 +308,10 @@ class Structure_data():
 
     def _Set_observation_log(self):
         """
-        @brief Placeholder for setting observation parameters.
+        @brief Placeholder for setting observation log parameters.
 
         @details
-        This method is intended to set observation parameters but is currently a placeholder.
+        This method is intended to set observation log parameters but is currently a placeholder.
         Future implementation may include populating observation-related attributes.
 
         @return None.

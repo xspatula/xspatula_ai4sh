@@ -207,6 +207,10 @@ def Check_param_instance(p, typeD, process_D, json_file_FN, p_str):
 
         else:
 
+            if isinstance(process_D[p], int):
+
+                process_D[p] = '%s' % process_D[p]
+
             try:
                 process_D[p] = '%s' % yyyymmdd_str_to_date(str(process_D[p]))
 
@@ -225,11 +229,22 @@ def Check_param_instance(p, typeD, process_D, json_file_FN, p_str):
 
         else:
 
+            if isinstance(process_D[p], int):
+
+                process_D[p] = '%s' % process_D[p]
+
             try:
                 process_D[p] = '%s' % yyyymmdd_HH_MM_SS_s_as_str_4_postgres(str(process_D[p]))
 
+                if not process_D[p]:
+
+                    error_msg = '          ❌ ERROR parameter %s is not a timestamp format in the format YYYYMMDD_HHMMSS_s (%s)\n' %(p,process_D[p])
+
+                    _Print_error_msg(error_msg)
+
+                    return None
             except:
-                error_msg = '          ❌ ERROR parameter %s is not a date in the format YYYYMMDD (%s)\n' %(p,process_D[p])
+                error_msg = '          ❌ ERROR parameter %s is not a timestamp format in the format YYYYMMDD (%s)\n' %(p,process_D[p])
 
                 _Print_error_msg(error_msg)
 
