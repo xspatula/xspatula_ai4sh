@@ -13,8 +13,8 @@
           "neg_frequency SMALLINT",
           "ext_frequency SMALLINT",
           "spectroscopy_method_id SMALLINT REFERENCES observation_utility.spectroscopy_method (id)",
-          "signal_mean REAL[]",
-          "signal_standard_deviation REAL[]",
+          "signal_mean DOUBLE PRECISION[]",
+          "signal_standard_deviation DOUBLE PRECISION[]",
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (observation_id)"
         ]

@@ -58,8 +58,8 @@
           "id BIGSERIAL",
           "observation_id INTEGER REFERENCES observation.observation (id)",
           "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
-          "value REAL",
-          "standard_deviation REAL",
+          "value DOUBLE PRECISION",
+          "standard_deviation DOUBLE PRECISION",
           "n_repeat SMALLINT",
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (observation_id,indicator_id)"
@@ -81,7 +81,7 @@
         "command": [
           "id SERIAL",
           "bioinformatics_id INTEGER",
-          "value REAL",
+          "value DOUBLE PRECISION",
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]

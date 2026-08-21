@@ -11,7 +11,7 @@
           "id SERIAL",
           "provision_id INTEGER REFERENCES observation_utility.provision",
           "provision_serial_nr_id INTEGER REFERENCES observation_utility.provision_serial_nr DEFAULT 0",
-          "wavelength_array REAL[]",
+          "wavelength_arrayDOUBLE PRECISION[]",
           "wavelength_unit_id SMALLINT",
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",

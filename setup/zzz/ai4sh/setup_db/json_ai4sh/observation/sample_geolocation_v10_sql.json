@@ -10,13 +10,13 @@
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
-          "x_coordinate REAL",
-          "y_coordinate REAL",
+          "x_coordinate DOUBLE PRECISION",
+          "y_coordinate DOUBLE PRECISION",
           "spatial_reference_id INTEGER REFERENCES observation_utility.spatial_reference (id)",
-          "elevation REAL",
+          "elevation DOUBLE PRECISION",
           "elevation_unit INTEGER REFERENCES observation_utility.unit (id)",
-          "latitude REAL",
-          "longitude REAL",
+          "latitude DOUBLE PRECISION",
+          "longitude DOUBLE PRECISION",
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]

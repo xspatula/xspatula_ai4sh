@@ -114,8 +114,8 @@
           "parent TEXT",
           "element TEXT",
           "parameter TEXT",
-          "minval REAL NOT NULL",
-          "maxval REAL NOT NULL",
+          "minval DOUBLE PRECISION NOT NULL",
+          "maxval DOUBLE PRECISION NOT NULL",
           "UNIQUE (process, parent,element,parameter)",
           "PRIMARY KEY (id)"
         ]
