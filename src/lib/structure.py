@@ -742,11 +742,10 @@ class Scheme_params():
 
                 return 0
 
-        # TG TODO Remove all parameters that are not in the db unless they start with @
-        #process_D = {re.sub(r"\s*\(.*?\)", "", key): value
-        #    for key, value in process_D.items() if not key.startswith('@')}
-
-        process_D = {re.sub(r"\s*\(.*?\)", "", key): value
+        # Remove parenthesised suffixes from parameter keys, but leave @-prefixed
+        # indicator keys (e.g. "@fungi(%)") intact - their "(%)" is meaningful and
+        # must survive to match indicator names/aliases in the database.
+        process_D = {(key if key.startswith('@') else re.sub(r"\s*\(.*?\)", "", key)): value
             for key, value in process_D.items()}
         
         # Recreate the process struct process with the updated parameters
