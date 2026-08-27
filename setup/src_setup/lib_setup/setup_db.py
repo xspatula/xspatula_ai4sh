@@ -35,60 +35,11 @@ from src.postgres import User_netrc_credentials, User_login_pswd, PG_psycopg2_co
 
 INITIAL_DATABASE_NAME = 'postgres'
 
-REVOKE_D = {'superuser': 'REVOKE ALL PRIVILEGES ON DATABASE {db} FROM {user};',
-            'community_admin': 'REVOKE CONNECT ON DATABASE {db} FROM {user}; \
-                                REVOKE USAGE ON SCHEMA community FROM {user}; \
-                                REVOKE SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA community FROM {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA community REVOKE SELECT, INSERT, UPDATE, DELETE ON TABLES FROM {user};',
-            'login_evaluation': 'REVOKE CONNECT ON DATABASE {db} FROM {user}; \
-                                REVOKE USAGE ON SCHEMA community FROM {user}; \
-                                REVOKE SELECT ON ALL TABLES IN SCHEMA community FROM {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA community REVOKE SELECT ON TABLES FROM {user}; \
-                                REVOKE USAGE ON SCHEMA audit FROM {user}; \
-                                REVOKE SELECT ON ALL TABLES IN SCHEMA audit FROM {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA audit REVOKE SELECT ON TABLES FROM {user};',
-            'user_cat_1': 'REVOKE CONNECT ON DATABASE {db} FROM {user};',
-            'user_cat_2': 'REVOKE CONNECT ON DATABASE {db} FROM {user};',
-            'user_cat_3': 'REVOKE CONNECT ON DATABASE {db} FROM {user};',
-            'user_cat_4': 'REVOKE CONNECT ON DATABASE {db} FROM {user};',
-            'user_cat_5': 'REVOKE CONNECT ON DATABASE {db} FROM {user}; \
-                                REVOKE USAGE ON SCHEMA utility FROM {user}; \
-                                REVOKE SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA utility FROM {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA utility REVOKE SELECT, INSERT, UPDATE, DELETE ON TABLES FROM {user}; \
-                                REVOKE USAGE ON SCHEMA process FROM {user}; \
-                                REVOKE SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA process FROM {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA process REVOKE SELECT, INSERT, UPDATE, DELETE ON TABLES FROM {user};'}
+_LIB_SETUP_DIR = path.dirname(path.abspath(__file__))
 
-ROLES_D = {'community_admin': "CREATE USER {user} WITH LOGIN PASSWORD '{password}'; \
-                                GRANT CONNECT ON DATABASE {db} TO {user}; \
-                                GRANT USAGE ON SCHEMA community TO {user}; \
-                                GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA community TO {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA community GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {user};",
-           'login_evaluation': "CREATE USER {user} WITH LOGIN PASSWORD '{password}'; \
-                                GRANT CONNECT ON DATABASE {db} TO {user}; \
-                                GRANT USAGE ON SCHEMA community TO {user}; \
-                                GRANT SELECT ON ALL TABLES IN SCHEMA community TO {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA community GRANT SELECT ON TABLES TO {user}; \
-                                GRANT USAGE ON SCHEMA audit TO {user}; \
-                                GRANT SELECT ON ALL TABLES IN SCHEMA audit TO {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA audit GRANT SELECT ON TABLES TO {user};",
-           'user_cat_1': "CREATE USER {user} WITH LOGIN PASSWORD '{password}'; \
-                                GRANT CONNECT ON DATABASE {db} TO {user};",
-           'user_cat_2': "CREATE USER {user} WITH LOGIN PASSWORD '{password}'; \
-                                GRANT CONNECT ON DATABASE {db} TO {user};",
-            'user_cat_3': "CREATE USER {user} WITH LOGIN PASSWORD '{password}'; \
-                                GRANT CONNECT ON DATABASE {db} TO {user};", 
-            'user_cat_4': "CREATE USER {user} WITH LOGIN PASSWORD '{password}'; \
-                                GRANT CONNECT ON DATABASE {db} TO {user};", 
-            'user_cat_5': "CREATE USER {user} WITH SUPERUSER LOGIN PASSWORD '{password}'; \
-                                GRANT CONNECT ON DATABASE {db} TO {user}; \
-                                GRANT USAGE ON SCHEMA utility TO {user}; \
-                                GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA utility TO {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA utility GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {user}; \
-                                GRANT USAGE ON SCHEMA process TO {user}; \
-                                GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA process TO {user}; \
-                                ALTER DEFAULT PRIVILEGES IN SCHEMA process GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {user};" }
+REVOKE_D = Read_json(path.join(_LIB_SETUP_DIR, 'revoke_privileges.json'))
 
+ROLES_D = Read_json(path.join(_LIB_SETUP_DIR, 'roles_grants.json'))
 
 class parameter():
     """
