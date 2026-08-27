@@ -802,6 +802,10 @@ def Get_process_from_db(pg_session_C, process_schema, process_parameter_C, user_
 
     process_parameter_C._Assemble_single_process(p_str, p, path.split(json_process_file_obj)[1])
 
+    if not process_parameter_C.process_S.process.execute:
+
+        return process_parameter_C.process_S
+    
     status_OK = process_parameter_C._Assemble_parameters(pg_session_C)
 
     if not status_OK:
@@ -931,9 +935,15 @@ def Job_processes_loop(scheme_params_D, process_file_FPN_L, process_parameter_C,
 
             if result:
 
-                json_cmd_D[json_process_file_obj][p_nr] = process_parameter_C.process_S
+                if process_parameter_C.process_S.process.execute:
 
-            else: # No db connection, just read the parameters
+                    json_cmd_D[json_process_file_obj][p_nr] = process_parameter_C.process_S
+
+                else:
+
+                    print ('.  ⚠️ SKIPPING: process nr %s <%s> not set to execute' %(p_str, p['process']))
+
+            else: # TG TODO No db connection, just read the parameters
 
                 return None
 
