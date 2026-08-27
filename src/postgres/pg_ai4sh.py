@@ -82,7 +82,7 @@ class PG_manage_AI4SH:
 
             if not recs_sample_name:
 
-                msg = '⚠️ No sample found for sample name: %s' %(query_D['sample_id__sample_name'])
+                msg = '⚠️ Sample name %s not found via observation_log %s' %(query_D['sample_id__sample_name'], query_D['observation_log_id__observation_log_name'])
                 print(msg)
 
                 return None
@@ -177,7 +177,7 @@ class PG_manage_AI4SH:
         # Convert the recs tuples to dicts with rec[0] as key and rec[1] and rec[2] as value array
         indicator_D = {rec[1]: rec[0] for rec in recs}
         
-        # extend indicator_D
+        # extend indicator_D with aliases
         indicator_D.update({rec[2]: rec[0] for rec in recs})
         # Dict comprehension to create a new dict with only the keys that start with '@' and strip the '@' from the key
         at_columns_D = {key.strip('@'): value for key, value in at_columns_D.items() if key.startswith('@')}
