@@ -14,13 +14,12 @@
           "value DOUBLE PRECISION",
           "standard_deviation DOUBLE PRECISION",
           "n_repeat SMALLINT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (observation_id,indicator_id)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -39,13 +38,12 @@
           "value DOUBLE PRECISION[]",
           "standard_deviation DOUBLE PRECISION[]",
           "n_repeat SMALLINT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (observation_id,indicator_id)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }

@@ -13,12 +13,11 @@
           "nucleotide_archive_id INTEGER",
           "accession_code TEXT",
           "accession_url TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -37,12 +36,11 @@
           "bioninformatics_treatment_date DATE",
           "taxa_id INTEGER",
           "biodiverity_id INTEGER",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -61,12 +59,11 @@
           "value DOUBLE PRECISION",
           "standard_deviation DOUBLE PRECISION",
           "n_repeat SMALLINT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (observation_id,indicator_id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -82,12 +79,11 @@
           "id SERIAL",
           "bioinformatics_id INTEGER",
           "value DOUBLE PRECISION",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }

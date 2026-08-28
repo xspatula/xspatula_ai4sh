@@ -12,12 +12,11 @@
           "sample_id INTEGER REFERENCES observation.sample (id)",
           "edna_metabarcoding_pipeline_id INTEGER",
           "raw_sequence_read_counts INTEGER",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }

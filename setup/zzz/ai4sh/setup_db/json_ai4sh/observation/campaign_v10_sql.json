@@ -17,13 +17,12 @@
           "begun_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "ended_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "status_code SMALLINT DEFAULT 10",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (dataset_id, name)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -44,13 +43,11 @@
           "doi TEXT",
           "abstract TEXT",
           "time_series BOOLEAN DEFAULT FALSE",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (campaign_id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -67,13 +64,12 @@
           "campaign_id INTEGER REFERENCES observation.campaign (id)",
           "tag TEXT NOT NULL",
           "tag_type TEXT NOT NULL CHECK (tag_type IN ('substance','keyword'))",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (campaign_id, tag, tag_type)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -95,12 +91,11 @@
           "document BOOLEAN DEFAULT FALSE",
           "senses BOOLEAN DEFAULT FALSE",
           "auxiliary BOOLEAN DEFAULT FALSE",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (campaign_id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -127,7 +122,6 @@
           "elevation_min DOUBLE PRECISION",
           "elevation_max DOUBLE PRECISION",
           "elevation_unit_id INTEGER REFERENCES observation_utility.unit (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (campaign_id)"
         ]
       },
@@ -147,7 +141,6 @@
         "command": [
           "campaign_id INTEGER REFERENCES observation.campaign (id)",
           "provision_id INTEGER REFERENCES observation_utility.provision (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (campaign_id, provision_id)"
         ]
       },
@@ -167,7 +160,6 @@
         "command": [
           "campaign_id INTEGER REFERENCES observation.campaign (id)",
           "setting_system_id INTEGER REFERENCES observation_utility.setting_system (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (campaign_id, setting_system_id)"
         ]
       },

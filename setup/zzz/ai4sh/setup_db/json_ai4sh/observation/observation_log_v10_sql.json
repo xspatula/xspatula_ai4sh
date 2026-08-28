@@ -16,14 +16,12 @@
           "name TEXT",
           "abstract TEXT",
           "time_series BOOLEAN DEFAULT FALSE",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (sampling_log_id, name)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -43,7 +41,6 @@
           "storage_id INTEGER REFERENCES observation_utility.storage (id)",
           "transportation_id INTEGER REFERENCES observation_utility.transportation (id)",
           "transportation_duration_h INTEGER",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (observation_log_id)",
           "PRIMARY KEY (id)"
         ]
@@ -71,7 +68,6 @@
           "document BOOLEAN DEFAULT FALSE",
           "senses BOOLEAN DEFAULT FALSE",
           "auxiliary BOOLEAN DEFAULT FALSE",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (observation_log_id)"
         ]
       },
@@ -92,7 +88,6 @@
           "id SERIAL",
           "observation_log_id INTEGER REFERENCES observation.observation_log (id)",
           "provision_id INTEGER REFERENCES observation_utility.provision (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (observation_log_id, provision_id)",
           "PRIMARY KEY (id)"
         ]

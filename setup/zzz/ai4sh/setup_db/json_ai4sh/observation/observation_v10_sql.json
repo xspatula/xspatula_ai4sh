@@ -16,7 +16,6 @@
           "replicate SMALLINT",
           "abstract TEXT",
           "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (observation_log_id,provision_id,sample_id,subsample,replicate,observed_at)",
           "PRIMARY KEY (id)"
@@ -42,7 +41,6 @@
           "temperature_unit_id INTEGER REFERENCES observation_utility.unit (id)",
           "duration FLOAT",
           "duration_unit_id INTEGER REFERENCES observation_utility.unit (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (observation_id)",
           "PRIMARY KEY (observation_id)"
         ]
@@ -63,7 +61,6 @@
         "command": [
           "observation_id BIGINT REFERENCES observation.observation (id)",
           "provision_serial_nr_id INTEGER",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (observation_id,provision_serial_nr_id)",
           "PRIMARY KEY (observation_id,provision_serial_nr_id)"
         ]

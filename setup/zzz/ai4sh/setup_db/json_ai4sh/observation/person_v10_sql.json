@@ -24,13 +24,11 @@
           "department VARCHAR",
           "section VARCHAR",
           "position VARCHAR",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }

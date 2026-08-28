@@ -17,7 +17,6 @@
           "abstract TEXT",
           "time_series_id INTEGER DEFAULT 0",
           "sampled_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (sampling_log_id, name)",
           "PRIMARY KEY (id)"
@@ -41,7 +40,6 @@
           "sample_id INTEGER REFERENCES observation.sample (id)",
           "setting_system_id INTEGER REFERENCES observation_utility.setting_system (id)",
           "juxtaposition_id INTEGER REFERENCES observation_utility.juxtaposition (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (sample_id, setting_system_id, juxtaposition_id)",
           "PRIMARY KEY (id)"
         ]
@@ -64,7 +62,6 @@
           "profile_min SMALLINT",
           "profile_max SMALLINT",
           "profile_obstacle BOOLEAN DEFAUlT FALSE",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (sample_id)"
         ]
       },
@@ -87,7 +84,6 @@
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
           "area_coverage FLOAT",
           "area_unit_id INTEGER REFERENCES observation_utility.unit (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (sample_id)",
           "PRIMARY KEY (id)"
         ]
@@ -109,7 +105,6 @@
           "id SERIAL",
           "sample_id INTEGER REFERENCES observation.sample (id)",
           "composition_id INTEGER REFERENCES observation_utility.composition (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (sample_id)",
           "PRIMARY KEY (id)"
         ]
@@ -131,7 +126,6 @@
           "id SERIAL",
           "sample_id INTEGER REFERENCES observation.sample (id)",
           "proximity_id INTEGER REFERENCES observation_utility.proximity (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (sample_id)",
           "PRIMARY KEY (id)"
         ]
