@@ -12,8 +12,6 @@
           "name TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },

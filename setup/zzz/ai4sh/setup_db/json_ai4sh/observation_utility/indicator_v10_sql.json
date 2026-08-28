@@ -14,8 +14,6 @@
           "alias TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
@@ -36,9 +34,7 @@
           "id SERIAL",
           "src_indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
           "dst_indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (src_indicator_id, dst_indicator_id)",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },

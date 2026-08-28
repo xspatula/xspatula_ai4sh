@@ -20,8 +20,6 @@
           "contact_name VARCHAR",
           "contact_email VARCHAR",
           "status_code SMALLINT DEFAULT 10",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
@@ -82,7 +80,6 @@
           "document BOOLEAN DEFAULT FALSE",
           "senses BOOLEAN DEFAULT FALSE",
           "auxiliary BOOLEAN DEFAULT FALSE",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (provision_id)",
           "PRIMARY KEY (id)"
         ]
@@ -104,7 +101,6 @@
           "id SERIAL",
           "provision_id INTEGER REFERENCES observation_utility.provision (id)",
           "serial_nr TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (provision_id,serial_nr)",
           "PRIMARY KEY (id)"
         ]
@@ -152,8 +148,6 @@
           "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
           "gain DOUBLE PRECISION",
           "add DOUBLE PRECISION",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (provision_id,provision_serial_nr_id)",
           "PRIMARY KEY (id)"
         ]

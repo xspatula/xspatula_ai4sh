@@ -13,8 +13,6 @@
           "display_name TEXT",
           "doi TEXT",
           "url TEXT UNIQUE",
-          "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },

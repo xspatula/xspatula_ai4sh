@@ -12,7 +12,6 @@
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
           "abstract TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
@@ -59,7 +58,6 @@
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
           "abstract TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
@@ -106,7 +104,6 @@
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
           "abstract TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
@@ -153,7 +150,6 @@
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
           "abstract TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
@@ -200,7 +196,6 @@
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
           "abstract TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },

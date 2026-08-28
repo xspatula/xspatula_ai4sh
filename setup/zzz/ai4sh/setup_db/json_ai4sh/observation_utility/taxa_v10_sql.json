@@ -34,7 +34,6 @@
           "id SERIAL",
           "src_taxa_id INTEGER REFERENCES observation_utility.taxa (id)",
           "dst_taxa_id INTEGER REFERENCES observation_utility.taxa (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (src_taxa_id, dst_taxa_id)",
           "PRIMARY KEY (id)"
         ]
