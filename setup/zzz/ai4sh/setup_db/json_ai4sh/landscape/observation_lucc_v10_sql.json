@@ -12,13 +12,12 @@
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
           "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "landuse_genus_id__landuse_genus_name INTEGER REFERENCES landscape_utility.landuse_genus",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -35,13 +34,12 @@
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
           "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "landcover_genus_id__landcover_genus_name INTEGER REFERENCES landscape_utility.landcover_genus",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }

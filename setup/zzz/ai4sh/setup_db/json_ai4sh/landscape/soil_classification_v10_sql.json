@@ -13,7 +13,7 @@
           "alias TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
@@ -36,7 +36,7 @@
           "alias TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
@@ -59,7 +59,7 @@
           "alias TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },

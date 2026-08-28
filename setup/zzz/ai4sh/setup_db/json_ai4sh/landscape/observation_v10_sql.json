@@ -17,13 +17,12 @@
           "temperature_c_24h_mean INTEGER",
           "temperature_c_24h_max INTEGER",
           "temperature_c_24h_min INTEGER",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -54,7 +53,6 @@
           "perennial_catch_crop BOOLEAN",
           "perennial_cover_crop BOOLEAN",
           "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (geolocation_id, season_start_at)",
           "PRIMARY KEY (id)"
         ]
@@ -77,13 +75,13 @@
           "cultivation_id INTEGER REFERENCES landscape.cultivation (id)",
           "taxa_id INTEGER REFERENCES observation_utility.taxa (id)",
           "role TEXT NOT NULL CHECK (role IN ('main','catch','cover'))",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (cultivation_id, taxa_id, role)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -99,13 +97,13 @@
           "id SERIAL",
           "cultivation_id INTEGER REFERENCES landscape.cultivation (id)",
           "soil_preparation_id INTEGER REFERENCES landscape_utility.soil_preparation (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (cultivation_id, soil_preparation_id)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
@@ -136,7 +134,7 @@
           "rock_cover_percent SMALLINT",
           "stone_cover_percent SMALLINT",
           "gravel_cover_percent SMALLINT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
+          "",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
@@ -163,13 +161,12 @@
           "aspect SMALLINT",
           "major_landform_id INTEGER REFERENCES landscape_utility.major_landform (id)",
           "slope_position_id INTEGER REFERENCES landscape_utility.slope_position (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
       },
       "audit": {
-        "INSERT": false,
+        "INSERT": true,
         "UPDATE": true,
         "DELETE": true
       }
