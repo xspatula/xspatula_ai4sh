@@ -151,6 +151,29 @@ class PG_common():
 
         return self.unique_keys
 
+    def _Get_primary_keys(self, schema, table):
+        """
+        @brief Get the primary key columns of a table.
+
+        @param schema The schema of the table.
+        @param table The name of the table.
+
+        @return A list of (column_name,) tuples making up the table's PRIMARY KEY.
+        """
+
+        sql = """
+            SELECT column_name
+            FROM information_schema.table_constraints
+            JOIN information_schema.key_column_usage
+                USING (constraint_catalog, constraint_schema, constraint_name,
+                       table_catalog, table_schema, table_name)
+            WHERE constraint_type = 'PRIMARY KEY'
+              AND table_schema = %s
+              AND table_name = %s;
+        """
+
+        return self._Execute_search_all_sql(sql, (schema, table))
+
     def _Get_text_columns(self, schema, table):
         """
         @brief Get the set of text/char/varchar column names for a table.
@@ -626,7 +649,17 @@ class PG_common():
         #    tab_keys = [item[0] for item in tab_keys]
 
         if not tab_unique:
-            tab_unique = list(updated_query_D.keys())
+            # No UNIQUE constraint on this table - prefer its PRIMARY KEY
+            # (a bare PK, e.g. observation_log_method_tier_pkey, is not
+            # reported as constraint_type = 'UNIQUE' by information_schema)
+            # over matching on every column supplied, which is brittle and
+            # can wrongly report an existing row as "not found".
+            tab_primary = self._Get_primary_keys(schema, table)
+
+            if tab_primary:
+                tab_unique = [item[0] for item in tab_primary]
+            else:
+                tab_unique = list(updated_query_D.keys())
         else:
             tab_unique = [item[0] for item in tab_unique]
 
@@ -837,20 +870,17 @@ class PG_common():
 
         return rec
 
-    def _Check_insert_single_record(self, queryD, schema, table, overwrite=False, delete=False):
+    def _Check_insert_single_record(self, queryD, schema, table):
         """
-        @brief Check if a record exists based on primary keys, and insert, overwrite,
-               or delete as specified.
+        @brief Check if a record exists based on unique/primary keys, and insert if not.
 
         @param queryD A dictionary where keys are column names and values are the
                corresponding values to search for or insert.
         @param schema The schema of the table.
         @param table The name of the table.
-        @param overwrite If True, overwrite the existing record if found.
-        @param delete If True, delete the existing record if found.
 
-        @return The existing record if found and deleted or overwritten, True if a new
-                record was inserted, or None if no action was taken.
+        @return True if a new record was inserted, or True if a matching record
+                already exists (no-op), or None/False on failure.
         """
 
         search_L = self._Create_search_sql_from_tab_keys(queryD, schema, table)
@@ -858,7 +888,7 @@ class PG_common():
         if not search_L or search_L == 'fk_error':
             return search_L
 
-        tab_unique, where_sql, where_params, updated_query_D = search_L  # tab_unique used below
+        _tab_unique, where_sql, where_params, updated_query_D = search_L
 
         select_sql = pgsql.SQL('SELECT * FROM {}.{} WHERE {};').format(
             pgsql.Identifier(schema),
@@ -868,27 +898,7 @@ class PG_common():
 
         rec = self._Execute_search_single_sql(select_sql, where_params)
 
-        if rec is not None and delete:
-
-            delete_sql = pgsql.SQL('DELETE FROM {}.{} WHERE {};').format(
-                pgsql.Identifier(schema),
-                pgsql.Identifier(table),
-                where_sql
-            )
-            self._Execute_commit_sql(delete_sql, where_params)
-            return rec
-
-        elif rec is not None and overwrite:
-
-            delete_sql = pgsql.SQL('DELETE FROM {}.{} WHERE {};').format(
-                pgsql.Identifier(schema),
-                pgsql.Identifier(table),
-                where_sql
-            )
-            self._Execute_commit_sql(delete_sql, where_params)
-            return self._Insert_record(queryD, schema, table)
-
-        elif rec is None and not delete:
+        if rec is None:
 
             return self._Insert_record(updated_query_D, schema, table)
 
@@ -912,13 +922,15 @@ class PG_common():
     def _Check_update_single_record(self, queryD, schema, table):
         """
         @brief Update a single record in the specified schema and table based on primary keys.
+               Skips the UPDATE (and any audit trigger it would fire) when every column to be
+               written already holds the same value in the database.
 
         @param queryD A dictionary where keys are column names and values are the
                corresponding values to update.
         @param schema The schema of the table.
         @param table The name of the table.
 
-        @return True on success, None on failure.
+        @return True on success (including a same-value no-op), None on failure.
         """
 
         updated_query_D = self._Convert_id_code(queryD)
@@ -933,7 +945,17 @@ class PG_common():
 
         tab_keys, where_sql, where_params, updated_query_D = search_L
 
-        select_sql = pgsql.SQL('SELECT * FROM {}.{} WHERE {};').format(
+        # Columns to update are those not part of the primary/unique key
+        update_cols = [k for k in updated_query_D if k not in tab_keys]
+        update_vals = [updated_query_D[k] for k in update_cols]
+
+        if not update_cols:
+            return None
+
+        current_cols_sql = pgsql.SQL(', ').join(map(pgsql.Identifier, update_cols))
+
+        select_sql = pgsql.SQL('SELECT {} FROM {}.{} WHERE {};').format(
+            current_cols_sql,
             pgsql.Identifier(schema),
             pgsql.Identifier(table),
             where_sql
@@ -947,9 +969,12 @@ class PG_common():
         if len(records) != 1:
             return None
 
-        # Columns to update are those not part of the primary key
-        update_cols = [k for k in updated_query_D if k not in tab_keys]
-        update_vals = [updated_query_D[k] for k in update_cols]
+        if list(records[0]) == update_vals:
+
+            if self.verbose > 1:
+                self.log('    🟡 No change detected, skipping UPDATE for %s.%s' % (schema, table))
+
+            return True
 
         set_clause = pgsql.SQL(', ').join(
             pgsql.SQL('{} = %s').format(pgsql.Identifier(col))
@@ -967,6 +992,47 @@ class PG_common():
             self.log('\n               %s' % update_sql)
 
         self._Execute_commit_sql(update_sql, update_vals + where_params)
+
+        return True
+
+    def _Check_delete_single_record(self, queryD, schema, table):
+        """
+        @brief Delete a single record in the specified schema and table based on
+               unique/primary keys.
+
+        @param queryD A dictionary where keys are column names and values are the
+               corresponding values identifying the row to delete.
+        @param schema The schema of the table.
+        @param table The name of the table.
+
+        @return True on success, None on failure.
+        """
+
+        search_L = self._Create_search_sql_from_tab_keys(queryD, schema, table)
+
+        if not search_L or search_L == 'fk_error':
+            return None
+
+        _tab_keys, where_sql, where_params, _updated_query_D = search_L
+
+        select_sql = pgsql.SQL('SELECT * FROM {}.{} WHERE {};').format(
+            pgsql.Identifier(schema),
+            pgsql.Identifier(table),
+            where_sql
+        )
+
+        records = self._Execute_search_all_sql(select_sql, where_params)
+
+        if len(records) != 1:
+            return None
+
+        delete_sql = pgsql.SQL('DELETE FROM {}.{} WHERE {};').format(
+            pgsql.Identifier(schema),
+            pgsql.Identifier(table),
+            where_sql
+        )
+
+        self._Execute_commit_sql(delete_sql, where_params)
 
         return True
 

@@ -339,7 +339,49 @@ class Process_import_JSON(Get_schema_table):
             print (msg)
 
             return success
-        
+
+        return success
+
+    def _Update(self, query_D, schema_S, table_S, model_name_S):
+        ''' Update record in table
+        '''
+
+        success = self.pg_session_C._Check_update_single_record(
+            self._Lower_text_values(query_D, schema_S, table_S),
+            schema_S, table_S
+        )
+
+        if not success:
+
+            msg = '   ❌ ERROR - could not update record <%s> in table %s.%s' %(model_name_S,
+                                                                                     schema_S,
+                                                                                     table_S)
+
+            print (msg)
+
+            return success
+
+        return success
+
+    def _Delete(self, query_D, schema_S, table_S, model_name_S):
+        ''' Delete record in table
+        '''
+
+        success = self.pg_session_C._Check_delete_single_record(
+            self._Lower_text_values(query_D, schema_S, table_S),
+            schema_S, table_S
+        )
+
+        if not success:
+
+            msg = '   ❌ ERROR - could not delete record <%s> in table %s.%s' %(model_name_S,
+                                                                                     schema_S,
+                                                                                     table_S)
+
+            print (msg)
+
+            return success
+
         return success
     
     def _Measurement_record(self, main_query_D):
@@ -493,16 +535,15 @@ class Process_import_JSON(Get_schema_table):
 
         elif record_id and self.process_S.process.delete:
 
-            self._Delete('id = %s' %(record_id[0]), dst_schema, dst_main_table, column_report_name)
+            self._Delete({'id': record_id[0]}, dst_schema, dst_main_table, column_report_name)
 
-            #replace the id with model_id in the wehere_statement
-            where_statement = where_statement.replace('id', 'model_id')
+            main_table_id = '%s_id' %(dst_main_table)
 
             for schema_table in schema_table_query_D:
 
                 schema, table  = schema_table.split('.')
 
-                self._Delete(where_statement,schema, table , column_report_name)
+                self._Delete({main_table_id: record_id[0]}, schema, table, column_report_name)
                 # TG TODO check if this is the correct printout
                 print ('.   ✅ Record %s deleted from %s.%s' %(column_report_name, schema, table))
 
@@ -518,13 +559,15 @@ class Process_import_JSON(Get_schema_table):
 
         elif record_id and self.process_S.process.overwrite:
 
-            success = self._Update(main_query_D,'hardware', 'model', column_report_name)
+            success = self._Update(main_query_D, dst_schema, dst_main_table, column_report_name)
 
             if success and self.verbose > 1:
 
-                print ('.   ✅ Nothing to delete, record %s not found' %(column_report_name))
+                print ('.   ✅ Record %s updated in %s.%s' %(column_report_name, dst_schema, dst_main_table))
 
-            return None
+            if not success:
+
+                return None
 
         elif record_id:
 
@@ -751,9 +794,7 @@ class Process_import_JSON(Get_schema_table):
             
         elif self.process_S.process.delete:
 
-            where_statement = '%s = %s' %(main_table_id, record_value)
-
-            self.pg_session_C._Delete_(schema, table, where_statement)
+            self._Delete({main_table_id: record_value}, schema, table, name)
 
         elif self.process_S.process.verbose > 1:
 
