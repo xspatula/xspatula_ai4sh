@@ -11,7 +11,6 @@
           "sample_id INTEGER REFERENCES observation.sample (id)",
           "profile_min SMALLINT",
           "profile_max SMALLINT",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (sample_id)"
         ]
       },

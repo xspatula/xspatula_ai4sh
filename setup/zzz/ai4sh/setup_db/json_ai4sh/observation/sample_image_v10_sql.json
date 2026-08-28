@@ -16,7 +16,6 @@
           "image_camera_id INTEGER REFERENCES observation_utility.image_setup (id)",
           "image_setup_id INTEGER REFERENCES observation_utility.image_setup (id)",
           "image_lightsource_id INTEGER REFERENCES observation_utility.image_lightsource (id)",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (sample_id, name)",
           "PRIMARY KEY (id)"
         ]
@@ -41,7 +40,6 @@
           "roll INTEGER",
           "yaw INTEGER",
           "panorama BOOLEAN",
-          "created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (sample_image_id)"
         ]
       },
