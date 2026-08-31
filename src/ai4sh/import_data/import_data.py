@@ -34,11 +34,20 @@ NO_LOWER_COLS = frozenset({
 # Define classfication levels for substances
 CLASSIFICATION_TABLE_D  = {'manage_order':['manage_family','manage_genus','manage_species'], 
                            'manage_family':['manage_genus','manage_species'], 
-                           'manage_genus':['manage_species']}
+                           'manage_genus':['manage_species'],
+                           'manage_landcover_order':['manage_landcover_family','manage_landcover_genus'],
+                           'manage_landcover_family':['manage_landcover_genus'],
+                           'manage_landuse_order':['manage_landuse_family','manage_landuse_genus'],
+                           'manage_landuse_family':['manage_landuse_genus']
+                           }
 
 CLASSIFICATION_CHILDREN_D = { 'manage_family': {'table': 'family', 'parent_id_name': 'order_id__order_name'},
                             'manage_genus': {'table': 'genus', 'parent_id_name': 'family_id__family_name'},
-                            'manage_species': {'table': 'species', 'parent_id_name': 'genus_id__genus_name'}}
+                            'manage_species': {'table': 'species', 'parent_id_name': 'genus_id__genus_name'},
+                            'manage_landcover_family': {'table': 'landcover_family', 'parent_id_name': 'landcover_order_id__landcover_order_name'},
+                            'manage_landcover_genus': {'table': 'landcover_genus', 'parent_id_name': 'landcover_family_id__landcover_family_name'},
+                            'manage_landuse_family': {'table': 'landuse_family', 'parent_id_name': 'landuse_order_id__landuse_order_name'},
+                            'manage_landuse_genus': {'table': 'landuse_genus', 'parent_id_name': 'landuse_family_id__landuse_family_name'}}
 
 SPECIAL_SEARCH_TABLES_D = {'observation.campaign': '_Retrieve_dataset_alias',
                            'observation.observation': '_Retrieve_sample_id_from_observation_log',
@@ -213,22 +222,22 @@ class Process_import_JSON(Get_schema_table):
         if self.process_S.process.parameters.process in CLASSIFICATION_TABLE_D:
 
             for rec in self.record_D:
-                
+
                 for lower_level in CLASSIFICATION_TABLE_D[self.process_S.process.parameters.process]:
                     name = self.record_D[rec]['name']
                     parent_column_id_name = CLASSIFICATION_CHILDREN_D[lower_level]['parent_id_name']
-                    alias = self.record_D[rec]['alias'] if 'alias' in self.record_D[rec] else None
-                    display_name = self.record_D[rec]['display_name'] if 'display_name' in self.record_D[rec] else None
-                    abstract = self.record_D[rec]['abstract'] if 'abstract' in self.record_D[rec] else None
                     process = lower_level
                     process_D = deepcopy(main_process_D)
                     process_D['process'] = process
                     process_D['parameters'] = {'name': name,
-                                                parent_column_id_name: name,
-                                                'alias': alias,
-                                                'display_name': display_name,
-                                                'abstract': abstract}
-            
+                                                parent_column_id_name: name}
+
+                    for opt_key in ('alias', 'display_name', 'abstract'):
+
+                        if opt_key in self.record_D[rec]:
+
+                            process_D['parameters'][opt_key] = self.record_D[rec][opt_key]
+
                     self.process_D['process'].append(process_D)
 
     def _Translate_tabular_data(self,json_file_key):

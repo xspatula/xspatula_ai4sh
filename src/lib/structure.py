@@ -942,9 +942,9 @@ def Job_processes_loop(scheme_params_D, process_file_FPN_L, process_parameter_C,
 
                     print ('.  ⚠️ SKIPPING: process nr %s <%s> not set to execute' %(p_str, p['process']))
 
-            else: # TG TODO No db connection, just read the parameters
+            else:
 
-                return None
+                continue
 
     # Main loop function
     verbose = scheme_params_D['process'][0]['verbose']

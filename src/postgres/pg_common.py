@@ -218,12 +218,16 @@ class PG_common():
 
         return {row[0].lower() for row in rows}
 
-    def _Dict_to_select(self, queryD):
+    def _Dict_to_select(self, queryD, combine='AND'):
         """
         @brief Converts a dictionary to parameterized WHERE conditions.
 
         @param queryD A dictionary where keys are column names and values are dicts
                with 'op' (SQL operator) and 'val' (value or tuple for BETWEEN).
+        @param combine 'AND' (default) or 'OR' - how the per-column conditions are
+               combined. Use 'OR' when any single condition matching should count
+               (e.g. checking whether a row would violate any one of several
+               independent UNIQUE constraints); 'AND' for an exact multi-column match.
 
         @details
         - Column names are wrapped with pgsql.Identifier to prevent injection.
@@ -236,6 +240,9 @@ class PG_common():
 
         @raises ValueError if an unsupported operator is supplied.
         """
+
+        if combine not in ('AND', 'OR'):
+            raise ValueError('_Dict_to_select: unsupported combine %r' % combine)
 
         conditions = []
         params = []
@@ -267,7 +274,7 @@ class PG_common():
         if not conditions:
             return pgsql.SQL('TRUE'), []
 
-        return pgsql.SQL(' AND ').join(conditions), params
+        return pgsql.SQL(f' {combine} ').join(conditions), params
 
     def _Dict_to_columns_values(self, queryD, schema, table):
         """
@@ -685,7 +692,12 @@ class PG_common():
 
             selectQuery[item] = {'op': '=', 'val': updated_query_D[item]}
 
-        where_sql, where_params = self._Dict_to_select(selectQuery)
+        # Each unique column is an independent UNIQUE constraint at the DB level, so a
+        # match on ANY one of them means an insert would conflict - combine with OR,
+        # not AND (which would only catch a row matching on every unique column at
+        # once, and let an insert reach the DB and crash on e.g. a shared alias with
+        # a differently-named row).
+        where_sql, where_params = self._Dict_to_select(selectQuery, combine='OR')
 
         #return tab_uniqe, where_sql, where_params, updated_query_D
         return tab_unique, where_sql, where_params, updated_query_D
