@@ -151,6 +151,47 @@ class PG_common():
 
         return self.unique_keys
 
+    def _Get_unique_key_groups(self, schema, table):
+        """
+        @brief Get the table's UNIQUE constraints, columns grouped per constraint.
+
+        @param schema The schema of the table.
+        @param table The name of the table.
+
+        @details A multi-column UNIQUE constraint (e.g. UNIQUE (name, system)) only
+        conflicts when ALL of its columns match together - unlike _Get_unique_keys,
+        which flattens every UNIQUE-constrained column into one list and loses which
+        columns belong to the same constraint. Use this version wherever columns
+        matching independently (rather than jointly, per constraint) would misreport
+        an existence check - e.g. two different rows sharing just one column of a
+        multi-column constraint must NOT be treated as the same row.
+
+        @return A list of column-name lists, one inner list per UNIQUE constraint,
+                columns in ordinal_position order.
+        """
+
+        sql = """
+            SELECT constraint_name, column_name
+            FROM information_schema.table_constraints
+            JOIN information_schema.key_column_usage
+                USING (constraint_catalog, constraint_schema, constraint_name,
+                       table_catalog, table_schema, table_name)
+            WHERE constraint_type = 'UNIQUE'
+              AND table_schema = %s
+              AND table_name = %s
+            ORDER BY constraint_name, ordinal_position;
+        """
+
+        rows = self._Execute_search_all_sql(sql, (schema, table))
+
+        groups_D = {}
+
+        for constraint_name, column_name in (rows or []):
+
+            groups_D.setdefault(constraint_name, []).append(column_name)
+
+        return list(groups_D.values())
+
     def _Get_primary_keys(self, schema, table):
         """
         @brief Get the primary key columns of a table.
@@ -218,16 +259,12 @@ class PG_common():
 
         return {row[0].lower() for row in rows}
 
-    def _Dict_to_select(self, queryD, combine='AND'):
+    def _Dict_to_select(self, queryD):
         """
         @brief Converts a dictionary to parameterized WHERE conditions.
 
         @param queryD A dictionary where keys are column names and values are dicts
                with 'op' (SQL operator) and 'val' (value or tuple for BETWEEN).
-        @param combine 'AND' (default) or 'OR' - how the per-column conditions are
-               combined. Use 'OR' when any single condition matching should count
-               (e.g. checking whether a row would violate any one of several
-               independent UNIQUE constraints); 'AND' for an exact multi-column match.
 
         @details
         - Column names are wrapped with pgsql.Identifier to prevent injection.
@@ -240,9 +277,6 @@ class PG_common():
 
         @raises ValueError if an unsupported operator is supplied.
         """
-
-        if combine not in ('AND', 'OR'):
-            raise ValueError('_Dict_to_select: unsupported combine %r' % combine)
 
         conditions = []
         params = []
@@ -274,7 +308,7 @@ class PG_common():
         if not conditions:
             return pgsql.SQL('TRUE'), []
 
-        return pgsql.SQL(f' {combine} ').join(conditions), params
+        return pgsql.SQL(' AND ').join(conditions), params
 
     def _Dict_to_columns_values(self, queryD, schema, table):
         """
@@ -648,14 +682,14 @@ class PG_common():
 
         #tab_keys = self._Get_table_keys(schema, table)
 
-        tab_unique = self._Get_unique_keys(schema, table)
+        unique_groups = self._Get_unique_key_groups(schema, table)
 
         #if not tab_keys:
         #    tab_keys = list(updated_query_D.keys())
         #else:
         #    tab_keys = [item[0] for item in tab_keys]
 
-        if not tab_unique:
+        if not unique_groups:
             # No UNIQUE constraint on this table - prefer its PRIMARY KEY
             # (a bare PK, e.g. observation_log_method_tier_pkey, is not
             # reported as constraint_type = 'UNIQUE' by information_schema)
@@ -664,43 +698,43 @@ class PG_common():
             tab_primary = self._Get_primary_keys(schema, table)
 
             if tab_primary:
-                tab_unique = [item[0] for item in tab_primary]
+                unique_groups = [[item[0] for item in tab_primary]]
             else:
-                tab_unique = list(updated_query_D.keys())
-        else:
-            tab_unique = [item[0] for item in tab_unique]
+                unique_groups = [list(updated_query_D.keys())]
 
-        selectQuery = {}
+        # A multi-column UNIQUE constraint (e.g. UNIQUE (name, system)) only conflicts
+        # when ALL of its columns match together - two rows sharing just one of those
+        # columns (e.g. the same "system") are NOT the same row. So AND the columns
+        # within one constraint's group, then OR the groups together: different
+        # constraints are independent, and a match on ANY one constraint's full
+        # column set means an insert would conflict.
+        usable_groups = [group for group in unique_groups if all(col in updated_query_D for col in group)]
 
-        #for item in tab_keys:
-        # Should be enough a single UNIQUE key to identify a record, so we use unique keys instead of primary keys here
-        unique_key_flag = False
-        for item in tab_unique:
-            
-            if item not in updated_query_D:
-                # Special solution to look for alias instead of name
-                # TG TODO DEMANDS MORE
-                #if item == 'alias':
-                #    continue
-                #    unique_key_flag = True
-                error_msg = '⚠️ WARNING unique key <%s> not found in queryD for table %s.%s' % (
-                    item, schema, table
-                )
-                error_msg += '\n            searching for inverted name key instead...'
-                self.log(error_msg)
-                return None
+        if not usable_groups:
 
-            selectQuery[item] = {'op': '=', 'val': updated_query_D[item]}
+            error_msg = '⚠️ WARNING no UNIQUE constraint fully present in queryD for table %s.%s (have: %s, need one of: %s)' % (
+                schema, table, list(updated_query_D.keys()), unique_groups
+            )
+            self.log(error_msg)
+            return None
 
-        # Each unique column is an independent UNIQUE constraint at the DB level, so a
-        # match on ANY one of them means an insert would conflict - combine with OR,
-        # not AND (which would only catch a row matching on every unique column at
-        # once, and let an insert reach the DB and crash on e.g. a shared alias with
-        # a differently-named row).
-        where_sql, where_params = self._Dict_to_select(selectQuery, combine='OR')
+        group_fragments = []
+        where_params = []
+        flat_columns = []
 
-        #return tab_uniqe, where_sql, where_params, updated_query_D
-        return tab_unique, where_sql, where_params, updated_query_D
+        for group in usable_groups:
+
+            selectQuery = {col: {'op': '=', 'val': updated_query_D[col]} for col in group}
+
+            group_sql, group_params = self._Dict_to_select(selectQuery)
+
+            group_fragments.append(pgsql.SQL('(') + group_sql + pgsql.SQL(')'))
+            where_params.extend(group_params)
+            flat_columns.extend(group)
+
+        where_sql = pgsql.SQL(' OR ').join(group_fragments)
+
+        return flat_columns, where_sql, where_params, updated_query_D
 
     def _Check_get_foreign_code_key(self, key, value):
         """
@@ -898,7 +932,11 @@ class PG_common():
         search_L = self._Create_search_sql_from_tab_keys(queryD, schema, table)
 
         if not search_L or search_L == 'fk_error':
-            return search_L
+            # 'fk_error'/None reasons are already logged by _Create_search_sql_from_tab_keys
+            # (or the foreign-key lookup it calls into) - normalize both to a plain falsy
+            # None here so callers' "if not success" checks can't mistake the truthy
+            # 'fk_error' string for a successful insert.
+            return None
 
         _tab_unique, where_sql, where_params, updated_query_D = search_L
 
@@ -945,14 +983,15 @@ class PG_common():
         @return True on success (including a same-value no-op), None on failure.
         """
 
-        updated_query_D = self._Convert_id_code(queryD)
+        # _Create_search_sql_from_tab_keys already runs the query dict through
+        # _Convert_id_code internally - converting it again here first was redundant,
+        # and worse, didn't check for its 'fk_error' return (a truthy string), which
+        # then went on to blow up trying to unpack it as the 4-tuple below.
+        search_L = self._Create_search_sql_from_tab_keys(queryD, schema, table)
 
-        if not updated_query_D:
-            return None
-
-        search_L = self._Create_search_sql_from_tab_keys(updated_query_D, schema, table)
-
-        if not search_L:
+        if not search_L or search_L == 'fk_error':
+            # Reason already logged by _Create_search_sql_from_tab_keys or the
+            # foreign-key lookup it calls into.
             return None
 
         tab_keys, where_sql, where_params, updated_query_D = search_L
@@ -962,6 +1001,7 @@ class PG_common():
         update_vals = [updated_query_D[k] for k in update_cols]
 
         if not update_cols:
+            self.log('⚠️ WARNING could not update %s.%s - every supplied column is part of its unique/primary key, nothing left to update' % (schema, table))
             return None
 
         current_cols_sql = pgsql.SQL(', ').join(map(pgsql.Identifier, update_cols))
@@ -979,6 +1019,7 @@ class PG_common():
         records = self._Execute_search_all_sql(select_sql, where_params)
 
         if len(records) != 1:
+            self.log('⚠️ WARNING could not update %s.%s - expected exactly 1 matching record, found %s' % (schema, table, len(records)))
             return None
 
         if list(records[0]) == update_vals:
@@ -1036,6 +1077,7 @@ class PG_common():
         records = self._Execute_search_all_sql(select_sql, where_params)
 
         if len(records) != 1:
+            self.log('⚠️ WARNING could not delete from %s.%s - expected exactly 1 matching record, found %s' % (schema, table, len(records)))
             return None
 
         delete_sql = pgsql.SQL('DELETE FROM {}.{} WHERE {};').format(

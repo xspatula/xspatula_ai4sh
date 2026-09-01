@@ -580,9 +580,7 @@ class Process_import_JSON(Get_schema_table):
 
         elif record_id:
 
-            if self.verbose > 1:
-
-                print ('.   ✅ Record %s already registered, use overwrite to update' %(column_report_name))
+            print ('.   🟡 Record %s not inserted - already registered in %s.%s, use overwrite to update' %(column_report_name, dst_schema, dst_main_table))
 
         elif not record_id:
 
@@ -606,7 +604,7 @@ class Process_import_JSON(Get_schema_table):
         
         if not record_id:
 
-            print ('.  ❌ ERROR: could not retrieve record_id after inserting device model to %s.%s' % (dst_schema, dst_main_table))
+            print ('.  ❌ ERROR: could not retrieve record_id after inserting to %s.%s' % (dst_schema, dst_main_table))
 
             return None
         
@@ -805,9 +803,9 @@ class Process_import_JSON(Get_schema_table):
 
             self._Delete({main_table_id: record_value}, schema, table, name)
 
-        elif self.process_S.process.verbose > 1:
+        else:
 
-            print ('.     ✅ Record already registered in table %s, use overwrite to update' %(table))
+            print ('.     🟡 Record %s not inserted - already registered in table %s, use overwrite to update' %(name, table))
 
     def _Insert_at_records(self,updated_query_D,at_params_D, schema, table, provision_name):
 
