@@ -521,10 +521,24 @@ class Process_import_JSON(Get_schema_table):
             
         # Get the keys for this table to use for managing content
         table_keys = self.pg_session_C._Get_table_keys(dst_schema, dst_main_table)
-        
+
         if not 'name' in main_query_D:
 
-            column_report_name = ",".join([item[0] for item in table_keys])
+            # Tables without their own 'name' (e.g. junction tables like
+            # provision_indicator) are identified by their FK-reference columns
+            # (xxx_id__xxx_name); main_query_D still holds those as human-readable
+            # strings at this point (FK resolution to raw ids happens later), so use
+            # the values themselves for the report label instead of table_keys'
+            # column NAMES (e.g. literally "id"), which don't identify a specific row.
+            descriptive_items = [(k.split('__')[-1], v) for k, v in main_query_D.items() if '__' in k]
+
+            if descriptive_items:
+
+                column_report_name = ", ".join('%s=%s' % (k, v) for k, v in descriptive_items)
+
+            else:
+
+                column_report_name = ",".join([item[0] for item in table_keys])
 
         else:
 
