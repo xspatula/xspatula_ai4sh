@@ -173,6 +173,11 @@ def Run_process(strcutured_process_D, scheme_params_D):
     if insert_result_L:
 
         print ('\n✅ Data translated and inserted into the database in a single step.\n')
+
+        failed_process_count = getattr(pg_session_C, 'failed_process_count', 0)
+
+        print ('   ❌ %s process(es) failed.\n' % failed_process_count)
+
         print ('   The following JSON process files were generated (staged) and applied:')
 
         for row in insert_result_L:

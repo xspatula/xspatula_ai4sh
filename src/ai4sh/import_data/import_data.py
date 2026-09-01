@@ -81,6 +81,17 @@ class Process_import_JSON(Get_schema_table):
             for k, v in queryD.items()
         }
 
+    def _Report_failure(self, msg):
+        ''' Print a process-failure message and count it. pg_session_C is the one
+        object shared by every Process_import_JSON instance created within a single
+        Run_process call (including the per-row instances _Insert_tabular_data spawns),
+        so a counter kept on it there survives across the whole run for a final
+        summary - see process.py. '''
+
+        print (msg)
+
+        self.pg_session_C.failed_process_count = getattr(self.pg_session_C, 'failed_process_count', 0) + 1
+
     def _Sub_process(self, json_file_key):
 
         # Direct to subprocess
@@ -345,7 +356,7 @@ class Process_import_JSON(Get_schema_table):
                                                                                      schema_S,
                                                                                      table_S)
 
-            print (msg)
+            self._Report_failure(msg)
 
             return success
 
@@ -366,7 +377,7 @@ class Process_import_JSON(Get_schema_table):
                                                                                      schema_S,
                                                                                      table_S)
 
-            print (msg)
+            self._Report_failure(msg)
 
             return success
 
@@ -387,7 +398,7 @@ class Process_import_JSON(Get_schema_table):
                                                                                      schema_S,
                                                                                      table_S)
 
-            print (msg)
+            self._Report_failure(msg)
 
             return success
 
@@ -403,33 +414,33 @@ class Process_import_JSON(Get_schema_table):
 
         if not measurement_indicators_L:
 
-            print ('.  ❌ ERROR: could not retrieve indicators for observation_log %s' %(main_query_D['observation_log_id__observation_log_name']))
+            self._Report_failure('.  ❌ ERROR: could not retrieve indicators for observation_log %s' %(main_query_D['observation_log_id__observation_log_name']))
 
             return None
-        
+
         indicator_D = dict(measurement_indicators_L)
-        
+
         if main_query_D['indicator_id__indicator_name'] not in indicator_D:
 
-            print ('.  ❌ ERROR: indicator %s not found for observation log %s' %(main_query_D['indicator_id__indicator_name'], main_query_D['observation_log_id__observation_log_name']))
+            self._Report_failure('.  ❌ ERROR: indicator %s not found for observation log %s' %(main_query_D['indicator_id__indicator_name'], main_query_D['observation_log_id__observation_log_name']))
             print ('.     Available indicators for this observation log are: %s' %(list(indicator_D.keys())))
 
             return None
-        
+
         if not main_query_D['indicator_id__indicator_name'] in indicator_D:
 
-            print ('.  ❌ ERROR: indicator %s not found for observation log %s' %(main_query_D['indicator_id__indicator_name'], main_query_D['observation_log_id__observation_log_name']))
+            self._Report_failure('.  ❌ ERROR: indicator %s not found for observation log %s' %(main_query_D['indicator_id__indicator_name'], main_query_D['observation_log_id__observation_log_name']))
             print ('.     Available indicators for this observation log are: %s' %(list(indicator_D.keys())))
 
             return None
-        
+
         indicator_id = indicator_D[main_query_D['indicator_id__indicator_name']]
-        
+
         observation_id = self.pg_session_C._Retrieve_observation_id_from_observation(main_query_D)
 
         if not observation_id:
 
-            print ('.  ❌ ERROR: could not retrieve observation id for measurement record')
+            self._Report_failure('.  ❌ ERROR: could not retrieve observation id for measurement record')
 
             return None
                 
@@ -488,7 +499,7 @@ class Process_import_JSON(Get_schema_table):
 
             if not record:
 
-                print ('.  ❌ ERROR: could not retrieve record for %s.%s' % (dst_schema, dst_main_table))
+                self._Report_failure('.  ❌ ERROR: could not retrieve record for %s.%s' % (dst_schema, dst_main_table))
 
                 return None
             
@@ -552,7 +563,7 @@ class Process_import_JSON(Get_schema_table):
 
         if record_id == 'fk_error':
 
-            print ('.  ❌ ERROR: could not retrieve foreign key for %s.%s' % (dst_schema, dst_main_table))
+            self._Report_failure('.  ❌ ERROR: could not retrieve foreign key for %s.%s' % (dst_schema, dst_main_table))
 
             return None
 
@@ -594,7 +605,7 @@ class Process_import_JSON(Get_schema_table):
 
         elif record_id:
 
-            print ('.   🟡 Record %s not inserted - already registered in %s.%s, use overwrite to update' %(column_report_name, dst_schema, dst_main_table))
+            print ('.   🟡 Record %s already registered in %s.%s, use overwrite to update' %(column_report_name, dst_schema, dst_main_table))
 
         elif not record_id:
 
@@ -618,7 +629,7 @@ class Process_import_JSON(Get_schema_table):
         
         if not record_id:
 
-            print ('.  ❌ ERROR: could not retrieve record_id after inserting to %s.%s' % (dst_schema, dst_main_table))
+            self._Report_failure('.  ❌ ERROR: could not retrieve record_id after inserting to %s.%s' % (dst_schema, dst_main_table))
 
             return None
         
@@ -782,7 +793,7 @@ class Process_import_JSON(Get_schema_table):
 
             if not at_params_D:
     
-                print ('.  ❌ ERROR: could not retrieve @-record for %s.%s' % (schema, table))
+                self._Report_failure('.  ❌ ERROR: could not retrieve @-record for %s.%s' % (schema, table))
 
                 return None
             
@@ -819,7 +830,7 @@ class Process_import_JSON(Get_schema_table):
 
         else:
 
-            print ('.     🟡 Record %s not inserted - already registered in table %s, use overwrite to update' %(name, table))
+            print ('.     🟡 Record %s already registered in table %s, use overwrite to update' %(name, table))
 
     def _Insert_at_records(self,updated_query_D,at_params_D, schema, table, provision_name):
 
@@ -853,13 +864,13 @@ class Process_import_JSON(Get_schema_table):
 
         if not record:
 
-            print ('.  ❌ ERROR: could not retrieve wavelength cardinality for provision %s' % provision_name)
+            self._Report_failure('.  ❌ ERROR: could not retrieve wavelength cardinality for provision %s' % provision_name)
 
             return None
 
         if record != value_len:
 
-            print ('.  ❌ ERROR: length of input array does not match wavelength cardinality for provision %s. Expected %s values, got %s values.' % (provision_name, record, value_len))
+            self._Report_failure('.  ❌ ERROR: length of input array does not match wavelength cardinality for provision %s. Expected %s values, got %s values.' % (provision_name, record, value_len))
 
             return None
         
