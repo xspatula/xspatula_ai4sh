@@ -343,44 +343,56 @@ observation/edna_v10_sql.json
 ### LANDSCAPE UTILITY
 ###===========================================###
 
-# TG TODO complete
-# Landscape utility includes tables for:
-# -major landform,
-# -slope position
-# -sky condition
-# -ground condition
-# -cultivation species
-# -soil preparation
-# -crop growth stage
-# -erosion conservation measure
-landscape/utility_v10_sql.json
+landscape_utility/crop_growth_stage_v10_sql.json
+
+landscape_utility/biogeo16_v10_sql.json
 
 # Land use utility includes tables for:
 # -land use order
 # -land use family
 # -land use genus
-landscape/land_use_v10_sql.json
+landscape_utility/land_use_v10_sql.json
 
 # Land cover utility includes tables for:
 # -land cover order
 # -land cover family
 # -land cover genus
-landscape/land_cover_v10_sql.json
+landscape_utility/land_cover_v10_sql.json
 
 # Soil classification utility includes tables for:
 # -soil texture (USDA)
 # -soil texture (ISSS)
 # -reference soil groups
-landscape/soil_classification_v10_sql.json
+landscape_utility/soil_classification_v10_sql.json
+
+# Major landform
+landscape_utility/major_landform_v10_sql.json
+
+# Slope position
+landscape_utility/slope_position_v10_sql.json
+
+# Sky conditions
+landscape_utility/sky_conditions_v10_sql.json
+
+# Ground conditions
+landscape_utility/ground_conditions_v10_sql.json
+
+# Soil preparation
+landscape_utility/soil_preparation_v10_sql.json
+
+# TG TODO complete
+# Landscape utility includes tables for:
+
+# -cultivation species
+# -erosion conservation measure
+
 
 ###===========================================###
 ### LANDSCAPE
 ###===========================================###
 
 # TG TODO complete
-landscape/observation_v10_sql.json
-
-# TG TODO landscape indicator
+### REMOVE TO RUN ###landscape/observation_v10_sql.json
 
 # observation_lucc contains tables for:
 # - landuse observation
