@@ -6,6 +6,74 @@
       "delete": false,
       "parameters": {
         "schema": "landscape_utility",
+        "table": "crop_growth_stage",
+        "trigger": "crop_growth_stage_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "soil_texture_usda",
+        "trigger": "soil_texture_usda_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "soil_texture_isss",
+        "trigger": "soil_texture_isss_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "reference_soil_group",
+        "trigger": "reference_soil_group_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
         "table": "major_landform",
         "trigger": "major_landform_audit",
         "timing": "AFTER",
@@ -74,59 +142,8 @@
       "delete": false,
       "parameters": {
         "schema": "landscape_utility",
-        "table": "cultivation_species",
-        "trigger": "cultivation_species_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "landscape_utility",
         "table": "soil_preparation",
         "trigger": "soil_preparation_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "landscape_utility",
-        "table": "crop_growth_stage",
-        "trigger": "crop_growth_stage_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "landscape_utility",
-        "table": "erosion_conservation_measure",
-        "trigger": "erosion_conservation_measure_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",
@@ -244,42 +261,8 @@
       "delete": false,
       "parameters": {
         "schema": "landscape_utility",
-        "table": "soil_texture_usda",
-        "trigger": "soil_texture_usda_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "landscape_utility",
-        "table": "soil_texture_isss",
-        "trigger": "soil_texture_isss_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "landscape_utility",
-        "table": "reference_soil_groups",
-        "trigger": "reference_soil_groups_audit",
+        "table": "biogeo16_eu",
+        "trigger": "biogeo16_eu_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",

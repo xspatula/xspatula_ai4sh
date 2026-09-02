@@ -26,6 +26,7 @@
         "trigger": "person_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -138,6 +139,7 @@
         "trigger": "campaign_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -154,6 +156,7 @@
         "trigger": "campaign_meta_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -170,6 +173,7 @@
         "trigger": "campaign_tag_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -186,6 +190,7 @@
         "trigger": "campaign_method_tier_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -250,6 +255,7 @@
         "trigger": "sampling_log_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -282,6 +288,7 @@
         "trigger": "geolocation_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -394,6 +401,7 @@
         "trigger": "observation_log_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -538,6 +546,7 @@
         "trigger": "monolith_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -554,6 +563,7 @@
         "trigger": "macrofauna_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -618,6 +628,7 @@
         "trigger": "edna_feature_abundance_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -746,6 +757,7 @@
         "trigger": "edna_nucleotide_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -762,6 +774,7 @@
         "trigger": "taxa_bioinformatics_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -778,6 +791,7 @@
         "trigger": "edna_measurement_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -794,6 +808,7 @@
         "trigger": "taxa_biodiversity_measurement_audit",
         "timing": "AFTER",
         "events": [
+          "INSERT",
           "UPDATE",
           "DELETE"
         ],

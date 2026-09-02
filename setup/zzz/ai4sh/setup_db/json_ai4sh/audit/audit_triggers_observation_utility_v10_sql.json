@@ -295,23 +295,6 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "microbiometer_version",
-        "trigger": "microbiometer_version_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
         "table": "monolith_excavation_method",
         "trigger": "monolith_excavation_method_audit",
         "timing": "AFTER",
@@ -571,7 +554,6 @@
         "trigger": "transportation_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
@@ -911,7 +893,6 @@
         "trigger": "unit_translate_audit",
         "timing": "AFTER",
         "events": [
-          "INSERT",
           "UPDATE",
           "DELETE"
         ],
