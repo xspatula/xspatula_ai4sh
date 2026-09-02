@@ -1,7 +1,7 @@
 {
   "process": {
     "job_folder": "import_data/FTIR_spectra/observation",
-    "process_sub_folder": "process",
+    "process_sub_folder": "manage_process",
     "pilot_file": "xspatula_add_observation_pilot.txt"
   }
 }
