@@ -26,7 +26,8 @@
           "ml_model_access_level SMALLINT DEFAULT 1",
           "max_MB SMALLINT DEFAULT 1",
           "updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "PRIMARY KEY (stratum_code)"
+          "UNIQUE (stratum_code)",
+          "PRIMARY KEY (id)"
         ]
       },
       "audit": {

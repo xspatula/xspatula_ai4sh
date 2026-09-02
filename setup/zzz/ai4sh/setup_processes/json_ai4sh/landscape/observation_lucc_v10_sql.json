@@ -1,0 +1,170 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_land_cover_observation",
+        "min_user_stratum": 4,
+        "title": "Manage land cover observation",
+        "label": "Insert, update or delete a land cover observation"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the sampling_log that define the collection of data",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "landcover_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "geolocation_id__geolocation_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the geolocation",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "landcover_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "landcover_genus_id__landcover_genus_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the land cover class (regardless of level in classification hierarchy)",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "landcover_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "observed_at",
+              "parameter_type": "timestamp",
+              "required": false,
+              "default_value": 0,
+              "hint": "The date of the observation, leave blank to set today as date",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "landcover_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_land_use_observation",
+        "min_user_stratum": 4,
+        "title": "Manage land use observation",
+        "label": "Insert, update or delete a land use observation"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the sampling_log that define the collection of data",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "landuse_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "geolocation_id__geolocation_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the geolocation",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "landuse_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "landuse_genus_id__landuse_genus_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the land use class (regardless of level in classification hierarchy)",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "landuse_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "observed_at",
+              "parameter_type": "timestamp",
+              "required": false,
+              "default_value": 0,
+              "hint": "The date of the observation, leave blank to set today as date",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "landuse_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
