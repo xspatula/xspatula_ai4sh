@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_soil_preparation",
+        "min_user_stratum": 4,
+        "title": "Manage soil preparation",
+        "label": "Insert, update or delete soil preparations in the landscape utility catalog"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the soil preparation",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_preparation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Alias or synonym of the soil preparation",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_preparation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the soil preparation.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_preparation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Abstract describing the soil preparation in layperson terms",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_preparation",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,285 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_landcover_order",
+        "min_user_stratum": 4,
+        "title": "Manage land cover order",
+        "label": "Insert, update or delete a land cover order, the highest, most generic, classification level used for defining land cover (e.g. primary production, industrial production)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Top level generic name of land cover.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_order",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Code for land cover as used by the EU.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_order",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the land cover order.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_order",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract describing the generic land cover in layperson terms",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_order",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_landcover_family",
+        "min_user_stratum": 4,
+        "title": "Manage land cover family",
+        "label": "Insert, update or delete a land cover family, a mid-layer classification level used for defining land cover (e.g. agriculture, forestry)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "landcover_order_id__landcover_order_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The order name or code under which this land cover family falls.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Family level generic name of the land cover.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Code for land cover as used by the EU.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the land cover family.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_family",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract describing the land cover family in layperson terms",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_family",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_landcover_genus",
+        "min_user_stratum": 4,
+        "title": "Manage land cover genus",
+        "label": "Insert, update or delete a land cover genus, the lowest classification level used for defining land cover (e.g. agricultural fields, kitchen gardens)"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "landcover_family_id__landcover_family_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The family name under which this genus falls.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Family level generic name of the land cover.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Code of the land cover used by the EU.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name that identifies the genus.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_genus",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract describing the genus of substances in layperson terms",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover_genus",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

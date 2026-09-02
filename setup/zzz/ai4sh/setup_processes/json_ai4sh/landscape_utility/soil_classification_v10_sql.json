@@ -1,0 +1,253 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_soil_texture_usda",
+        "min_user_stratum": 4,
+        "title": "Manage soil texture USDA classification",
+        "label": "Insert, update or delete soil texture classes in the USDA classification system"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of USDA soil texture class.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_texture_usda",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Alias for USDA soil texture class.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_texture_usda",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name for USDA soil texture class.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_texture_usda",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract describing USDA soil tecture class",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_texture_usda",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_soil_texture_isss",
+        "min_user_stratum": 4,
+        "title": "Manage soil texture ISSS classification",
+        "label": "Insert, update or delete soil texture classes in the USDA classification system"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of ISSS soil texture class.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_texture_isss",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Alias for ISSS soil texture class.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_texture_isss",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name for ISSS soil texture class.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_texture_isss",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract describing the ISSS texture class",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "soil_texture_isss",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_reference_soil_groups",
+        "min_user_stratum": 4,
+        "title": "Manage reference soil groups",
+        "label": "Insert, update or delete reference soil groups"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of reference soil group.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "reference_soil_group",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Alias for reference soil group.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "reference_soil_group",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name for reference soil group.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "reference_soil_group",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Abstract describing the reference soil group",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "reference_soil_group",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
