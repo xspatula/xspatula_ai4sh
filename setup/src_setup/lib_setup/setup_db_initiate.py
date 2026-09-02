@@ -16,6 +16,7 @@
  @date Created: 2025-09-02
  @date Updated: 2026-03-14 (Code cleanup)
  @date Updated: 2026-03-15 (Added prompts for user confirmation before critical operations)
+ @date Updated: 2026-08-19 (Added audit initiation from main database setup)
 """
 
 # Standard library imports
