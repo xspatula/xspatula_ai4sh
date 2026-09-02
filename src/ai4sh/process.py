@@ -20,7 +20,7 @@ from src.lib.login import Get_set_database_session
 
 from src.utils import Log, Today_as_str_YYYYMMDD
 
-def Run_process(strcutured_process_D, scheme_params_D):
+def Run_process(structured_process_D, scheme_params_D):
     '''
     '''
     
@@ -36,17 +36,17 @@ def Run_process(strcutured_process_D, scheme_params_D):
     
     print ('\n########### STARTING PROCESSES ########### \n')
     
-    for key in strcutured_process_D:
+    for key in structured_process_D:
 
         json_file_name = path.split(key)[1]
 
         if scheme_params_D['process'][0]['verbose'] > 0:
         
-            msg = '. Command file: %s\n.   (%s ready processes to run)' %(key, len(strcutured_process_D[key]))
+            msg = '. Command file: %s\n.   (%s ready processes to run)' %(key, len(structured_process_D[key]))
 
             print (msg)
 
-        for p_nr, process_S in strcutured_process_D[key].items():
+        for p_nr, process_S in structured_process_D[key].items():
 
             # Check the process stratum requirements against the user status and skip if not met
             rec = pg_session_C._Single_search(
@@ -110,7 +110,7 @@ def Run_process(strcutured_process_D, scheme_params_D):
 
                 if result:
 
-                    result_print_L.append(result)
+                    insert_result_L.append(result)
 
             elif root_process == 'select_data':
 
@@ -172,14 +172,22 @@ def Run_process(strcutured_process_D, scheme_params_D):
 
     if insert_result_L:
 
-        print ('\n✅ Data translated and inserted into the database in a single step.\n')
+        print ('\nData translated and inserted into the database in a single step.\n')
 
         failed_process_count = getattr(pg_session_C, 'failed_process_count', 0)
 
-        print ('   ❌ %s process(es) failed.\n' % failed_process_count)
+        if failed_process_count == 0:
 
-        print ('   The following JSON process files were generated (staged) and applied:')
+            print ('✅ All processes completed successfully.\n')
 
-        for row in insert_result_L:
+        else:
 
-            print (row)
+            print ('❌ %s process(es) failed.\n' % failed_process_count)
+
+        if structured_process_D[key][0].process.verbose:
+            
+            print ('   The following JSON process files were generated (staged) and applied:')
+
+            for row in insert_result_L:
+
+                print (row)
