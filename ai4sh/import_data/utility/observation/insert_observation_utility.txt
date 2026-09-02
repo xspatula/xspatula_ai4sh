@@ -49,10 +49,6 @@ location_method.json
 method_tier.json
 
 # TG TODO
-# Micobiometer kit version.
-# microbiometer_version.json
-
-# TG TODO
 # Monolith extraction method (e.g. block of soil, sediment or ice-core).
 #monolith_extraction.json
 
