@@ -1,93 +1,9 @@
 {
   "process": [
-    {
-      "process_id": "create_table",
-      "overwrite": false,
-      "delete": false,
-      "parameters": {
-        "schema": "landscape_utility",
-        "table": "major_landform",
-        "command": [
-          "id SERIAL",
-          "name TEXT UNIQUE",
-          "alias TEXT UNIQUE",
-          "abstract TEXT",
-          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
-          "PRIMARY KEY (id)"
-        ]
-      },
-      "audit": {
-        "INSERT": true,
-        "UPDATE": true,
-        "DELETE": true
-      }
-    },
-    {
-      "process_id": "create_table",
-      "overwrite": false,
-      "delete": false,
-      "parameters": {
-        "schema": "landscape_utility",
-        "table": "slope_position",
-        "command": [
-          "id SERIAL",
-          "name TEXT UNIQUE",
-          "alias TEXT UNIQUE",
-          "abstract TEXT",
-          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
-          "PRIMARY KEY (id)"
-        ]
-      },
-      "audit": {
-        "INSERT": true,
-        "UPDATE": true,
-        "DELETE": true
-      }
-    },
-    {
-      "process_id": "create_table",
-      "overwrite": false,
-      "delete": false,
-      "parameters": {
-        "schema": "landscape_utility",
-        "table": "sky_condition",
-        "command": [
-          "id SERIAL",
-          "name TEXT UNIQUE",
-          "alias TEXT UNIQUE",
-          "abstract TEXT",
-          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
-          "PRIMARY KEY (id)"
-        ]
-      },
-      "audit": {
-        "INSERT": true,
-        "UPDATE": true,
-        "DELETE": true
-      }
-    },
-    {
-      "process_id": "create_table",
-      "overwrite": false,
-      "delete": false,
-      "parameters": {
-        "schema": "landscape_utility",
-        "table": "ground_condition",
-        "command": [
-          "id SERIAL",
-          "name TEXT UNIQUE",
-          "alias TEXT UNIQUE",
-          "abstract TEXT",
-          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
-          "PRIMARY KEY (id)"
-        ]
-      },
-      "audit": {
-        "INSERT": true,
-        "UPDATE": true,
-        "DELETE": true
-      }
-    },
+
+
+
+
     {
       "process_id": "create_table",
       "overwrite": false,
@@ -102,7 +18,6 @@
           "genus TEXT",
           "species TEXT",
           "sub_species TEXT",
-          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "UNIQUE (genus, species, sub_species)",
           "PRIMARY KEY (id)"
         ]
@@ -113,28 +28,7 @@
         "DELETE": true
       }
     },
-    {
-      "process_id": "create_table",
-      "overwrite": false,
-      "delete": false,
-      "parameters": {
-        "schema": "landscape_utility",
-        "table": "soil_preparation",
-        "command": [
-          "id SERIAL",
-          "name TEXT UNIQUE",
-          "alias TEXT UNIQUE",
-          "abstract TEXT",
-          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
-          "PRIMARY KEY (id)"
-        ]
-      },
-      "audit": {
-        "INSERT": true,
-        "UPDATE": true,
-        "DELETE": true
-      }
-    },
+    
     {
       "process_id": "create_table",
       "overwrite": false,
@@ -147,7 +41,6 @@
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
           "abstract TEXT",
-          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },
@@ -169,7 +62,6 @@
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
           "abstract TEXT",
-          "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
           "PRIMARY KEY (id)"
         ]
       },

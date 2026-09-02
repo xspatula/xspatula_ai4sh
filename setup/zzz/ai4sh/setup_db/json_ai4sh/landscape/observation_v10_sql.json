@@ -134,7 +134,6 @@
           "rock_cover_percent SMALLINT",
           "stone_cover_percent SMALLINT",
           "gravel_cover_percent SMALLINT",
-          "",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]

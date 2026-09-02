@@ -9,9 +9,10 @@
         "table": "landuse_observation",
         "command": [
           "id SERIAL",
+          "sampling_log_id INTEGER REFERENCES observation.sampling_log (id)",
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
-          "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "landuse_genus_id__landuse_genus_name INTEGER REFERENCES landscape_utility.landuse_genus",
+          "landuse_genus_id INTEGER REFERENCES landscape_utility.landuse_genus",
+          "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
@@ -31,9 +32,10 @@
         "table": "landcover_observation",
         "command": [
           "id SERIAL",
+          "sampling_log_id INTEGER REFERENCES observation.sampling_log (id)",
           "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
-          "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "landcover_genus_id__landcover_genus_name INTEGER REFERENCES landscape_utility.landcover_genus",
+          "landcover_genus_id INTEGER REFERENCES landscape_utility.landuse_genus",
+          "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP",
           "UNIQUE (geolocation_id, observed_at)",
           "PRIMARY KEY (id)"
         ]
