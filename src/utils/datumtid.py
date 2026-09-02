@@ -182,6 +182,15 @@ def yyyymmdd_HH_MM_SS_s_as_str_4_postgres(yyyymmdd_HH_MM_SS_s):
         yyyymmdd_HH_MM_SS_s = f"{yyyymmdd_HH_MM_SS_s}_000000_0"
     elif len(yyyymmdd_HH_MM_SS_s) == 15:
         yyyymmdd_HH_MM_SS_s = f"{yyyymmdd_HH_MM_SS_s}_0"
+    elif 'T' in yyyymmdd_HH_MM_SS_s:
+        try:
+            dt = datetime.datetime.fromisoformat(yyyymmdd_HH_MM_SS_s)
+        except ValueError:
+            log_msg = 'Date string format not recognized: %s' %(yyyymmdd_HH_MM_SS_s)
+            Log(log_msg)
+            return None
+        ts_str = f"{dt:%Y-%m-%d %H:%M:%S}.{dt.microsecond // 100000}"
+        return ts_str
     elif len(yyyymmdd_HH_MM_SS_s) != 21:
         log_msg = 'Date string format not recognized: %s' %(yyyymmdd_HH_MM_SS_s) 
         Log(log_msg)
@@ -189,6 +198,7 @@ def yyyymmdd_HH_MM_SS_s_as_str_4_postgres(yyyymmdd_HH_MM_SS_s):
     dt = datetime.datetime.strptime(yyyymmdd_HH_MM_SS_s, '%Y%m%d_%H%M%S_%f')
     ts_str = f"{dt:%Y-%m-%d %H:%M:%S}.{dt.microsecond // 100000}"
     return ts_str
+
 
 def Date_str_yyyy_mm_dd_2_datetime(yyyymmdd):
     """
