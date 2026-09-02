@@ -459,15 +459,15 @@ class Process_import_JSON(Get_schema_table):
 
     def _Add_JSON_data(self):
 
-        if self.verbose > 1:
+        if self.verbose > 2:
 
-            print ('Adding JSON data to Postgres')
+            print ('.   Adding JSON data to Postgres')
 
         schema_table_query_D = self._Get_process_schema_table()
 
-        if self.verbose > 1:
+        if self.verbose > 2:
 
-            print ('Schema table query dictionary retrieved')
+            print ('.      Schema table query dictionary retrieved')
 
         query_D = {'process': self.process_S.process.process}
         records = self.pg_session_C._Multi_search(query_D,

@@ -132,15 +132,31 @@ observation/dataset_tag_v10_sql.json
 
 ### landscape utility ###
 
-landscape/land_use_v10_sql.json
+landscape_utility/crop_growth_stage_v10_sql.json
 
-landscape/land_cover_v10_sql.json
+landscape_utility/land_use_v10_sql.json
+
+landscape_utility/land_cover_v10_sql.json
+
+landscape_utility/soil_classification_v10_sql.json
+
+landscape_utility/major_landform_v10_sql.json
+
+landscape_utility/slope_position_v10_sql.json
+
+landscape_utility/sky_conditions_v10_sql.json
+
+landscape_utility/ground_conditions_v10_sql.json
+
+landscape_utility/soil_preparation_v10_sql.json
+
+#landscape/cultivation_crop_v10_sql.json
 
 ### landscape ###
 
-landscape/cultivation_crop_v10_sql.json
+#landscape/cultivation_soil_preparation_v10_sql.json
 
-landscape/cultivation_soil_preparation_v10_sql.json
+landscape/observation_lucc_v10_sql.json
 
 ### SELECT SPECTRA ###
 
