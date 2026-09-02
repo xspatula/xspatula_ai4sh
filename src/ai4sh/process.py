@@ -172,7 +172,7 @@ def Run_process(structured_process_D, scheme_params_D):
 
     if insert_result_L:
 
-        print ('\nData translated and inserted into the database in a single step.\n')
+        print ('\nData applied to the database.\n')
 
         failed_process_count = getattr(pg_session_C, 'failed_process_count', 0)
 
@@ -185,9 +185,9 @@ def Run_process(structured_process_D, scheme_params_D):
             print ('❌ %s process(es) failed.\n' % failed_process_count)
 
         if structured_process_D[key][0].process.verbose:
-            
-            print ('   The following JSON process files were generated (staged) and applied:')
 
-            for row in insert_result_L:
+            print ('   The following JSON process files were applied:')
+
+            for row in dict.fromkeys(insert_result_L):
 
                 print (row)

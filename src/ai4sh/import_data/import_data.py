@@ -117,7 +117,9 @@ class Process_import_JSON(Get_schema_table):
 
                 return None
 
-            return self._Add_JSON_data()
+            success = self._Add_JSON_data()
+
+            return json_file_key if success else None
 
         else:
 
@@ -603,7 +605,7 @@ class Process_import_JSON(Get_schema_table):
 
                 return None
 
-        elif record_id:
+        elif record_id and self.verbose > 1:
 
             print ('.   🟡 Record %s already registered in %s.%s, use overwrite to update' %(column_report_name, dst_schema, dst_main_table))
 
@@ -644,6 +646,8 @@ class Process_import_JSON(Get_schema_table):
             name = 'record %s' %(record_id[0])
 
         self._Define_specifics(main_query_D,record_id, schema_table_query_D, main_table_id, name)
+
+        return True
 
     def _Legacy_array_alias(self, item):
         ''' Original x_id__x_name[_array] -> x_id__x_name alias inference, kept for
@@ -828,7 +832,7 @@ class Process_import_JSON(Get_schema_table):
 
             self._Delete({main_table_id: record_value}, schema, table, name)
 
-        else:
+        elif self.verbose > 1:
 
             print ('.     🟡 Record %s already registered in table %s, use overwrite to update' %(name, table))
 
