@@ -120,17 +120,17 @@ def Run_process(structured_process_D, scheme_params_D):
 
             elif root_process == 'plot':
                 # Iinitate the plot class
-                plot_C = Process_plot(process_S,pg_session_C)
+                plot_C = Process_plot(process_S,pg_session_C,scheme_params_D['project_root_FP'])
 
                 plot_C._Sub_process(key)
 
             elif root_process == 'machine_learning':
 
                 if process_S.process.process == 'regression_modeling':
-                    model_C = Process_regression_model(process_S, pg_session_C)
+                    model_C = Process_regression_model(process_S, pg_session_C, scheme_params_D['project_root_FP'])
                     model_C._Sub_process(key)
                 else:
-                    ml_C = Process_ml_preprocess(process_S, pg_session_C)
+                    ml_C = Process_ml_preprocess(process_S, pg_session_C, scheme_params_D['project_root_FP'])
                     ml_C._Sub_process(key)
 
             else:

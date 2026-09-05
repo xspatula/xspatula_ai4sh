@@ -29,6 +29,7 @@ from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction,
 from src.ai4sh.filter import apply_filter, apply_multi_filter
 
 from src.postgres import Get_schema_table
+from src.lib.pilot import Get_project_path
 
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
@@ -418,10 +419,11 @@ def _chem_abbrev(step_name, label, append=False):
 class Process_ml_preprocess(Get_schema_table):
     '''Machine-learning preprocessing: outlier detection per indicator.'''
 
-    def __init__(self, process_S, pg_session_C):
+    def __init__(self, process_S, pg_session_C, project_root_FP):
         self.verbose = process_S.process.verbose
         self.process_S = process_S
         self.pg_session_C = pg_session_C
+        self.project_root_FP = project_root_FP
 
     def _Sub_process(self, _json_file_key):
         if self.process_S.process.process == 'detect_outliers':
@@ -537,7 +539,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
@@ -783,7 +785,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
@@ -910,7 +912,7 @@ class Process_ml_preprocess(Get_schema_table):
         '''Parse common params, load full parquet, return input dict or None on error.'''
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return None
@@ -1077,20 +1079,20 @@ class Process_ml_preprocess(Get_schema_table):
     # ------------------------------------------------------------------ filter steps
 
     def _Resolve_filter_fp(self, filter_fp_param):
-        '''Resolve filter JSON path: relative ./... → _REPO_ROOT/ai4sh/...; absolute as-is.'''
+        '''Resolve filter JSON path: relative ./... → project root; absolute as-is.'''
         s = str(filter_fp_param).strip()
         if not s or s.lower() in ('none', 'no'):
             return None
         if os.path.isabs(s):
             return s
-        return os.path.join(_REPO_ROOT, 'ai4sh', s.lstrip('./'))
+        return Get_project_path(self.project_root_FP, s)
 
     def _Filter_spectra(self):
         p = self.process_S.process.parameters
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
@@ -1173,7 +1175,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
@@ -1284,7 +1286,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
@@ -1456,7 +1458,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
@@ -1660,7 +1662,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
@@ -1688,7 +1690,7 @@ class Process_ml_preprocess(Get_schema_table):
         # Model hyperparameters
         if model_params_param and model_params_param.lower() not in ('default', 'none', ''):
             mp_fp = (model_params_param if os.path.isabs(model_params_param)
-                     else os.path.join(_REPO_ROOT, 'ai4sh', model_params_param.lstrip('./')))
+                     else Get_project_path(self.project_root_FP, model_params_param))
         else:
             mp_fp = _DEFAULT_MODEL_PARAMS_FP
         model_params = {}

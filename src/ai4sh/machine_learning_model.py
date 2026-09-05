@@ -46,6 +46,7 @@ from sklearn.metrics import (mean_squared_error, r2_score, mean_absolute_error,
                               mean_absolute_percentage_error, median_absolute_error)
 
 from src.postgres import Get_schema_table
+from src.lib.pilot import Get_project_path
 from src.ai4sh.machine_learning_preprocess import (
     _resolve_input_parquet, _resolve_single_previous, _load_companion_json,
     _is_spectral_col, _col_to_index, _parse_array_param, _METADATA_COLS,
@@ -240,10 +241,11 @@ def _save_permutation_data(pi_result, wavelengths, model_key, indicator, mode_la
 
 class Process_regression_model(Get_schema_table):
 
-    def __init__(self, process_S, pg_session_C):
-        self.verbose      = process_S.process.verbose
-        self.process_S    = process_S
-        self.pg_session_C = pg_session_C
+    def __init__(self, process_S, pg_session_C, project_root_FP):
+        self.verbose        = process_S.process.verbose
+        self.process_S      = process_S
+        self.pg_session_C   = pg_session_C
+        self.project_root_FP = project_root_FP
 
     def _Sub_process(self, _):
         if self.process_S.process.process == 'regression_modeling':
@@ -255,7 +257,7 @@ class Process_regression_model(Get_schema_table):
             return default_fp
         if os.path.isabs(s):
             return s
-        return os.path.join(_REPO_ROOT, 'ai4sh', s.lstrip('./'))
+        return Get_project_path(self.project_root_FP, s)
 
     def _load_json_safe(self, fp, label):
         if not os.path.exists(fp):
@@ -295,7 +297,7 @@ class Process_regression_model(Get_schema_table):
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
@@ -369,7 +371,7 @@ class Process_regression_model(Get_schema_table):
 
         if model_params_param and model_params_param.lower() not in ('default', 'none', ''):
             mp_fp = (model_params_param if os.path.isabs(model_params_param)
-                     else os.path.join(_REPO_ROOT, 'ai4sh', model_params_param.lstrip('./')))
+                     else Get_project_path(self.project_root_FP, model_params_param))
         else:
             mp_fp = _DEFAULT_MODEL_PARAMS_FP
         model_params = self._load_json_safe(mp_fp, 'model_parameters')

@@ -20,6 +20,8 @@ from src.postgres import Get_schema_table
 
 from src.postgres.pg_ai4sh import PG_manage_AI4SH
 
+from src.lib.pilot import Get_project_path
+
 from src.ai4sh.chemometrics import (apply_transformations, apply_standardisation,
                                     apply_chemometrics, apply_scatter_correction,
                                     apply_scaling)
@@ -81,13 +83,15 @@ def _step_to_abbrev(step_label):
 class Process_plot(Get_schema_table):
     '''Plot indicator distributions (boxplot, histogram) from a saved Parquet dataset.'''
 
-    def __init__(self, process_S, pg_session_C):
+    def __init__(self, process_S, pg_session_C, project_root_FP):
 
         self.verbose = process_S.process.verbose
 
         self.process_S = process_S
 
         self.pg_session_C = pg_session_C
+
+        self.project_root_FP = project_root_FP
 
         self.pg_ai4sh_C = PG_manage_AI4SH(pg_session_C)
 
@@ -471,7 +475,7 @@ class Process_plot(Get_schema_table):
         # Support relative paths via Full_path_locate if not absolute
         if not os.path.isabs(project_root_fp):
             # Resolve relative to repo root
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
 
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
@@ -548,7 +552,7 @@ class Process_plot(Get_schema_table):
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
@@ -641,7 +645,7 @@ class Process_plot(Get_schema_table):
         '''
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
-            project_root_fp = os.path.join(_REPO_ROOT, 'ai4sh', project_root_fp.lstrip('./'))
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
         if not os.path.exists(project_root_fp):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return None, None, None, None, None, None, None, None
