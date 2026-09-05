@@ -635,6 +635,9 @@ class Scheme_params():
 
                         continue
                     try:
+                        # For the special case where an id is searched from the id defining table itself
+                        if inherit_rec[4].endswith('_id') and inherit_rec[2] == inherit_rec[4].split('_')[0]:
+                            inherit_rec[4] = 'id'
                         inhereted_rec = session._Single_search( {inherit_rec[4]:foreign_key[0]}, [inherit_rec[3]], inherit_rec[1], inherit_rec[2])
                     except:
 
