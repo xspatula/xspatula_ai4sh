@@ -1,7 +1,7 @@
 {
     "process": {
         "job_folder": "delete_db",
-        "process_sub_folder": "json_delete",
-        "pilot_file": "db_xspatula_delete.txt"
+        "process_sub_folder": "json",
+        "pilot_file": "db_delete.txt"
     }
 }

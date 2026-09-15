@@ -96,3 +96,13 @@ ai4sh/user_management/organisation/excel/
 ai4sh/user_management/organisation/manage_process/
 ai4sh/user_management/user/excel/
 ai4sh/user_management/user/manage_process/
+
+# =============================================================
+# LUCAS separate data
+# =============================================================
+lucas/
+
+# =============================================================
+# Files created at run time
+# =============================================================
+setup/zzz/lucas/setup_db/db_audit.txt

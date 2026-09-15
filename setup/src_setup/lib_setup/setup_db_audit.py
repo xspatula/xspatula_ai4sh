@@ -6,14 +6,14 @@
  @details Reads the inline "audit": {"INSERT":bool,"UPDATE":bool,"DELETE":bool}
  key that create_table blocks may carry, and uses it to assemble and
  sync-to-disk the per-schema audit_triggers_<schema>_v10_sql.json config,
- plus a pilot file (db_xspatula_ai4sh_audit.txt) listing every file that
+ plus a pilot file (db_audit.txt) listing every file that
  needs to run to bring the database's audit triggers in line with that
  config. Pure file I/O - no database connection, no DDL, safe to call
  unconditionally on every setup_db.ipynb run.
 
  Deliberately disentangled from actually applying the triggers to a database:
  this module only ever writes JSON/text config files. Running the generated
- pilot file (job_setup_audit.json -> db_xspatula_ai4sh_audit.txt) through
+ pilot file (job_setup_audit.json -> db_audit.txt) through
  Initiate_audit() in setup_db_initiate.py - a separate, optional notebook
  cell - is what executes the CREATE TRIGGER calls for real, via the same
  Setup_schemas_tables dispatcher the main setup pass already uses. That
@@ -51,7 +51,7 @@ EVENT_ORDER = ["INSERT", "UPDATE", "DELETE"]
 
 BOOTSTRAP_FILES = ["audit_table_v10_sql.json", "audit_function_v10_sql.json", "audit_triggers_audit_v10_sql.json"]
 
-AUDIT_PILOT_FILE = "db_xspatula_ai4sh_audit.txt"
+AUDIT_PILOT_FILE = "db_audit.txt"
 
 # audit.if_modified_func() inserts into audit.logged_actions on every trigger
 # fire; an INSERT trigger on that same table would make that internal insert
@@ -275,7 +275,7 @@ def _Merge_schema_trigger_file(audit_dir_FP, schema, found_S, deleted_S, desired
 
 def _Write_audit_pilot_file(setup_db_dir_FP, schema_L, dry_run, verbose):
     """
-    @brief Writes db_xspatula_ai4sh_audit.txt - the pilot file a separate,
+    @brief Writes db_audit.txt - the pilot file a separate,
     optional notebook cell (Initiate_audit) runs to actually apply the audit
     config assembled by this module.
 
