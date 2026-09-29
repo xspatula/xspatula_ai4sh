@@ -1,0 +1,69 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "organism_utility",
+        "table": "taxon_function",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "organism_utility",
+        "table": "taxon_function",
+        "command": {
+          "columns": [
+            "name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "chemoheterotrophy",
+              "organism with a metabolic pathway that gets both energy and carbon by consuming pre-formed organic compounds"
+            ],
+            [
+              "human pathogens all",
+              "summary of recognised human pathogens, usually from environmental DNA (eDNA) analysis"
+            ],
+            [
+              "nitrogen fixation",
+              "microorganisms that convert inert atmospheric nitrogen gas into plant accessible nitrogen compounds"
+            ],
+            [
+              "ectomycorrhizal fungi",
+              "symbiotic fungi that form a protective sheath around plant root tips and exchange soil nutrients for plant sugars without penetrating the plant's cells"
+            ],
+            [
+              "arbuscular mycorrhizal fungi",
+              "beneficial soil microorganisms that form a close, mutually supportive partnership with the roots of terrestrial plant species"
+            ],
+            [
+              "saprotrophs",
+              "organisms that get their food and energy by breaking down dead and decaying organic matter"
+            ],
+            [
+              "plant pathogens",
+              "organisms that infect plants and cause disease"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

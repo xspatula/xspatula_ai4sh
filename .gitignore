@@ -78,17 +78,40 @@ notes/
 # =============================================================
 # JSON data
 # =============================================================
-ai4sh/import_data/dataset/
-ai4sh/import_data/digit_soil/
+ai4sh/import_data/aggstab/excel/
+ai4sh/import_data/aggstab/insert_process/staging/
+ai4sh/import_data/dataset/excel/
+ai4sh/import_data/dataset/insert_process/staging/
+ai4sh/import_data/digit_soil/excel/
+ai4sh/import_data/digit_soil/insert_process/staging/
 ai4sh/import_data/DS2500_spectra/
+ai4sh/import_data/DS2500_eDNA/excel/
+ai4sh/import_data/DS2500_eDNA/insert_process/staging/
 ai4sh/import_data/FTIR_spectra/
+ai4sh/import_data/infiltration/excel/
+ai4sh/import_data/infiltration/insert_process/staging/
 ai4sh/import_data/LIBS_spectra/
+ai4sh/import_data/microbiometer/excel/
+ai4sh/import_data/microbiometer/insert_process/staging/
 ai4sh/import_data/neospectra/
 ai4sh/import_data/OSSL/
-ai4sh/import_data/sample/
+ai4sh/import_data/sample/excel/
+ai4sh/import_data/sample/insert_process/staging/
+ai4sh/import_data/soil_respiration/excel/
+ai4sh/import_data/soil_respiration/insert_process/staging/
 ai4sh/import_data/utility/
-ai4sh/import_data/wetlab/
-ai4sh/import_data/
+ai4sh/import_data/wetlab/agrolab/excel/
+ai4sh/import_data/wetlab/agrolab/insert_process/staging/
+ai4sh/import_data/wetlab/auth/excel/
+ai4sh/import_data/wetlab/auth/insert_process/staging/
+ai4sh/import_data/wetlab/i-bec/excel/
+ai4sh/import_data/wetlab/i-bec/insert_process/staging/
+ai4sh/import_data/wetlab/neiker/excel/
+ai4sh/import_data/wetlab/neiker/insert_process/staging/
+ai4sh/import_data/wetlab/slu/excel/
+ai4sh/import_data/wetlab/slu/insert_process/staging/
+ai4sh/import_data/wetlab/veltia/excel/
+ai4sh/import_data/wetlab/veltia/insert_process/staging/
 
 # Registration intake and generated output contain real applicant PII (names, emails) -
 # unlike ai4sh/import_data/*, never tracked, not even a filled template.
@@ -106,3 +129,17 @@ lucas/
 # Files created at run time
 # =============================================================
 setup/zzz/lucas/setup_db/db_audit.txt
+
+# =============================================================
+# eDNA buildup to be excluded from version control
+# =============================================================
+ai4sh/import_data/eDNA/raw_data_scripts_tests/
+
+# regenerable eDNA data: CLI master input and outputs, import staging
+ai4sh/import_data/eDNA/excel/
+ai4sh/import_data/eDNA/insert_process/staging/
+ai4sh/import_data/eDNA/manage_process/
+ai4sh/import_data/prepare_ai4sh_data/edna/excel/
+ai4sh/import_data/prepare_ai4sh_data/edna/report/
+.~lock.*#
+setup/zzz/ai4sh/setup_db/db_audit.txt

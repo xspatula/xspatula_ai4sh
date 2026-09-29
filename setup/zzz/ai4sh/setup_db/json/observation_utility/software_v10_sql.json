@@ -10,7 +10,7 @@
         "command": [
           "id SERIAL",
           "name TEXT",
-          "version TEXT",
+          "version TEXT NOT NULL DEFAULT 'unspecified'",
           "url TEXT",
           "doi TEXT",
           "abstract TEXT",
@@ -22,6 +22,75 @@
         "INSERT": true,
         "UPDATE": true,
         "DELETE": true
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "software",
+        "command": {
+          "columns": [
+            "name",
+            "version",
+            "url",
+            "doi",
+            "abstract"
+          ],
+          "values": [
+            [
+              "qiime2",
+              "2024.10",
+              "https://qiime2.org",
+              "10.1038/s41587-019-0209-9",
+              "Quantitative Insights Into Microbial Ecology 2, platform for amplicon (metabarcoding) bioinformatics, including demultiplexing and taxonomic annotation"
+            ],
+            [
+              "flash",
+              "unspecified",
+              "https://ccb.jhu.edu/software/FLASH/",
+              "10.1093/bioinformatics/btr507",
+              "Fast Length Adjustment of SHort reads, merges paired-end reads into single tags"
+            ],
+            [
+              "fastp",
+              "unspecified",
+              "https://github.com/OpenGene/fastp",
+              "10.1093/bioinformatics/bty560",
+              "Quality control and filtering of sequencing reads"
+            ],
+            [
+              "vsearch",
+              "unspecified",
+              "https://github.com/torognes/vsearch",
+              "10.7717/peerj.2584",
+              "Sequence search and clustering tool, used for chimera detection and removal"
+            ],
+            [
+              "dada2",
+              "unspecified",
+              "https://benjjneb.github.io/dada2/",
+              "10.1038/nmeth.3869",
+              "Divisive Amplicon Denoising Algorithm, infers exact amplicon sequence variants (ASV)"
+            ],
+            [
+              "faprotax",
+              "unspecified",
+              "https://pages.uoregon.edu/slouca/LoucaLab/archive/FAPROTAX/",
+              "10.1126/science.aaf4507",
+              "Functional Annotation of Prokaryotic Taxa, maps prokaryote taxa to metabolic and ecological functions"
+            ],
+            [
+              "funguild",
+              "unspecified",
+              "https://github.com/UMNFuN/FUNGuild",
+              "10.1016/j.funeco.2015.06.004",
+              "Fungal Functional Guild, assigns fungal taxa to trophic modes and functional guilds"
+            ]
+          ]
+        }
       }
     }
   ]

@@ -1,0 +1,151 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_lab_protocol",
+        "min_user_stratum": 4,
+        "title": "Manage lab protocol",
+        "label": "Insert, update or delete laboratory protocol."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unique name of the laboratory protocol.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "lab_protocol",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "protocol_type",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Type of laboratory protocol.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "lab_protocol",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "kit",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": null,
+              "hint": "If the protocol is based on a kit, state the kit.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "lab_protocol",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "manufacturer",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": null,
+              "hint": "The producer of the kit, if applicable.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "lab_protocol",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "forward_name",
+              "parameter_type": "platform",
+              "required": false,
+              "default_value": null,
+              "hint": "Any required platform for the protocol.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "lab_protocol",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "strategy",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": null,
+              "hint": "If the protocol is following a strategy, enter the strategy, otherwide null.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "lab_protocol",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "data_requirement",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": null,
+              "hint": "If the protocol requires a datastrategy, otherwise null",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "lab_protocol",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "abstract describing the laboratory method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "lab_protocol",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

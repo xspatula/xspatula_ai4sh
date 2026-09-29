@@ -35,6 +35,27 @@
               "required": true,
               "default_value": "",
               "hint": "Absolute or relative destination path for writing the staging json process file"
+            },
+            {
+              "parameter": "taxonomy_reference",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Only for target process manage_taxon: default taxonomy reference name (e.g. silva), overridden per row by a taxonomy_reference column"
+            },
+            {
+              "parameter": "taxonomy_reference_version",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "unspecified",
+              "hint": "Only for target process manage_taxon: default taxonomy reference version, overridden per row by a taxonomy_reference_version column"
+            },
+            {
+              "parameter": "method_pipeline",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Only for target process manage_edna_asv: name of the method pipeline (observation_utility.method_pipeline) that produced the ASVs, e.g. ai4sh-16s"
             }
           ]
         }

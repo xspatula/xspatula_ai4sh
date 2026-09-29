@@ -22,6 +22,14 @@ from src.postgres import Get_schema_table
 
 from src.postgres.pg_ai4sh import PG_manage_AI4SH
 
+from src.ai4sh.import_data.import_taxon import Process_import_taxon, TARGET_PROCESS as TAXON_PROCESS
+
+from src.ai4sh.import_data.import_edna_asv import Process_import_edna_asv, TARGET_PROCESS as EDNA_ASV_PROCESS
+
+# Target processes bulk loaded with COPY instead of row by row, and their handler class
+BULK_PROCESS_D = {TAXON_PROCESS: Process_import_taxon,
+                  EDNA_ASV_PROCESS: Process_import_edna_asv}
+
 # Column names whose values must never be forced to lowercase during import.
 # Add entries here to extend the exclusion list.
 NO_LOWER_COLS = frozenset({
@@ -93,6 +101,13 @@ class Process_import_JSON(Get_schema_table):
         self.pg_session_C.failed_process_count = getattr(self.pg_session_C, 'failed_process_count', 0) + 1
 
     def _Sub_process(self, json_file_key):
+
+        # Bulk data (taxa, eDNA ASVs) is loaded with COPY, not row by row - see BULK_PROCESS_D
+        for target in (self.process_S.process.process, getattr(self.process_S.process.parameters, 'process', None)):
+
+            if target in BULK_PROCESS_D:
+
+                return BULK_PROCESS_D[target](self.process_S, self.pg_session_C, self.project_root_FP, self.scheme_params_D)._Sub_process(json_file_key)
 
         # Direct to subprocess
         if self.process_S.process.process.startswith('translate'):

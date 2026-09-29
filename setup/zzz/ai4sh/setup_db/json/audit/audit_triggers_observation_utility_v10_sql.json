@@ -516,40 +516,6 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "taxa_level",
-        "trigger": "taxa_level_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "taxa_status",
-        "trigger": "taxa_status_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
         "table": "transportation",
         "trigger": "transportation_audit",
         "timing": "AFTER",
@@ -838,57 +804,6 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "taxa",
-        "trigger": "taxa_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "taxa_parity",
-        "trigger": "taxa_parity_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "taxa_function",
-        "trigger": "taxa_function_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
         "table": "unit_translate",
         "trigger": "unit_translate_audit",
         "timing": "AFTER",
@@ -922,161 +837,76 @@
       "delete": false,
       "parameters": {
         "schema": "observation_utility",
-        "table": "edna_extraction",
-        "trigger": "edna_extraction_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "edna_amplification",
-        "trigger": "edna_amplification_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "edna_purification",
-        "trigger": "edna_purification_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "edna_sequencing",
-        "trigger": "edna_sequencing_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "edna_metabarcoding_pipeline",
-        "trigger": "edna_metabarcoding_pipeline_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "edna_bioinformatics",
-        "trigger": "edna_bioinformatics_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "edna_nucleotide_archive",
-        "trigger": "edna_nucleotide_archive_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "edna_reference_db",
-        "trigger": "edna_reference_db_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
-        "table": "edna_sequence_library",
-        "trigger": "edna_sequence_library_audit",
-        "timing": "AFTER",
-        "events": [
-          "INSERT",
-          "UPDATE",
-          "DELETE"
-        ],
-        "function": "audit.if_modified_func"
-      }
-    },
-    {
-      "process_id": "create_trigger",
-      "overwrite": true,
-      "delete": false,
-      "parameters": {
-        "schema": "observation_utility",
         "table": "macrofauna_image_setting",
         "trigger": "macrofauna_image_setting_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "edna_primer_pair",
+        "trigger": "edna_primer_pair_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "lab_protocol",
+        "trigger": "lab_protocol_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "method_pipeline",
+        "trigger": "method_pipeline_audit",
+        "timing": "AFTER",
+        "events": [
+          "INSERT",
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "audit.if_modified_func"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "method_pipeline_step",
+        "trigger": "method_pipeline_step_audit",
         "timing": "AFTER",
         "events": [
           "INSERT",

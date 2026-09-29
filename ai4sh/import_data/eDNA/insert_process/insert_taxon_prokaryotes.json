@@ -1,0 +1,15 @@
+{
+  "process": [
+    {
+      "process": "insert_tabular_data",
+      "overwrite": true,
+      "parameters": {
+        "process": "manage_taxon",
+        "tabular_data_path": "import_data/eDNA/excel/taxa_prokaryotes_singlecolumn.xlsx",
+        "dst_path": "import_data/eDNA/insert_process/staging/taxon_prokaryotes",
+        "taxonomy_reference": "silva",
+        "taxonomy_reference_version": "unspecified"
+      }
+    }
+  ]
+}

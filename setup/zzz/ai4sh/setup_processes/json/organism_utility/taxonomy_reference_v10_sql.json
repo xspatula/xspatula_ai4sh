@@ -1,0 +1,95 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_taxonomy_reference",
+        "min_user_stratum": 3,
+        "title": "Manage a taxonomy reference",
+        "label": "Insert, update or delete a taxonomy_reference"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the taxonomy reference",
+              "schema_table": {
+                "schema": "organism_utility",
+                "table": "taxonomy_reference",
+                "write": true
+              }
+            },
+            {
+              "parameter": "version",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "unspecified",
+              "hint": "The version of the taxonomy reference.",
+              "schema_table": {
+                "schema": "organism_utility",
+                "table": "taxonomy_reference",
+                "write": true
+              }
+            },
+            {
+              "parameter": "marker_gene",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "unspecified",
+              "hint": "The marker gene of the taxonomy reference.",
+              "schema_table": {
+                "schema": "organism_utility",
+                "table": "taxonomy_reference",
+                "write": true
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The url of the taxonomy reference.",
+              "schema_table": {
+                "schema": "organism_utility",
+                "table": "taxonomy_reference",
+                "write": true
+              }
+            },
+            {
+              "parameter": "doi",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The doi of the taxonomy reference.",
+              "schema_table": {
+                "schema": "organism_utility",
+                "table": "taxonomy_reference",
+                "write": true
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Short abstract explaining the taxonomy reference.",
+              "schema_table": {
+                "schema": "organism_utility",
+                "table": "taxonomy_reference",
+                "write": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "process": [
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "analysis_method",
+        "command": {
+          "columns": [
+            "name",
+            "display_name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "ai4sh 16s metabarcoding",
+              "AI4SH 16S metabarcoding",
+              "Soil prokaryote (bacteria and archaea) community composition, diversity and function from eDNA metabarcoding of the 16S rRNA V4 region"
+            ],
+            [
+              "ai4sh its metabarcoding",
+              "AI4SH ITS metabarcoding",
+              "Soil fungal community composition, diversity and function from eDNA metabarcoding of the ITS2 region"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "method_pipeline",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "version TEXT NOT NULL DEFAULT 'unspecified'",
+          "analysis_method_id INTEGER NOT NULL REFERENCES observation_utility.analysis_method (id)",
+          "url TEXT",
+          "doi TEXT",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "method_pipeline_step",
+        "command": [
+          "id SERIAL",
+          "method_pipeline_id INTEGER NOT NULL REFERENCES observation_utility.method_pipeline (id)",
+          "step SMALLINT NOT NULL",
+          "stage TEXT NOT NULL CHECK (stage IN ('laboratory','bioinformatics'))",
+          "name TEXT NOT NULL",
+          "lab_protocol_id INTEGER REFERENCES observation_utility.lab_protocol (id)",
+          "edna_primer_pair_id INTEGER REFERENCES observation_utility.edna_primer_pair (id)",
+          "software_id INTEGER REFERENCES observation_utility.software (id)",
+          "taxonomy_reference_id INTEGER REFERENCES organism_utility.taxonomy_reference (id)",
+          "parameters JSONB NOT NULL DEFAULT '{}'::JSONB",
+          "abstract TEXT",
+          "UNIQUE (method_pipeline_id, step)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "execute_sql",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "sql": [
+          "INSERT INTO observation_utility.method_pipeline (name, analysis_method_id, abstract)\nSELECT v.name, am.id, v.abstract FROM (VALUES\n('ai4sh-16s', 'ai4sh 16s metabarcoding', 'Soil prokaryote (bacteria and archaea) community composition, diversity and function from eDNA metabarcoding of the 16S rRNA V4 region'),\n('ai4sh-its', 'ai4sh its metabarcoding', 'Soil fungal community composition, diversity and function from eDNA metabarcoding of the ITS2 region')\n) AS v(name, analysis_method, abstract)\nJOIN observation_utility.analysis_method am ON am.name = v.analysis_method\nON CONFLICT (name) DO NOTHING;"
+        ]
+      }
+    },
+    {
+      "process_id": "execute_sql",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "sql": [
+          "DO $body$\nDECLARE v_missing TEXT;\nBEGIN\n    CREATE TEMP TABLE _pipeline_step_seed ON COMMIT DROP AS SELECT v.*, p.id AS method_pipeline_id, lp.id AS lab_protocol_id, pp.id AS edna_primer_pair_id, sw.id AS software_id, tr.id AS taxonomy_reference_id\n    FROM (VALUES\n('ai4sh-16s', 1, 'laboratory', 'extraction', 'zymobiomics dna miniprep', NULL, NULL, NULL, NULL, NULL, '{}', 'DNA extraction from soil'),\n('ai4sh-16s', 2, 'laboratory', 'amplification', 'pcr amplification', '515f-806r modified', NULL, NULL, NULL, NULL, '{}', 'PCR amplification of the marker region with forward and reverse primer used together'),\n('ai4sh-16s', 3, 'laboratory', 'purification', 'magnetic bead purification', NULL, NULL, NULL, NULL, NULL, '{}', 'Purification of amplicons'),\n('ai4sh-16s', 4, 'laboratory', 'sequencing', 'illumina pe250', NULL, NULL, NULL, NULL, NULL, '{}', 'Amplicon sequencing'),\n('ai4sh-16s', 5, 'bioinformatics', 'demultiplexing and primer trimming', NULL, NULL, NULL, NULL, NULL, NULL, '{\"barcode_mismatches\": null, \"primer_trimming\": true}', 'Assigns pooled reads to samples by barcode and removes barcode and primer sequences'),\n('ai4sh-16s', 6, 'bioinformatics', 'paired-end merging', NULL, NULL, 'flash', 'unspecified', NULL, NULL, '{\"min_overlap\": null, \"max_overlap\": null, \"max_mismatch_density\": null}', 'Merges forward and reverse reads into tags'),\n('ai4sh-16s', 7, 'bioinformatics', 'quality filtering', NULL, NULL, 'fastp', 'unspecified', NULL, NULL, '{\"min_phred_score\": null, \"min_length\": null}', 'Removes low quality tags'),\n('ai4sh-16s', 8, 'bioinformatics', 'chimera removal', NULL, NULL, 'vsearch', 'unspecified', NULL, NULL, '{\"method\": null}', 'Detects and removes chimeric sequences, yielding effective tags'),\n('ai4sh-16s', 9, 'bioinformatics', 'asv inference', NULL, NULL, 'dada2', 'unspecified', NULL, NULL, '{\"trunc_len_forward\": null, \"trunc_len_reverse\": null}', 'Denoising into amplicon sequence variants (ASV)'),\n('ai4sh-16s', 10, 'bioinformatics', 'taxonomic annotation', NULL, NULL, 'qiime2', '2024.10', 'silva', 'unspecified', '{\"classifier\": null, \"confidence_threshold\": null}', 'Assigns taxonomy to each ASV against the taxonomy reference'),\n('ai4sh-16s', 11, 'bioinformatics', 'functional prediction', NULL, NULL, 'faprotax', 'unspecified', NULL, NULL, '{}', 'Maps annotated taxa to ecological functions'),\n('ai4sh-16s', 12, 'bioinformatics', 'diversity indices', NULL, NULL, 'qiime2', '2024.10', NULL, NULL, '{\"indices\": [\"observed_richness\", \"chao1\", \"dominance\", \"pielou_e\", \"shannon\", \"simpson\"], \"rarefaction_depth\": 20000}', 'Alpha diversity indices per sample'),\n('ai4sh-its', 1, 'laboratory', 'extraction', 'zymobiomics dna miniprep', NULL, NULL, NULL, NULL, NULL, '{}', 'DNA extraction from soil'),\n('ai4sh-its', 2, 'laboratory', 'amplification', 'pcr amplification', 'gits7-its4', NULL, NULL, NULL, NULL, '{}', 'PCR amplification of the marker region with forward and reverse primer used together'),\n('ai4sh-its', 3, 'laboratory', 'purification', 'magnetic bead purification', NULL, NULL, NULL, NULL, NULL, '{}', 'Purification of amplicons'),\n('ai4sh-its', 4, 'laboratory', 'sequencing', 'illumina pe250', NULL, NULL, NULL, NULL, NULL, '{}', 'Amplicon sequencing'),\n('ai4sh-its', 5, 'bioinformatics', 'demultiplexing and primer trimming', NULL, NULL, NULL, NULL, NULL, NULL, '{\"barcode_mismatches\": null, \"primer_trimming\": true}', 'Assigns pooled reads to samples by barcode and removes barcode and primer sequences'),\n('ai4sh-its', 6, 'bioinformatics', 'paired-end merging', NULL, NULL, 'flash', 'unspecified', NULL, NULL, '{\"min_overlap\": null, \"max_overlap\": null, \"max_mismatch_density\": null}', 'Merges forward and reverse reads into tags'),\n('ai4sh-its', 7, 'bioinformatics', 'quality filtering', NULL, NULL, 'fastp', 'unspecified', NULL, NULL, '{\"min_phred_score\": null, \"min_length\": null}', 'Removes low quality tags'),\n('ai4sh-its', 8, 'bioinformatics', 'chimera removal', NULL, NULL, 'vsearch', 'unspecified', NULL, NULL, '{\"method\": null}', 'Detects and removes chimeric sequences, yielding effective tags'),\n('ai4sh-its', 9, 'bioinformatics', 'asv inference', NULL, NULL, 'dada2', 'unspecified', NULL, NULL, '{\"trunc_len_forward\": null, \"trunc_len_reverse\": null}', 'Denoising into amplicon sequence variants (ASV)'),\n('ai4sh-its', 10, 'bioinformatics', 'taxonomic annotation', NULL, NULL, 'qiime2', '2024.10', 'unite', 'unspecified', '{\"classifier\": null, \"confidence_threshold\": null}', 'Assigns taxonomy to each ASV against the taxonomy reference'),\n('ai4sh-its', 11, 'bioinformatics', 'functional prediction', NULL, NULL, 'funguild', 'unspecified', NULL, NULL, '{}', 'Maps annotated taxa to ecological functions'),\n('ai4sh-its', 12, 'bioinformatics', 'diversity indices', NULL, NULL, 'qiime2', '2024.10', NULL, NULL, '{\"indices\": [\"observed_richness\", \"chao1\", \"dominance\", \"pielou_e\", \"shannon\", \"simpson\"], \"rarefaction_depth\": 20000}', 'Alpha diversity indices per sample')\n    ) AS v(pipeline, step, stage, name, lab_protocol, primer_pair, software, software_version, taxonomy_reference, taxonomy_reference_version, parameters, abstract)\n    LEFT JOIN observation_utility.method_pipeline p ON p.name = v.pipeline\n    LEFT JOIN observation_utility.lab_protocol lp ON lp.name = v.lab_protocol\n    LEFT JOIN observation_utility.edna_primer_pair pp ON pp.name = v.primer_pair\n    LEFT JOIN observation_utility.software sw ON sw.name = v.software AND sw.version = v.software_version\n    LEFT JOIN organism_utility.taxonomy_reference tr ON tr.name = v.taxonomy_reference AND tr.version = v.taxonomy_reference_version;\n    SELECT string_agg(pipeline || ' step ' || step, ', ') INTO v_missing FROM _pipeline_step_seed\n    WHERE method_pipeline_id IS NULL\n       OR (lab_protocol IS NOT NULL AND lab_protocol_id IS NULL)\n       OR (primer_pair IS NOT NULL AND edna_primer_pair_id IS NULL)\n       OR (software IS NOT NULL AND software_id IS NULL)\n       OR (taxonomy_reference IS NOT NULL AND taxonomy_reference_id IS NULL);\n    IF v_missing IS NOT NULL THEN\n        RAISE EXCEPTION 'method_pipeline_step seed: unresolved reference (name/version not in catalogue) for %', v_missing;\n    END IF;\n    INSERT INTO observation_utility.method_pipeline_step (method_pipeline_id, step, stage, name, lab_protocol_id, edna_primer_pair_id, software_id, taxonomy_reference_id, parameters, abstract)\n    SELECT method_pipeline_id, step::SMALLINT, stage, name, lab_protocol_id, edna_primer_pair_id, software_id, taxonomy_reference_id, parameters::JSONB, abstract FROM _pipeline_step_seed\n    ON CONFLICT (method_pipeline_id, step) DO NOTHING;\nEND\n$body$;"
+        ]
+      }
+    }
+  ]
+}

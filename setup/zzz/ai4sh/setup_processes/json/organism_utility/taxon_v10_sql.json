@@ -1,0 +1,37 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_taxon",
+        "min_user_stratum": 3,
+        "title": "Manage taxon lineages",
+        "label": "Bulk insert of taxon lineages to organism_utility.taxon with postgres COPY, rank by rank. Insert only: existing taxa are kept, new taxa added."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "taxon_data_path",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Path to the canonical lineage csv written by translate_tabular_data with target process manage_taxon"
+            },
+            {
+              "parameter": "dst_path",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional folder where the csv source of each per-rank COPY is written for inspection"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

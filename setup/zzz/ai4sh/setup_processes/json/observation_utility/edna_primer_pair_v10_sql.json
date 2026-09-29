@@ -1,0 +1,199 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_edna_primer_pair",
+        "min_user_stratum": 4,
+        "title": "Manage eDNA primer_pair method",
+        "label": "Insert, update or delete eDNA forward/reverse primer_pair method."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unique name of the eDNA primer_pair method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "marker_gene",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Marker gene of the eDNA primer pair method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "target_region",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Target region of the eDNA primer pair method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "target_group",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Target group of the eDNA primer pair method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "forward_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Forward amplifier of the eDNA primer pair method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "forward_sequence",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Forward sequence of the eDNA primer pair method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "reverse_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Reverse amplifier of the eDNA primer pair method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "reverse_sequence",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Reverse sequence of the eDNA primer pair method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "url of the amplification method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "doi",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "doi of the amplification method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "abstract describing the amplification method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "edna_primer_pair",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

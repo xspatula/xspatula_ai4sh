@@ -1,0 +1,2 @@
+provision_id__provision_name,contact_name,contact_email,abstract,preparation_id__preparation_name,preservation_id__preservation_name,storage_id__storage_name,transportation_id__transportation_name,laboratory
+ai4sh-metabarcoding,Lur Epelde,lepelde@neiker.eus,,none,dna/rna shield,cold,cold,True

@@ -1,0 +1,35 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_run_step",
+        "command": [
+          "observation_id BIGINT NOT NULL REFERENCES observation.observation (id)",
+          "method_pipeline_step_id INTEGER NOT NULL REFERENCES observation_utility.method_pipeline_step (id)",
+          "reads_in INTEGER",
+          "reads_out INTEGER",
+          "PRIMARY KEY (observation_id, method_pipeline_step_id)"
+        ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "execute_sql",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "sql": [
+          "COMMENT ON TABLE observation.edna_run_step IS 'Reads entering and leaving each bioinformatics step (demultiplexing, merging, quality filtering, chimera removal, ASV inference) per observation, e.g. from the DADA2 denoising stats';"
+        ]
+      }
+    }
+  ]
+}

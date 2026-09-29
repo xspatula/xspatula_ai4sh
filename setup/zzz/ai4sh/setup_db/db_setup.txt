@@ -114,9 +114,6 @@ observation_utility/macrofauna_v10_sql.json
 # Inserted with id = 0 for unknown/undisclosed method tier.
 observation_utility/method_tier_v10_sql.json
 
-# Micobiometer kit version (microbiometer is citizen scientist tool for soil microbiota).
-observation_utility/microbiometer_version_v10_sql.json
-
 # Monolith extraction method (e.g. block of soil, sediment or ice-core).
 # Inserted with id = 0 for unknown/undisclosed method.
 observation_utility/monolith_extraction_v10_sql.json
@@ -163,12 +160,6 @@ observation_utility/spectroscopy_method_v10_sql.json
 # Storage method for acquired samples before analysis.
 # Inserted with id = 0 for no relevance.
 observation_utility/storage_v10_sql.json
-
-# Taxa levels in the Linnean classification system.
-observation_utility/taxa_level_v10_sql.json
-
-# Taxa status to handle outdated and redundant taxa definitions.
-observation_utility/taxa_status_v10_sql.json
 
 # transportation method/conditions for acquired samples before analysis (e.g. cold, frozen).
 # Inserted with id = 0 for no relevance.
@@ -218,38 +209,57 @@ observation_utility/spectrometer_v10_sql.json
 # requires: quantity, species, unit.
 observation_utility/quantity_default_unit_v10_sql.json
 
-# Taxa defines arbitrary taxa with its Linnean classification level
-# requires: taxa_level, taxa_status
-observation_utility/taxa_v10_sql.json
-
-# Taxa function defines ecosystem functions related to a taxa
-# requires: taxa_level, taxa_status.
-observation_utility/taxa_function_v10_sql.json
-
 # Unit translate defines the mathematical translation between different units
 # requires: unit.
 observation_utility/unit_translate_v10_sql.json
 
-# eDNA utility (software, sequence_library, nucleotide_archive, extraction,
-# amplification, purification, sequencing, metabarcoding_pipeline, bioinformatics).
-# Folded into observation_utility (was a separate edna_utility schema) -
-# structurally it's just more reference/lookup data, same as the rest of this
-# section, and it already leans on
-# observation_utility.reference_proprietor/analysis_method/taxa/taxa_function/unit.
-# Split from a single edna_v10_sql.json into per-table files 2026-08-17.
-# metabarcoding_pipeline requires extraction/amplification/purification/sequencing,
-# so those four must precede it; the rest have no interdependencies.
-# requires: reference_proprietor, analysis_method, taxa, taxa_function, unit.
+# Software used in analysis pipelines (e.g. eDNA bioinformatics), with version, url and doi.
 observation_utility/software_v10_sql.json
-observation_utility/edna_extraction_v10_sql.json
-observation_utility/edna_amplification_v10_sql.json
-observation_utility/edna_purification_v10_sql.json
-observation_utility/edna_sequencing_v10_sql.json
-observation_utility/edna_Metabarcoding_pipeline_v10_sql.json
-observation_utility/edna_bioiformatics_v10_sql.json
-observation_utility/edna_nucleotide_archive_v10_sql.json
-observation_utility/edna_reference_db_v10_sql.json
-observation_utility/edna_sequence_library_v10_sql.json
+
+# eDNA primer pair (forward + reverse primer used together in PCR), with marker gene and target group.
+observation_utility/edna_primer_pair_v10_sql.json
+
+# Lab protocol for laboratory steps (extraction, amplification, purification, sequencing ...).
+observation_utility/lab_protocol_v10_sql.json
+
+###===========================================###
+### ORGANISM UTILITIES ###
+###===========================================###
+#!!!!! Biological reference data: taxonomy and taxon functions.
+#!!!!! Must precede OBSERVATION (macrofauna references taxon).
+
+# Taxonomy reference (e.g. SILVA, UNITE, GBIF backbone) with release version.
+organism_utility/taxonomy_reference_v10_sql.json
+
+# Taxon rank in the Linnean classification system, with lineage prefix (k__, p__ ...).
+organism_utility/taxon_rank_v10_sql.json
+
+# Taxon status (accepted, synonym).
+organism_utility/taxon_status_v10_sql.json
+
+# Taxon defines a taxonomic tree node (parent, rank, status, source reference).
+# requires: taxon_rank, taxon_status, taxonomy_reference.
+organism_utility/taxon_v10_sql.json
+
+# Taxon parity links synonymous taxa.
+# requires: taxon.
+organism_utility/taxon_parity_v10_sql.json
+
+# Taxon function defines ecosystem functions (e.g. FAPROTAX, FUNGuild categories).
+organism_utility/taxon_function_v10_sql.json
+
+###===========================================###
+### METHOD PIPELINES ###
+###===========================================###
+#!!!!! Multi-step analysis methods (e.g. eDNA metabarcoding), one row per step.
+#!!!!! Placed after ORGANISM UTILITIES as steps reference organism_utility.taxonomy_reference.
+
+# Method pipeline (linked to analysis_method) and its numbered steps, each referencing
+# lab_protocol, edna_primer_pair, software (name + version) and taxonomy_reference (name + version).
+# Also inserts the analysis_method rows for the ai4sh-16s and ai4sh-its pipelines.
+# Step seeds raise an error if any referenced name/version is missing from its catalogue.
+# requires: analysis_method, lab_protocol, edna_primer_pair, software, taxonomy_reference.
+observation_utility/method_pipeline_v10_sql.json
 
 ###===========================================###
 ### OBSERVATION ###
@@ -314,30 +324,16 @@ observation/macrofauna_image_v10_sql.json
 # Measurement links together an observation and an indicator
 observation/measurement_v10_sql.json
 
-# eDNA metabarcoding pipeline output tables (demux_trim/feature_abundance,
-# fastp_qc, denoise, chimera_vsearch, merge_flash/merge_count, annotation,
-# functional_abundance, taxa_abundance). New 2026-08-17, split per pipeline
-# stage. demux_trim creates edna_feature_abundance, which functional_abundance
-# and taxa_abundance FK-reference, so it must come first; the rest have no
-# interdependencies among themselves.
-# requires: observation.sample, observation_utility.software,
-# observation_utility.edna_reference_db, observation_utility.taxa,
-# observation_utility.taxa_function.
-observation/edna_demux_trim_v10_sql.json
-observation/edna_annotation_v10_sql.json
-observation/edna_chimera_vsearch_v10_sql.json
-observation/edna_denoise_v10_sql.json
-observation/edna_fastp_qc_v10_sql.json
-observation/edna_merge_flash_v10_sql.json
-observation/edna_functional_abundance_v10_sql.json
-observation/edna_taxa_abundance_v10_sql.json
+# eDNA ASVs (one row per amplicon sequence variant and method pipeline, linked to the
+# deepest resolved taxon) and their abundance per observation (relative abundance,
+# rarefied read count and, when delivered, raw read count).
+# requires: observation, observation_utility.method_pipeline, organism_utility.taxon.
+observation/edna_asv_v10_sql.json
 
-# eDNA observation data (edna_nucleotide, taxa_bioinformatics, edna_measurement,
-# taxa_biodiversity_measurement). Folded into observation (was a separate edna
-# schema) - structurally the same pattern as macrofauna/spectra/infiltration_beerkan
-# above: purpose-built tables hanging off observation.observation.
-# requires: observation, observation_utility.indicator.
-observation/edna_v10_sql.json
+# eDNA read counts in and out of each bioinformatics pipeline step per observation
+# (empty until the laboratory delivers e.g. the DADA2 denoising stats).
+# requires: observation, observation_utility.method_pipeline_step.
+observation/edna_run_step_v10_sql.json
 
 ###===========================================###
 ### LANDSCAPE UTILITY

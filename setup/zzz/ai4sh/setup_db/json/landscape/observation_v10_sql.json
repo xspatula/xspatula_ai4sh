@@ -73,10 +73,10 @@
         "command": [
           "id SERIAL",
           "cultivation_id INTEGER REFERENCES landscape.cultivation (id)",
-          "taxa_id INTEGER REFERENCES observation_utility.taxa (id)",
+          "taxon_id INTEGER REFERENCES organism_utility.taxon (id)",
           "role TEXT NOT NULL CHECK (role IN ('main','catch','cover'))",
           "observed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(1)",
-          "UNIQUE (cultivation_id, taxa_id, role)",
+          "UNIQUE (cultivation_id, taxon_id, role)",
           "PRIMARY KEY (id)"
         ]
       },

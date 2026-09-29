@@ -1,0 +1,37 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_edna_asv",
+        "min_user_stratum": 3,
+        "title": "Manage eDNA ASV abundances",
+        "label": "Bulk insert of eDNA ASVs (observation.edna_asv) and their abundance per observation (observation.edna_asv_abundance) with postgres COPY. Insert only: existing records are kept, new records added."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "asv_data_path",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Path to the canonical abundance csv written by translate_tabular_data with target process manage_edna_asv"
+            },
+            {
+              "parameter": "method_pipeline",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the method pipeline (observation_utility.method_pipeline) that produced the ASVs"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

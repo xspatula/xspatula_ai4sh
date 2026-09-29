@@ -37,7 +37,7 @@
           "macrofauna_extraction_method_id INTEGER REFERENCES observation_utility.macrofauna_extraction_method (id)",
           "monolith_id INTEGER REFERENCES observation.monolith (id)",
           "soil_horizon_id INTEGER REFERENCES observation_utility.soil_horizon (id)",
-          "taxa_id INTEGER REFERENCES observation_utility.taxa (id)",
+          "taxon_id INTEGER REFERENCES organism_utility.taxon (id)",
           "life_cycle_stage_id INTEGER REFERENCES observation_utility.life_cycle_stage (id)",
           "specimen_quantity INTEGER",
           "weight FLOAT",

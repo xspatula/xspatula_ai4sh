@@ -1,0 +1,66 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_asv",
+        "command": [
+          "id SERIAL",
+          "method_pipeline_id INTEGER NOT NULL REFERENCES observation_utility.method_pipeline (id)",
+          "asv_key TEXT NOT NULL",
+          "taxon_id INTEGER REFERENCES organism_utility.taxon (id)",
+          "lineage TEXT",
+          "sequence TEXT",
+          "sequence_md5 TEXT UNIQUE",
+          "UNIQUE (method_pipeline_id, asv_key)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "edna_asv_abundance",
+        "command": [
+          "observation_id BIGINT NOT NULL REFERENCES observation.observation (id)",
+          "edna_asv_id INTEGER NOT NULL REFERENCES observation.edna_asv (id)",
+          "rel_abundance DOUBLE PRECISION",
+          "read_count INTEGER",
+          "raw_read_count INTEGER",
+          "PRIMARY KEY (observation_id, edna_asv_id)"
+        ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "execute_sql",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "sql": [
+          "CREATE INDEX IF NOT EXISTS edna_asv_taxon_idx ON observation.edna_asv (taxon_id);",
+          "CREATE INDEX IF NOT EXISTS edna_asv_abundance_asv_idx ON observation.edna_asv_abundance (edna_asv_id);",
+          "COMMENT ON COLUMN observation.edna_asv.asv_key IS 'Delivery key when no sequence is available (<group>-<row number in source sheet>); only stable while the laboratory keeps the row order';",
+          "COMMENT ON COLUMN observation.edna_asv.taxon_id IS 'Deepest resolved taxon of the ASV lineage';",
+          "COMMENT ON COLUMN observation.edna_asv_abundance.read_count IS 'Rarefied read count; the rarefaction depth is the rarefaction_depth parameter of the pipeline diversity step';",
+          "COMMENT ON COLUMN observation.edna_asv_abundance.raw_read_count IS 'Unrarefied read count from the feature table, when delivered';"
+        ]
+      }
+    }
+  ]
+}

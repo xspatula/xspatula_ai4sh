@@ -1,0 +1,41 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "organism_utility",
+        "table": "taxon",
+        "command": [
+          "id SERIAL",
+          "parent_taxon_id INTEGER REFERENCES organism_utility.taxon (id)",
+          "taxon_rank_id SMALLINT REFERENCES organism_utility.taxon_rank (id)",
+          "taxon_status_id INTEGER REFERENCES organism_utility.taxon_status (id)",
+          "taxonomy_reference_id INTEGER REFERENCES organism_utility.taxonomy_reference (id)",
+          "name TEXT",
+          "scientific_name TEXT",
+          "UNIQUE NULLS NOT DISTINCT (parent_taxon_id, name)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "execute_sql",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "sql": [
+          "ALTER TABLE organism_utility.taxon ADD COLUMN IF NOT EXISTS scientific_name TEXT;",
+          "CREATE INDEX IF NOT EXISTS taxon_name_idx ON organism_utility.taxon (name);",
+          "CREATE INDEX IF NOT EXISTS taxon_scientific_name_idx ON organism_utility.taxon (scientific_name);"
+        ]
+      }
+    }
+  ]
+}

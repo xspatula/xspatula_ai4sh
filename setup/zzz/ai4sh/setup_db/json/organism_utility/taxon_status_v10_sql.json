@@ -1,0 +1,49 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "organism_utility",
+        "table": "taxon_status",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "organism_utility",
+        "table": "taxon_status",
+        "command": {
+          "columns": [
+            "name",
+            "abstract"
+          ],
+          "values": [
+            [
+              "accepted",
+              "currently accepted name in the taxonomy reference"
+            ],
+            [
+              "synonym",
+              "outdated or alternative name, linked to the accepted taxon via taxon_parity"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

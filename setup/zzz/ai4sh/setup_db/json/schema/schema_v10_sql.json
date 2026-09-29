@@ -39,6 +39,18 @@
     {
       "process_id": "create_schema",
       "parameters": {
+        "schema": "organism_utility"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
+        "schema": "organism"
+      }
+    },
+    {
+      "process_id": "create_schema",
+      "parameters": {
         "schema": "observation_utility"
       }
     },

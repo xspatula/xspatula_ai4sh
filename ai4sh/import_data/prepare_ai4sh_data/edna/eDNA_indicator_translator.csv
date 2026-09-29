@@ -1,0 +1,20 @@
+summary_group,summary_category,summary_indicator,xspatula_column
+Prokaryotes,Alpha diversity,observed richness,@prokaryotes alpha richness
+Prokaryotes,Alpha diversity,chao1_estimated richness,@prokaryotes alpha chao1 richness
+Prokaryotes,Alpha diversity,dominance,@prokaryotes alpha dominance
+Prokaryotes,Alpha diversity,pielou_e,@prokaryotes alpha pielou e
+Prokaryotes,Alpha diversity,shannon,@prokaryotes alpha shannon
+Prokaryotes,Alpha diversity,simpson,@prokaryotes alpha simpson
+Prokaryotes,Functional prediction,chemoheterotrophy,@prokaryotes chemoheterotrophy
+Prokaryotes,Functional prediction,human_pathogens_all,@prokaryotes human pathogens all
+Prokaryotes,Functional prediction,nitrogen_fixation,@prokaryotes nitrogen fixation
+Fungi,Alpha diversity,observed richness,@fungi alpha richness
+Fungi,Alpha diversity,chao1_estimated richness,@fungi alpha chao1 richness
+Fungi,Alpha diversity,dominance,@fungi alpha dominance
+Fungi,Alpha diversity,pielou_e,@fungi alpha pielou e
+Fungi,Alpha diversity,shannon,@fungi alpha shannon
+Fungi,Alpha diversity,simpson,@fungi alpha simpson
+Fungi,Functional prediction,Ectomycorrhizal fungi,@ectomycorrhizal fungi function
+Fungi,Functional prediction,Arbuscular mycorrhizal fungi,@arbuscular mycorrhizal fungi function
+Fungi,Functional prediction,Fungal saprotrophs,@saprotrophic fungal function
+Fungi,Functional prediction,Fungal plant pathogens,@plant pathogenic fungal function

@@ -72,6 +72,8 @@ observation_utility/quantity_v10_sql.json
 
 observation_utility/setting_system_v10_sql.json
 
+observation_utility/software_v10_sql.json
+
 observation_utility/spatial_reference_v10_sql.json
 
 observation_utility/spectrometer_v10_sql.json
@@ -86,21 +88,10 @@ observation_utility/unit_translate_v10_sql.json
 
 observation_utility/unit_v10_sql.json
 
-### OBSERVATION UTILITIES eDNA ###
+### ORGANISM UTILITIES ###
 
-observation_utility/edna_sequence_library_v10_sql.json
-
-observation_utility/edna_nucleotide_archive_v10_sql.json
-
-observation_utility/edna_extraction_v10_sql.json
-
-observation_utility/edna_purification_v10_sql.json
-
-observation_utility/edna_amplification_v10_sql.json
-
-observation_utility/edna_sequencing_v10_sql.json
-
-observation_utility/edna_metabarcoding_pipeline_v10_sql.json
+organism_utility/taxonomy_reference_v10_sql.json
+organism_utility/taxon_v10_sql.json
 
 ### observation DATASET ###
 
@@ -113,6 +104,7 @@ observation/measurement_v10_sql.json
 observation/observation_log_v10_sql.json
 
 observation/observation_v10_sql.json
+observation/edna_asv_v10_sql.json
 
 observation/data_source_v10_sql.json
 
