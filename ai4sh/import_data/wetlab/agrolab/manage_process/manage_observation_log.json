@@ -1,0 +1,220 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_dk_foulum_2024",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_es_arkaute_2024",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_fi_jokioinen_2024",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_gb-eng_woodoaks_2025",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_gb-wls_plynlimon_2025",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_gr_zazari_2025",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_hr_neretva_2024",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_hr_neretva_2025",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_nl_boermarke-zeijen_2025",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_se_loennstorp_2024",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_fr_estrees-mons_2025",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_ch_lens_2025",
+        "provision_id__provision_name": "ai4sh-agrolab",
+        "contact_name": "thomas gumbricht",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "ds2",
+        "preservation_id__preservation_name": "ds2",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "laboratory": true
+      }
+    }
+  ]
+}
