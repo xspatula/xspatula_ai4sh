@@ -7,7 +7,7 @@
   "process": [
     {
       "execute": true,
-      "verbose": 2,
+      "verbose": 0,
       "overwrite": false,
       "delete": false
     }
