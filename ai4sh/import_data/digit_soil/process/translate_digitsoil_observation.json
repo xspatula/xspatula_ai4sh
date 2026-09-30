@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process": "translate_tabular_data",
+      "overwrite": true,
+      "parameters": {
+        "process": "manage_observation_log",
+        "tabular_data_path": "digitsoil/excel/AI4SH_observation_log_digitsoil.xlsx",
+        "dst_path": "digitsoil/manage_process"
+      }
+    },
+    {
+      "process": "translate_tabular_data",
+      "overwrite": true,
+      "parameters": {
+        "process": "manage_observation",
+        "tabular_data_path": "digitsoil/excel/AI4SH_SEAR_tg.xlsx",
+        "dst_path": "digitsoil/manage_process"
+      }
+    }
+  ]
+}
