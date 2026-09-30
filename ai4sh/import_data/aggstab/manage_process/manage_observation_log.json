@@ -1,0 +1,58 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": true,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_dk_foulum_2024",
+        "provision_id__provision_name": "slakes",
+        "contact_name": "hsiang-ju fan",
+        "contact_email": "hsiang-ju.fan@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "agg",
+        "preservation_id__preservation_name": "d",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "home": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": true,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_se_loennstorp_2024",
+        "provision_id__provision_name": "slakes",
+        "contact_name": "hsiang-ju fan",
+        "contact_email": "hsiang-ju.fan@natgeo.su.se",
+        "name": "auto",
+        "preparation_id__preparation_name": "agg",
+        "preservation_id__preservation_name": "d",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "home": true
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_observation_log",
+      "delete": false,
+      "overwrite": true,
+      "parameters": {
+        "sampling_log_id__sampling_log_name": "ai4sh_es_arkaute_2025",
+        "provision_id__provision_name": "slakes",
+        "contact_name": "lur epelde",
+        "contact_email": "lepelde@neiker.eus",
+        "name": "auto",
+        "preparation_id__preparation_name": "agg",
+        "preservation_id__preservation_name": "d",
+        "storage_id__storage_name": "amb",
+        "transportation_id__transportation_name": "none",
+        "home": true
+      }
+    }
+  ]
+}
