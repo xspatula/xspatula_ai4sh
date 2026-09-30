@@ -255,9 +255,9 @@ organism_utility/taxon_function_v10_sql.json
 #!!!!! Placed after ORGANISM UTILITIES as steps reference organism_utility.taxonomy_reference.
 
 # Method pipeline (linked to analysis_method) and its numbered steps, each referencing
-# lab_protocol, edna_primer_pair, software (name + version) and taxonomy_reference (name + version).
-# Also inserts the analysis_method rows for the ai4sh-16s and ai4sh-its pipelines.
-# Step seeds raise an error if any referenced name/version is missing from its catalogue.
+# lab_protocol, edna_primer_pair, software and taxonomy_reference. Tables only: the content
+# (e.g. ai4sh-16s, ai4sh-its) is inserted from excel in the utility insert chain
+# (import_data/utility/observation, EDNA UTILITIES section).
 # requires: analysis_method, lab_protocol, edna_primer_pair, software, taxonomy_reference.
 observation_utility/method_pipeline_v10_sql.json
 

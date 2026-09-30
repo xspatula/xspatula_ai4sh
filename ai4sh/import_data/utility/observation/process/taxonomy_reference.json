@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "overwrite": true,
+      "process": "translate_tabular_data",
+      "parameters": {
+        "process": "manage_taxonomy_reference",
+        "tabular_data_path": "import_data/utility/observation/excel/taxonomy_reference.xlsx",
+        "dst_path": "import_data/utility/observation/manage_process"
+      }
+    }
+  ]
+}

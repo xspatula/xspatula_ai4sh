@@ -211,13 +211,33 @@ profiling.json
 ###=================###
 ### EDNA UTILITIES ###
 ###=================###
-# metabarcoding_amplification
-# metabarcoding_bioinformatics
-# metabarcoding_extraction
-# metabarcoding_purification
-# metabarcoding_sequencing_data_requirements
+#!!!!! Catalogues for multi-step methods such as eDNA metabarcoding. Keep this order:
+#!!!!! method_pipeline_step references all the others (and analysis_method above).
 
-# metabarcoding_platform
-# metabarcoding_strategy
+# Software with version; alias '<name> <version>' is how pipeline steps reference an exact version.
+# You can add software in software.xlsx and rerun this translation.
+software.json
+
+# Taxonomy reference (e.g. SILVA, UNITE) with release; alias '<name> <version>' as for software.
+# You can add taxonomy references in taxonomy_reference.xlsx and rerun this translation.
+taxonomy_reference.json
+
+# eDNA primer pair (forward + reverse primer, used together in PCR).
+# You can add primer pairs in edna_primer_pair.xlsx and rerun this translation.
+edna_primer_pair.json
+
+# Lab protocol for laboratory steps (extraction, amplification, purification, sequencing ...).
+# You can add lab protocols in lab_protocol.xlsx and rerun this translation.
+lab_protocol.json
+
 ### DEPENDENT
-# metabarcoding_pipeline
+# Method pipeline, linked to an analysis method.
+# require: analysis_method.
+# You can add pipelines in method_pipeline.xlsx and rerun this translation.
+method_pipeline.json
+
+# Numbered steps of a method pipeline; a blank or 'none' reference cell means "not applicable".
+# Step parameters are a JSON object in the parameters column, {} if none.
+# require: method_pipeline, lab_protocol, edna_primer_pair, software, taxonomy_reference.
+# You can add steps in method_pipeline_step.xlsx and rerun this translation.
+method_pipeline_step.json

@@ -40,6 +40,22 @@
               }
             },
             {
+              "parameter": "alias",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unique '<name> <version>' used to reference this exact version, e.g. 'silva 138.2'",
+              "schema_table": {
+                "schema": "organism_utility",
+                "table": "taxonomy_reference",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
               "parameter": "marker_gene",
               "parameter_type": "text",
               "required": true,

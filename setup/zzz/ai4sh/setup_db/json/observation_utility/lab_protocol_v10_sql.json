@@ -10,7 +10,7 @@
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
-          "protocol_type TEXT NOT NULL CHECK (protocol_type IN ('extraction','amplification','purification','library_preparation','sequencing','other'))",
+          "protocol_type TEXT NOT NULL CHECK (protocol_type IN ('','extraction','amplification','purification','library_preparation','sequencing','other'))",
           "kit TEXT",
           "manufacturer TEXT",
           "platform TEXT",
@@ -37,55 +37,15 @@
         "table": "lab_protocol",
         "command": {
           "columns": [
+            "id",
             "name",
-            "protocol_type",
-            "kit",
-            "manufacturer",
-            "platform",
-            "strategy",
-            "data_requirement",
-            "abstract"
+            "protocol_type"
           ],
           "values": [
             [
-              "zymobiomics dna miniprep",
-              "extraction",
-              "ZymoBIOMICS DNA Miniprep Kit",
-              "Zymo Research",
-              null,
-              null,
-              null,
-              "DNA extraction from milligram quantities of soil, sample preserved in DNA/RNA Shield prior to extraction"
-            ],
-            [
-              "pcr amplification",
-              "amplification",
-              null,
-              null,
-              null,
-              null,
-              null,
-              "PCR amplification of the marker gene region with a primer pair (see edna_primer_pair in the pipeline step)"
-            ],
-            [
-              "magnetic bead purification",
-              "purification",
-              null,
-              null,
-              null,
-              null,
-              null,
-              "Purification of PCR amplicons using magnetic beads"
-            ],
-            [
-              "illumina pe250",
-              "sequencing",
-              null,
-              "Illumina",
-              "Illumina",
-              "2x250 bp paired-end",
-              "30k tags",
-              "Amplicon sequencing on Illumina platform, 2x250 bp paired-end reads, minimum 30 000 tags per sample"
+              "0",
+              "",
+              ""
             ]
           ]
         }

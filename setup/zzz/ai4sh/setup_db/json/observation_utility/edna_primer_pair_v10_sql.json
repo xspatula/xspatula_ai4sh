@@ -38,41 +38,13 @@
         "table": "edna_primer_pair",
         "command": {
           "columns": [
-            "name",
-            "marker_gene",
-            "target_region",
-            "target_group",
-            "forward_name",
-            "forward_sequence",
-            "reverse_name",
-            "reverse_sequence",
-            "doi",
-            "abstract"
+            "id",
+            "name"
           ],
           "values": [
             [
-              "515f-806r modified",
-              "16S rRNA",
-              "V4",
-              "prokaryotes",
-              "515F modified",
-              "GTGYCAGCMGCCGCGGTAA",
-              "806R modified",
-              "GGACTACNVGGGTWTCTAAT",
-              "10.1128/mSystems.00009-15",
-              "Modified 515F/806R primer pair amplifying the V4 region of the 16S rRNA gene of bacteria and archaea"
-            ],
-            [
-              "gits7-its4",
-              "ITS",
-              "ITS2",
-              "fungi",
-              "gITS7",
-              "GTGARTCATCGARTCTTTG",
-              "ITS4",
-              "TCCTCCGCTTATTGATATGC",
-              "10.1111/j.1574-6941.2012.01437.x",
-              "gITS7/ITS4 primer pair amplifying the ITS2 region of the fungal nuclear ribosomal DNA"
+              "0",
+              ""
             ]
           ]
         }

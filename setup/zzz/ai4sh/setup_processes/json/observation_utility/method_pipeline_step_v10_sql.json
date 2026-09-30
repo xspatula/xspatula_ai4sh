@@ -2,13 +2,13 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": true,
+      "overwrite": false,
       "parameters": {
         "root_process": "manage_table_data",
-        "process": "manage_lab_protocol",
-        "min_user_stratum": 4,
-        "title": "Manage lab protocol",
-        "label": "Insert, update or delete laboratory protocol."
+        "process": "manage_method_pipeline_step",
+        "min_user_stratum": 3,
+        "title": "Manage method pipeline step",
+        "label": "Insert, update or delete a numbered step of a method pipeline, referencing its lab protocol, primer pair, software and taxonomy reference"
       },
       "nodes": [
         {
@@ -16,14 +16,14 @@
           "element": "parameters",
           "parameter": [
             {
-              "parameter": "name",
+              "parameter": "method_pipeline_id__method_pipeline_name",
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Unique name of the laboratory protocol.",
+              "hint": "Pipeline the step belongs to",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "lab_protocol",
+                "table": "method_pipeline_step",
                 "write": true
               },
               "permission": {
@@ -32,110 +32,30 @@
               }
             },
             {
-              "parameter": "protocol_type",
+              "parameter": "step",
+              "parameter_type": "integer",
+              "required": true,
+              "default_value": "",
+              "hint": "Step number, 1 = first step",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "method_pipeline_step",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "stage",
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Type of laboratory protocol.",
+              "hint": "laboratory or bioinformatics",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "lab_protocol",
-                "write": true
-              },
-              "permission": {
-                "update": false,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "kit",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "",
-              "hint": "If the protocol is based on a kit, state the kit.",
-              "schema_table": {
-                "schema": "observation_utility",
-                "table": "lab_protocol",
-                "write": true
-              },
-              "permission": {
-                "update": false,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "manufacturer",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "",
-              "hint": "The producer of the kit, if applicable.",
-              "schema_table": {
-                "schema": "observation_utility",
-                "table": "lab_protocol",
-                "write": true
-              },
-              "permission": {
-                "update": false,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "platform",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "",
-              "hint": "Any required platform for the protocol.",
-              "schema_table": {
-                "schema": "observation_utility",
-                "table": "lab_protocol",
-                "write": true
-              },
-              "permission": {
-                "update": false,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "strategy",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "",
-              "hint": "If the protocol is following a strategy, enter the strategy, otherwide null.",
-              "schema_table": {
-                "schema": "observation_utility",
-                "table": "lab_protocol",
-                "write": true
-              },
-              "permission": {
-                "update": false,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "data_requirement",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "",
-              "hint": "If the protocol requires a datastrategy, otherwise null",
-              "schema_table": {
-                "schema": "observation_utility",
-                "table": "lab_protocol",
-                "write": true
-              },
-              "permission": {
-                "update": false,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "url",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "",
-              "hint": "Url describing the protocol",
-              "schema_table": {
-                "schema": "observation_utility",
-                "table": "lab_protocol",
+                "table": "method_pipeline_step",
                 "write": true
               },
               "permission": {
@@ -144,14 +64,94 @@
               }
             },
             {
-              "parameter": "doi",
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the step, e.g. paired-end merging",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "method_pipeline_step",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "lab_protocol_id__lab_protocol_name",
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "DOI of the protocol publication",
+              "hint": "Lab protocol of a laboratory step; leave blank if none",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "lab_protocol",
+                "table": "method_pipeline_step",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "edna_primer_pair_id__edna_primer_pair_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Primer pair of an amplification step; leave blank if none",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "method_pipeline_step",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "software_id__software_alias",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Software of a bioinformatics step as its alias '<name> <version>'; leave blank if none",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "method_pipeline_step",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "taxonomy_reference_id__taxonomy_reference_alias",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Taxonomy reference as its alias '<name> <version>'; leave blank if none",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "method_pipeline_step",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "parameters",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "{}",
+              "hint": "Step parameters as a JSON object, e.g. {\"min_overlap\": 10}; {} if none",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "method_pipeline_step",
                 "write": true
               },
               "permission": {
@@ -164,14 +164,14 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "abstract describing the laboratory method.",
+              "hint": "Abstract describing the step",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "lab_protocol",
+                "table": "method_pipeline_step",
                 "write": true
               },
               "permission": {
-                "update": false,
+                "update": true,
                 "delete": false
               }
             }

@@ -36,7 +36,10 @@ NO_LOWER_COLS = frozenset({
     'display_name',
     'abstract',
     'title',
-    'label'
+    'label',
+    'url',                  # url paths are case sensitive
+    'forward_sequence',     # nucleotide sequences are conventionally upper case (IUPAC)
+    'reverse_sequence'
 })
 
 # Define classfication levels for substances

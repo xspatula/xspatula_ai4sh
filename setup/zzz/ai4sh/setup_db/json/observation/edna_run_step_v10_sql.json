@@ -13,22 +13,15 @@
           "reads_in INTEGER",
           "reads_out INTEGER",
           "PRIMARY KEY (observation_id, method_pipeline_step_id)"
-        ]
+        ],
+        "comment": {
+          "table": "Reads entering and leaving each bioinformatics step (demultiplexing, merging, quality filtering, chimera removal, ASV inference) per observation, e.g. from the DADA2 denoising stats"
+        }
       },
       "audit": {
         "INSERT": false,
         "UPDATE": true,
         "DELETE": true
-      }
-    },
-    {
-      "process_id": "execute_sql",
-      "overwrite": false,
-      "delete": false,
-      "parameters": {
-        "sql": [
-          "COMMENT ON TABLE observation.edna_run_step IS 'Reads entering and leaving each bioinformatics step (demultiplexing, merging, quality filtering, chimera removal, ASV inference) per observation, e.g. from the DADA2 denoising stats';"
-        ]
       }
     }
   ]

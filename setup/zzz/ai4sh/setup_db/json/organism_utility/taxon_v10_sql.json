@@ -17,24 +17,26 @@
           "scientific_name TEXT",
           "UNIQUE NULLS NOT DISTINCT (parent_taxon_id, name)",
           "PRIMARY KEY (id)"
-        ]
+        ],
+        "index": [
+          [
+            "name"
+          ],
+          [
+            "scientific_name"
+          ]
+        ],
+        "comment": {
+          "columns": {
+            "name": "Taxon name at its rank; for species the epithet only (e.g. elkanii)",
+            "scientific_name": "Full scientific name, e.g. bradyrhizobium elkanii for a species; equals name above species rank"
+          }
+        }
       },
       "audit": {
         "INSERT": false,
         "UPDATE": true,
         "DELETE": true
-      }
-    },
-    {
-      "process_id": "execute_sql",
-      "overwrite": false,
-      "delete": false,
-      "parameters": {
-        "sql": [
-          "ALTER TABLE organism_utility.taxon ADD COLUMN IF NOT EXISTS scientific_name TEXT;",
-          "CREATE INDEX IF NOT EXISTS taxon_name_idx ON organism_utility.taxon (name);",
-          "CREATE INDEX IF NOT EXISTS taxon_scientific_name_idx ON organism_utility.taxon (scientific_name);"
-        ]
       }
     }
   ]

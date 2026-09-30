@@ -73,6 +73,10 @@ observation_utility/quantity_v10_sql.json
 observation_utility/setting_system_v10_sql.json
 
 observation_utility/software_v10_sql.json
+observation_utility/edna_primer_pair_v10_sql.json
+observation_utility/lab_protocol_v10_sql.json
+observation_utility/method_pipeline_v10_sql.json
+observation_utility/method_pipeline_step_v10_sql.json
 
 observation_utility/spatial_reference_v10_sql.json
 

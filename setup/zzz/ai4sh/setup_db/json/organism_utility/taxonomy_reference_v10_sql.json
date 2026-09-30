@@ -11,6 +11,7 @@
           "id SERIAL",
           "name TEXT",
           "version TEXT NOT NULL DEFAULT 'unspecified'",
+          "alias TEXT UNIQUE",
           "marker_gene TEXT",
           "url TEXT",
           "doi TEXT",
@@ -34,29 +35,17 @@
         "table": "taxonomy_reference",
         "command": {
           "columns": [
+            "id",
             "name",
             "version",
-            "marker_gene",
-            "url",
-            "doi",
-            "abstract"
+            "alias"
           ],
           "values": [
             [
-              "silva",
-              "unspecified",
-              "16S rRNA",
-              "https://www.arb-silva.de",
-              "10.1093/nar/gks1219",
-              "Curated database of aligned ribosomal RNA gene sequences, used for taxonomic annotation of prokaryotes (bacteria and archaea)"
-            ],
-            [
-              "unite",
-              "unspecified",
-              "ITS",
-              "https://unite.ut.ee",
-              "10.1093/nar/gkad1039",
-              "Database and sequence management environment for the nuclear ribosomal ITS region, used for taxonomic annotation of fungi"
+              "0",
+              "",
+              "",
+              ""
             ]
           ]
         }

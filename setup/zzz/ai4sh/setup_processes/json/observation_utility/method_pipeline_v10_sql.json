@@ -5,10 +5,10 @@
       "overwrite": false,
       "parameters": {
         "root_process": "manage_table_data",
-        "process": "manage_software",
+        "process": "manage_method_pipeline",
         "min_user_stratum": 3,
-        "title": "Manage a software",
-        "label": "Insert, update or delete a software used in any analysis or analysis pipeline"
+        "title": "Manage method pipeline",
+        "label": "Insert, update or delete a multi-step analysis method (e.g. eDNA metabarcoding), linked to its analysis method"
       },
       "nodes": [
         {
@@ -20,11 +20,15 @@
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "The name of the software",
+              "hint": "Unique name of the pipeline, e.g. ai4sh-16s",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "software",
+                "table": "method_pipeline",
                 "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
               }
             },
             {
@@ -32,22 +36,26 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "unspecified",
-              "hint": "The version of the software.",
+              "hint": "Version of the pipeline",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "software",
+                "table": "method_pipeline",
                 "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
               }
             },
             {
-              "parameter": "alias",
+              "parameter": "analysis_method_id__analysis_method_name",
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Unique '<name> <version>' used to reference this exact version, e.g. 'qiime2 2024.10'",
+              "hint": "Analysis method (observation_utility.analysis_method) the pipeline implements",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "software",
+                "table": "method_pipeline",
                 "write": true
               },
               "permission": {
@@ -58,13 +66,17 @@
             {
               "parameter": "url",
               "parameter_type": "text",
-              "required": true,
+              "required": false,
               "default_value": "",
-              "hint": "The url of the software.",
+              "hint": "Url describing the pipeline",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "software",
+                "table": "method_pipeline",
                 "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
               }
             },
             {
@@ -72,11 +84,15 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "The doi of the software.",
+              "hint": "DOI of the pipeline publication",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "software",
+                "table": "method_pipeline",
                 "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
               }
             },
             {
@@ -84,11 +100,15 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "Short abstract explaining what the software does.",
+              "hint": "Abstract describing the pipeline",
               "schema_table": {
                 "schema": "observation_utility",
-                "table": "software",
+                "table": "method_pipeline",
                 "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
               }
             }
           ]

@@ -17,7 +17,18 @@
           "sequence_md5 TEXT UNIQUE",
           "UNIQUE (method_pipeline_id, asv_key)",
           "PRIMARY KEY (id)"
-        ]
+        ],
+        "index": [
+          [
+            "taxon_id"
+          ]
+        ],
+        "comment": {
+          "columns": {
+            "asv_key": "Delivery key when no sequence is available (<group>-<row number in source sheet>); only stable while the laboratory keeps the row order",
+            "taxon_id": "Deepest resolved taxon of the ASV lineage"
+          }
+        }
       },
       "audit": {
         "INSERT": false,
@@ -39,27 +50,23 @@
           "read_count INTEGER",
           "raw_read_count INTEGER",
           "PRIMARY KEY (observation_id, edna_asv_id)"
-        ]
+        ],
+        "index": [
+          [
+            "edna_asv_id"
+          ]
+        ],
+        "comment": {
+          "columns": {
+            "read_count": "Rarefied read count; the rarefaction depth is the rarefaction_depth parameter of the pipeline diversity step",
+            "raw_read_count": "Unrarefied read count from the feature table, when delivered"
+          }
+        }
       },
       "audit": {
         "INSERT": false,
         "UPDATE": true,
         "DELETE": true
-      }
-    },
-    {
-      "process_id": "execute_sql",
-      "overwrite": false,
-      "delete": false,
-      "parameters": {
-        "sql": [
-          "CREATE INDEX IF NOT EXISTS edna_asv_taxon_idx ON observation.edna_asv (taxon_id);",
-          "CREATE INDEX IF NOT EXISTS edna_asv_abundance_asv_idx ON observation.edna_asv_abundance (edna_asv_id);",
-          "COMMENT ON COLUMN observation.edna_asv.asv_key IS 'Delivery key when no sequence is available (<group>-<row number in source sheet>); only stable while the laboratory keeps the row order';",
-          "COMMENT ON COLUMN observation.edna_asv.taxon_id IS 'Deepest resolved taxon of the ASV lineage';",
-          "COMMENT ON COLUMN observation.edna_asv_abundance.read_count IS 'Rarefied read count; the rarefaction depth is the rarefaction_depth parameter of the pipeline diversity step';",
-          "COMMENT ON COLUMN observation.edna_asv_abundance.raw_read_count IS 'Unrarefied read count from the feature table, when delivered';"
-        ]
       }
     }
   ]
