@@ -1,0 +1,60 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_dataset",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "land use and coverage area frame survey (lucas) topsoil data",
+        "alias": "lucas",
+        "display_name": "Land Use and Coverage Area frame Survey (LUCAS) topsoil data",
+        "data_source_id__data_source_name": "esdac-jrc",
+        "contact_name": "esdac - european commissiony",
+        "contact_email": "ec-esdac@jrc.ec.europa.eu",
+        "begun_at": 20090101,
+        "ended_at": 20221231,
+        "species_id__species_name": "soil",
+        "profiling_id__profiling_name": "depth_cm",
+        "license_id__license_name": "jrc-lucas",
+        "substance_array": "soil",
+        "keyword_array": "topsoil, soil health, soil health indicator, europe",
+        "url": "https://esdac.jrc.ec.europa.eu/resource-type/soil-point-data",
+        "abstract": "LUCAS\u2026",
+        "laboratory": 1,
+        "territory_id__territory_name": "eu",
+        "spatial_reference_id__spatial_reference_name": "geographic"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_dataset",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "ai4soilhealth",
+        "alias": "ai4sh",
+        "display_name": "AI4SoilHealth",
+        "data_source_id__data_source_name": "ai4soilhealth",
+        "contact_name": "stockholm university",
+        "contact_email": "thomas.gumbricht@natgeo.su.se",
+        "begun_at": 20230101,
+        "ended_at": 20261231,
+        "species_id__species_name": "soil",
+        "profiling_id__profiling_name": "depth_cm",
+        "setting_system_id__setting_system_name_array": "agricultural field",
+        "license_id__license_name": "mit",
+        "substance_array": "soil",
+        "keyword_array": "topsoil, soil health, soil health indicator, europe",
+        "url": "https://ai4soilhealth.eu",
+        "abstract": "AI4SoilHealth\u2026",
+        "field": 1.0,
+        "home": 1.0,
+        "laboratory": 1,
+        "satellite": 1.0,
+        "territory_id__territory_name": "eu",
+        "spatial_reference_id__spatial_reference_name": "geographic"
+      }
+    }
+  ]
+}

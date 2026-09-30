@@ -1,0 +1,52 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_person",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "data_source_id__data_source_name": "esdac-jrc",
+        "first_name": "fn",
+        "middle_name": "mn",
+        "last_name": "ln",
+        "email": "ec-esdac@jrc.ec.europa.eu",
+        "territory_id__territory_name": "eu"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_person",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "data_source_id__data_source_name": "ai4soilhealth",
+        "first_name": "thomas",
+        "last_name": "gumbricht",
+        "email": "thomas.gumbricht@natgeo.su.se",
+        "postal_address": "stockholm",
+        "territory_id__territory_name": "se",
+        "telephone": "+46 7763057701",
+        "department": "physical geography",
+        "position": "researcher"
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_person",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "data_source_id__data_source_name": "stockholm university",
+        "first_name": "fatemeh",
+        "last_name": "hateffard",
+        "email": "fatemeh.hateffard@natgeo.su.se",
+        "postal_address": "stockholm",
+        "territory_id__territory_name": "se",
+        "telephone": "+46 7763057701",
+        "department": "physical geography",
+        "position": "postdoc"
+      }
+    }
+  ]
+}

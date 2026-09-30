@@ -1,0 +1,3161 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@10-1",
+        "x_coordinate": -2.62319677333332,
+        "y_coordinate": 42.8543979992745
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@10-2",
+        "x_coordinate": -2.62258694166665,
+        "y_coordinate": 42.8541260592745
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@10-3",
+        "x_coordinate": -2.62222419999998,
+        "y_coordinate": 42.8534931426078
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@10-4",
+        "x_coordinate": -2.62185861666665,
+        "y_coordinate": 42.8529534292745
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@10-5",
+        "x_coordinate": -2.62149438999998,
+        "y_coordinate": 42.8525918676078
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@10-6",
+        "x_coordinate": -2.62113046166665,
+        "y_coordinate": 42.8521396742745
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@1",
+        "x_coordinate": 6.549972,
+        "y_coordinate": 53.07558
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@2",
+        "x_coordinate": 6.549528,
+        "y_coordinate": 53.07064
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@3",
+        "x_coordinate": 6.5435,
+        "y_coordinate": 53.06928
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@4",
+        "x_coordinate": 6.540833,
+        "y_coordinate": 53.07472
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@6",
+        "x_coordinate": 6.538611,
+        "y_coordinate": 53.085
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@7",
+        "x_coordinate": 6.535167,
+        "y_coordinate": 53.086
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@8",
+        "x_coordinate": 6.543056,
+        "y_coordinate": 53.08722
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@10",
+        "x_coordinate": 6.548472,
+        "y_coordinate": 53.06489
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@11",
+        "x_coordinate": 6.544306,
+        "y_coordinate": 53.05936
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@12",
+        "x_coordinate": 6.548056,
+        "y_coordinate": 53.05806
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@13",
+        "x_coordinate": 6.550278,
+        "y_coordinate": 53.05583
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@14",
+        "x_coordinate": 6.554111,
+        "y_coordinate": 53.05019
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@15",
+        "x_coordinate": 6.557556,
+        "y_coordinate": 53.05706
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@16",
+        "x_coordinate": 6.551111,
+        "y_coordinate": 53.06417
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@17",
+        "x_coordinate": 6.557083,
+        "y_coordinate": 53.06328
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@18",
+        "x_coordinate": 6.559361,
+        "y_coordinate": 53.06253
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@20",
+        "x_coordinate": 6.563056,
+        "y_coordinate": 53.05444
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@21",
+        "x_coordinate": 6.533889,
+        "y_coordinate": 53.0515
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@22",
+        "x_coordinate": 6.52938,
+        "y_coordinate": 53.0506
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@23",
+        "x_coordinate": 6.526528,
+        "y_coordinate": 53.05286
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@25",
+        "x_coordinate": 6.525833,
+        "y_coordinate": 53.05444
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@28",
+        "x_coordinate": 6.53756,
+        "y_coordinate": 53.06583
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@29",
+        "x_coordinate": 6.537222,
+        "y_coordinate": 53.07028
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@30",
+        "x_coordinate": 6.5325,
+        "y_coordinate": 53.07333
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@31",
+        "x_coordinate": 6.52938,
+        "y_coordinate": 53.07308
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@32",
+        "x_coordinate": 6.5325,
+        "y_coordinate": 53.07694
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@1-extra",
+        "x_coordinate": 6.550833,
+        "y_coordinate": 53.07778
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "nl_boermarke-zeijen@25-26-extra",
+        "x_coordinate": 6.532905,
+        "y_coordinate": 53.05744
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@366-2",
+        "x_coordinate": 8.20529,
+        "y_coordinate": 56.12742
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@366",
+        "x_coordinate": 8.20529,
+        "y_coordinate": 56.12742
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@191",
+        "x_coordinate": 8.771627,
+        "y_coordinate": 56.50942
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@201",
+        "x_coordinate": 8.997477,
+        "y_coordinate": 56.25962
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@207",
+        "x_coordinate": 8.658696,
+        "y_coordinate": 56.31963
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@210",
+        "x_coordinate": 8.544503,
+        "y_coordinate": 56.31951
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@219",
+        "x_coordinate": 8.206761,
+        "y_coordinate": 56.38076
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@230",
+        "x_coordinate": 9.909339,
+        "y_coordinate": 56.50758
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@256",
+        "x_coordinate": 9.449972,
+        "y_coordinate": 56.25717
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@279",
+        "x_coordinate": 10.70076,
+        "y_coordinate": 56.43527
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@297",
+        "x_coordinate": 10.35694,
+        "y_coordinate": 56.3135
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "dk_foulum@307",
+        "x_coordinate": 10.36138,
+        "y_coordinate": 56.43933
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@1-b",
+        "x_coordinate": 23.473479862,
+        "y_coordinate": 60.850960434
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@2-b",
+        "x_coordinate": 23.462775954,
+        "y_coordinate": 60.848399714
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@3-b",
+        "x_coordinate": 23.469017089,
+        "y_coordinate": 60.846993108
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@4-b",
+        "x_coordinate": 23.514151902,
+        "y_coordinate": 60.820979202
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@5-b",
+        "x_coordinate": 23.489336678,
+        "y_coordinate": 60.821960483
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@6-b",
+        "x_coordinate": 23.496750628,
+        "y_coordinate": 60.817217836
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@7-b",
+        "x_coordinate": 23.488820075,
+        "y_coordinate": 60.818004564
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@8-b",
+        "x_coordinate": 23.483499328,
+        "y_coordinate": 60.817364178
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@9-b",
+        "x_coordinate": 23.471200534,
+        "y_coordinate": 60.813284193
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@10-b",
+        "x_coordinate": 23.514498653,
+        "y_coordinate": 60.802818399
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@11-b",
+        "x_coordinate": 23.519533616,
+        "y_coordinate": 60.80017122
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@12-b",
+        "x_coordinate": 23.465409512,
+        "y_coordinate": 60.80364534
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@13-b",
+        "x_coordinate": 23.455298747,
+        "y_coordinate": 60.803535787
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@14-b",
+        "x_coordinate": 23.445337441,
+        "y_coordinate": 60.803943135
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@15-b",
+        "x_coordinate": 23.46689605,
+        "y_coordinate": 60.80160994
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@16-b",
+        "x_coordinate": 23.461218598,
+        "y_coordinate": 60.801566658
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@17-b",
+        "x_coordinate": 23.465679055,
+        "y_coordinate": 60.806888226
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@18-b",
+        "x_coordinate": 23.460359931,
+        "y_coordinate": 60.80356414
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@19-b",
+        "x_coordinate": 23.456630424,
+        "y_coordinate": 60.800092292
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@21-b",
+        "x_coordinate": 23.457125712,
+        "y_coordinate": 60.798424093
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@22-b",
+        "x_coordinate": 23.452553752,
+        "y_coordinate": 60.794253964
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@23-b",
+        "x_coordinate": 23.452757879,
+        "y_coordinate": 60.793589331
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@24-b",
+        "x_coordinate": 23.460473498,
+        "y_coordinate": 60.791760377
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@1-r",
+        "x_coordinate": 23.460984154,
+        "y_coordinate": 60.854921997
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@10-r",
+        "x_coordinate": 23.470745619,
+        "y_coordinate": 60.84572319
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@11-r",
+        "x_coordinate": 23.441477664,
+        "y_coordinate": 60.802616862
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@12-r",
+        "x_coordinate": 23.518288325,
+        "y_coordinate": 60.82938878
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@13-r",
+        "x_coordinate": 23.455226495,
+        "y_coordinate": 60.796671723
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@14-r",
+        "x_coordinate": 23.505183157,
+        "y_coordinate": 60.815504247
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@15-r",
+        "x_coordinate": 23.468607249,
+        "y_coordinate": 60.801694884
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@16-r",
+        "x_coordinate": 23.453164578,
+        "y_coordinate": 60.799828629
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@17-r",
+        "x_coordinate": 23.470629772,
+        "y_coordinate": 60.798483158
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@18-r",
+        "x_coordinate": 23.492095871,
+        "y_coordinate": 60.813728968
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@19-r",
+        "x_coordinate": 23.508919665,
+        "y_coordinate": 60.80281838
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@2-r",
+        "x_coordinate": 23.450553159,
+        "y_coordinate": 60.804267525
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@20-r",
+        "x_coordinate": 23.459418682,
+        "y_coordinate": 60.8564517
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@21-r",
+        "x_coordinate": 23.467926202,
+        "y_coordinate": 60.847113724
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@22-r",
+        "x_coordinate": 23.479190111,
+        "y_coordinate": 60.817773051
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@23-r",
+        "x_coordinate": 23.512893888,
+        "y_coordinate": 60.801620195
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@24-r",
+        "x_coordinate": 23.459278679,
+        "y_coordinate": 60.800930398
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@25-r",
+        "x_coordinate": 23.456336952,
+        "y_coordinate": 60.849044516
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@4-r",
+        "x_coordinate": 23.457857501,
+        "y_coordinate": 60.851329818
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@5-r",
+        "x_coordinate": 23.523782581,
+        "y_coordinate": 60.802239069
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@6-r",
+        "x_coordinate": 23.466646434,
+        "y_coordinate": 60.853548993
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@7-r",
+        "x_coordinate": 23.493872667,
+        "y_coordinate": 60.817951078
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@8-r",
+        "x_coordinate": 23.478491472,
+        "y_coordinate": 60.849669819
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fi_jokioinen@9-r",
+        "x_coordinate": 23.485355775,
+        "y_coordinate": 60.819046365
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@1-sand",
+        "x_coordinate": 13.0588638888888,
+        "y_coordinate": 55.6584
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@16-a",
+        "x_coordinate": 13.10975,
+        "y_coordinate": 55.6690833333333
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@2-sand",
+        "x_coordinate": 13.0603138888888,
+        "y_coordinate": 55.6586361111111
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@20-a",
+        "x_coordinate": 13.1078888888888,
+        "y_coordinate": 55.6683888888888
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@24-a",
+        "x_coordinate": 13.1095833333333,
+        "y_coordinate": 55.6685555555555
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@3-organic",
+        "x_coordinate": 13.0796972222222,
+        "y_coordinate": 55.6503416666666
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@4-a",
+        "x_coordinate": 13.1080805555555,
+        "y_coordinate": 55.6689472222222
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@4-organic",
+        "x_coordinate": 13.0796333333333,
+        "y_coordinate": 55.6495333333333
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@5-a",
+        "x_coordinate": 13.1081388888888,
+        "y_coordinate": 55.6689444444444
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@5-organic",
+        "x_coordinate": 13.0826583333333,
+        "y_coordinate": 55.6516194444444
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@51-c",
+        "x_coordinate": 13.1146111111111,
+        "y_coordinate": 55.66775
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@55-c",
+        "x_coordinate": 13.1156944444444,
+        "y_coordinate": 55.6671111111111
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@60-c",
+        "x_coordinate": 13.1142222222222,
+        "y_coordinate": 55.66735
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@61-c",
+        "x_coordinate": 13.1142805555555,
+        "y_coordinate": 55.6673166666666
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@72-c",
+        "x_coordinate": 13.1154722222222,
+        "y_coordinate": 55.66675
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@79-d",
+        "x_coordinate": 13.1169472222222,
+        "y_coordinate": 55.6663916666666
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@80-d",
+        "x_coordinate": 13.117,
+        "y_coordinate": 55.6663611111111
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@9-sand",
+        "x_coordinate": 13.0641611111111,
+        "y_coordinate": 55.6590833333333
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@91-d",
+        "x_coordinate": 13.1180833333333,
+        "y_coordinate": 55.6656666666666
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@95-d",
+        "x_coordinate": 13.1162277777777,
+        "y_coordinate": 55.6661666666666
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "se_loennstorp@99-d",
+        "x_coordinate": 13.1177222222222,
+        "y_coordinate": 55.6653333333333
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@1-r",
+        "x_coordinate": 17.531942,
+        "y_coordinate": 42.993403
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@10-r",
+        "x_coordinate": 17.535638,
+        "y_coordinate": 42.987692
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@11-r",
+        "x_coordinate": 17.523274,
+        "y_coordinate": 42.994861
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@12-r",
+        "x_coordinate": 17.511739,
+        "y_coordinate": 42.994083
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@2-r",
+        "x_coordinate": 17.514241,
+        "y_coordinate": 42.996345
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@3-r",
+        "x_coordinate": 17.517461,
+        "y_coordinate": 42.995563
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@4-r",
+        "x_coordinate": 17.540353,
+        "y_coordinate": 43.001478
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@5-r",
+        "x_coordinate": 17.538091,
+        "y_coordinate": 43.001102
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@6-r",
+        "x_coordinate": 17.53401,
+        "y_coordinate": 42.995153
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@7-r",
+        "x_coordinate": 17.516308,
+        "y_coordinate": 42.998095
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@8-r",
+        "x_coordinate": 17.516181,
+        "y_coordinate": 42.991308
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "hr_neretva@9-r",
+        "x_coordinate": 17.531241,
+        "y_coordinate": 42.985028
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-wls_plynlimon@gwy1",
+        "x_coordinate": -3.7433,
+        "y_coordinate": 52.4704
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-wls_plynlimon@gwy2",
+        "x_coordinate": -3.7138,
+        "y_coordinate": 52.4651
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-wls_plynlimon@gwy3",
+        "x_coordinate": -3.7308,
+        "y_coordinate": 52.4685
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-wls_plynlimon@gwy4",
+        "x_coordinate": -3.7507,
+        "y_coordinate": 52.4593
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-wls_plynlimon@gwy5",
+        "x_coordinate": -3.7301,
+        "y_coordinate": 52.4512
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-wls_plynlimon@hafren1",
+        "x_coordinate": -3.73385,
+        "y_coordinate": 52.4836
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-wls_plynlimon@hafren2",
+        "x_coordinate": -3.7164,
+        "y_coordinate": 52.4736
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-wls_plynlimon@hafren3",
+        "x_coordinate": -3.7291,
+        "y_coordinate": 52.4786
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-wls_plynlimon@hafren4",
+        "x_coordinate": -3.7135,
+        "y_coordinate": 52.4671
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-wls_plynlimon@hafren5",
+        "x_coordinate": -3.6942,
+        "y_coordinate": 52.4701
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@c-1",
+        "x_coordinate": -0.52248,
+        "y_coordinate": 51.63297
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@c-2",
+        "x_coordinate": -0.52712,
+        "y_coordinate": 51.63397
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@c-3",
+        "x_coordinate": -0.52116,
+        "y_coordinate": 51.63288
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@c-4",
+        "x_coordinate": -0.50569,
+        "y_coordinate": 51.62856
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@c-5",
+        "x_coordinate": -0.51496,
+        "y_coordinate": 51.63072
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@c-6",
+        "x_coordinate": -0.51757,
+        "y_coordinate": 51.62977
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@c-7",
+        "x_coordinate": -0.52201,
+        "y_coordinate": 51.629
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@c-8",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-1",
+        "x_coordinate": -0.51813,
+        "y_coordinate": 51.62554
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-2",
+        "x_coordinate": -0.51422,
+        "y_coordinate": 51.62943
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-3",
+        "x_coordinate": -0.52035,
+        "y_coordinate": 51.62751
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-4",
+        "x_coordinate": -0.51475,
+        "y_coordinate": 51.63235
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-5",
+        "x_coordinate": -0.50857,
+        "y_coordinate": 51.62966
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-6",
+        "x_coordinate": -0.5155,
+        "y_coordinate": 51.62741
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-7",
+        "x_coordinate": -0.5122,
+        "y_coordinate": 51.63015
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-8",
+        "x_coordinate": -0.51012,
+        "y_coordinate": 51.63252
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-9",
+        "x_coordinate": -0.50808,
+        "y_coordinate": 51.63225
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-10",
+        "x_coordinate": -0.51913,
+        "y_coordinate": 51.6317
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gb-eng_woodoaks@p-11",
+        "x_coordinate": -0.51773,
+        "y_coordinate": 51.63319
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@136-pl",
+        "x_coordinate": 22.921955,
+        "y_coordinate": 40.453426
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@165-pl",
+        "x_coordinate": 22.918362,
+        "y_coordinate": 40.453353
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@169-pl",
+        "x_coordinate": 22.919755,
+        "y_coordinate": 40.453168
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@205-pl",
+        "x_coordinate": 22.924229,
+        "y_coordinate": 40.452302
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@298-pl",
+        "x_coordinate": 22.921626,
+        "y_coordinate": 40.451824
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@443-pl",
+        "x_coordinate": 22.925879,
+        "y_coordinate": 40.449889
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@461-pl",
+        "x_coordinate": 22.923386,
+        "y_coordinate": 40.449945
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@54-pl",
+        "x_coordinate": 22.920433,
+        "y_coordinate": 40.454725
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@503-pl",
+        "x_coordinate": 22.921187,
+        "y_coordinate": 40.449687
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@644-pl",
+        "x_coordinate": 22.923937,
+        "y_coordinate": 40.447403
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@755-pl",
+        "x_coordinate": 22.921463,
+        "y_coordinate": 40.445811
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@777-pl",
+        "x_coordinate": 22.923846,
+        "y_coordinate": 40.445221
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@840-pl",
+        "x_coordinate": 22.920785,
+        "y_coordinate": 40.444254
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@858-pl",
+        "x_coordinate": 22.923517,
+        "y_coordinate": 40.443619
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@597-pl",
+        "x_coordinate": 22.920215,
+        "y_coordinate": 40.448444
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@136",
+        "x_coordinate": 22.921955,
+        "y_coordinate": 40.453426
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@165",
+        "x_coordinate": 22.918362,
+        "y_coordinate": 40.453353
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@169",
+        "x_coordinate": 22.919755,
+        "y_coordinate": 40.453168
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@205",
+        "x_coordinate": 22.924229,
+        "y_coordinate": 40.452302
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@298",
+        "x_coordinate": 22.921626,
+        "y_coordinate": 40.451824
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@443",
+        "x_coordinate": 22.925879,
+        "y_coordinate": 40.449889
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@461",
+        "x_coordinate": 22.923386,
+        "y_coordinate": 40.449945
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@54",
+        "x_coordinate": 22.920433,
+        "y_coordinate": 40.454725
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@503",
+        "x_coordinate": 22.921187,
+        "y_coordinate": 40.449687
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@644",
+        "x_coordinate": 22.923937,
+        "y_coordinate": 40.447403
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@755",
+        "x_coordinate": 22.921463,
+        "y_coordinate": 40.445811
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@777",
+        "x_coordinate": 22.923846,
+        "y_coordinate": 40.445221
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@840",
+        "x_coordinate": 22.920785,
+        "y_coordinate": 40.444254
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@858",
+        "x_coordinate": 22.923517,
+        "y_coordinate": 40.443619
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_ktima-gerovassiliou@597",
+        "x_coordinate": 22.920215,
+        "y_coordinate": 40.448444
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@1",
+        "x_coordinate": 21.5942,
+        "y_coordinate": 40.618962
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@2",
+        "x_coordinate": 21.598281,
+        "y_coordinate": 40.620805
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@3n",
+        "x_coordinate": 21.592002,
+        "y_coordinate": 40.622973
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@4",
+        "x_coordinate": 21.587324,
+        "y_coordinate": 40.625728
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@5",
+        "x_coordinate": 21.580835,
+        "y_coordinate": 40.628066
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@6",
+        "x_coordinate": 21.577414,
+        "y_coordinate": 40.641918
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@7",
+        "x_coordinate": 21.583161,
+        "y_coordinate": 40.646022
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@10",
+        "x_coordinate": 21.584604,
+        "y_coordinate": 40.654314
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@11",
+        "x_coordinate": 21.605392,
+        "y_coordinate": 40.640165
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@12",
+        "x_coordinate": 21.603028,
+        "y_coordinate": 40.641477
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@13",
+        "x_coordinate": 21.607983,
+        "y_coordinate": 40.647848
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@21",
+        "x_coordinate": 21.63207,
+        "y_coordinate": 40.65268
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@25",
+        "x_coordinate": 21.638509,
+        "y_coordinate": 40.662593
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@31",
+        "x_coordinate": 21.619012,
+        "y_coordinate": 40.669466
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@36",
+        "x_coordinate": 21.615633,
+        "y_coordinate": 40.641746
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@38",
+        "x_coordinate": 21.573866,
+        "y_coordinate": 40.617511
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@40",
+        "x_coordinate": 21.560488,
+        "y_coordinate": 40.651678
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@41",
+        "x_coordinate": 21.560456,
+        "y_coordinate": 40.649234
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@45",
+        "x_coordinate": 21.576904,
+        "y_coordinate": 40.64942
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@46",
+        "x_coordinate": 21.584287,
+        "y_coordinate": 40.650946
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@49",
+        "x_coordinate": 21.603281,
+        "y_coordinate": 40.624112
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@51",
+        "x_coordinate": 21.584853,
+        "y_coordinate": 40.644502
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@52",
+        "x_coordinate": 21.584888,
+        "y_coordinate": 40.6445
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@53",
+        "x_coordinate": 21.585332,
+        "y_coordinate": 40.651314
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@54",
+        "x_coordinate": 21.585059,
+        "y_coordinate": 40.655186
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@55",
+        "x_coordinate": 21.585072,
+        "y_coordinate": 40.655201
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@56",
+        "x_coordinate": 21.584444,
+        "y_coordinate": 40.656075
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@57",
+        "x_coordinate": 21.583096,
+        "y_coordinate": 40.655572
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@58",
+        "x_coordinate": 21.605144,
+        "y_coordinate": 40.639416
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@59",
+        "x_coordinate": 21.632062,
+        "y_coordinate": 40.652699
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@60",
+        "x_coordinate": 21.585821,
+        "y_coordinate": 40.658536
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@61",
+        "x_coordinate": 21.585855,
+        "y_coordinate": 40.658524
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@62",
+        "x_coordinate": 21.567389,
+        "y_coordinate": 40.644589
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@63",
+        "x_coordinate": 21.571742,
+        "y_coordinate": 40.646921
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "gr_zazari@64",
+        "x_coordinate": 21.616721,
+        "y_coordinate": 40.676927
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a03-1",
+        "x_coordinate": 3.031312151,
+        "y_coordinate": 49.87432541
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a12-1",
+        "x_coordinate": 3.033032674,
+        "y_coordinate": 49.8732072
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a13-1",
+        "x_coordinate": 3.030103714,
+        "y_coordinate": 49.87248404
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a22-1",
+        "x_coordinate": 3.031832006,
+        "y_coordinate": 49.87155552
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a04-1",
+        "x_coordinate": 3.031892783,
+        "y_coordinate": 49.87430695
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a11-1",
+        "x_coordinate": 3.032451803,
+        "y_coordinate": 49.87322652
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a15-1",
+        "x_coordinate": 3.031266957,
+        "y_coordinate": 49.87244689
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a19-1",
+        "x_coordinate": 3.030084549,
+        "y_coordinate": 49.87161147
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a28-1",
+        "x_coordinate": 3.021263849,
+        "y_coordinate": 49.87270023
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a28-2",
+        "x_coordinate": 3.020584725,
+        "y_coordinate": 49.8723421
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "fr_estrees-mons@a28-3",
+        "x_coordinate": 3.019741848,
+        "y_coordinate": 49.87180029
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "ch_lens@lens",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5796",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5797",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5798",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5799",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5800",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5801",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5802",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5803",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5804",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5805",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5806",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5807",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@5808",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6398",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6399",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6400",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6401",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6402",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6403",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6404",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6405",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6406",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6407",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6408",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6409",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6410",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6411",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6412",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6413",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@6414",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7191",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7192",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7193",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7194",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7195",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7196",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7197",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7198",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7199",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7200",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7201",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7202",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7203",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7204",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7205",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7206",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7207",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7208",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7209",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7210",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7211",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7212",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7213",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7214",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    },
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_geolocation",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "name": "es_arkaute@7215",
+        "x_coordinate": 0.0,
+        "y_coordinate": 0.0
+      }
+    }
+  ]
+}
