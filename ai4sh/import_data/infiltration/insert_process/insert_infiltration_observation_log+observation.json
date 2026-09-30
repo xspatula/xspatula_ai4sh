@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process": "insert_tabular_data",
+      "overwrite": true,
+      "parameters": {
+        "process": "manage_observation_log",
+        "tabular_data_path": "import_data/infiltration/excel/AI4SH_observation_log_infiltration.xlsx",
+        "dst_path": "import_data/infiltration/insert_process/staging"
+      }
+    },
+    {
+      "process": "insert_tabular_data",
+      "overwrite": true,
+      "parameters": {
+        "process": "manage_observation",
+        "tabular_data_path": "import_data/infiltration/excel/AI4SH_infiltration_tg_cleaned.xlsx",
+        "dst_path": "import_data/infiltration/insert_process/staging"
+      }
+    }
+  ]
+}
