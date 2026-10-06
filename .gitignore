@@ -149,3 +149,11 @@ ai4sh/import_data/prepare_ai4sh_data/edna/excel/
 ai4sh/import_data/prepare_ai4sh_data/edna/report/
 .~lock.*#
 setup/zzz/ai4sh/setup_db/db_audit.txt
+
+# =============================================================
+# Excel files - may contain sensitive data, never commit
+# =============================================================
+*.xlsx
+*.xls
+*.xlsm
+~$*
