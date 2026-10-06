@@ -1,0 +1,21 @@
+{
+  "process": [
+    {
+      "root_process_id": "import_tabular_data",
+      "process": "manage_person",
+      "delete": false,
+      "overwrite": false,
+      "parameters": {
+        "data_source_id__data_source_name": "ai4soilhealth",
+        "first_name": "thomas",
+        "last_name": "gumbricht",
+        "email": "thomas.gumbricht@natgeo.su.se",
+        "postal_address": "stockholm",
+        "territory_id__territory_name": "se",
+        "telephone": "+46 7763057701",
+        "department": "physical geography",
+        "position": "researcher"
+      }
+    }
+  ]
+}

@@ -5,8 +5,8 @@
       "overwrite": true,
       "parameters": {
         "process": "manage_campaign",
-        "tabular_data_path": "import_data/dataset/excel/campaign.xlsx",
-        "dst_path": "import_data/dataset/insert_process/staging"
+        "tabular_data_path": "import_data/dataset_metadata/excel/campaign.xlsx",
+        "dst_path": "import_data/dataset_metadata/insert_process/staging"
       }
     }
   ]
