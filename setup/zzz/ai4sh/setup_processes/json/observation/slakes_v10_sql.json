@@ -5,10 +5,10 @@
       "overwrite": false,
       "parameters": {
         "root_process": "manage_table_data",
-        "process": "manage_beerkan_observation",
+        "process": "manage_app_aggregate_stability_observation",
         "min_user_stratum": 2,
-        "title": "Manage beerkan infiltration observation",
-        "label": "Insert, update or delete beerkan field observation data."
+        "title": "Manage app aggregate stability observation",
+        "label": "Insert, update or delete app aggregate stability observation data."
       },
       "nodes": [
         {
@@ -51,8 +51,8 @@
               "parameter": "provision_id__provision_name",
               "parameter_type": "text",
               "required": false,
-              "default_value": "beerkan estimation of soil hydraulic properties",
-              "hint": "Default name that should not be changed",
+              "default_value": "slakes",
+              "hint": "Name of application (e.g. slakes or moulder)",
               "schema_table": {
                 "schema": "observation",
                 "table": "observation",
@@ -79,98 +79,18 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "'%s@beerkan' %(sampling_log_id__sampling_log_name)"
+                "concat": "'%s@slakes' %(sampling_log_id__sampling_log_name)"
               }
             },
             {
-              "parameter": "ring_diameter",
+              "parameter": "stability_index",
               "parameter_type": "float",
               "required": true,
-              "default_value": 8,
-              "hint": "The inner ring diameter of the ring (can) used for the infiltration test.",
-              "schema_table": {
-                "schema": "observation",
-                "table": "infiltration_beerkan",
-                "write": true
-              },
-              "permission": {
-                "update": true,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "ring_diameter_unit_id__ring_diameter_unit_name",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "cm",
-              "hint": "The unit in whihc the inner ring diameter is given.",
-              "schema_table": {
-                "schema": "observation",
-                "table": "infiltration_beerkan",
-                "write": true
-              },
-              "permission": {
-                "update": true,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "unit_water_volume",
-              "parameter_type": "float",
-              "required": true,
-              "default_value": 50,
-              "hint": "The unit water volume poured into the ring.",
-              "schema_table": {
-                "schema": "observation",
-                "table": "infiltration_beerkan",
-                "write": true
-              },
-              "permission": {
-                "update": true,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "unit_water_volume_unit_id__unit_water_volume_unit_name",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "ml",
-              "hint": "The unit water volume unit.",
-              "schema_table": {
-                "schema": "observation",
-                "table": "infiltration_beerkan",
-                "write": true
-              },
-              "permission": {
-                "update": true,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "initial_soil_moisture_volume_percent",
-              "parameter_type": "smallint",
-              "required": false,
               "default_value": 0,
-              "hint": "The initial volumetric soil moisture content.",
+              "hint": "The stability index reported by the app.",
               "schema_table": {
                 "schema": "observation",
-                "table": "infiltration_beerkan",
-                "write": true
-              },
-              "permission": {
-                "update": true,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "final_soil_moisture_volume_percent",
-              "parameter_type": "smallint",
-              "required": false,
-              "default_value": 0,
-              "hint": "The final volumetric soil moisture content.",
-              "schema_table": {
-                "schema": "observation",
-                "table": "infiltration_beerkan",
+                "table": "app_aggregate_stability",
                 "write": true
               },
               "permission": {
@@ -257,22 +177,6 @@
               },
               "permission": {
                 "update": false,
-                "delete": false
-              }
-            },
-            {
-              "parameter": "sampled_at",
-              "parameter_type": "timestamp",
-              "required": false,
-              "default_value": "",
-              "hint": "The timestamp of the observation, leave blank to set now (1/10 of second precision)",
-              "schema_table": {
-                "schema": "observation",
-                "table": "observation",
-                "write": true
-              },
-              "permission": {
-                "update": true,
                 "delete": false
               }
             }

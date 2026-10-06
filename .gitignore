@@ -135,6 +135,12 @@ setup/zzz/lucas/setup_db/db_audit.txt
 # =============================================================
 ai4sh/import_data/eDNA/raw_data_scripts_tests/
 
+
+# =============================================================
+# eDNA input data
+# =============================================================
+ai4sh/import_data/prepare_ai4sh_data/edna/excel/AI4SH_eDNA_Final results.xlsx
+
 # regenerable eDNA data: CLI master input and outputs, import staging
 ai4sh/import_data/eDNA/excel/
 ai4sh/import_data/eDNA/insert_process/staging/
