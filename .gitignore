@@ -99,7 +99,8 @@ ai4sh/import_data/sample/excel/
 ai4sh/import_data/sample/insert_process/staging/
 ai4sh/import_data/soil_respiration/excel/
 ai4sh/import_data/soil_respiration/insert_process/staging/
-ai4sh/import_data/utility/
+ai4sh/import_data/utility/**
+!ai4sh/import_data/utility/**/
 ai4sh/import_data/wetlab/agrolab/excel/
 ai4sh/import_data/wetlab/agrolab/insert_process/staging/
 ai4sh/import_data/wetlab/auth/excel/
@@ -159,9 +160,12 @@ ai4sh/import_data/prepare_ai4sh_data/edna/report/
 setup/zzz/ai4sh/setup_db/db_audit.txt
 
 # =============================================================
-# Excel files - may contain sensitive data, never commit
+# Excel files - may contain sensitive data, never commit except for those explicitly listed above
 # =============================================================
 *.xlsx
 *.xls
 *.xlsm
 ~$*
+
+# Exception: utility reference tables are not sensitive - track them
+!ai4sh/import_data/utility/**/*.xlsx
