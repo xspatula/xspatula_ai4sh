@@ -1,9 +1,5 @@
 {
   "process": [
-
-
-
-
     {
       "process_id": "create_table",
       "overwrite": false,
@@ -28,7 +24,6 @@
         "DELETE": true
       }
     },
-    
     {
       "process_id": "create_table",
       "overwrite": false,

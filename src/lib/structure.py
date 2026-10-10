@@ -435,6 +435,231 @@ class Scheme_params():
 
             return format_string, values
 
+        def column_schema(table, column):
+            """
+            Return the schema of <table> if it has <column>, else None.
+            """
+            sql = "SELECT table_schema FROM information_schema.columns WHERE table_name = %s AND column_name = %s;"
+
+            schema_rec = session._Execute_search_single_sql(sql, (table, column))
+
+            return schema_rec[0] if schema_rec else None
+
+        def find_record(table):
+            """
+            Locate the record in <table> referenced by the process parameter '<table>_id__<table>_name'.
+
+            As users can give the name, the tag or the alias of the record, the value is searched for
+            in the columns name, tag and alias (in that order, skipping columns the table does not have).
+
+            If the value matches more than one record (e.g. a campaign name that is only unique within
+            its dataset), the search is narrowed by the parent records that the process also gives
+            (see parent_scope). If still ambiguous the search is rejected.
+
+            Returns:
+                (schema, id) of the record or None if not found or ambiguous
+            """
+            name_key = '%s_id__%s_name' %(table, table)
+
+            value = getattr(self.process_S.process.parameters, name_key, None)
+
+            if value in [None, '']:
+
+                Log('\n          ❌ ERROR auto_name: parameter <%s> is missing' %(name_key))
+
+                return None
+
+            for column in ['name', 'tag', 'alias']:
+
+                schema = column_schema(table, column)
+
+                if not schema:
+
+                    continue
+
+                recs = session._Multi_search({column: value}, ['id'], schema, table)
+
+                if not recs:
+
+                    continue
+
+                if len(recs) == 1:
+
+                    return schema, recs[0][0]
+
+                scope_D = parent_scope(schema, table)
+
+                if scope_D:
+
+                    scope_D[column] = value
+
+                    recs = session._Multi_search(scope_D, ['id'], schema, table)
+
+                    if len(recs) == 1:
+
+                        return schema, recs[0][0]
+
+                Log('\n          ❌ ERROR auto_name: <%s> matches %s records in <%s.%s> - give the tag or add the parent (e.g. <%s>) to the process'
+                    %(value, len(recs), schema, table, ', '.join(parent_keys(schema, table)) or 'none'))
+
+                return None
+
+            Log('\n          ❌ ERROR auto_name: <%s> not found as name, tag or alias in table <%s>' %(value, table))
+
+            return None
+
+        def parent_keys(schema, table):
+            """
+            Return the parent foreign key parameters of <table>, e.g. ['dataset_id__dataset_name'] for campaign.
+            Parents are the columns '<parent>_id' of <table>.
+            """
+            cols = session._Multi_search({'table_schema': schema, 'table_name': table}, ['column_name'], 'information_schema', 'columns')
+
+            return ['%s__%s_name' %(c[0], c[0][:-3]) for c in cols if c[0].endswith('_id') and c[0] != 'id']
+
+        def parent_scope(schema, table):
+            """
+            Return a query dict {'<parent>_id': id} for each parent of <table> that the process gives as
+            parameter '<parent>_id__<parent>_name' (resolved recursively with find_record).
+            """
+            scope_D = {}
+
+            for key in parent_keys(schema, table):
+
+                if getattr(self.process_S.process.parameters, key, None) in [None, '']:
+
+                    continue
+
+                found = find_record(key.split('_id__')[0])
+
+                if found:
+
+                    scope_D['%s_id' %(key.split('_id__')[0])] = found[1]
+
+            return scope_D
+
+        def lookup_column(key):
+            """
+            Retrieve a column value from the record referenced by a foreign key parameter.
+
+            For key = '<table>_id__<table>_<column>' (e.g. 'campaign_id__campaign_tag' or 'dataset_id__dataset_name')
+            the record is located via the process parameter '<table>_id__<table>_name' (see find_record)
+            and <column> is returned.
+
+            Returns:
+                column value or None if the record or value is missing
+            """
+            table, column = re.fullmatch(r'(\w+)_id__\1_(\w+)', key).groups()
+
+            if not column_schema(table, column):
+
+                Log('\n          ❌ ERROR auto_name: table <%s> has no column <%s> (from <%s>)' %(table, column, key))
+
+                return None
+
+            found = find_record(table)
+
+            if not found:
+
+                return None
+
+            schema, record_id = found
+
+            rec = session._Single_search({'id': record_id}, [column], schema, table)
+
+            if not rec or rec[0] in [None, '']:
+
+                Log('\n          ❌ ERROR auto_name: record id <%s> in <%s.%s> has no %s' %(record_id, schema, table, column))
+
+                return None
+
+            return rec[0]
+
+        def lookup_campaign_territory():
+            """
+            Retrieve the territory code (utility.territory.iso_code_a2_ext, e.g. 'eu') of the campaign
+            given by the process parameter 'campaign_id__campaign_name' via observation.campaign_location.
+
+            Returns:
+                territory code or None if not found
+            """
+            found = find_record('campaign')
+
+            if not found:
+
+                return None
+
+            loc_rec = session._Single_search({'campaign_id': found[1]}, ['territory_id'], 'observation', 'campaign_location')
+
+            if not loc_rec or not loc_rec[0]:
+
+                Log('\n          ❌ ERROR auto_name: campaign id <%s> has no territory in observation.campaign_location' %(found[1]))
+
+                return None
+
+            ter_rec = session._Single_search({'id': loc_rec[0]}, ['iso_code_a2_ext'], 'utility', 'territory')
+
+            if not ter_rec or not ter_rec[0]:
+
+                Log('\n          ❌ ERROR auto_name: territory id <%s> has no iso_code_a2_ext' %(loc_rec[0]))
+
+                return None
+
+            return ter_rec[0]
+
+        def compose_auto_name(parameter, concat):
+            """
+            Compose an auto name from a concat rule, e.g. "'%s_%s' %(campaign_id__campaign_tag, campaign_territory_id)".
+
+            Concat arguments are resolved as:
+            - 'campaign_territory_id': territory code of the campaign (via observation.campaign_location)
+            - '<table>_id__<table>_<column>' (e.g. 'dataset_id__dataset_tag', 'campaign_id__campaign_name'):
+              <column> of the record referenced by the parameter '<table>_id__<table>_name', where the
+              parameter value can be the name, tag or alias of the record
+            - any other argument (e.g. 'datetime_tag', 'tag', 'profile_min'):
+              the process parameter value as given
+
+            Returns:
+                the composed name or None if it can not be composed
+            """
+            format_string, keys = extract_concat_parts(concat)
+
+            if not format_string or not keys:
+
+                Log('\n          ❌ ERROR auto_name: can not parse concat <%s> for <%s>' %(concat, parameter))
+
+                return None
+
+            values = []
+
+            for key in keys:
+
+                fk_match = re.fullmatch(r'(\w+)_id__\1_(\w+)', key)
+
+                if key == 'campaign_territory_id':
+
+                    value = lookup_campaign_territory()
+
+                elif fk_match:
+
+                    value = lookup_column(key)
+
+                else:
+
+                    value = getattr(self.process_S.process.parameters, key, None)
+
+                    if value in [None, '']:
+
+                        Log('\n          ❌ ERROR auto_name: parameter <%s> required for <%s> is missing' %(key, parameter))
+
+                if value in [None, '']:
+
+                    return None
+
+                values.append(value)
+
+            return format_string % tuple(values)
+
         status_OK = 1
 
         if not hasattr(self.process_S.process,'process'):
@@ -537,13 +762,50 @@ class Scheme_params():
 
                 if getattr(self.process_S.process.parameters, auto_name_rec[0], None) in ['auto', 'auto_name']:
 
-                    format_string, values = extract_concat_parts(auto_name_rec[1])
-                        
-                    values = [ getattr(self.process_S.process.parameters, v) for v in values]  # only keep values that are defined parameters in the database
-               
-                    if format_string and values:
+                    auto_name = compose_auto_name(auto_name_rec[0], auto_name_rec[1])
 
-                        setattr(self.process_S.process.parameters, auto_name_rec[0], format_string % tuple(values))
+                    if auto_name is None:
+
+                        status_OK = 0
+
+                    else:
+
+                        setattr(self.process_S.process.parameters, auto_name_rec[0], auto_name)
+
+        # Names, aliases and tags must not contain "_" or "@" as these are used as separators in composed names
+        # (e.g. sampling_log_name@provision_name) that must be possible to disentangle. A name containing "_" or "@"
+        # is only accepted if it exactly equals the name composed by the auto_name concat rule of the parameter.
+        # Exempted are process parameters listed in separator_exempt_D, e.g. the geolocation name that is set before
+        # the sample and acts as unique key when different sources give different names for the same sample.
+        auto_name_D = dict( [ (i[0], i[1]) for i in auto_name_recs ] ) if auto_name_recs else {}
+
+        separator_exempt_D = {'manage_geolocation': ['name']}
+
+        for key in ['name', 'alias', 'tag']:
+
+            if key in separator_exempt_D.get(self.process_S.process.process, []):
+
+                continue
+
+            value = getattr(self.process_S.process.parameters, key, None)
+
+            if not isinstance(value, str) or not any(c in value for c in '_@'):
+
+                continue
+
+            if key in auto_name_D and value == compose_auto_name(key, auto_name_D[key]):
+
+                continue
+
+            error_msg = '\n          ❌ ERROR parameter <%s> = <%s> contains "_" or "@" (reserved for composed names) for process <%s>\n \
+            (file: %s;  process nr: %s)' %(key, value, self.process_S.process.process,
+                                             self.json_file_FN,
+                                            self.p_str)
+
+            Log( error_msg)
+
+            status_OK = 0
+
         # Check if this process has inherit parameters and if so fill in the inherit parameters, this is needed for the process to be able to get the inherited value for the parameter when it runs, but also for the type checking of the parameters as the inherited parameters are defined in the database as well and need to be included in the process parameters for the type checking to work
         paramL =['process_parameter','src_schema', 'src_table', 'src_column', 'search_column', 'search_object', 'filter_column', 'filter_value']
 
