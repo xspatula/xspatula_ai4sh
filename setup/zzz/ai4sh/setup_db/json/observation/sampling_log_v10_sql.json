@@ -13,6 +13,7 @@
           "contact_name VARCHAR",
           "contact_email VARCHAR",
           "name TEXT",
+          "tag TEXT UNIQUE NOT NULL",
           "abstract TEXT",
           "sampling_tool_array TEXT[]",
           "time_series BOOLEAN DEFAULT FALSE",

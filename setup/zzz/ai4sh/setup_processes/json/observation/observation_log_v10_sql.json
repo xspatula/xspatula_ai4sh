@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_observation_log",
@@ -51,7 +51,7 @@
               "parameter": "contact_name",
               "parameter_type": "text",
               "required": false,
-              "default_value": "",
+              "default_value": "inherit",
               "hint": "Contact name for the observation log",
               "schema_table": {
                 "schema": "observation",
@@ -61,13 +61,21 @@
               "permission": {
                 "update": true,
                 "delete": false
+              },
+              "inherit": {
+                "process_parameter": "contact_name",
+                "src_schema": "observation",
+                "src_table": "sampling_log",
+                "src_column": "contact_name",
+                "search_column": "id",
+                "search_object": "sampling_log_id__sampling_log_name"
               }
             },
             {
               "parameter": "contact_email",
               "parameter_type": "text",
               "required": false,
-              "default_value": "",
+              "default_value": "inherit",
               "hint": "The email contact address for the observation log",
               "schema_table": {
                 "schema": "observation",
@@ -77,12 +85,20 @@
               "permission": {
                 "update": true,
                 "delete": false
+              },
+              "inherit": {
+                "process_parameter": "contact_email",
+                "src_schema": "observation",
+                "src_table": "sampling_log",
+                "src_column": "contact_email",
+                "search_column": "id",
+                "search_object": "sampling_log_id__sampling_log_name"
               }
             },
             {
               "parameter": "name",
               "parameter_type": "text",
-              "required": true,
+              "required": false,
               "default_value": "auto",
               "hint": "The name of the observation log, auto = sampling_log+@+provision",
               "schema_table": {
@@ -96,6 +112,25 @@
               },
               "auto_name": {
                 "concat": "'%s@%s' %(sampling_log_id__sampling_log_name, provision_id__provision_name)"
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "The name of the observation log, auto = sampling_log+@+provision",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "auto_name": {
+                "concat": "'%s@%s' %(sampling_log_id__sampling_log_tag, provision_id__provision_tag)"
               }
             },
             {

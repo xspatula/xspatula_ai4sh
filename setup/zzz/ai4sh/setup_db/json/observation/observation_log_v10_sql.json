@@ -14,9 +14,11 @@
           "contact_name VARCHAR",
           "contact_email VARCHAR",
           "name TEXT",
+          "tag TEXT",
           "abstract TEXT",
           "time_series BOOLEAN DEFAULT FALSE",
           "UNIQUE (sampling_log_id, name)",
+          "UNIQUE (sampling_log_id, tag)",
           "PRIMARY KEY (id)"
         ]
       },

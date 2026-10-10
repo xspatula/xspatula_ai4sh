@@ -34,7 +34,7 @@
             {
               "parameter": "name",
               "parameter_type": "text",
-              "required": true,
+              "required": false,
               "default_value": "auto",
               "hint": "Name of the campaign",
               "schema_table": {
@@ -47,7 +47,31 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "%s_%s  %(dataset_id__dataset_alias, begun_at)"
+                "concat": "'%s %s' %(dataset_id__dataset_alias, datetime_tag)"
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "Unique tag used for auto naming production files and results, should be less than 16 chars and not contain at (@) or blank",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "auto_name": {
+                "concat": "'%s_%s' %(dataset_id__dataset_tag, datetime_tag)"
+              },
+              "format": {
+                "at": false,
+                "capital": false,
+                "blank": false
               }
             },
             {
@@ -66,14 +90,14 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "%s_%s  %(dataset_id__dataset_alias, begun_at)"
+                "concat": "'%s %s' %(dataset_id__dataset_alias, datetime_tag)"
               }
             },
             {
               "parameter": "contact_name",
               "parameter_type": "text",
               "required": false,
-              "default_value": "",
+              "default_value": "inherit",
               "hint": "Contact name for the campaign",
               "schema_table": {
                 "schema": "observation",
@@ -83,6 +107,14 @@
               "permission": {
                 "update": true,
                 "delete": false
+              },
+              "inherit": {
+                "process_parameter": "contact_name",
+                "src_schema": "observation",
+                "src_table": "dataset",
+                "src_column": "contact_name",
+                "search_column": "id",
+                "search_object": "dataset_id__dataset_name"
               }
             },
             {
@@ -99,6 +131,14 @@
               "permission": {
                 "update": true,
                 "delete": false
+              },
+              "inherit": {
+                "process_parameter": "contact_email",
+                "src_schema": "observation",
+                "src_table": "dataset",
+                "src_column": "contact_email",
+                "search_column": "id",
+                "search_object": "dataset_id__dataset_name"
               }
             },
             {
@@ -131,6 +171,28 @@
               "permission": {
                 "update": true,
                 "delete": false
+              }
+            },
+            {
+              "parameter": "datetime_tag",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unique tag used for auto naming production files and results, should be less than 24 chars not contain underscore, at (@) or blank",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "format": {
+                "underscore": false,
+                "at": false,
+                "capital": false,
+                "blank": false
               }
             },
             {

@@ -14,6 +14,7 @@
           "method_tier_id INTEGER REFERENCES observation_utility.method_tier (id)",
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
+          "tag TEXT UNIQUE NOT NULL",
           "display_name TEXT",
           "url TEXT",
           "abstract TEXT",
@@ -43,6 +44,7 @@
             "apparatus_id",
             "method_tier_id",
             "name",
+            "tag",
             "alias",
             "display_name",
             "abstract"
@@ -54,6 +56,7 @@
               "0",
               "0",
               "unknown",
+              "none",
               "none",
               "Unknown",
               "Unknown or undisclosed provision."
