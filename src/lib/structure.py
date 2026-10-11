@@ -589,7 +589,17 @@ class Scheme_params():
 
                 return None
 
-            loc_rec = session._Single_search({'campaign_id': found[1]}, ['territory_id'], 'observation', 'campaign_location')
+            loc_recs = session._Multi_search({'campaign_id': found[1]}, ['territory_id'], 'observation', 'campaign_location')
+
+            # campaign_location has campaign_id as primary key, but guard against several territories
+            # being added in the future as the territory used for the name would then be arbitrary
+            if loc_recs and len(loc_recs) > 1:
+
+                Log('\n          ❌ ERROR auto_name: campaign id <%s> has %s territories in observation.campaign_location - can not use campaign_territory_id' %(found[1], len(loc_recs)))
+
+                return None
+
+            loc_rec = loc_recs[0] if loc_recs else None
 
             if not loc_rec or not loc_rec[0]:
 
@@ -772,7 +782,7 @@ class Scheme_params():
 
                         setattr(self.process_S.process.parameters, auto_name_rec[0], auto_name)
 
-        # Names, aliases and tags must not contain "_" or "@" as these are used as separators in composed names
+        # Names, aliases, tags and datetime tags must not contain "_" or "@" as these are used as separators in composed names
         # (e.g. sampling_log_name@provision_name) that must be possible to disentangle. A name containing "_" or "@"
         # is only accepted if it exactly equals the name composed by the auto_name concat rule of the parameter.
         # Exempted are process parameters listed in separator_exempt_D, e.g. the geolocation name that is set before
@@ -781,7 +791,7 @@ class Scheme_params():
 
         separator_exempt_D = {'manage_geolocation': ['name']}
 
-        for key in ['name', 'alias', 'tag']:
+        for key in ['name', 'alias', 'tag', 'datetime_tag']:
 
             if key in separator_exempt_D.get(self.process_S.process.process, []):
 
