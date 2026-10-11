@@ -119,7 +119,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "auto",
-              "hint": "The name of the observation log, auto = sampling_log+@+provision",
+              "hint": "Tag of the observation log (unique per sampling log) used for auto naming production files and results, auto = sampling_log tag + @ + provision tag. A tag given by hand must not contain underscore, at (@), capitals or blank.",
               "schema_table": {
                 "schema": "observation",
                 "table": "observation_log",

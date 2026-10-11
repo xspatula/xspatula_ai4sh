@@ -103,7 +103,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "auto",
-              "hint": "Unique tag used for auto naming production files and results, should be less than 16 chars not contain underscore, at (@) or blank",
+              "hint": "Unique tag used for auto naming production files and results, auto = campaign tag + _ + campaign territory code. A tag given by hand must not contain underscore, at (@), capitals or blank.",
               "schema_table": {
                 "schema": "observation",
                 "table": "sampling_log",

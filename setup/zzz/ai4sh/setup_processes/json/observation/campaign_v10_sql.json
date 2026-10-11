@@ -55,7 +55,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "auto",
-              "hint": "Unique tag used for auto naming production files and results, should be less than 16 chars and not contain at (@) or blank",
+              "hint": "Unique tag used for auto naming production files and results, auto = dataset tag + _ + datetime_tag. A tag given by hand must not contain underscore, at (@), capitals or blank.",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign",
