@@ -71,6 +71,28 @@
         "UPDATE": true,
         "DELETE": true
       }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation",
+        "table": "observation_classification",
+        "command": [
+          "id BIGSERIAL",
+          "observation_id INTEGER REFERENCES observation.observation (id)",
+          "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
+          "value_id INTEGER REFERENCES observation_utility.nominal_classification (id)",
+          "UNIQUE (observation_id,indicator_id)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
+      }
     }
   ]
 }

@@ -22,6 +22,7 @@ from src.postgres import Get_schema_table
 
 from src.postgres.pg_ai4sh import PG_manage_AI4SH
 
+from src.ai4sh.import_data.nominal_classification import CLASSIFIER_FUNCTIONS, CLASSIFIER_INDICATOR_NAMES
 from src.ai4sh.import_data.import_taxon import Process_import_taxon, TARGET_PROCESS as TAXON_PROCESS
 
 from src.ai4sh.import_data.import_edna_asv import Process_import_edna_asv, TARGET_PROCESS as EDNA_ASV_PROCESS
@@ -45,20 +46,14 @@ NO_LOWER_COLS = frozenset({
 # Define classfication levels for substances
 CLASSIFICATION_TABLE_D  = {'manage_order':['manage_family','manage_genus','manage_species'], 
                            'manage_family':['manage_genus','manage_species'], 
-                           'manage_genus':['manage_species'],
-                           'manage_landcover_order':['manage_landcover_family','manage_landcover_genus'],
-                           'manage_landcover_family':['manage_landcover_genus'],
-                           'manage_landuse_order':['manage_landuse_family','manage_landuse_genus'],
-                           'manage_landuse_family':['manage_landuse_genus']
+                           'manage_genus':['manage_species']
                            }
 
 CLASSIFICATION_CHILDREN_D = { 'manage_family': {'table': 'family', 'parent_id_name': 'order_id__order_name'},
                             'manage_genus': {'table': 'genus', 'parent_id_name': 'family_id__family_name'},
-                            'manage_species': {'table': 'species', 'parent_id_name': 'genus_id__genus_name'},
-                            'manage_landcover_family': {'table': 'landcover_family', 'parent_id_name': 'landcover_order_id__landcover_order_name'},
-                            'manage_landcover_genus': {'table': 'landcover_genus', 'parent_id_name': 'landcover_family_id__landcover_family_name'},
-                            'manage_landuse_family': {'table': 'landuse_family', 'parent_id_name': 'landuse_order_id__landuse_order_name'},
-                            'manage_landuse_genus': {'table': 'landuse_genus', 'parent_id_name': 'landuse_family_id__landuse_family_name'}}
+                            'manage_species': {'table': 'species', 'parent_id_name': 'genus_id__genus_name'}}
+# Land cover and land use are single tables with a parent class and a class rank (as taxon); a class is
+# recorded once at its own rank and observations reference it at whatever rank was recorded
 
 SPECIAL_SEARCH_TABLES_D = {'observation.campaign': '_Retrieve_dataset_alias',
                            'observation.observation': '_Retrieve_sample_id_from_observation_log',
@@ -820,9 +815,13 @@ class Process_import_JSON(Get_schema_table):
                 return None
             
             self._Insert_at_records(updated_query_D,at_params_D, schema, table, main_query_D['provision_id__provision_name'])
-    
+
+            if schema_table == 'observation.observation_measurement':
+
+                self._Insert_derived_classifications(main_query_D, updated_query_D, at_columns_D)
+
             return None
-        
+
         # Quick and dirty for method tier
 
         if table == 'observation_log_method_tier':
@@ -853,6 +852,61 @@ class Process_import_JSON(Get_schema_table):
         elif self.verbose > 1:
 
             print ('.     🟡 Record %s already registered in table %s, use overwrite to update' %(name, table))
+
+    def _Insert_derived_classifications(self, main_query_D, updated_query_D, at_columns_D):
+        ''' Compute and store any derived nominal classification (e.g. soil texture -
+        see src/ai4sh/import_data/nominal_classification.py) whose indicator is
+        registered as a provision_indicator (quantity 'class') for this observation's
+        provision. Called once per manage_observation insert, right after its regular
+        @-indicator measurements are written.
+        '''
+
+        provision_name = main_query_D['provision_id__provision_name']
+
+        registered_D = self.pg_ai4sh_C._Retrieve_classification_indicators_for_provision(provision_name, self.pg_session_C)
+
+        if not registered_D or not (set(registered_D) & CLASSIFIER_INDICATOR_NAMES):
+
+            return None
+
+        observation_id = updated_query_D['observation_id']
+
+        for classifier_fn in CLASSIFIER_FUNCTIONS:
+
+            result_D = classifier_fn(at_columns_D)
+
+            for indicator_name, class_name in result_D.items():
+
+                if indicator_name not in registered_D:
+
+                    continue
+
+                indicator_id, analysis_method_id = registered_D[indicator_name]
+
+                value_id = self.pg_ai4sh_C._Retrieve_nominal_classification_id(
+                    indicator_id, analysis_method_id, class_name, self.pg_session_C)
+
+                if value_id is None:
+
+                    self._Report_failure(
+                        '.  ❌ ERROR: derived class "%s" for indicator "%s" is not a registered '
+                        'nominal_classification row (provision %s) - add it to nominal_classes.xlsx '
+                        'and re-run the insert_process' % (class_name, indicator_name, provision_name))
+
+                    continue
+
+                classification_query_D = {
+                    'observation_id': observation_id,
+                    'indicator_id': indicator_id,
+                    'value_id': value_id,
+                }
+
+                self._Manage_specifics(
+                    main_query_D, classification_query_D, 'observation_id',
+                    'observation', 'observation_classification', observation_id,
+                    '%s@%s' % (indicator_name, provision_name))
+
+        return None
 
     def _Insert_at_records(self,updated_query_D,at_params_D, schema, table, provision_name):
 

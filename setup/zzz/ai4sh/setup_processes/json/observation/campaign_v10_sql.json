@@ -36,7 +36,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "auto",
-              "hint": "Name of the campaign",
+              "hint": "Name of the campaign, auto = dataset alias + territory name + site (if given); no territory gives 'no location'",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign",
@@ -47,7 +47,7 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "'%s %s' %(dataset_id__dataset_alias, datetime_tag)"
+                "concat": "'%s %s %s' %(dataset_id__dataset_alias, territory_id__territory_name, site?)"
               }
             },
             {
@@ -55,7 +55,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "auto",
-              "hint": "Unique tag used for auto naming production files and results, auto = dataset tag + _ + datetime_tag. A tag given by hand must not contain underscore, at (@), capitals or blank.",
+              "hint": "Unique tag used for auto naming production files and results, auto = dataset tag + _ + territory code (0 if no territory) + _ + site (if given). A tag (and a site used in it) must not contain underscore, at (@), capitals or blank.",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign",
@@ -66,7 +66,7 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "'%s_%s' %(dataset_id__dataset_tag, datetime_tag)"
+                "concat": "'%s_%s_%s' %(dataset_id__dataset_tag, territory_id__territory_iso_code_a2_ext, site?)"
               },
               "format": {
                 "at": false,
@@ -90,7 +90,7 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "'%s %s' %(dataset_id__dataset_alias, datetime_tag)"
+                "concat": "'%s %s' %(dataset_id__dataset_alias, territory_id__territory_name)"
               }
             },
             {
@@ -171,28 +171,6 @@
               "permission": {
                 "update": true,
                 "delete": false
-              }
-            },
-            {
-              "parameter": "datetime_tag",
-              "parameter_type": "text",
-              "required": true,
-              "default_value": "",
-              "hint": "Unique tag used for auto naming production files and results, should be less than 24 chars not contain underscore, at (@) or blank",
-              "schema_table": {
-                "schema": "observation",
-                "table": "campaign",
-                "write": true
-              },
-              "permission": {
-                "update": false,
-                "delete": false
-              },
-              "format": {
-                "underscore": false,
-                "at": false,
-                "capital": false,
-                "blank": false
               }
             },
             {

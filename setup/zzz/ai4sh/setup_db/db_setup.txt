@@ -209,6 +209,10 @@ observation_utility/spectrometer_v10_sql.json
 # requires: quantity, species, unit.
 observation_utility/quantity_default_unit_v10_sql.json
 
+# Nominal classification that can be derived from numerical observations
+# requires: indicator and analysis method
+observation_utility/nominal_classification_v10_sql.json
+
 # Unit translate defines the mathematical translation between different units
 # requires: unit.
 observation_utility/unit_translate_v10_sql.json
@@ -343,16 +347,13 @@ landscape_utility/crop_growth_stage_v10_sql.json
 
 landscape_utility/biogeo16_v10_sql.json
 
-# Land use utility includes tables for:
-# -land use order
-# -land use family
-# -land use genus
+# Class rank is the catalogue of ranks (order, family, genus) for hierarchical landscape classifications
+landscape_utility/class_rank_v10_sql.json
+
+# Land use classes, all ranks in one table (parent class + class rank, as taxon)
 landscape_utility/land_use_v10_sql.json
 
-# Land cover utility includes tables for:
-# -land cover order
-# -land cover family
-# -land cover genus
+# Land cover classes, all ranks in one table (parent class + class rank, as taxon)
 landscape_utility/land_cover_v10_sql.json
 
 # Soil classification utility includes tables for:
@@ -394,3 +395,7 @@ landscape_utility/soil_preparation_v10_sql.json
 # - landuse observation
 # - landcover observation
 landscape/observation_lucc_v10_sql.json
+
+# observation_biogeo16 contains the table for:
+# - biogeo16 observation
+landscape/observation_biogeo16_v10_sql.json

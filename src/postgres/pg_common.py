@@ -584,6 +584,11 @@ class PG_common():
             return rec
 
         def _Get_id(key, value):
+            # An empty parent key (e.g. parent_landuse_id of an order, the top rank) is left out, so it is NULL.
+            # Other empty keys resolve to id 0, the "none" row of catalogues such as setting_system
+            if key.startswith('parent_') and value in ('', 'none', 'null'):
+                updated_query_D.pop(key)
+                return True
             #rec = self._Check_get_foreign_id_key(key, value)
             rec = self._Check_get_foreign_key(key, value)
             if not rec:
@@ -652,8 +657,13 @@ class PG_common():
 
                     rec = _Get_id(key, queryD[key])
 
-                    if not rec:
-                        
+                    # _Get_id returns the (truthy) string 'fk_error' when the value is not found; without
+                    # this check the unresolved key (e.g. parent_landuse_id__landuse_alias) was passed on
+                    # to the INSERT as a column name
+                    if not rec or rec == 'fk_error':
+
+                        print('   ❌ ERROR Can not find foreign key value <%s> for %s' % (queryD[key], key))
+
                         return 'fk_error'
 
         return updated_query_D

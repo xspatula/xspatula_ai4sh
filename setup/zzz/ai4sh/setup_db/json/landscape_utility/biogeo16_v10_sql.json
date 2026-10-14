@@ -6,11 +6,12 @@
       "delete": false,
       "parameters": {
         "schema": "landscape_utility",
-        "table": "biogeo16_eu",
+        "table": "biogeo16",
         "command": [
           "id SERIAL",
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
+          "tag TEXT UNIQUE",
           "display_name TEXT",
           "abstract TEXT",
           "PRIMARY KEY (id)"

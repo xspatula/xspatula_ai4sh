@@ -469,7 +469,29 @@ class Scheme_params():
 
                 return None
 
-            for column in ['name', 'tag', 'alias']:
+            search_column_L = ['name', 'tag', 'alias']
+
+            # Also search the other unique columns of the table (e.g. territory iso_code_a2_ext = 'eu').
+            # Only single column UNIQUE constraints on text columns qualify; a column in a multi column
+            # constraint (e.g. dataset_id in UNIQUE (dataset_id, name)) does not identify a record on its own
+            table_schema = column_schema(table, 'id')
+
+            if table_schema:
+
+                for group in session._Get_unique_key_groups(table_schema, table):
+
+                    if len(group) != 1 or group[0] in search_column_L:
+
+                        continue
+
+                    type_rec = session._Single_search({'table_schema': table_schema, 'table_name': table, 'column_name': group[0]},
+                                                      ['data_type'], 'information_schema', 'columns')
+
+                    if type_rec and type_rec[0] in ['text', 'character varying', 'character']:
+
+                        search_column_L.append(group[0])
+
+            for column in search_column_L:
 
                 schema = column_schema(table, column)
 
@@ -477,7 +499,15 @@ class Scheme_params():
 
                     continue
 
-                recs = session._Multi_search({column: value}, ['id'], schema, table)
+                try:
+
+                    recs = session._Multi_search({column: value}, ['id'], schema, table)
+
+                except Exception as e:
+
+                    Log('\n          ❌ ERROR auto_name: searching <%s> in <%s.%s.%s> failed: %s' %(value, schema, table, column, str(e).strip().split('\n')[0]))
+
+                    return None
 
                 if not recs:
 
@@ -504,7 +534,7 @@ class Scheme_params():
 
                 return None
 
-            Log('\n          ❌ ERROR auto_name: <%s> not found as name, tag or alias in table <%s>' %(value, table))
+            Log('\n          ❌ ERROR auto_name: <%s> not found as name, tag, alias or other unique column in table <%s>' %(value, table))
 
             return None
 
@@ -575,59 +605,42 @@ class Scheme_params():
 
             return rec[0]
 
-        def lookup_campaign_territory():
+        def null_value(parameter, key):
             """
-            Retrieve the territory code (utility.territory.iso_code_a2_ext, e.g. 'eu') of the campaign
-            given by the process parameter 'campaign_id__campaign_name' via observation.campaign_location.
-
-            Returns:
-                territory code or None if not found
+            Return the strict null value for a concat argument that is allowed to be empty
+            (see auto_name_null_D): '0' when composing a tag, else the null text (e.g. 'no location').
+            Returns None if the argument is not nullable.
             """
-            found = find_record('campaign')
+            fk_match = re.fullmatch(r'(\w+)_id__\1_(\w+)', key)
 
-            if not found:
+            null_key = fk_match.group(1) if fk_match else key
 
-                return None
-
-            loc_recs = session._Multi_search({'campaign_id': found[1]}, ['territory_id'], 'observation', 'campaign_location')
-
-            # campaign_location has campaign_id as primary key, but guard against several territories
-            # being added in the future as the territory used for the name would then be arbitrary
-            if loc_recs and len(loc_recs) > 1:
-
-                Log('\n          ❌ ERROR auto_name: campaign id <%s> has %s territories in observation.campaign_location - can not use campaign_territory_id' %(found[1], len(loc_recs)))
+            if null_key not in auto_name_null_D:
 
                 return None
 
-            loc_rec = loc_recs[0] if loc_recs else None
-
-            if not loc_rec or not loc_rec[0]:
-
-                Log('\n          ❌ ERROR auto_name: campaign id <%s> has no territory in observation.campaign_location' %(found[1]))
-
-                return None
-
-            ter_rec = session._Single_search({'id': loc_rec[0]}, ['iso_code_a2_ext'], 'utility', 'territory')
-
-            if not ter_rec or not ter_rec[0]:
-
-                Log('\n          ❌ ERROR auto_name: territory id <%s> has no iso_code_a2_ext' %(loc_rec[0]))
-
-                return None
-
-            return ter_rec[0]
+            return '0' if parameter == 'tag' else auto_name_null_D[null_key]
 
         def compose_auto_name(parameter, concat):
             """
-            Compose an auto name from a concat rule, e.g. "'%s_%s' %(campaign_id__campaign_tag, campaign_territory_id)".
+            Compose an auto name from a concat rule, e.g. "'%s_%s' %(campaign_id__campaign_tag, datetime_tag)".
 
             Concat arguments are resolved as:
-            - 'campaign_territory_id': territory code of the campaign (via observation.campaign_location)
-            - '<table>_id__<table>_<column>' (e.g. 'dataset_id__dataset_tag', 'campaign_id__campaign_name'):
+            - '<table>_id__<table>_<column>' (e.g. 'dataset_id__dataset_tag', 'territory_id__territory_iso_code_a2_ext'):
               <column> of the record referenced by the parameter '<table>_id__<table>_name', where the
-              parameter value can be the name, tag or alias of the record
-            - any other argument (e.g. 'datetime_tag', 'tag', 'profile_min'):
+              parameter value can be the name, tag, alias or other unique column of the record
+            - any other argument (e.g. 'datetime_tag', 'site', 'profile_min'):
               the process parameter value as given
+
+            Empty arguments:
+            - an argument ending with '?' (e.g. 'site?') is optional; if empty it is dropped together with
+              the separator before it
+            - an argument listed in auto_name_null_D (e.g. territory, datetime_tag) gets the strict null
+              value: '0' in a tag, else the null text (e.g. 'no location', 'no date')
+            - any other empty argument is an error
+
+            When composing a tag, values given directly as process parameters must only hold lower case
+            letters, digits, "." and "-".
 
             Returns:
                 the composed name or None if it can not be composed
@@ -640,37 +653,91 @@ class Scheme_params():
 
                 return None
 
+            separator_L = format_string.split('%s')
+
+            if len(separator_L) != len(keys) + 1:
+
+                Log('\n          ❌ ERROR auto_name: concat <%s> for <%s> has %s placeholders but %s arguments' %(concat, parameter, len(separator_L) - 1, len(keys)))
+
+                return None
+
             values = []
 
             for key in keys:
 
+                optional = key.endswith('?')
+
+                key = key.rstrip('?')
+
                 fk_match = re.fullmatch(r'(\w+)_id__\1_(\w+)', key)
 
-                if key == 'campaign_territory_id':
+                given_key = '%s_id__%s_name' %(fk_match.group(1), fk_match.group(1)) if fk_match else key
 
-                    value = lookup_campaign_territory()
+                given = getattr(self.process_S.process.parameters, given_key, None)
 
-                elif fk_match:
+                # 0 is a valid value (e.g. profile_min = 0) except for nullable arguments where it means null
+                # (e.g. datetime_tag = 0 is no date)
+                if given in [None, ''] or (given in ['0', 0] and null_value(parameter, key) is not None):
+
+                    if optional:
+
+                        values.append(None)
+
+                        continue
+
+                    value = null_value(parameter, key)
+
+                    if value is None:
+
+                        Log('\n          ❌ ERROR auto_name: parameter <%s> required for <%s> is missing' %(given_key, parameter))
+
+                        return None
+
+                    values.append(value)
+
+                    continue
+
+                if fk_match:
 
                     value = lookup_column(key)
 
-                else:
-
-                    value = getattr(self.process_S.process.parameters, key, None)
-
                     if value in [None, '']:
 
-                        Log('\n          ❌ ERROR auto_name: parameter <%s> required for <%s> is missing' %(key, parameter))
+                        return None
 
-                if value in [None, '']:
+                else:
 
-                    return None
+                    value = str(given)
 
-                values.append(value)
+                    if parameter == 'tag' and not re.fullmatch(r'[a-z0-9.-]+', value):
 
-            return format_string % tuple(values)
+                        Log('\n          ❌ ERROR auto_name: <%s> = <%s> can not be part of a tag (only a-z, 0-9, "." and "-" allowed)' %(key, value))
+
+                        return None
+
+                values.append(str(value))
+
+            composed = separator_L[0]
+
+            first = True
+
+            for i, value in enumerate(values):
+
+                if value is None:
+
+                    continue
+
+                composed += value if first else separator_L[i] + value
+
+                first = False
+
+            return composed + separator_L[-1]
 
         status_OK = 1
+
+        # Concat arguments that may be empty and then get a strict null value: '0' in a tag, else the text below
+        # (e.g. a campaign without territory, a sampling_log without date)
+        auto_name_null_D = {'territory': 'no location', 'datetime_tag': 'no date'}
 
         if not hasattr(self.process_S.process,'process'):
 
@@ -790,6 +857,16 @@ class Scheme_params():
         auto_name_D = dict( [ (i[0], i[1]) for i in auto_name_recs ] ) if auto_name_recs else {}
 
         separator_exempt_D = {'manage_geolocation': ['name']}
+
+        # datetime_tag must be '0' (no date) or a datestamp YYYY, YYYYMM, YYYYMMDD or YYYYMMDDhhmmss
+        datetime_tag = getattr(self.process_S.process.parameters, 'datetime_tag', None)
+
+        if datetime_tag not in [None, ''] and not re.fullmatch(r'0|\d{4}|\d{6}|\d{8}|\d{14}', str(datetime_tag)):
+
+            Log('\n          ❌ ERROR parameter <datetime_tag> = <%s> must be 0 or YYYY, YYYYMM, YYYYMMDD or YYYYMMDDhhmmss for process <%s>\n \
+            (file: %s;  process nr: %s)' %(datetime_tag, self.process_S.process.process, self.json_file_FN, self.p_str))
+
+            status_OK = 0
 
         for key in ['name', 'alias', 'tag', 'datetime_tag']:
 

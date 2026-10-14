@@ -1,0 +1,57 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "class_rank",
+        "command": [
+          "id SMALLINT",
+          "name TEXT UNIQUE",
+          "alias TEXT UNIQUE",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape_utility",
+        "table": "class_rank",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "alias"
+          ],
+          "values": [
+            [
+              "1",
+              "order",
+              "ordo"
+            ],
+            [
+              "2",
+              "family",
+              "familia"
+            ],
+            [
+              "3",
+              "genus",
+              "genus"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

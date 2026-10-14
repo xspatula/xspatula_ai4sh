@@ -4,109 +4,130 @@
       "color": "whitesmoke",
       "alpha": 0.2,
       "label": "CaCo3",
-      "unit": "percent"
+      "unit": "native"
     },
     "ca2+": {
       "color": "moccasin",
       "alpha": 0.2,
       "label": "Ca2+",
-      "unit": "mg*kg-1"
+      "unit": "native"
     },
     "cec": {
       "color": "seagreen",
       "alpha": 0.2,
       "label": "Cation Exc. Cap.",
-      "unit": "mol*kg-1"
+      "unit": "native"
     },
     "cf": {
       "color": "sienna",
       "alpha": 0.2,
       "label": "Coarse fraction",
-      "unit": "percent"
+      "unit": "native"
     },
     "clay": {
       "color": "tan",
       "alpha": 0.2,
       "label": "Clay cont.",
-      "unit": "percent"
+      "unit": "native"
     },
     "ec": {
       "color": "dodgerblue",
       "alpha": 0.2,
       "label": "Electric cond.",
-      "unit": "ms*m'-1"
+      "unit": "native"
     },
     "k-ext": {
       "color": "lightcyan",
       "alpha": 0.2,
-      "label": "Potassion (K)",
-      "unit": "mol*kg-1"
+      "label": "Extractable potassium (K)",
+      "unit": "native"
     },
-    "n-to": {
+    "n-tot": {
       "color": "darkcyan",
       "alpha": 0.2,
       "label": "Nitrogen (N) [tot]",
-      "unit": "percent"
+      "unit": "native"
     },
     "c-org": {
       "color": "dimgray",
       "alpha": 0.2,
       "label": "Organic carbon (C)",
-      "unit": "percent"
+      "unit": "native"
     },
     "p-ext": {
       "color": "firebrick",
       "alpha": 0.2,
       "label": "Phosphorus (P)",
-      "unit": "mg*kg-1"
+      "unit": "native"
     },
     "ph-cacl2": {
       "color": "lemonchiffon",
       "alpha": 0.2,
       "label": "pH (CaCl)",
-      "unit": "pH"
+      "unit": "native"
     },
     "ph-h2o": {
       "color": "lightyellow",
       "alpha": 0.2,
       "label": "pH (H20)",
-      "unit": "pH"
+      "unit": "native"
     },
     "sand": {
       "color": "orange",
       "alpha": 0.2,
       "label": "Sand cont.",
-      "unit": "percent"
+      "unit": "native"
     },
     "fine sand": {
       "color": "orange",
       "alpha": 0.2,
       "label": "Sand cont.",
-      "unit": "percent"
+      "unit": "native"
     },
     "coarse sand": {
       "color": "orange",
       "alpha": 0.2,
       "label": "Sand cont.",
-      "unit": "percent"
+      "unit": "native"
     },
     "silt": {
       "color": "khaki",
       "alpha": 0.2,
       "label": "Silt cont.",
-      "unit": "percent"
+      "unit": "native"
     },
     "fine silt": {
       "color": "khaki",
       "alpha": 0.2,
       "label": "Silt cont.",
-      "unit": "percent"
+      "unit": "native"
     },
     "coarse silt": {
       "color": "khaki",
       "alpha": 0.2,
       "label": "Silt cont.",
-      "unit": "percent"
+      "unit": "native"
+    },
+    "landcover": {
+      "color": "olivedrab",
+      "alpha": 0.6,
+      "hatch": "//",
+      "label": "Land cover",
+      "unit": "native"
+    },
+    "landuse": {
+      "color": "goldenrod",
+      "alpha": 0.6,
+      "hatch": "\\\\",
+      "label": "Land use",
+      "unit": "native"
+    },
+    "biogeo16": {
+      "color": "teal",
+      "alpha": 0.6,
+      "hatch": "xx",
+      "label": "Biogeographic region",
+      "unit": "native"
     }
   },
   "featureImportancePlot": {

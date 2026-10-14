@@ -14,6 +14,7 @@
           "factor DOUBLE PRECISION",
           "addon DOUBLE PRECISION",
           "exponent DOUBLE PRECISION DEFAULT 1",
+          "process TEXT DEFAULT 'None'",
           "UNIQUE (src_unit_id, dst_unit_id)",
           "PRIMARY KEY (id)"
         ]

@@ -5,9 +5,9 @@
       "overwrite": false,
       "parameters": {
         "root_process": "manage_table_data",
-        "process": "manage_biogeo16_eu",
+        "process": "manage_biogeo16",
         "min_user_stratum": 4,
-        "title": "Manage biogeo16_eu",
+        "title": "Manage biogeo16",
         "label": "Insert, update or delete classed for the biogeographical regions, Europe 2016 dataset."
       },
       "nodes": [
@@ -23,7 +23,7 @@
               "hint": "biogeographical region name.",
               "schema_table": {
                 "schema": "landscape_utility",
-                "table": "biogeo16_eu",
+                "table": "biogeo16",
                 "write": true
               },
               "permission": {
@@ -39,7 +39,23 @@
               "hint": "biogeographical region alias.",
               "schema_table": {
                 "schema": "landscape_utility",
-                "table": "biogeo16_eu",
+                "table": "biogeo16",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Short unique label for the biogeographic region, used as class value in selected data and plots.",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "biogeo16",
                 "write": true
               },
               "permission": {
@@ -55,7 +71,7 @@
               "hint": "Display name for the biogeographical region.",
               "schema_table": {
                 "schema": "landscape_utility",
-                "table": "biogeo16_eu",
+                "table": "biogeo16",
                 "write": true
               },
               "permission": {
@@ -71,7 +87,7 @@
               "hint": "Abstract describing the biogeographical region in layperson terms",
               "schema_table": {
                 "schema": "landscape_utility",
-                "table": "biogeo16_eu",
+                "table": "biogeo16",
                 "write": true
               },
               "permission": {

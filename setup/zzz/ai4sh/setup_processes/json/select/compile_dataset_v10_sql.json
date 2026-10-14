@@ -1,0 +1,80 @@
+{
+  "process": [
+    {
+      "process": "add_root_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "select_data",
+        "title": "Select data",
+        "label": "Select data with options for filtering and saving locally."
+      }
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "select_data",
+        "process": "compile_dataset",
+        "min_user_stratum": 1,
+        "title": "Compile a dataset from selected subsets",
+        "label": "Join saved selections (spectra, indicator and covariate Parquet files) on sample_id into one dataset, keeping only samples present in all inputs. The output folder can be used as project_root_fp in the machine learning processes."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "input_array",
+              "parameter_type": "array",
+              "required": true,
+              "default_value": "",
+              "hint": "Parquet files (relative to the project root) to join, e.g. the outputs of select_spectra_only and select_indicator_only",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "output_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "./data",
+              "hint": "Root directory (relative to the project root) for saving the compiled dataset",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "output_sub_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Sub path under output_root_fp, default = compiled; the dataset is saved in {output_root_fp}/{output_sub_fp}/{output_name}/",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "output_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the compiled dataset (folder and {output_name}.parquet)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

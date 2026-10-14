@@ -16,11 +16,11 @@
           "element": "parameters",
           "parameter": [
             {
-              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter": "observation_log_id__observation_log_name",
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "The name of the sampling_log that define the collection of data",
+              "hint": "The name of the observation_log.",
               "schema_table": {
                 "schema": "landscape",
                 "table": "landcover_observation",
@@ -48,7 +48,7 @@
               }
             },
             {
-              "parameter": "landcover_genus_id__landcover_genus_name",
+              "parameter": "landcover_id__landcover_name",
               "parameter_type": "text",
               "required": true,
               "default_value": "",
@@ -99,11 +99,11 @@
           "element": "parameters",
           "parameter": [
             {
-              "parameter": "sampling_log_id__sampling_log_name",
+              "parameter": "observation_log_id__observation_log_name",
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "The name of the sampling_log that define the collection of data",
+              "hint": "The name of the observation_log that define the collection of data",
               "schema_table": {
                 "schema": "landscape",
                 "table": "landuse_observation",
@@ -131,7 +131,7 @@
               }
             },
             {
-              "parameter": "landuse_genus_id__landuse_genus_name",
+              "parameter": "landuse_id__landuse_name",
               "parameter_type": "text",
               "required": true,
               "default_value": "",

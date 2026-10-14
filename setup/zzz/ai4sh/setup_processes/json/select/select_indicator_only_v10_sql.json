@@ -1,0 +1,176 @@
+{
+  "process": [
+    {
+      "process": "add_root_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "select_data",
+        "title": "Select data",
+        "label": "Select data with options for filtering and saving locally."
+      }
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "select_data",
+        "process": "select_indicator_only",
+        "min_user_stratum": 1,
+        "title": "Select indicator data subset",
+        "label": "Select indicators (target features) for the samples in scope, translate to target units and save as a local Parquet file (role indicator)."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "dataset",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name, tag or alias of the dataset to query",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": false
+              }
+            },
+            {
+              "parameter": "campaign",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: restrict to a single campaign (name, tag or alias) within the dataset",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": false
+              }
+            },
+            {
+              "parameter": "sampling_log",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: restrict to a single sampling_log (name or tag) within the dataset/campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": false
+              }
+            },
+            {
+              "parameter": "sample_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: restrict to a list of sample names (output sub path then ends with sample_select)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "min_profile",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "Minimum soil profile depth (cm); samples with profile_min shallower than this are excluded",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": false
+              }
+            },
+            {
+              "parameter": "max_profile",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 20,
+              "hint": "Maximum soil profile depth (cm); samples with profile_max deeper than this are excluded",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": false
+              }
+            },
+            {
+              "parameter": "indicator_array",
+              "parameter_type": "array",
+              "required": true,
+              "default_value": "",
+              "hint": "Indicator names or aliases to select (e.g. [cec, clay, c-org]); numeric and nominal (class) indicators",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator",
+                "write": false
+              }
+            },
+            {
+              "parameter": "data_range",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "JSON string with per-indicator min/max filters, e.g. {\"c-org\": {\"min\": 0, \"max\": 100}}; empty = no filter",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "targetfeaturesymbols",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Target feature symbols JSON giving the unit each indicator is translated to; default = the package default",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "output_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "./data",
+              "hint": "Root directory (relative to the project root) for saving the Parquet subset",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "output_sub_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Sub path under output_root_fp, default = indicator/{scope tag}; scope tag = sampling_log, campaign or dataset tag (most specific given) or sample_select",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "output_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Name of the Parquet subset, saved as {output_name}.parquet with {output_name}.json; default = {indicator aliases joined by -}_{min_profile}-{max_profile}",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

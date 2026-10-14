@@ -11,13 +11,13 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "select_data",
         "process": "select_spectra",
         "min_user_stratum": 1,
         "title": "Select spectral data subset",
-        "label": "Filter and select a spectral data subset from the database and save locally as Parquet. Query spectra and indicator data from the database, apply filters, resample to output bandwidth, and save as a local Parquet file for downstream plotting and modelling."
+        "label": "Select spectra, indicators and optionally covariates for the samples in scope in one call and save as one local Parquet file (role all)."
       },
       "nodes": [
         {
@@ -25,11 +25,11 @@
           "element": "parameters",
           "parameter": [
             {
-              "parameter": "dataset_name",
+              "parameter": "dataset",
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Name or alias of the dataset to query",
+              "hint": "Name, tag or alias of the dataset to query",
               "schema_table": {
                 "schema": "observation",
                 "table": "dataset",
@@ -37,11 +37,11 @@
               }
             },
             {
-              "parameter": "campaign_name",
+              "parameter": "campaign",
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "Optional: restrict to a single campaign within the dataset",
+              "hint": "Optional: restrict to a single campaign (name, tag or alias) within the dataset",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign",
@@ -49,11 +49,59 @@
               }
             },
             {
-              "parameter": "provision_name",
+              "parameter": "sampling_log",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: restrict to a single sampling_log (name or tag) within the dataset/campaign",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": false
+              }
+            },
+            {
+              "parameter": "sample_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: restrict to a list of sample names (output sub path then ends with sample_select)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "min_profile",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "Minimum soil profile depth (cm); samples with profile_min shallower than this are excluded",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": false
+              }
+            },
+            {
+              "parameter": "max_profile",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 20,
+              "hint": "Maximum soil profile depth (cm); samples with profile_max deeper than this are excluded",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample_profile",
+                "write": false
+              }
+            },
+            {
+              "parameter": "spectra_provision",
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Name or alias of the provision (spectrometer provision) identifying which spectral sensor data to select",
+              "hint": "Name, tag or alias of the provision identifying which spectral sensor data to select",
               "schema_table": {
                 "schema": "observation_utility",
                 "table": "provision",
@@ -61,23 +109,11 @@
               }
             },
             {
-              "parameter": "preparation_name",
+              "parameter": "spectra_preparation_name",
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "Optional: restrict to a specific sample preparation (e.g. dried-sieved). Matches observation_utility.preparation name or alias.",
-              "schema_table": {
-                "schema": "observation_utility",
-                "table": "preparation",
-                "write": false
-              }
-            },
-            {
-              "parameter": "out_prefix",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "default",
-              "hint": "The prefix to set to the output dataframe, if set to default it will be written as dataset+_+preparation_name_ or campaign+_+preparation_name_, where preparation_name is the alias of the preparation as given in the database, you can also set the prefix freely. To the prefix the band range and resolution will be autoamtically added.",
+              "hint": "Optional: restrict to a specific sample preparation (name or alias, e.g. ds2); the alias is used in the output sub path",
               "schema_table": {
                 "schema": "observation_utility",
                 "table": "preparation",
@@ -121,35 +157,59 @@
               }
             },
             {
-              "parameter": "min_profile",
-              "parameter_type": "integer",
+              "parameter": "output_spectra_signal",
+              "parameter_type": "text",
               "required": false,
-              "default_value": 0,
-              "hint": "Minimum soil profile depth (cm); samples with profile_min shallower than this are excluded",
+              "default_value": "refl",
+              "hint": "Output signal type: refl, absorb, transm, flrs, libs or raman. Only refl -> absorb conversion is supported; written as header row 2 of the spectral columns",
               "schema_table": {
-                "schema": "observation",
-                "table": "sample_profile",
+                "schema": "observation_utility",
+                "table": "spectrometer",
                 "write": false
               }
             },
             {
-              "parameter": "max_profile",
-              "parameter_type": "integer",
+              "parameter": "output_band_unit",
+              "parameter_type": "text",
               "required": false,
-              "default_value": 20,
-              "hint": "Maximum soil profile depth (cm); samples with profile_max deeper than this are excluded",
+              "default_value": "um",
+              "hint": "Desired output band unit, nm, um, wavenumber",
               "schema_table": {
-                "schema": "observation",
-                "table": "sample_profile",
+                "schema": "observation_utility",
+                "table": "spectrometer",
                 "write": false
               }
             },
             {
               "parameter": "indicator_array",
               "parameter_type": "array",
+              "required": true,
+              "default_value": "",
+              "hint": "Indicator names or aliases to select (e.g. [cec, clay, c-org]); numeric and nominal (class) indicators",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator",
+                "write": false
+              }
+            },
+            {
+              "parameter": "covariate_array",
+              "parameter_type": "array",
               "required": false,
               "default_value": "",
-              "hint": "Array of indicator names to retrieve alongside spectra (e.g. [oc_usda.c729_w.pct, clay.tot_usda.a334_w.pct])",
+              "hint": "Covariate names or aliases to select: indicators (e.g. ph-water) or landscape classes joined by position (e.g. landcover, landuse, biogeo16)",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator",
+                "write": false
+              }
+            },
+            {
+              "parameter": "covariate_rank",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "lowest",
+              "hint": "Rank for hierarchical class covariates (land cover, land use): order, family, genus or lowest (the rank recorded). One rank for all, or JSON per covariate, e.g. {\"landcover\": \"family\", \"landuse\": \"order\"}",
               "schema_table": {
                 "schema": "observation_utility",
                 "table": "indicator",
@@ -161,34 +221,58 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "JSON string with per-indicator min/max filters, e.g. {\"oc_usda.c729_w.pct\": {\"min\": 0, \"max\": 50}}. Samples outside the range are excluded.",
+              "hint": "JSON string with per-indicator min/max filters, e.g. {\"c-org\": {\"min\": 0, \"max\": 100}}; empty = no filter",
               "schema_table": {
-                "schema": "observation_utility",
-                "table": "indicator",
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "targetfeaturesymbols",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Target feature symbols JSON giving the unit each indicator is translated to; default = the package default",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
                 "write": false
               }
             },
             {
               "parameter": "output_root_fp",
               "parameter_type": "text",
-              "required": true,
-              "default_value": "",
-              "hint": "Root directory for saving the Parquet subset. Saved under {output_root_fp}/{provision_name}/{dataset}_{begin}-{end}_{bw}/",
+              "required": false,
+              "default_value": "./data",
+              "hint": "Root directory (relative to the project root) for saving the Parquet subset",
               "schema_table": {
                 "schema": "observation",
-                "table": "dataset",
+                "table": "sample",
                 "write": false
               }
             },
             {
-              "parameter": "as_absorbance",
-              "parameter_type": "boolean",
+              "parameter": "output_sub_fp",
+              "parameter_type": "text",
               "required": false,
-              "default_value": false,
-              "hint": "If set to true spectral signal are translated from reflectance to absorbance",
+              "default_value": "default",
+              "hint": "Sub path under output_root_fp, default = all/{spectra provision tag}/{preparation alias}/{scope tag}; scope tag = sampling_log, campaign or dataset tag (most specific given) or sample_select",
               "schema_table": {
                 "schema": "observation",
-                "table": "dataset",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "output_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Name of the Parquet subset, saved as {output_name}.parquet with {output_name}.json; default = {begin}-{end}_{bandwidth}+{indicator aliases}[+{covariate aliases}]_{min_profile}-{max_profile}",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
                 "write": false
               }
             }

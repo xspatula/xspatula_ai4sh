@@ -1,0 +1,28 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "observation_utility",
+        "table": "nominal_classification",
+        "command": [
+          "id SERIAL",
+          "indicator_id INTEGER REFERENCES observation_utility.indicator (id)",
+          "analysis_method_id INTEGER REFERENCES observation_utility.analysis_method (id)",
+          "name TEXT",
+          "display_name TEXT",
+          "abstract TEXT",
+          "UNIQUE (indicator_id,analysis_method_id,name)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": false,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    }
+  ]
+}

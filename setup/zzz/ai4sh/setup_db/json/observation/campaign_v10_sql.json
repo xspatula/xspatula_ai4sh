@@ -17,7 +17,6 @@
           "contact_email VARCHAR",
           "begun_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
           "ended_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP(1)",
-          "datetime_tag TEXT NOT NULL",
           "status_code SMALLINT DEFAULT 10",
           "UNIQUE (dataset_id, name)",
           "PRIMARY KEY (id)"

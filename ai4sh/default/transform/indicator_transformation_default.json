@@ -335,6 +335,30 @@
       "boxcox": false,
       "yeojohnson": false,
       "quantile": false
+    },
+    "landcover": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "landuse": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
+    },
+    "biogeo16": {
+      "log": false,
+      "sqrt": false,
+      "reciprocal": false,
+      "boxcox": false,
+      "yeojohnson": false,
+      "quantile": false
     }
   }
 }
