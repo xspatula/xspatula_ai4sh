@@ -113,6 +113,8 @@ ai4sh/import_data/wetlab/slu/excel/
 ai4sh/import_data/wetlab/slu/insert_process/staging/
 ai4sh/import_data/wetlab/veltia/excel/
 ai4sh/import_data/wetlab/veltia/insert_process/staging/
+ai4sh/import_data/dataset_metadata/insert_process/staging/
+**/staging/
 
 # Registration intake and generated output contain real applicant PII (names, emails) -
 # unlike ai4sh/import_data/*, never tracked, not even a filled template.
