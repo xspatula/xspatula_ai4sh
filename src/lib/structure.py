@@ -40,6 +40,8 @@ from src.utils import Today, yyyymmdd_str_to_date, Now_as_str_4_postgres, yyyymm
 # --- IGNORE ---
 from src.postgres import PG_session
 
+from src.postgres.pg_common import Parse_concat, AUTO_NAME_NULL_D
+
 from src.lib.login import Get_set_database_session
 
 def Check_param_instance(p, typeD, process_D, json_file_FN, p_str):
@@ -412,29 +414,6 @@ class Scheme_params():
         - Logs warnings for any issues encountered.
         """
 
-        def extract_concat_parts(expr: str):
-            """
-            Extract:
-            - values inside the last parentheses
-            - the string inside single quotes
-
-            Returns:
-                (format_string, values_list)
-            """
-            # Extract quoted string
-            quote_match = re.search(r"'([^']*)'", expr)
-            format_string = quote_match.group(1) if quote_match else None
-
-            # Extract last parenthesis content
-            paren_match = re.search(r'\(([^()]*)\)\s*$', expr)
-            if paren_match:
-                content = paren_match.group(1)
-                values = [v.strip() for v in content.split(',') if v.strip()]
-            else:
-                values = []
-
-            return format_string, values
-
         def column_schema(table, column):
             """
             Return the schema of <table> if it has <column>, else None.
@@ -533,6 +512,13 @@ class Scheme_params():
                     %(value, len(recs), schema, table, ', '.join(parent_keys(schema, table)) or 'none'))
 
                 return None
+
+            # A composed name (e.g. sampling_log_name@provision_name) given with an alias or tag for one of its parts
+            rec = session._Resolve_composed_name(table, value)
+
+            if rec and table_schema:
+
+                return table_schema, rec[0]
 
             Log('\n          ❌ ERROR auto_name: <%s> not found as name, tag, alias or other unique column in table <%s>' %(value, table))
 
@@ -645,7 +631,7 @@ class Scheme_params():
             Returns:
                 the composed name or None if it can not be composed
             """
-            format_string, keys = extract_concat_parts(concat)
+            format_string, keys = Parse_concat(concat)
 
             if not format_string or not keys:
 
@@ -735,9 +721,9 @@ class Scheme_params():
 
         status_OK = 1
 
-        # Concat arguments that may be empty and then get a strict null value: '0' in a tag, else the text below
-        # (e.g. a campaign without territory, a sampling_log without date)
-        auto_name_null_D = {'territory': 'no location', 'datetime_tag': 'no date'}
+        # Concat arguments that may be empty and then get a strict null value: '0' in a tag, else the null text
+        # (e.g. a campaign without territory, a sampling_log without date); shared with the foreign key search
+        auto_name_null_D = AUTO_NAME_NULL_D
 
         if not hasattr(self.process_S.process,'process'):
 

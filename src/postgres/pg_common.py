@@ -19,6 +19,8 @@
 """
 
 from copy import deepcopy
+from itertools import product
+import re
 from tabnanny import verbose
 
 from psycopg2 import sql as pgsql
@@ -26,6 +28,63 @@ from psycopg2 import sql as pgsql
 
 # Operators permitted in _Dict_to_select WHERE clauses
 _VALID_OPS = frozenset({'=', '!=', '<>', '<', '>', '<=', '>=', 'LIKE', 'ILIKE', 'IS', 'IS NOT', 'BETWEEN'})
+
+# Auto name concat arguments that may be empty and then get a strict null value: '0' in a tag, else the text below
+# (e.g. a campaign without territory, a sampling_log without date)
+AUTO_NAME_NULL_D = {'territory': 'no location', 'datetime_tag': 'no date'}
+
+# Max nesting when disentangling composed names (observation_log -> sampling_log -> campaign -> dataset)
+_COMPOSED_NAME_MAX_DEPTH = 3
+
+def Parse_concat(expr):
+    """
+    @brief Split an auto name concat rule, e.g. "'%s@%s' %(sampling_log_id__sampling_log_name, provision_id__provision_name)".
+
+    @param expr The concat rule.
+
+    @return (format_string, values_list), format_string is None if the rule has no quoted string.
+    """
+    # Extract quoted string
+    quote_match = re.search(r"'([^']*)'", expr)
+    format_string = quote_match.group(1) if quote_match else None
+
+    # Extract last parenthesis content
+    paren_match = re.search(r'\(([^()]*)\)\s*$', expr)
+    if paren_match:
+        content = paren_match.group(1)
+        values = [v.strip() for v in content.split(',') if v.strip()]
+    else:
+        values = []
+
+    return format_string, values
+
+def _Split_at_separators(text, joiner_L):
+    """
+    @brief Yield every split of <text> into len(joiner_L) + 1 non-empty parts separated by joiner_L in order.
+
+    @details Names may contain the separators themselves (e.g. spaces in "'%s %s' %(campaign_name, datetime_tag)"),
+    so every position of each separator is tried, not just the first.
+    """
+
+    if not joiner_L:
+
+        if text:
+
+            yield [text]
+
+        return
+
+    joiner = joiner_L[0]
+
+    pos = text.find(joiner, 1)
+
+    while pos > 0:
+
+        for rest_L in _Split_at_separators(text[pos + len(joiner):], joiner_L[1:]):
+
+            yield [text[:pos]] + rest_L
+
+        pos = text.find(joiner, pos + 1)
 
 class PG_common():
     """
@@ -871,7 +930,14 @@ class PG_common():
                         print (msg)
 
                     return rec
-            
+
+            # A composed name (e.g. sampling_log_name@provision_name) given with an alias or tag for one of its parts
+            rec = self._Resolve_composed_name(table_name, value)
+
+            if rec:
+
+                return rec
+
             error_msg += '     🔺 WARNING Cannot find foreign key <%s> in schema.table <%s.%s>\n ' %(value, schema_name[0], table_name)
             
             error_msg += '    🔑 Check spelling or add the value <%s> to the column <%s> in schema.table <%s.%s>' % (value, column[0], schema_name[0], table_name)
@@ -925,6 +991,255 @@ class PG_common():
                         rec = self._Single_search(queryD, parameter_L, search_rec[1], search_rec[2])
 
         return rec
+
+    def _Text_column_schema(self, table, column):
+        """
+        @brief Return the schema of <table> if it has the text column <column>, else None.
+        """
+
+        sql = """
+            SELECT table_schema FROM information_schema.columns
+            WHERE table_name = %s AND column_name = %s
+              AND data_type IN ('text', 'character varying', 'character');
+        """
+
+        rec = self._Execute_search_single_sql(sql, (table, column))
+
+        return rec[0] if rec else None
+
+    def _Find_identified_ids(self, table, value):
+        """
+        @brief Find the ids of the records in <table> identified by <value>.
+
+        @details As in the auto name composition (find_record in src/lib/structure.py) the value is
+        searched in the columns name, tag and alias, then in any other single column UNIQUE text column
+        (e.g. territory iso_code_a2_ext); the first column with a hit wins.
+
+        @return (schema, [id, ...]); the id list is empty if not found, schema is None if <table> is unknown.
+        """
+
+        schema = self._Text_column_schema(table, 'name') or self._Text_column_schema(table, 'tag')
+
+        if not schema:
+
+            return None, []
+
+        search_column_L = [c for c in ['name', 'tag', 'alias'] if self._Text_column_schema(table, c) == schema]
+
+        for group in self._Get_unique_key_groups(schema, table):
+
+            if len(group) == 1 and group[0] not in search_column_L and self._Text_column_schema(table, group[0]) == schema:
+
+                search_column_L.append(group[0])
+
+        for column in search_column_L:
+
+            recs = self._Multi_search({column: value}, ['id'], schema, table)
+
+            if recs:
+
+                return schema, [rec[0] for rec in recs]
+
+        return schema, []
+
+    def _Resolve_composed_name(self, table, value, depth=0):
+        """
+        @brief Find a record whose auto named (composed) value was given with the wrong form of one or more parts.
+
+        @details Auto names compose the parts of other records, e.g. an observation_log name is
+        "'%s@%s' %(sampling_log_id__sampling_log_name, provision_id__provision_name)". A value naming the
+        record must hold each part in the form of the rule (here the names), but users often give the
+        alias or the tag of a part instead (e.g. "ai4sh-dk-foulum 2024@ai4sh-metabarcod").
+
+        For each auto name rule of the process manage_<table> (name, tag, display_name ...) the value is
+        split at every possible position of the rule's separators. Each part referring to another record
+        (<t>_id__<t>_<column>) is looked up in <t> by name, tag, alias or other unique column - or, if it is
+        itself a composed value, recursively by this function - and replaced by <column> of that record.
+        Other parts (datetime_tag, site ...) are kept as given. The rebuilt value is then searched in the
+        column of <table> that the rule composes.
+
+        @param table The table the value refers to (e.g. observation_log).
+        @param value The value given for the foreign key (e.g. observation_log_id__observation_log_name).
+        @param depth Recursion depth (internal).
+
+        @return (id,) if exactly one record matches, else None (an ambiguous match is reported).
+        """
+
+        if depth > _COMPOSED_NAME_MAX_DEPTH or not isinstance(value, str) or not any(c in value for c in '@_ '):
+
+            return None
+
+        # Only successes are cached: a record not found may be inserted later in the same session
+        cache_D = self.__dict__.setdefault('_composed_name_cache_D', {})
+
+        if (table, value) in cache_D:
+
+            return cache_D[(table, value)]
+
+        schema = self._Text_column_schema(table, 'name') or self._Text_column_schema(table, 'tag')
+
+        if not schema:
+
+            return None
+
+        rule_recs = self._Multi_search({'process': 'manage_%s' % table}, ['parameter', 'concat'], 'process', 'process_parameter_auto_name')
+
+        match_D = {}
+
+        for parameter, concat in rule_recs or []:
+
+            if not self._Text_column_schema(table, parameter):
+
+                continue
+
+            for composed in self._Composed_name_candidates(parameter, concat, value, depth):
+
+                for rec in self._Multi_search({parameter: composed}, ['id'], schema, table):
+
+                    match_D[rec[0]] = composed
+
+        if len(match_D) == 1:
+
+            record_id, composed = next(iter(match_D.items()))
+
+            if getattr(self, 'verbose', 0) >= 1 and depth == 0:
+
+                # Report the name, the form the foreign key parameter (<table>_id__<table>_name) should be given in
+                name_rec = self._Single_search({'id': record_id}, ['name'], schema, table) if self._Text_column_schema(table, 'name') else None
+
+                print('    ℹ️ <%s> resolved as <%s> in %s.%s' % (value, name_rec[0] if name_rec else composed, schema, table))
+
+            cache_D[(table, value)] = (record_id,)
+
+            return (record_id,)
+
+        if len(match_D) > 1:
+
+            print('   ❌ ERROR <%s> matches %s records in %s.%s: %s - give the full name'
+                  % (value, len(match_D), schema, table, ', '.join(sorted(set(match_D.values())))))
+
+        return None
+
+    def _Composed_name_candidates(self, parameter, concat, value, depth):
+        """
+        @brief Yield the values that <value> may stand for under one auto name rule.
+
+        @details See _Resolve_composed_name. Mirrors compose_auto_name in src/lib/structure.py: an
+        optional argument ('site?') is dropped together with the separator before it, and a nullable
+        argument (AUTO_NAME_NULL_D) given as its null text or '0' gets the null value of <parameter>.
+
+        @param parameter The column the rule composes (name, tag ...).
+        @param concat The auto name rule.
+        @param value The given value.
+        @param depth Recursion depth.
+        """
+
+        format_string, keys = Parse_concat(concat)
+
+        if not format_string or not keys:
+
+            return
+
+        separator_L = format_string.split('%s')
+
+        if len(separator_L) != len(keys) + 1:
+
+            return
+
+        optional_L = [i for i, key in enumerate(keys) if key.endswith('?')]
+
+        # One variant per combination of optional arguments present/dropped
+        for drop_L in product([False, True], repeat=len(optional_L)):
+
+            dropped = set(i for i, drop in zip(optional_L, drop_L) if drop)
+
+            kept_L = [i for i in range(len(keys)) if i not in dropped]
+
+            if not kept_L:
+
+                continue
+
+            # The separator before each kept argument; the first kept argument follows the prefix only
+            joiner_L = [separator_L[i] for i in kept_L[1:]]
+
+            prefix, suffix = separator_L[0], separator_L[-1]
+
+            if '' in joiner_L or not value.startswith(prefix) or not value.endswith(suffix) or len(value) <= len(prefix) + len(suffix):
+
+                continue
+
+            body = value[len(prefix):len(value) - len(suffix)]
+
+            for part_L in _Split_at_separators(body, joiner_L):
+
+                option_L = []
+
+                for i, part in zip(kept_L, part_L):
+
+                    options = self._Composed_part_options(parameter, keys[i].rstrip('?'), part, depth)
+
+                    if not options:
+
+                        break
+
+                    option_L.append(options)
+
+                else:
+
+                    for combination in product(*option_L):
+
+                        composed = prefix
+
+                        for n, part in enumerate(combination):
+
+                            composed += part if n == 0 else joiner_L[n - 1] + part
+
+                        yield composed + suffix
+
+    def _Composed_part_options(self, parameter, key, part, depth):
+        """
+        @brief Return the possible values of one argument of a composed value, as the rule wants it.
+
+        @return A list of values (empty if the part can not be resolved).
+        """
+
+        fk_match = re.fullmatch(r'(\w+)_id__\1_(\w+)', key)
+
+        null_key = fk_match.group(1) if fk_match else key
+
+        if null_key in AUTO_NAME_NULL_D and part in ['0', AUTO_NAME_NULL_D[null_key]]:
+
+            return ['0' if parameter == 'tag' else AUTO_NAME_NULL_D[null_key]]
+
+        if not fk_match:
+
+            return [part]
+
+        ref_table, column = fk_match.groups()
+
+        ref_schema, id_L = self._Find_identified_ids(ref_table, part)
+
+        if not id_L:
+
+            rec = self._Resolve_composed_name(ref_table, part, depth + 1)
+
+            id_L = [rec[0]] if rec else []
+
+        if not id_L or not self._Text_column_schema(ref_table, column):
+
+            return []
+
+        options = []
+
+        for record_id in id_L:
+
+            rec = self._Single_search({'id': record_id}, [column], ref_schema, ref_table)
+
+            if rec and rec[0] not in [None, ''] and rec[0] not in options:
+
+                options.append(rec[0])
+
+        return options
 
     def _Check_insert_single_record(self, queryD, schema, table):
         """

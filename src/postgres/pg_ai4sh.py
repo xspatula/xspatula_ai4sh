@@ -93,14 +93,20 @@ class PG_manage_AI4SH:
         '''
         '''
 
-        sql = "SELECT OS.id from observation.sample as OS\
-                INNER JOIN observation.sampling_log as OSL\
-                ON OS.sampling_log_id = OSL.id\
-                INNER JOIN observation.observation_log AS OOL\
-                ON OOL.sampling_log_id = OSL.id\
-                WHERE OS.name ='%(sample_id__sample_name)s' AND OOL.name  = '%(observation_log_id__observation_log_name)s';" %query_D
+        # Resolve the observation log as any foreign key: by name, tag, or a composed name given with
+        # the alias or tag of its parts (e.g. sampling_log_name@provision_alias, see _Resolve_composed_name)
+        log_rec = pg_session_C._Check_get_foreign_key('observation_log_id__observation_log_name', query_D['observation_log_id__observation_log_name'])
 
-        rec = pg_session_C._Execute_search_single_sql(sql)
+        rec = None
+
+        if log_rec:
+
+            sql = "SELECT OS.id from observation.sample as OS\
+                    INNER JOIN observation.observation_log AS OOL\
+                    ON OOL.sampling_log_id = OS.sampling_log_id\
+                    WHERE OS.name = %s AND OOL.id = %s;"
+
+            rec = pg_session_C._Execute_search_single_sql(sql, (query_D['sample_id__sample_name'], log_rec[0]))
 
         if not rec:
 
