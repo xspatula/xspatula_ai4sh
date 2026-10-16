@@ -8,6 +8,7 @@
       "parameters": {
         "name": "ai4soilhealth",
         "alias": "ai4sh",
+        "tag": "ai4sh",
         "display_name": "AI4SoilHealth",
         "data_source_id__data_source_name": "ai4soilhealth",
         "contact_name": "stockholm university",
@@ -15,7 +16,7 @@
         "begun_at": 20230101,
         "ended_at": 20261231,
         "species_id__species_name": "soil",
-        "profiling_id__profiling_name": "depth_cm",
+        "profiling_id__profiling_name": "depth cm",
         "setting_system_id__setting_system_name_array": "agricultural field",
         "license_id__license_name": "mit",
         "substance_array": "soil",

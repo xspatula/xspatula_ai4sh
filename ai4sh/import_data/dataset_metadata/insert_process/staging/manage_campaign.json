@@ -7,7 +7,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_se_loennstorp",
+        "name": "ai4sh-se-loennstorp",
         "display_name": "AI4SH SE Loennstorp",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -35,7 +35,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_fi_jokioinen",
+        "name": "ai4sh-fi-jokioinen",
         "display_name": "AI4SH FI Jokioinen",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -63,7 +63,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_gr_ktima-gerovassiliou",
+        "name": "ai4sh-gr-ktima-gerovassiliou",
         "display_name": "AI4SH GR Ktima-Gerovassiliou",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -91,7 +91,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_gr_zazari",
+        "name": "ai4sh-gr-zazari",
         "display_name": "AI4SH GR Zazari",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -119,7 +119,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_hr_neretva",
+        "name": "ai4sh-hr-neretva",
         "display_name": "AI4SH HR Neretva",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -147,7 +147,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_nl_boermarke-zeijen",
+        "name": "ai4sh-nl-boermarke-zeijen",
         "display_name": "AI4SH NL Boermarke-Zeijen",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -175,7 +175,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_dk_foulum",
+        "name": "ai4sh-dk-foulum",
         "display_name": "AI4SH DK Foulum",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -203,7 +203,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_es_arkaute",
+        "name": "ai4sh-es-arkaute",
         "display_name": "AI4SH ES Arkaute",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -231,7 +231,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_gb-eng_woodoaks",
+        "name": "ai4sh-gb-eng-woodoaks",
         "display_name": "AI4SH GB-ENG Woodoaks",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -259,7 +259,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_gb-wls_plynlimon",
+        "name": "ai4sh-gb-wls-plynlimon",
         "display_name": "AI4SH GB-WLS Plynlimon",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -287,7 +287,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_fr_estrees-mons",
+        "name": "ai4sh-fr-estrees-mons",
         "display_name": "AI4SH FR INRAE ACBB Estr\u00e9es-Mons",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",
@@ -315,7 +315,7 @@
       "overwrite": false,
       "parameters": {
         "dataset_id__dataset_name": "ai4soilhealth",
-        "name": "ai4sh_ch_lens",
+        "name": "ai4sh-ch-lens",
         "display_name": "AI4SH CH Lens",
         "contact_name": "thomas gumbricht",
         "contact_email": "thomas.gumbricht@natgeo.su.se",

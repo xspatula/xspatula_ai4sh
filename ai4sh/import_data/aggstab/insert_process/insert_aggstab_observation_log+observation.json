@@ -11,11 +11,10 @@
     },
     {
       "process": "insert_tabular_data",
-      "execute": false,
       "overwrite": true,
       "parameters": {
         "process": "manage_observation",
-        "tabular_data_path": "import_data/aggstab/excel/AI4SH_observation_aggstab.xlsx",
+        "tabular_data_path": "import_data/aggstab/excel/AI4SH_Slakes_tg.xlsx",
         "dst_path": "import_data/aggstab/insert_process/staging"
       }
     }
