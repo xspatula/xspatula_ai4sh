@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "overwrite": true,
+      "process": "insert_tabular_data",
+      "parameters": {
+        "process": "manage_foreign_key",
+        "tabular_data_path": "import_data/utility/general/excel/foreign_key.xlsx",
+        "dst_path": "import_data/utility/general/insert_process/staging"
+      }
+    }
+  ]
+}

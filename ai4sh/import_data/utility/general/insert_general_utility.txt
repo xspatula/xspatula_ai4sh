@@ -12,3 +12,6 @@
 
 # You can add territory in territory.xlsx and rerun this insert.
 territory.json
+
+# You can add non-standard foreign key lookup in foreign_key.xlsx and rerun this insert.
+foreign_key.json
