@@ -418,59 +418,6 @@ class Process_import_JSON(Get_schema_table):
             return success
 
         return success
-    
-    def _Measurement_record(self, main_query_D):
-        ''' Special function to retrieve the sample id for a measurement record based on the sample name and observation log name provided in the query_D. This allows for more flexible queries for retrieving the sample id without needing to have the sample_id field in the measurement table.
-        '''
-
-        # it should be enought o find the indicators once for each measurement record,        
-        # Retrieve the indicators name and idname for the observation log based on the query_D. This is needed to ensure that the sample_id is retrieved for the correct observation log in case there are multiple observation logs with the same name but different indicators.
-        measurement_indicators_L = self.pg_session_C._Retrieve_observation_log_indicators_from_log_name(main_query_D['observation_log_id__observation_log_name'])
-
-        if not measurement_indicators_L:
-
-            self._Report_failure('.  ❌ ERROR: could not retrieve indicators for observation_log %s' %(main_query_D['observation_log_id__observation_log_name']))
-
-            return None
-
-        indicator_D = dict(measurement_indicators_L)
-
-        if main_query_D['indicator_id__indicator_name'] not in indicator_D:
-
-            self._Report_failure('.  ❌ ERROR: indicator %s not found for observation log %s' %(main_query_D['indicator_id__indicator_name'], main_query_D['observation_log_id__observation_log_name']))
-            print ('.     Available indicators for this observation log are: %s' %(list(indicator_D.keys())))
-
-            return None
-
-        if not main_query_D['indicator_id__indicator_name'] in indicator_D:
-
-            self._Report_failure('.  ❌ ERROR: indicator %s not found for observation log %s' %(main_query_D['indicator_id__indicator_name'], main_query_D['observation_log_id__observation_log_name']))
-            print ('.     Available indicators for this observation log are: %s' %(list(indicator_D.keys())))
-
-            return None
-
-        indicator_id = indicator_D[main_query_D['indicator_id__indicator_name']]
-
-        observation_id = self.pg_session_C._Retrieve_observation_id_from_observation(main_query_D)
-
-        if not observation_id:
-
-            self._Report_failure('.  ❌ ERROR: could not retrieve observation id for measurement record')
-
-            return None
-                
-  
-        update_main_query_D = {'observation_id': observation_id,
-                               'indicator_id': indicator_id,
-                               'value': main_query_D['value'],
-                               'standard_deviation': main_query_D['standard_deviation'],
-                               'n_repeat': main_query_D['n_repeat']}
-        
-        if update_main_query_D['standard_deviation'] == -999.999:
-
-            update_main_query_D.pop('standard_deviation')
-
-        return update_main_query_D
 
     def _Add_JSON_data(self):
 
@@ -523,14 +470,6 @@ class Process_import_JSON(Get_schema_table):
             main_query_D.pop(record[0])
 
             main_query_D[record[1]] = record[2]
-
-        elif main_table_key == 'observation.measurement':
-
-            main_query_D = self._Measurement_record(main_query_D)
-
-            if not main_query_D:
-
-                return None
             
         # Remove all parameter where write is set to False in the process_parameter_schema_table. This allows for more flexible queries where not all parameters need to be included in the main_query_D, but can still be used for retrieving id values for the parameters that are included in the main_query_D.  
         #TG TODO: this should be done in a more elegant way, for example by having a separate table for the parameters that are used for retrieving id values and the parameters that are used for writing to the database, or by having a flag in the process_parameter_schema_table that indicates whether the parameter is used for retrieving id values or for writing to the database. This would prevent the need to remove parameters from the main_query_D and would allow for more flexible queries where some parameters are only used for retrieving id values and not for writing to the database.
