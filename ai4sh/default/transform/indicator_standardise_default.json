@@ -41,6 +41,9 @@
     "na+": false,
     "sodium ion": false,
     "mg2+": false,
-    "magnesium ion": false
+    "magnesium ion": false,
+    "landcover": false,
+    "landuse": false,
+    "biogeo16": false
   }
 }

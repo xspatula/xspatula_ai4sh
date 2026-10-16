@@ -34,9 +34,9 @@
             {
               "parameter": "name",
               "parameter_type": "text",
-              "required": true,
+              "required": false,
               "default_value": "auto",
-              "hint": "Name of the campaign",
+              "hint": "Name of the campaign, auto = dataset alias + territory name + site (if given); no territory gives 'no location'",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign",
@@ -47,7 +47,31 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "%s_%s  %(dataset_id__dataset_alias, begun_at)"
+                "concat": "'%s %s %s' %(dataset_id__dataset_alias, territory_id__territory_name, site?)"
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "Unique tag used for auto naming production files and results, auto = dataset tag + _ + territory code (0 if no territory) + _ + site (if given). A tag (and a site used in it) must not contain underscore, at (@), capitals or blank.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "campaign",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "auto_name": {
+                "concat": "'%s_%s_%s' %(dataset_id__dataset_tag, territory_id__territory_iso_code_a2_ext, site?)"
+              },
+              "format": {
+                "at": false,
+                "capital": false,
+                "blank": false
               }
             },
             {
@@ -66,14 +90,14 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "%s_%s  %(dataset_id__dataset_alias, begun_at)"
+                "concat": "'%s %s' %(dataset_id__dataset_alias, territory_id__territory_name)"
               }
             },
             {
               "parameter": "contact_name",
               "parameter_type": "text",
               "required": false,
-              "default_value": "",
+              "default_value": "inherit",
               "hint": "Contact name for the campaign",
               "schema_table": {
                 "schema": "observation",
@@ -83,6 +107,14 @@
               "permission": {
                 "update": true,
                 "delete": false
+              },
+              "inherit": {
+                "process_parameter": "contact_name",
+                "src_schema": "observation",
+                "src_table": "dataset",
+                "src_column": "contact_name",
+                "search_column": "id",
+                "search_object": "dataset_id__dataset_name"
               }
             },
             {
@@ -99,6 +131,14 @@
               "permission": {
                 "update": true,
                 "delete": false
+              },
+              "inherit": {
+                "process_parameter": "contact_email",
+                "src_schema": "observation",
+                "src_table": "dataset",
+                "src_column": "contact_email",
+                "search_column": "id",
+                "search_object": "dataset_id__dataset_name"
               }
             },
             {

@@ -5,8 +5,8 @@ Created on 25 April 2026
 '''
 
 import os
-import glob
 import json
+import numbers
 import re
 
 import numpy as np
@@ -27,6 +27,10 @@ from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction,
                                      apply_scaling, apply_decomposition,
                                      apply_chemometrics, _load_chemometric_config)
 from src.ai4sh.filter import apply_filter, apply_multi_filter
+from src.ai4sh.parquet_units import (Read_parquet_with_units, Save_parquet_with_units,
+                                    Find_selected_parquet, DERIVED_STEM_RE)
+from src.ai4sh.spectral_columns import (Band_col_name, Band_value, Is_band_col,
+                                       Set_signal_type, Signal_type_of)
 
 from src.postgres import Get_schema_table
 from src.lib.pilot import Get_project_path
@@ -34,7 +38,7 @@ from src.lib.pilot import Get_project_path
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 _METADATA_COLS = frozenset([
-    'sample_name', 'campaign_name', 'latitude_dd', 'longitude_dd',
+    'sample_id', 'sample_name', 'sampling_log_tag', 'campaign_name', 'latitude_dd', 'longitude_dd',
     'profile_min', 'profile_max',
 ])
 
@@ -65,23 +69,22 @@ def _parse_array_param(raw):
 
 
 # Regex matching any known preprocessing suffix at the end of a parquet stem.
-_DERIVED_RE = re.compile(
-    r'_(?:ol|vt|ma|gf|sg|lw|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|snv|msc|l1|l2|max|l1snv|snvmsc|mc|as|ps|poi|pca\d+|(?:[\w-]+-)?(?:pms|rfe|tree))$'
-)
+_DERIVED_RE = DERIVED_STEM_RE
 
-# Spectral column patterns: w_1350 (raw), d1350 (derivative), pc1 (PCA), wc1 (Ward cluster)
-_SPECTRAL_COL_RE = re.compile(r'^(?:w_\d+|d\d+|pc\d+|wc\d+)$')
+# Spectral column patterns: wl_nm_1350 (band, see spectral_columns.py), d1350 (derivative),
+# pc1 (PCA), wc1 (Ward cluster)
+_DERIVED_SPECTRAL_COL_RE = re.compile(r'^(?:d\d+|pc\d+|wc\d+)$')
 
 
 def _is_spectral_col(col):
-    return bool(_SPECTRAL_COL_RE.match(str(col)))
+    return Is_band_col(col) or bool(_DERIVED_SPECTRAL_COL_RE.match(str(col)))
 
 
 def _col_to_index(col):
     '''Extract the numeric index from a spectral column name.'''
     s = str(col)
-    if s.startswith('w_'):
-        return int(s[2:])
+    if Is_band_col(s):
+        return Band_value(s)
     if s.startswith('pc') or s.startswith('wc'):
         return int(s[2:])
     if s.startswith('d'):
@@ -92,12 +95,12 @@ def _col_to_index(col):
 # ------------------------------------------------------------------ companion JSON helpers
 
 def _normalize_params_to_companion(d):
-    '''Convert old params-*.json format to new companion format.'''
+    '''Convert a selection JSON (as written by select.py) to the companion format.'''
     out = dict(d)
     wavelengths = out.pop('output_wavelengths', [])
     out['output_data'] = {
         'data_type': 'wavelength',
-        'column_format': 'w_{n} — n is wavelength in nm',
+        'column_format': 'wl_nm_{n} — n is wavelength in nm',
         'spectral_array': wavelengths,
     }
     out.setdefault('preprocessing_chain', [])
@@ -105,25 +108,27 @@ def _normalize_params_to_companion(d):
 
 
 def _load_companion_json(project_root_fp, stem):
-    '''Load companion JSON for a parquet stem. Falls back to old params-*.json.'''
-    new_fp = os.path.join(project_root_fp, stem + '.json')
-    if os.path.exists(new_fp):
-        with open(new_fp) as fh:
-            d = json.load(fh)
-        if 'output_data' not in d:
-            d = _normalize_params_to_companion(d)
-        return d
-    bare = stem[len('data-'):] if stem.startswith('data-') else stem
-    old_fp = os.path.join(project_root_fp, 'params-' + bare + '.json')
-    if os.path.exists(old_fp):
-        with open(old_fp) as fh:
-            d = json.load(fh)
-        return _normalize_params_to_companion(d)
-    return None
+    '''Load the companion {stem}.json of a parquet stem, or None if there is none.'''
+    fp = os.path.join(project_root_fp, stem + '.json')
+    if not os.path.exists(fp):
+        return None
+    with open(fp) as fh:
+        d = json.load(fh)
+    if 'output_data' not in d:
+        d = _normalize_params_to_companion(d)
+    return d
 
 
-def _build_output_data(out_cols):
+def _build_output_data(out_cols, signal_type=None):
     '''Build output_data dict from output column names.'''
+    out = _build_output_format(out_cols)
+    if signal_type:
+        out['signal_type'] = signal_type
+    return out
+
+
+def _build_output_format(out_cols):
+    '''Describe the column format of the output column names.'''
     if not out_cols:
         return {'data_type': 'unknown', 'column_format': '', 'spectral_array': []}
     first = str(out_cols[0])
@@ -147,7 +152,7 @@ def _build_output_data(out_cols):
         }
     return {
         'data_type': 'wavelength',
-        'column_format': 'w_{n} — n is wavelength in nm',
+        'column_format': 'wl_nm_{n} — n is wavelength in nm',
         'spectral_array': [_col_to_index(c) if isinstance(c, str) else int(c)
                            for c in out_cols],
     }
@@ -186,10 +191,11 @@ def _step_abbrev_from_info(process_name, parameters):
     return process_name[:4]
 
 
-def _write_companion_json(project_root_fp, in_stem, out_stem, out_cols, step_info_or_list):
+def _write_companion_json(project_root_fp, in_stem, out_stem, out_cols, step_info_or_list,
+                          signal_type=None):
     '''Write companion JSON for an output parquet, inheriting input companion metadata.'''
     companion = _load_companion_json(project_root_fp, in_stem) or {}
-    companion['output_data'] = _build_output_data(out_cols)
+    companion['output_data'] = _build_output_data(out_cols, signal_type)
     chain = list(companion.get('preprocessing_chain', []))
     step_num = len(chain) + 1
     steps = step_info_or_list if isinstance(step_info_or_list, list) else [step_info_or_list]
@@ -248,17 +254,11 @@ def _Ward_pick_best(scores):
 def _resolve_input_parquet(project_root_fp, dataframe_param):
     '''Resolve the input parquet path from the dataframe parameter.
 
-    "raw" → find data-*.parquet whose stem has no known preprocessing suffix.
+    "raw" → the selected parquet, i.e. no known preprocessing suffix (see Find_selected_parquet).
     Anything else → treat as filename (with or without .parquet extension).
     '''
     if dataframe_param.lower() == 'raw':
-        candidates = [
-            fp for fp in glob.glob(os.path.join(project_root_fp, 'data-*.parquet'))
-            if not _DERIVED_RE.search(os.path.splitext(os.path.basename(fp))[0])
-        ]
-        if not candidates:
-            raise FileNotFoundError('No raw data-*.parquet found in: %s' % project_root_fp)
-        return candidates[0]
+        return Find_selected_parquet(project_root_fp)[0]
     name = dataframe_param if dataframe_param.endswith('.parquet') else dataframe_param + '.parquet'
     fp = os.path.join(project_root_fp, name)
     if not os.path.exists(fp):
@@ -454,29 +454,22 @@ class Process_ml_preprocess(Get_schema_table):
     # ------------------------------------------------------------------ helpers
 
     def _Load_parquet_data(self, project_root_fp):
-        '''Load data-*.parquet (excluding _ol files) + params-*.json.'''
-        parquet_matches = [
-            f for f in glob.glob(os.path.join(project_root_fp, 'data-*.parquet'))
-            if '_ol' not in os.path.basename(f)
-        ]
-        params_matches = glob.glob(os.path.join(project_root_fp, 'params-*.json'))
+        '''Load the selected {name}.parquet + {name}.json (see Find_selected_parquet).'''
+        parquet_fpn, params_fpn = Find_selected_parquet(project_root_fp)
 
-        if not parquet_matches:
-            raise FileNotFoundError('No data-*.parquet file found in: %s' % project_root_fp)
-
-        df = pd.read_parquet(parquet_matches[0])
+        df, _units_D = Read_parquet_with_units(parquet_fpn)
 
         params_D = {}
-        if params_matches:
-            with open(params_matches[0]) as fh:
+        if params_fpn:
+            with open(params_fpn) as fh:
                 params_D = json.load(fh)
 
         if self.verbose >= 1:
             n_expected = params_D.get('n_samples', len(df))
             print('    Loaded %d rows (%d expected) from %s' % (
-                len(df), n_expected, os.path.basename(parquet_matches[0])))
+                len(df), n_expected, os.path.basename(parquet_fpn)))
 
-        return df, params_D, parquet_matches[0]
+        return df, params_D, parquet_fpn
 
     def _Build_plot_output_path(self, project_root_fp):
         plot_dir = os.path.join(project_root_fp, 'plot')
@@ -562,7 +555,7 @@ class Process_ml_preprocess(Get_schema_table):
             except FileNotFoundError as e:
                 print('    ERROR: %s' % e)
                 return
-        df = pd.read_parquet(parquet_fp)
+        df, units_D = Read_parquet_with_units(parquet_fp)
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
 
@@ -693,7 +686,7 @@ class Process_ml_preprocess(Get_schema_table):
         for col in approved:
             df_out.loc[masks[col], col] = np.nan
 
-        df_out.to_parquet(ol_del_fp, index=False)
+        Save_parquet_with_units(df_out, ol_del_fp, units_D)
         _write_previous_df(project_root_fp, 'detect_outliers', [
             {'dataframe': os.path.basename(ol_del_fp),
              'indicator': None, 'regressor': None, 'selector': None}
@@ -706,6 +699,7 @@ class Process_ml_preprocess(Get_schema_table):
             {'process': 'detect_outliers',
              'parameters': {'detector': detector_name, 'threshold': threshold,
                             'indicator_array': list(approved)}},
+            Signal_type_of(units_D, spectral_kept),
         )
 
         n_removed = sum(int(masks[c].sum()) for c in approved)
@@ -817,7 +811,7 @@ class Process_ml_preprocess(Get_schema_table):
             except FileNotFoundError as e:
                 print('    ERROR: %s' % e)
                 return
-        df = pd.read_parquet(parquet_fp)
+        df, units_D = Read_parquet_with_units(parquet_fp)
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
 
@@ -836,7 +830,7 @@ class Process_ml_preprocess(Get_schema_table):
         # Extract spectral columns
         spectral_cols = [c for c in df.columns if _is_spectral_col(c)]
         if not spectral_cols:
-            print('    ERROR: no spectral columns (w_*, d*, pc*) found.')
+            print('    ERROR: no spectral columns (wl_*, wn_*, d*, pc*) found.')
             return
 
         wavelengths = [_col_to_index(c) for c in spectral_cols]
@@ -887,7 +881,7 @@ class Process_ml_preprocess(Get_schema_table):
         non_spectral = [c for c in df.columns if not _is_spectral_col(c)]
         df_out = df[non_spectral + retain_cols].copy()
 
-        df_out.to_parquet(vt_fp, index=False)
+        Save_parquet_with_units(df_out, vt_fp, units_D)
         _write_previous_df(project_root_fp, 'select_variance_threshold', [
             {'dataframe': os.path.basename(vt_fp),
              'indicator': None, 'regressor': None, 'selector': None}
@@ -898,6 +892,7 @@ class Process_ml_preprocess(Get_schema_table):
             project_root_fp, stem, out_stem, retain_cols,
             {'process': 'select_variance_threshold',
              'parameters': {'scaler': scaler_name, 'threshold': threshold}},
+            Signal_type_of(units_D, retain_cols),
         )
 
         print('    Removed %d band%s. %d band%s retained. Saved: %s' % (
@@ -935,13 +930,13 @@ class Process_ml_preprocess(Get_schema_table):
                 print('    ERROR: %s' % e)
                 return None
 
-        df = pd.read_parquet(parquet_fp)
+        df, units_D = Read_parquet_with_units(parquet_fp)
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
 
         spectral_cols = [c for c in df.columns if _is_spectral_col(c)]
         if not spectral_cols:
-            print('    ERROR: no spectral columns (w_*, d*, pc*) found.')
+            print('    ERROR: no spectral columns (wl_*, wn_*, d*, pc*) found.')
             return None
 
         wavelengths = [_col_to_index(c) for c in spectral_cols]
@@ -955,7 +950,7 @@ class Process_ml_preprocess(Get_schema_table):
             'df': df, 'spec_df': spec_df, 'spectral_cols': spectral_cols,
             'wavelengths': wavelengths, 'max_spectra': max_spectra,
             'colormap': colormap, 'ann': 'n=%d' % len(df), 'stem': stem,
-            'project_root_fp': project_root_fp,
+            'project_root_fp': project_root_fp, 'units_D': units_D,
             'show': show, 'save': save, 'overwrite': overwrite, 'plot_dir': plot_dir,
         }
 
@@ -1035,7 +1030,7 @@ class Process_ml_preprocess(Get_schema_table):
             plt.close(fig)
 
     def _Accept_and_save(self, df_orig, spec_out_full, out_cols, abbrev,
-                          stem, project_root_fp, overwrite, step_info):
+                          stem, project_root_fp, overwrite, step_info, units_D=None):
         '''Prompt y/n, save parquet + companion JSON. Returns (out_fp, skipped).'''
         out_stem = '%s_%s' % (stem, abbrev)
         out_fp   = os.path.join(project_root_fp, out_stem + '.parquet')
@@ -1056,23 +1051,24 @@ class Process_ml_preprocess(Get_schema_table):
             return None, False
 
         non_spectral = [c for c in df_orig.columns if not _is_spectral_col(c)]
+        signal_type  = Signal_type_of(units_D or {}, [c for c in df_orig.columns if _is_spectral_col(c)])
         save_df = spec_out_full.copy()
-        # Integer wavelength columns → w_ storage convention; d/pc columns kept as-is
-        save_df.columns = ['w_%d' % c if isinstance(c, int) else str(c)
+        # Numeric wavelength columns → wl_nm_ storage convention; d/pc columns kept as-is
+        save_df.columns = [Band_col_name(c) if isinstance(c, numbers.Real) else str(c)
                             for c in out_cols]
         saved_cols = list(save_df.columns)
         df_save = pd.concat([
             df_orig[non_spectral].reset_index(drop=True),
             save_df.reset_index(drop=True),
         ], axis=1)
-        df_save.to_parquet(out_fp, index=False)
+        Save_parquet_with_units(df_save, out_fp, Set_signal_type(units_D, saved_cols, signal_type))
         _proc = (step_info[0].get('process', 'unknown') if isinstance(step_info, list)
                  else step_info.get('process', 'unknown'))
         _write_previous_df(project_root_fp, _proc, [
             {'dataframe': os.path.basename(out_fp),
              'indicator': None, 'regressor': None, 'selector': None}
         ])
-        _write_companion_json(project_root_fp, stem, out_stem, saved_cols, step_info)
+        _write_companion_json(project_root_fp, stem, out_stem, saved_cols, step_info, signal_type)
         print('    Saved: %s' % out_fp)
         return out_fp, False
 
@@ -1132,7 +1128,7 @@ class Process_ml_preprocess(Get_schema_table):
                 print('    ERROR: %s' % e)
                 return
 
-        df   = pd.read_parquet(parquet_fp)
+        df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
@@ -1168,7 +1164,7 @@ class Process_ml_preprocess(Get_schema_table):
             'filter': filter_cfg,
         }
         self._Accept_and_save(df, df_filtered, list(cols_out), abbrev,
-                               stem, project_root_fp, overwrite, step_info)
+                               stem, project_root_fp, overwrite, step_info, units_D)
 
     def _Multi_filter_spectra(self):
         p = self.process_S.process.parameters
@@ -1211,7 +1207,7 @@ class Process_ml_preprocess(Get_schema_table):
                 print('    ERROR: %s' % e)
                 return
 
-        df   = pd.read_parquet(parquet_fp)
+        df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
@@ -1247,7 +1243,7 @@ class Process_ml_preprocess(Get_schema_table):
             'multi_filter': mf_cfg,
         }
         self._Accept_and_save(df, df_filtered, list(cols_out), 'mf',
-                               stem, project_root_fp, overwrite, step_info)
+                               stem, project_root_fp, overwrite, step_info, units_D)
 
     # ------------------------------------------------------------------ ward clustering
 
@@ -1322,7 +1318,7 @@ class Process_ml_preprocess(Get_schema_table):
                 print('    ERROR: %s' % e)
                 return
 
-        df   = pd.read_parquet(parquet_fp)
+        df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
@@ -1387,7 +1383,7 @@ class Process_ml_preprocess(Get_schema_table):
             'agglomeration': cfg,
         }
         self._Accept_and_save(df, spec_out, out_cols, 'wc',
-                               stem, project_root_fp, overwrite, step_info)
+                               stem, project_root_fp, overwrite, step_info, units_D)
 
     # ------------------------------------------------------------------ univariate selection
 
@@ -1496,7 +1492,7 @@ class Process_ml_preprocess(Get_schema_table):
                 print('    ERROR: %s' % e)
                 return
 
-        df   = pd.read_parquet(parquet_fp)
+        df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
@@ -1583,7 +1579,7 @@ class Process_ml_preprocess(Get_schema_table):
                     'univariate_selector': cfg,
                 }
                 self._Accept_and_save(df, spec_out_df, retained_wl, abbrev,
-                                       stem, project_root_fp, overwrite, step_info)
+                                       stem, project_root_fp, overwrite, step_info, units_D)
 
         else:
             # Combined: average F-scores across all indicators
@@ -1644,7 +1640,7 @@ class Process_ml_preprocess(Get_schema_table):
                 'univariate_selector': cfg,
             }
             self._Accept_and_save(df, spec_out_df, retained_wl, 'uv',
-                                   stem, project_root_fp, overwrite, step_info)
+                                   stem, project_root_fp, overwrite, step_info, units_D)
 
     # ------------------------------------------------------------------ permutation / RFE / tree selector
 
@@ -1727,7 +1723,7 @@ class Process_ml_preprocess(Get_schema_table):
             except FileNotFoundError as e:
                 print('    ERROR: %s' % e)
                 return
-        df   = pd.read_parquet(parquet_fp)
+        df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
@@ -1932,12 +1928,14 @@ class Process_ml_preprocess(Get_schema_table):
                 return
             non_spectral = [c for c in df.columns if not _is_spectral_col(c)]
             spec_out = df[top_cols].copy()
-            spec_out.columns = ['w_%d' % wl for wl in top_wl]
+            spec_out.columns = [Band_col_name(wl) for wl in top_wl]
+            signal_type = Signal_type_of(units_D, top_cols)
             df_save = pd.concat([
                 df[non_spectral].reset_index(drop=True),
                 spec_out.reset_index(drop=True),
             ], axis=1)
-            df_save.to_parquet(out_fp, index=False)
+            Save_parquet_with_units(df_save, out_fp,
+                                    Set_signal_type(units_D, list(spec_out.columns), signal_type))
             step_info = {
                 '_id': abbrev,
                 'process': 'spectra_indicator_permutation_selection',
@@ -1949,7 +1947,7 @@ class Process_ml_preprocess(Get_schema_table):
                 },
             }
             _write_companion_json(project_root_fp, stem, out_stem,
-                                   list(spec_out.columns), step_info)
+                                   list(spec_out.columns), step_info, signal_type)
             # Accumulate entry — caller (_prompt_and_write wrapper) collects and writes all at end
             _prev_entries_acc.append({
                 'dataframe': os.path.basename(out_fp),
@@ -2085,6 +2083,7 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_derivative',
              'parameters': {'derivative': derive, 'append': append}},
+            inp['units_D'],
         )
 
     def _Spectra_scatter_correction(self):
@@ -2113,6 +2112,7 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_scatter_correction',
              'parameters': {'scaler': scalers}},
+            inp['units_D'],
         )
 
     def _Spectra_scaling(self):
@@ -2142,6 +2142,7 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_scaling',
              'parameters': {'method': method}},
+            inp['units_D'],
         )
 
     def _Spectra_decomposition(self):
@@ -2174,6 +2175,7 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_decomposition',
              'parameters': {'method': method, 'n_components': n_actual}},
+            inp['units_D'],
         )
 
     def _Chemometric_default(self):
@@ -2234,4 +2236,5 @@ class Process_ml_preprocess(Get_schema_table):
             inp['df'], spec_final, cols_final, abbrev,
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             step_info_list,
+            inp['units_D'],
         )

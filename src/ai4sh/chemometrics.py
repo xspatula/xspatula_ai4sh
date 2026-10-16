@@ -72,6 +72,17 @@ def _msc(X, reference=None):
 # Indicator (lab data) transformations
 # ---------------------------------------------------------------------------
 
+def _Mask_outside_domain(series, outside, col, transform, condition):
+    '''Return series as float with values outside the transform's domain set to NaN (with a warning),
+    so that e.g. log(0) gives a missing value instead of -inf that breaks plots and models.'''
+    series = series.astype(float)
+    n_outside = int(outside.sum())
+    if n_outside:
+        print('    ⚠️  %s: %s value(s) %s cannot be %s-transformed, set to missing' % (col, n_outside, condition, transform))
+        series = series.mask(outside)
+    return series
+
+
 def apply_transformations(df, indicators, param, verbose=0):
     '''Apply per-indicator transformations to a copy of df.
 
@@ -88,22 +99,23 @@ def apply_transformations(df, indicators, param, verbose=0):
     df_out = df.copy()
 
     for col in indicators:
-        if col not in df_out.columns:
+        # Nominal (class) columns can not be transformed or standardised
+        if col not in df_out.columns or not pd.api.types.is_numeric_dtype(df_out[col]):
             continue
 
         col_cfg = config.get(col, {})
         series = df_out[col].dropna()
 
         if col_cfg.get('log'):
-            df_out[col] = np.log(df_out[col])
+            df_out[col] = np.log(_Mask_outside_domain(df_out[col], df_out[col] <= 0, col, 'log', '<= 0'))
             transform_dict[col] = 'log'
 
         elif col_cfg.get('sqrt'):
-            df_out[col] = np.sqrt(df_out[col])
+            df_out[col] = np.sqrt(_Mask_outside_domain(df_out[col], df_out[col] < 0, col, 'sqrt', '< 0'))
             transform_dict[col] = 'sqrt'
 
         elif col_cfg.get('reciprocal'):
-            df_out[col] = np.reciprocal(df_out[col].astype(float))
+            df_out[col] = np.reciprocal(_Mask_outside_domain(df_out[col], df_out[col] == 0, col, 'reciprocal', '= 0'))
             transform_dict[col] = 'reciprocal'
 
         elif col_cfg.get('boxcox'):
@@ -157,7 +169,8 @@ def apply_standardisation(df, indicators, param, verbose=0):
     df_out = df.copy()
 
     for col in indicators:
-        if col not in df_out.columns:
+        # Nominal (class) columns can not be transformed or standardised
+        if col not in df_out.columns or not pd.api.types.is_numeric_dtype(df_out[col]):
             continue
 
         if not config.get(col, False):

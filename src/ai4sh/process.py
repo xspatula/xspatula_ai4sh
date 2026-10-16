@@ -16,6 +16,8 @@ from src.ai4sh.select import Process_select
 from src.ai4sh.machine_learning_preprocess import Process_ml_preprocess
 from src.ai4sh.machine_learning_model import Process_regression_model
 
+from src.ai4sh.pandas_df_management import Process_pandas
+
 from src.lib.login import Get_set_database_session
 
 from src.utils import Log, Today_as_str_YYYYMMDD
@@ -114,7 +116,7 @@ def Run_process(structured_process_D, scheme_params_D):
 
             elif root_process == 'select_data':
 
-                select_C = Process_select(process_S, pg_session_C)
+                select_C = Process_select(process_S, pg_session_C, scheme_params_D['project_root_FP'])
 
                 select_C._Sub_process(key)
 
@@ -132,6 +134,12 @@ def Run_process(structured_process_D, scheme_params_D):
                 else:
                     ml_C = Process_ml_preprocess(process_S, pg_session_C, scheme_params_D['project_root_FP'])
                     ml_C._Sub_process(key)
+
+            elif root_process == 'pandas':
+
+                pandas_C = Process_pandas(process_S, pg_session_C, scheme_params_D['project_root_FP'])
+
+                pandas_C._Sub_process(key)
 
             else:
                 

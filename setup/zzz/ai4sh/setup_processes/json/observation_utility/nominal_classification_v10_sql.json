@@ -1,0 +1,103 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_nominal_classification",
+        "min_user_stratum": 4,
+        "title": "Manage nominal classes",
+        "label": "Insert, update or delete a nominal class."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the class.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "nominal_classification",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Display name of analysis method.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "nominal_classification",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "indicator_id__indicator_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the indicator to which a class name belongs.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "nominal_classification",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "analysis_method_id__analysis_method_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the analysis method used to derive the class (typically derived).",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "nominal_classification",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Summarise the class definition, if possible in layperson terms",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "nominal_classification",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

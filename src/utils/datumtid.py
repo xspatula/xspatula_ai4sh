@@ -180,6 +180,8 @@ def yyyymmdd_HH_MM_SS_s_as_str_4_postgres(yyyymmdd_HH_MM_SS_s):
     """
     if len(yyyymmdd_HH_MM_SS_s) == 8:
         yyyymmdd_HH_MM_SS_s = f"{yyyymmdd_HH_MM_SS_s}_000000_0"
+    elif len(yyyymmdd_HH_MM_SS_s) == 10 and '-' in yyyymmdd_HH_MM_SS_s:
+        yyyymmdd_HH_MM_SS_s = yyyymmdd_HH_MM_SS_s.replace('-', '') + '_000000_0'
     elif len(yyyymmdd_HH_MM_SS_s) == 15:
         yyyymmdd_HH_MM_SS_s = f"{yyyymmdd_HH_MM_SS_s}_0"
     elif 'T' in yyyymmdd_HH_MM_SS_s:

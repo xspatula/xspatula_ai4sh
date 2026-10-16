@@ -47,7 +47,7 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "'%s@slakes' %(sampling_log_id__sampling_log_name)"
+                "concat": "'%s@slakes' %(sampling_log_id__sampling_log_tag)"
               }
             },
             {

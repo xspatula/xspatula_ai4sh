@@ -11,6 +11,7 @@
           "id SERIAL",
           "name TEXT UNIQUE",
           "alias TEXT UNIQUE",
+          "tag TEXT UNIQUE NOT NULL",
           "display_name TEXT",
           "data_source_id INTEGER REFERENCES observation.data_source (id)",
           "contact_name VARCHAR",
@@ -39,12 +40,14 @@
             "id",
             "name",
             "alias",
+            "tag",
             "data_source_id"
           ],
           "values": [
             [
               "0",
               "dump",
+              "none",
               "none",
               "0"
             ]

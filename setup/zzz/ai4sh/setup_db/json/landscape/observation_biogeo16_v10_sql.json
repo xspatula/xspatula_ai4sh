@@ -1,0 +1,27 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "landscape",
+        "table": "biogeo16_observation",
+        "command": [
+          "id SERIAL",
+          "observation_log_id INTEGER REFERENCES observation.observation_log (id)",
+          "geolocation_id INTEGER REFERENCES observation.geolocation (id)",
+          "biogeo16_id INTEGER REFERENCES landscape_utility.biogeo16 (id)",
+          "observed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP",
+          "UNIQUE (geolocation_id, observed_at)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    }  
+  ]
+}

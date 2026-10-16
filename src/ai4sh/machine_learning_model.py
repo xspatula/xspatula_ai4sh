@@ -51,6 +51,8 @@ from src.ai4sh.machine_learning_preprocess import (
     _resolve_input_parquet, _resolve_single_previous, _load_companion_json,
     _is_spectral_col, _col_to_index, _parse_array_param, _METADATA_COLS,
 )
+from src.ai4sh.parquet_units import Read_parquet_with_units
+from src.ai4sh.spectral_columns import Signal_type_of
 
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
@@ -337,7 +339,7 @@ class Process_regression_model(Get_schema_table):
             except FileNotFoundError as e:
                 print('    ERROR: %s' % e)
                 return
-        df   = pd.read_parquet(parquet_fp)
+        df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
@@ -349,7 +351,10 @@ class Process_regression_model(Get_schema_table):
             print('    ERROR: no spectral columns found.')
             return
         wavelengths = [_col_to_index(c) for c in spectral_cols]
-        col_names   = ['w_%d' % wl for wl in wavelengths]
+        col_names   = [str(c) for c in spectral_cols]
+        # Header row 2 — stored on each saved model and in the results JSON
+        signal_type = Signal_type_of(units_D, spectral_cols)
+        spectral_header_D = {c: signal_type for c in col_names}
         X_all       = pd.DataFrame(df[spectral_cols].values.astype(float), columns=col_names)
 
         all_indicators = [
@@ -469,6 +474,7 @@ class Process_regression_model(Get_schema_table):
 
                     jl_fp = os.path.join(models_dir_tt,
                                          '%s_%s_%s_tt.joblib' % (stem, ind_s, model_key))
+                    model_tt.spectral_header_ = spectral_header_D
                     joblib.dump(model_tt, jl_fp)
                     metrics_tt['model_fp'] = jl_fp
 
@@ -534,6 +540,7 @@ class Process_regression_model(Get_schema_table):
                     model_kf.fit(X, y)
                     jl_fp = os.path.join(models_dir_kf,
                                          '%s_%s_%s_kf.joblib' % (stem, ind_s, model_key))
+                    model_kf.spectral_header_ = spectral_header_D
                     joblib.dump(model_kf, jl_fp)
                     metrics_kf['model_fp'] = jl_fp
 
@@ -577,6 +584,8 @@ class Process_regression_model(Get_schema_table):
         out_json = {
             'source_parquet':      os.path.basename(parquet_fp),
             'preprocessing_chain': companion.get('preprocessing_chain', []),
+            'signal_type':         signal_type,
+            'feature_columns':     col_names,
             'results':             results_D,
         }
         result_fp = os.path.join(project_root_fp, stem + '_regression.json')

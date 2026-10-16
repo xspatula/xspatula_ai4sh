@@ -94,6 +94,22 @@
                 "update": false,
                 "delete": false
               }
+            },
+            {
+              "parameter": "process",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "None",
+              "hint": "The process to be applied for the unit translation, default None = no process required.",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "unit_translate",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
             }
           ]
         }

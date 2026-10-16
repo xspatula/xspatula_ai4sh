@@ -54,6 +54,28 @@
               }
             },
             {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Unique tag used for auto naming production files and results, should be less than 16 chars not contain underscore, at (@) or blank",
+              "schema_table": {
+                "schema": "observation",
+                "table": "dataset",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "format": {
+                "underscore": false,
+                "at": false,
+                "capital": false,
+                "blank": false
+              }
+            },
+            {
               "parameter": "display_name",
               "parameter_type": "text",
               "required": true,

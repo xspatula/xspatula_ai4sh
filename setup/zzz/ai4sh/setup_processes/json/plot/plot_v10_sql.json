@@ -39,6 +39,27 @@
               "hint": "Comma separated list of the indicators to plot"
             },
             {
+              "parameter": "covariate_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Comma separated list of the covariates to plot; nominal (class) covariates are plotted as class counts"
+            },
+            {
+              "parameter": "max_classes",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 15,
+              "hint": "Max number of classes shown per nominal covariate; the remaining classes are summed as other"
+            },
+            {
+              "parameter": "class_label",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "display_name",
+              "hint": "Label of class covariates (land cover, land use, biogeo16) in plots: display_name, tag, name or alias"
+            },
+            {
               "parameter": "targetfeaturesymbols",
               "parameter_type": "text",
               "required": false,
@@ -72,6 +93,20 @@
               "required": false,
               "default_value": true,
               "hint": "True or false if you want a histogram plot"
+            },
+            {
+              "parameter": "single_canvas_plot",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "True or false if you want all plots on a single canvas"
+            },
+            {
+              "parameter": "individual_canvas_plot",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "True or false if you want each plot on an individual canvas"
             },
             {
               "parameter": "show",

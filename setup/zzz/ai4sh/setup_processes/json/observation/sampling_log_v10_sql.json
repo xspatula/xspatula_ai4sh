@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "manage_table_data",
         "process": "manage_sampling_log",
@@ -35,7 +35,7 @@
               "parameter": "contact_name",
               "parameter_type": "text",
               "required": false,
-              "default_value": "",
+              "default_value": "inherit",
               "hint": "Contact name for the sampling log",
               "schema_table": {
                 "schema": "observation",
@@ -45,13 +45,21 @@
               "permission": {
                 "update": true,
                 "delete": false
+              },
+              "inherit": {
+                "process_parameter": "contact_name",
+                "src_schema": "observation",
+                "src_table": "campaign",
+                "src_column": "contact_name",
+                "search_column": "id",
+                "search_object": "campaign_id__campaign_name"
               }
             },
             {
               "parameter": "contact_email",
               "parameter_type": "text",
               "required": false,
-              "default_value": "",
+              "default_value": "inherit",
               "hint": "The email contact address for the campaign",
               "schema_table": {
                 "schema": "observation",
@@ -61,14 +69,22 @@
               "permission": {
                 "update": true,
                 "delete": false
+              },
+              "inherit": {
+                "process_parameter": "contact_email",
+                "src_schema": "observation",
+                "src_table": "campaign",
+                "src_column": "contact_email",
+                "search_column": "id",
+                "search_object": "campaign_id__campaign_name"
               }
             },
             {
               "parameter": "name",
               "parameter_type": "text",
               "required": false,
-              "default_value": "",
-              "hint": "The name of the sampling log",
+              "default_value": "auto",
+              "hint": "Name of the sampling log, auto = campaign name + datetime tag ('no date' if no datetime tag)",
               "schema_table": {
                 "schema": "observation",
                 "table": "sampling_log",
@@ -77,6 +93,84 @@
               "permission": {
                 "update": true,
                 "delete": false
+              },
+              "auto_name": {
+                "concat": "'%s %s' %(campaign_id__campaign_name, datetime_tag)"
+              }
+            },
+            {
+              "parameter": "tag",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "Unique tag used for auto naming production files and results, auto = campaign tag + _ + datetime tag (0 if no date). A tag given by hand must not contain underscore, at (@), capitals or blank.",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "auto_name": {
+                "concat": "'%s_%s' %(campaign_id__campaign_tag, datetime_tag)"
+              },
+              "format": {
+                "at": false,
+                "capital": false,
+                "blank": false
+              }
+            },
+            {
+              "parameter": "display_name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "auto",
+              "hint": "Display name of the sampling log, auto = campaign display name + datetime tag",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              },
+              "auto_name": {
+                "concat": "'%s %s' %(campaign_id__campaign_display_name, datetime_tag)"
+              }
+            },
+            {
+              "parameter": "datetime_tag",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "0",
+              "hint": "Datestamp of the sampling: YYYY, YYYYMM, YYYYMMDD or YYYYMMDDhhmmss; 0 if no date",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "url",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "URL describing this sampling (e.g. the data release of the sampling year)",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sampling_log",
+                "write": true
+              },
+              "permission": {
+                "update": true,
+                "delete": true
               }
             },
             {

@@ -7,13 +7,13 @@ Created on 22 April 2026
 # Standard library imports
 import os
 import json
-import glob
 from math import ceil
 
 # Third-party imports
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 # Application package imports
 from src.postgres import Get_schema_table
@@ -28,11 +28,11 @@ from src.ai4sh.chemometrics import (apply_transformations, apply_standardisation
 
 from src.ai4sh.filter import apply_filter, apply_multi_filter, _load_filter_config
 
-# Repo root: src/ai4sh/plot.py → up 2 levels
-_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+from src.ai4sh.feature_symbols import Load_feature_symbols
 
-_DEFAULT_SYMBOLS_FPN = os.path.join(_REPO_ROOT, 'ai4sh', 'default', 'plot', 'targetfeaturesymbols.json')
+from src.ai4sh.parquet_units import Read_parquet_with_units, Find_selected_parquet
 
+from src.ai4sh.spectral_columns import Band_value, Is_band_col, Signal_type_of, SIGNAL_TYPE_LABELS
 
 def _spectra_x_axis(columns):
     '''Return (x_values, x_label) appropriate for the given spectral column list.'''
@@ -47,9 +47,8 @@ def _spectra_x_axis(columns):
     except (ValueError, TypeError):
         return list(range(len(columns))), 'Band'
 
-
 def _step_to_abbrev(step_label):
-    '''Return a short abbreviation for a single chemometric step label.
+    '''Return a short abbreviation for an individual chemometric step label.
 
     See ai4sh/default/chemometric/chemometric_abbreviations.md for the full table.
     '''
@@ -79,7 +78,6 @@ def _step_to_abbrev(step_label):
                 'lowess': 'lw', 'multi_filter': 'mf'}.get(method, method[:4])
     return ''.join(c if c.isalnum() else '' for c in step_label.lower())[:6]
 
-
 class Process_plot(Get_schema_table):
     '''Plot indicator distributions (boxplot, histogram) from a saved Parquet dataset.'''
 
@@ -94,6 +92,9 @@ class Process_plot(Get_schema_table):
         self.project_root_FP = project_root_FP
 
         self.pg_ai4sh_C = PG_manage_AI4SH(pg_session_C)
+
+        # y-axis label for spectra, set from header row 2 when the Parquet is loaded
+        self.signal_label = SIGNAL_TYPE_LABELS['refl']
 
     def _Sub_process(self, _json_file_key):
 
@@ -118,47 +119,49 @@ class Process_plot(Get_schema_table):
     # ------------------------------------------------------------------
 
     def _Parse_indicator_array(self):
-        '''Return list of indicator names from the indicator_array parameter.
+        '''Return list of indicator and covariate names from the indicator_array and covariate_array
+        parameters (in that order, without duplicates).
 
         Handles JSON list, CSV string, or postgres "{a,b,c}" format.
         '''
-        raw = getattr(self.process_S.process.parameters, 'indicator_array', '')
+        names = []
 
-        if not raw:
-            return []
+        for key in ('indicator_array', 'covariate_array'):
 
-        if isinstance(raw, list):
-            return [x.strip() for x in raw if x.strip()]
+            for name in self._Parse_chemometrics_array(getattr(self.process_S.process.parameters, key, '')):
 
-        s = str(raw).strip()
+                if name not in names:
+                    names.append(name)
 
-        if s.startswith('{') and s.endswith('}'):
-            s = s[1:-1]
-
-        return [x.strip() for x in s.split(',') if x.strip()]
+        return names
 
     def _Load_parquet_data(self, project_root_fp):
-        '''Find and load data-*.parquet + params-*.json from project_root_fp.
+        '''Find and load the selected {name}.parquet + {name}.json from project_root_fp
+        (see Find_selected_parquet).
 
         Returns (DataFrame, params_dict). Raises FileNotFoundError if not found.
         '''
-        parquet_matches = glob.glob(os.path.join(project_root_fp, 'data-*.parquet'))
-        params_matches = glob.glob(os.path.join(project_root_fp, 'params-*.json'))
+        parquet_fpn, params_fpn = Find_selected_parquet(project_root_fp)
 
-        if not parquet_matches:
-            raise FileNotFoundError('No data-*.parquet file found in: %s' % project_root_fp)
-
-        df = pd.read_parquet(parquet_matches[0])
+        df, units_D = Read_parquet_with_units(parquet_fpn)
 
         params_D = {}
-        if params_matches:
-            with open(params_matches[0]) as f:
+        if params_fpn:
+            with open(params_fpn) as f:
                 params_D = json.load(f)
+
+        # Units embedded in the Parquet's column MultiIndex take priority over the (legacy)
+        # JSON copy, which is kept only as a fallback for older files.
+        if units_D:
+            params_D['indicator_units'] = units_D
+
+        self.signal_label = SIGNAL_TYPE_LABELS[
+            Signal_type_of(units_D, [c for c in df.columns if Is_band_col(c)])]
 
         if self.verbose >= 1:
             n_samples = params_D.get('n_samples', len(df))
             print('    Loaded %d rows (%d expected) from %s' % (
-                len(df), n_samples, os.path.basename(parquet_matches[0])))
+                len(df), n_samples, os.path.basename(parquet_fpn)))
 
         return df, params_D
 
@@ -170,20 +173,7 @@ class Process_plot(Get_schema_table):
         '''
         raw = getattr(self.process_S.process.parameters, 'targetfeaturesymbols', 'default')
 
-        if not raw or str(raw).strip().lower() == 'default':
-            fpn = _DEFAULT_SYMBOLS_FPN
-        else:
-            fpn = str(raw).strip()
-
-        if not os.path.exists(fpn):
-            if self.verbose >= 1:
-                print('    Warning: targetfeaturesymbols file not found: %s — using fallback labels.' % fpn)
-            return {}
-
-        with open(fpn) as f:
-            data = json.load(f)
-
-        return data.get('targetFeatureSymbols', {})
+        return Load_feature_symbols(raw, self.verbose)
 
     def _Build_plot_output_path(self, project_root_fp):
         '''Create and return the plot output directory under project_root_fp/plot/.'''
@@ -194,8 +184,12 @@ class Process_plot(Get_schema_table):
 
         return plot_dir
 
-    def _Get_symbol(self, symbols, indicator):
-        '''Return (color, label, unit) for an indicator, with fallback to indicator name.'''
+    def _Get_symbol(self, symbols, indicator, applied_units_D=None):
+        '''Return (color, label, unit) for an indicator, with fallback to indicator name.
+
+        If the symbol's unit is "native", resolve to the actual DB-recorded unit saved in
+        applied_units_D (params_D['indicator_units']) instead of the literal "native".
+        '''
 
         sym = symbols.get(indicator, {})
 
@@ -203,10 +197,13 @@ class Process_plot(Get_schema_table):
         label = sym.get('label', indicator)
         unit = sym.get('unit', '')
 
+        if unit == 'native' and applied_units_D:
+            unit = applied_units_D.get(indicator, unit)
+
         return color, label, unit
 
     def _build_transform_info(self, indicator, transform_dict, standard_dict):
-        '''Return (annotation_str, filename_suffix) for a single indicator.'''
+        '''Return (annotation_str, filename_suffix) for an individual indicator.'''
 
         transform = transform_dict.get(indicator, 'linear')
         standardised = standard_dict.get(indicator, 'none') != 'none'
@@ -258,7 +255,7 @@ class Process_plot(Get_schema_table):
         file_suffix: filename stem derived from chain_ann (e.g. "snv_mc").
         '''
         x_vals, x_label = _spectra_x_axis(step_cols)
-        y_label = 'Score' if step_cols and str(step_cols[0]).startswith('pc') else 'Reflectance'
+        y_label = 'Score' if step_cols and str(step_cols[0]).startswith('pc') else self.signal_label
 
         fig, ax = plt.subplots(figsize=(10, 5))
         for i, (_, row) in enumerate(df_step.iterrows()):
@@ -284,46 +281,48 @@ class Process_plot(Get_schema_table):
         plt.close(fig)
 
     def _Histogram_plot(self, df, indicators, symbols, bins, show, save, plot_dir,
-                        transform_dict=None, standard_dict=None):
-        '''Plot histograms for each indicator — singles then multi-column grid.'''
+                        transform_dict=None, standard_dict=None,
+                        individual_canvas_plot=True, single_canvas_plot=False, applied_units_D=None):
+        '''Plot histograms for each indicator — individual canvases then multi-column grid canvas.'''
 
         n_cols = 3
 
         transform_dict = transform_dict or {}
         standard_dict = standard_dict or {}
 
-        # --- Singles ---
-        for indicator in indicators:
+        # --- Individual canvases ---
+        if individual_canvas_plot:
+            for indicator in indicators:
 
-            if indicator not in df.columns:
-                if self.verbose >= 1:
-                    print('    Warning: indicator "%s" not in DataFrame — skipping.' % indicator)
-                continue
+                if indicator not in df.columns:
+                    if self.verbose >= 1:
+                        print('    Warning: indicator "%s" not in DataFrame — skipping.' % indicator)
+                    continue
 
-            series = df[indicator].dropna()
-            color, label, unit = self._Get_symbol(symbols, indicator)
-            ann, suffix = self._build_transform_info(indicator, transform_dict, standard_dict)
+                series = df[indicator].dropna()
+                color, label, unit = self._Get_symbol(symbols, indicator, applied_units_D)
+                ann, suffix = self._build_transform_info(indicator, transform_dict, standard_dict)
 
-            fig, ax = plt.subplots(figsize=(6, 4))
-            series.plot.hist(bins=bins, color=color, ax=ax)
-            ax.set_title(label)
-            ax.set_xlabel(unit)
-            ax.text(0.98, 0.98, ann, transform=ax.transAxes, fontsize=7,
-                    ha='right', va='top', color='gray')
+                fig, ax = plt.subplots(figsize=(6, 4))
+                series.plot.hist(bins=bins, color=color, ax=ax)
+                ax.set_title(label)
+                ax.set_xlabel(unit)
+                ax.text(0.98, 0.98, ann, transform=ax.transAxes, fontsize=7,
+                        ha='right', va='top', color='gray')
 
-            if save:
-                fpn = os.path.join(plot_dir, 'histogram_%s%s.png' % (indicator, suffix))
-                fig.savefig(fpn, bbox_inches='tight')
-                if self.verbose >= 1:
-                    print('    Saved: %s' % fpn)
+                if save:
+                    fpn = os.path.join(plot_dir, 'histogram_%s%s.png' % (indicator, suffix))
+                    fig.savefig(fpn, bbox_inches='tight')
+                    if self.verbose >= 1:
+                        print('    Saved: %s' % fpn)
 
-            if show:
-                plt.show()
+                if show:
+                    plt.show()
 
-            plt.close(fig)
+                plt.close(fig)
 
-        # --- Multi-column grid (separate pass so singles are fully closed first) ---
-        if len(indicators) > 1:
+        # --- Multi-column grid (separate pass so individual plots are fully closed first) ---
+        if len(indicators) > 1 and single_canvas_plot:
 
             n_rows = ceil(len(indicators) / n_cols)
             multi_fig, multi_axs = plt.subplots(
@@ -339,7 +338,7 @@ class Process_plot(Get_schema_table):
                     continue
 
                 series = df[indicator].dropna()
-                color, label, unit = self._Get_symbol(symbols, indicator)
+                color, label, unit = self._Get_symbol(symbols, indicator, applied_units_D)
                 ann, _ = self._build_transform_info(indicator, transform_dict, standard_dict)
                 ax = axs_flat[f]
                 series.plot.hist(bins=bins, color=color, ax=ax)
@@ -368,50 +367,193 @@ class Process_plot(Get_schema_table):
 
             plt.close(multi_fig)
 
-    def _Boxplot_plot(self, df, indicators, symbols, show, save, plot_dir,
-                      transform_dict=None, standard_dict=None):
-        '''Plot boxplots for each indicator — singles then multi-column grid.'''
+    def _Class_style(self, symbols, name):
+        '''Return bar style kwargs for a nominal covariate from its symbol: color, alpha, hatch
+        (e.g. "//", "xx", ".."), fill (false = outline only) and edgecolor (default = color).'''
 
-        n_cols = 3
-        transform_dict = transform_dict or {}
-        standard_dict = standard_dict or {}
+        sym = symbols.get(name, {})
 
-        # --- Singles ---
-        for indicator in indicators:
+        color = sym.get('color', 'steelblue')
 
-            if indicator not in df.columns:
-                if self.verbose >= 1:
-                    print('    Warning: indicator "%s" not in DataFrame — skipping.' % indicator)
-                continue
+        fill = sym.get('fill', True)
 
-            color, label, unit = self._Get_symbol(symbols, indicator)
-            ann, suffix = self._build_transform_info(indicator, transform_dict, standard_dict)
+        return dict(color=color if fill else 'none', alpha=sym.get('alpha', 1.0), hatch=sym.get('hatch'),
+                    edgecolor=sym.get('edgecolor', color), linewidth=0.8)
 
-            fig, ax = plt.subplots(figsize=(4, 5))
-            df.boxplot(
-                column=[indicator],
-                patch_artist=True,
-                boxprops=dict(facecolor=color),
-                ax=ax
-            )
-            ax.set_title(label)
-            ax.set_xlabel(unit)
-            ax.text(0.98, 0.98, ann, transform=ax.transAxes, fontsize=7,
-                    ha='right', va='top', color='gray')
+    def _Class_counts(self, series, max_classes):
+        '''Return class counts (largest first), the classes beyond max_classes summed as "other".'''
+
+        counts = series.dropna().astype(str).value_counts()
+
+        if max_classes and len(counts) > max_classes:
+
+            other = counts.iloc[max_classes:].sum()
+
+            counts = counts.iloc[:max_classes]
+
+            counts['other (%s classes)' % (len(series.dropna().unique()) - max_classes)] = other
+
+        return counts
+
+    def _Relabel_classes(self, df, nominal, params_D, class_label):
+        '''Return df with the nominal class values (tags) shown as class_label: tag, display_name, name or alias.
+
+        The lookup is the class_labels of the selection params JSON; values without a lookup (older
+        selections, nominal indicators) are shown as stored.
+        '''
+        lookup_D = (params_D or {}).get('class_labels', {})
+
+        if class_label == 'tag' or not lookup_D:
+            return df
+
+        df = df.copy()
+
+        for name in nominal:
+
+            classes_D = lookup_D.get(name, {})
+
+            mapping = {tag: info.get(class_label) or tag for tag, info in classes_D.items()}
+
+            df[name] = df[name].map(lambda v: mapping.get(v, v))
+
+        return df
+
+    def _Class_bar_axes(self, ax, counts, label, style, fontsize):
+        '''Draw class counts as horizontal bars (largest on top) on ax.'''
+
+        names = [n if len(n) <= 40 else n[:39] + '…' for n in counts.index]
+
+        ax.barh(names[::-1], counts.values[::-1], height=0.7, **style)
+
+        # Same bar thickness for few classes: room for at least 5 bars, bars at the top
+        n_bars = len(counts)
+
+        ax.set_ylim(n_bars - max(n_bars, 5) - 0.6, n_bars - 0.4)
+
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+        ax.set_title(label)
+
+        ax.set_xlabel('samples')
+
+        ax.tick_params(axis='y', labelsize=fontsize)
+
+        ax.text(0.98, 0.02, '%s class%s, n = %s' % (len(counts), '' if len(counts) == 1 else 'es', int(counts.sum())), transform=ax.transAxes,
+                fontsize=fontsize, ha='right', va='bottom', color='gray')
+
+    def _Class_bar_plot(self, df, covariates, symbols, max_classes, show, save, plot_dir,
+                        individual_canvas_plot=True, single_canvas_plot=False, ranks_D=None):
+        '''Plot class counts for each nominal covariate — individual canvases then a grid canvas.
+        ranks_D: {covariate: rank} of hierarchical covariates, added to the title unless lowest.'''
+
+        def _Title(name):
+            rank = (ranks_D or {}).get(name, 'lowest')
+            label = self._Get_symbol(symbols, name)[1]
+            return label if rank == 'lowest' else '%s (%s)' % (label, rank)
+
+        if individual_canvas_plot:
+
+            for name in covariates:
+
+                counts = self._Class_counts(df[name], max_classes)
+
+                fig, ax = plt.subplots(figsize=(7, 0.3 * max(len(counts), 5) + 1.5))
+
+                self._Class_bar_axes(ax, counts, _Title(name), self._Class_style(symbols, name), 8)
+
+                fig.tight_layout()
+
+                if save:
+                    fpn = os.path.join(plot_dir, 'classes_%s.png' % name)
+                    fig.savefig(fpn, bbox_inches='tight')
+                    if self.verbose >= 1:
+                        print('    Saved: %s' % fpn)
+
+                if show:
+                    plt.show()
+
+                plt.close(fig)
+
+        if len(covariates) > 1 and single_canvas_plot:
+
+            n_cols = 2
+
+            n_rows = ceil(len(covariates) / n_cols)
+
+            all_counts = [self._Class_counts(df[name], max_classes) for name in covariates]
+
+            row_height = 0.3 * max(max(len(c) for c in all_counts), 5) + 1.5
+
+            multi_fig, multi_axs = plt.subplots(n_rows, n_cols, figsize=(n_cols * 6, n_rows * row_height))
+
+            axs_flat = np.array(multi_axs).flatten()
+
+            for f, (name, counts) in enumerate(zip(covariates, all_counts)):
+
+                self._Class_bar_axes(axs_flat[f], counts, _Title(name), self._Class_style(symbols, name), 7)
+
+            for idx in range(len(covariates), len(axs_flat)):
+                axs_flat[idx].set_visible(False)
+
+            multi_fig.tight_layout()
 
             if save:
-                fpn = os.path.join(plot_dir, 'boxplot_%s%s.png' % (indicator, suffix))
-                fig.savefig(fpn, bbox_inches='tight')
+                fpn = os.path.join(plot_dir, 'classes_all-covariates.png')
+                multi_fig.savefig(fpn, bbox_inches='tight')
                 if self.verbose >= 1:
                     print('    Saved: %s' % fpn)
 
             if show:
                 plt.show()
 
-            plt.close(fig)
+            plt.close(multi_fig)
 
-        # --- Multi-column grid (separate pass so singles are fully closed first) ---
-        if len(indicators) > 1:
+    def _Boxplot_plot(self, df, indicators, symbols, show, save, plot_dir,
+                      transform_dict=None, standard_dict=None,
+                      individual_canvas_plot=True, single_canvas_plot=False, applied_units_D=None):
+        '''Plot boxplots for each indicator — individual canvases then multi-column grid canvas.'''
+
+        n_cols = 3
+        transform_dict = transform_dict or {}
+        standard_dict = standard_dict or {}
+
+        # --- Individual canvases ---
+        if individual_canvas_plot:
+            for indicator in indicators:
+
+                if indicator not in df.columns:
+                    if self.verbose >= 1:
+                        print('    Warning: indicator "%s" not in DataFrame — skipping.' % indicator)
+                    continue
+
+                color, label, unit = self._Get_symbol(symbols, indicator, applied_units_D)
+                ann, suffix = self._build_transform_info(indicator, transform_dict, standard_dict)
+
+                fig, ax = plt.subplots(figsize=(4, 5))
+                df.boxplot(
+                    column=[indicator],
+                    patch_artist=True,
+                    boxprops=dict(facecolor=color),
+                    ax=ax
+                )
+                ax.set_title(label)
+                ax.set_xlabel(unit)
+                ax.text(0.98, 0.98, ann, transform=ax.transAxes, fontsize=7,
+                        ha='right', va='top', color='gray')
+
+                if save:
+                    fpn = os.path.join(plot_dir, 'boxplot_%s%s.png' % (indicator, suffix))
+                    fig.savefig(fpn, bbox_inches='tight')
+                    if self.verbose >= 1:
+                        print('    Saved: %s' % fpn)
+
+                if show:
+                    plt.show()
+
+                plt.close(fig)
+
+        # --- Multi-column grid (separate pass so individual canvases are fully closed first) ---
+        if len(indicators) > 1 and single_canvas_plot:
 
             n_rows = ceil(len(indicators) / n_cols)
             multi_fig, multi_axs = plt.subplots(
@@ -426,7 +568,7 @@ class Process_plot(Get_schema_table):
                 if indicator not in df.columns:
                     continue
 
-                color, label, unit = self._Get_symbol(symbols, indicator)
+                color, label, unit = self._Get_symbol(symbols, indicator, applied_units_D)
                 ann, _ = self._build_transform_info(indicator, transform_dict, standard_dict)
                 ax = axs_flat[f]
                 df.boxplot(
@@ -501,12 +643,11 @@ class Process_plot(Get_schema_table):
 
         if not indicators:
             # Use all non-spectral, non-metadata columns
-            skip_prefixes = ('w_',)
-            skip_cols = {'sample_name', 'campaign_name', 'latitude_dd', 'longitude_dd',
+            skip_cols = {'sample_id', 'sample_name', 'sampling_log_tag', 'campaign_name', 'latitude_dd', 'longitude_dd',
                          'profile_min', 'profile_max'}
             indicators = [
                 c for c in df.columns
-                if c not in skip_cols and not any(c.startswith(px) for px in skip_prefixes)
+                if c not in skip_cols and not Is_band_col(c)
             ]
 
         # Keep only indicators that exist in the DataFrame
@@ -516,14 +657,24 @@ class Process_plot(Get_schema_table):
             print('    No indicators found in the data. Available columns: %s' % list(df.columns))
             return
 
+        # Nominal (class) indicators/covariates are plotted as class counts, numeric ones as
+        # histograms and boxplots
+        nominal = [i for i in indicators if not pd.api.types.is_numeric_dtype(df[i])]
+
+        indicators = [i for i in indicators if i not in nominal]
+
         if self.verbose >= 1:
-            print('    Plotting %d indicator(s): %s' % (len(indicators), indicators))
+            print('    Plotting %d numeric: %s and %d nominal: %s' % (len(indicators), indicators, len(nominal), nominal))
 
         # Apply transformation and standardisation before plotting
         transformation_param = getattr(p, 'transformation', 'default')
         standardisation_param = getattr(p, 'standardisation', 'default')
         df, transform_dict = apply_transformations(df, indicators, transformation_param, self.verbose)
         df, standard_dict = apply_standardisation(df, indicators, standardisation_param, self.verbose)
+
+        if params_D and 'indicator_units' not in params_D:
+            print('    Warning: this Parquet was built before unit tracking was added to select_spectra — '
+                  'units are not guaranteed to match targetfeaturesymbols.json. Re-run select to be sure.')
 
         # Load symbols
         symbols = self._Load_feature_symbols()
@@ -534,16 +685,38 @@ class Process_plot(Get_schema_table):
         show = getattr(p, 'show', True)
         save = getattr(p, 'save', False)
         bins = getattr(p, 'bins', 10)
+        single_canvas_plot = getattr(p, 'single_canvas_plot', False)
+        individual_canvas_plot = getattr(p, 'individual_canvas_plot', True)
 
         plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
 
+        applied_units_D = params_D.get('indicator_units', {}) if params_D else {}
+
+        if nominal and (do_histogram or do_boxplot):
+            class_label = (getattr(p, 'class_label', 'display_name') or 'display_name').strip().lower()
+
+            if class_label not in ('tag', 'display_name', 'name', 'alias'):
+
+                print('    ⚠️  Unknown class_label "%s" (tag, display_name, name or alias); using display_name' % class_label)
+
+                class_label = 'display_name'
+
+            self._Class_bar_plot(self._Relabel_classes(df, nominal, params_D, class_label), nominal, symbols,
+                                 getattr(p, 'max_classes', 15), show, save, plot_dir,
+                                 individual_canvas_plot, single_canvas_plot, (params_D or {}).get('covariate_rank'))
+
+        if not indicators:
+            return
+
         if do_histogram:
             self._Histogram_plot(df, indicators, symbols, bins, show, save, plot_dir,
-                                 transform_dict, standard_dict)
+                                 transform_dict, standard_dict,
+                                 individual_canvas_plot, single_canvas_plot, applied_units_D)
 
         if do_boxplot:
             self._Boxplot_plot(df, indicators, symbols, show, save, plot_dir,
-                               transform_dict, standard_dict)
+                               transform_dict, standard_dict,
+                               individual_canvas_plot, single_canvas_plot, applied_units_D)
 
     def _Plot_spectra(self):
         '''Plot spectra through each chemometric step from a saved Parquet dataset.'''
@@ -563,9 +736,9 @@ class Process_plot(Get_schema_table):
             print('    ERROR: %s' % e)
             return
 
-        spectral_cols = [c for c in df.columns if c.startswith('w_')]
+        spectral_cols = [c for c in df.columns if Is_band_col(c)]
         if not spectral_cols:
-            print('    ERROR: no spectral columns (w_*) found in the data.')
+            print('    ERROR: no spectral columns (wl_*, wn_*) found in the data.')
             return
 
         # Subsample rows
@@ -587,7 +760,7 @@ class Process_plot(Get_schema_table):
         plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
 
         # Build spectral-only DataFrame with integer wavelength column names
-        wavelengths = [int(c[2:]) for c in spectral_cols]
+        wavelengths = [Band_value(c) for c in spectral_cols]
         spec_df = df_sub[spectral_cols].copy()
         spec_df.columns = wavelengths
 
@@ -656,9 +829,9 @@ class Process_plot(Get_schema_table):
             print('    ERROR: %s' % e)
             return None, None, None, None, None, None, None, None
 
-        spectral_cols = [c for c in df.columns if c.startswith('w_')]
+        spectral_cols = [c for c in df.columns if Is_band_col(c)]
         if not spectral_cols:
-            print('    ERROR: no spectral columns (w_*) found in the data.')
+            print('    ERROR: no spectral columns (wl_*, wn_*) found in the data.')
             return None, None, None, None, None, None, None, None
 
         n_total = len(df)
@@ -678,7 +851,7 @@ class Process_plot(Get_schema_table):
         if bw:
             ann += '  bw=%s nm' % bw
 
-        wavelengths = [int(c[2:]) for c in spectral_cols]
+        wavelengths = [Band_value(c) for c in spectral_cols]
         spec_df = df_sub[spectral_cols].copy()
         spec_df.columns = wavelengths
 
@@ -705,7 +878,7 @@ class Process_plot(Get_schema_table):
 
         for ax, (abbrev, label, df_step, step_cols) in zip(axs, panels):
             x_vals, _ = _spectra_x_axis(step_cols)
-            y_label = 'Score' if step_cols and str(step_cols[0]).startswith('pc') else 'Reflectance'
+            y_label = 'Score' if step_cols and str(step_cols[0]).startswith('pc') else self.signal_label
             for i, (_, row) in enumerate(df_step.iterrows()):
                 ax.plot(x_vals, row[step_cols].values, color=colors[i], linewidth=0.5)
             ax.set_ylabel(y_label, fontsize=7)

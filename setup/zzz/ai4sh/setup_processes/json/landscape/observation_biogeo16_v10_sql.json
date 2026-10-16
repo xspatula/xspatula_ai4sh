@@ -1,0 +1,87 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "manage_table_data",
+        "process": "manage_biogeo16_observation",
+        "min_user_stratum": 4,
+        "title": "Manage biogeographic observation",
+        "label": "Insert, update or delete a biogeographic observation"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "observation_log_id__observation_log_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the observation_log.",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "biogeo16_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "geolocation_id__geolocation_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the geolocation",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "biogeo16_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "biogeo16_id__biogeo16_name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The name of the biogeographic class",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "biogeo16_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            },
+            {
+              "parameter": "observed_at",
+              "parameter_type": "timestamp",
+              "required": false,
+              "default_value": 0,
+              "hint": "The date of the observation, leave blank to set today as date",
+              "schema_table": {
+                "schema": "landscape",
+                "table": "biogeo16_observation",
+                "write": true
+              },
+              "permission": {
+                "update": false,
+                "delete": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "process": [
+    {
+      "process": "add_root_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "pandas",
+        "title": "Pandas dataset management",
+        "label": "Root for pandas dataset management"
+      }
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "pandas",
+        "process": "inspect_pandas_dataset",
+        "min_user_stratum": 4,
+        "title": "Inspect pandas dataset",
+        "label": "Inspect the structure and contents of a pandas dataset"
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "parquet_file",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "The parquet file to inspect"
+            },
+            {
+              "parameter": "column_array",
+              "parameter_type": "text_array",
+              "required": false,
+              "default_value": "",
+              "hint": "Set the columns to show as csv list, leave empty to show all columns"
+            },
+            {
+              "parameter": "columns_units_data",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "Show the column and unit names, and the data."
+            },
+            {
+              "parameter": "columns_data",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Show the column names and the data"
+            },
+            {
+              "parameter": "columns_only",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Only show the column names"
+            },
+            {
+              "parameter": "columns_units_only",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Only show the column and unit names"
+            },
+            {
+              "parameter": "max_rows",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "Maximum number of rows to show; 0 = let Pandas automatically select the number of rows to show."
+            },
+            {
+              "parameter": "show_size",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "If set to true, show the array size."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
