@@ -619,7 +619,7 @@ class Scheme_params():
               the process parameter value as given
 
             Empty arguments:
-            - an argument ending with '?' (e.g. 'site?') is optional; if empty it is dropped together with
+            - an argument ending with '?' (e.g. 'site?') is optional; if empty, 'none' or 0 it is dropped together with
               the separator before it
             - an argument listed in auto_name_null_D (e.g. territory, datetime_tag) gets the strict null
               value: '0' in a tag, else the null text (e.g. 'no location', 'no date')
@@ -660,6 +660,13 @@ class Scheme_params():
                 given_key = '%s_id__%s_name' %(fk_match.group(1), fk_match.group(1)) if fk_match else key
 
                 given = getattr(self.process_S.process.parameters, given_key, None)
+
+                # An optional argument given as 'none' or 0 (e.g. preparation 'none', rescan_nr 0) is dropped
+                if optional and given in ['none', '0', 0]:
+
+                    values.append(None)
+
+                    continue
 
                 # 0 is a valid value (e.g. profile_min = 0) except for nullable arguments where it means null
                 # (e.g. datetime_tag = 0 is no date)
@@ -835,8 +842,8 @@ class Scheme_params():
 
                         setattr(self.process_S.process.parameters, auto_name_rec[0], auto_name)
 
-        # Names, aliases, tags and datetime tags must not contain "_" or "@" as these are used as separators in composed names
-        # (e.g. sampling_log_name@provision_name) that must be possible to disentangle. A name containing "_" or "@"
+        # Names, aliases, tags and datetime tags must not contain "_", "@" or "#" as these are used as separators in composed names
+        # (e.g. sampling_log_name@provision_name#preparation_alias) that must be possible to disentangle. A name containing "_", "@" or "#"
         # is only accepted if it exactly equals the name composed by the auto_name concat rule of the parameter.
         # Exempted are process parameters listed in separator_exempt_D, e.g. the geolocation name that is set before
         # the sample and acts as unique key when different sources give different names for the same sample.
@@ -862,7 +869,7 @@ class Scheme_params():
 
             value = getattr(self.process_S.process.parameters, key, None)
 
-            if not isinstance(value, str) or not any(c in value for c in '_@'):
+            if not isinstance(value, str) or not any(c in value for c in '_@#'):
 
                 continue
 
@@ -870,7 +877,7 @@ class Scheme_params():
 
                 continue
 
-            error_msg = '\n          ❌ ERROR parameter <%s> = <%s> contains "_" or "@" (reserved for composed names) for process <%s>\n \
+            error_msg = '\n          ❌ ERROR parameter <%s> = <%s> contains "_", "@" or "#" (reserved for composed names) for process <%s>\n \
             (file: %s;  process nr: %s)' %(key, value, self.process_S.process.process,
                                              self.json_file_FN,
                                             self.p_str)

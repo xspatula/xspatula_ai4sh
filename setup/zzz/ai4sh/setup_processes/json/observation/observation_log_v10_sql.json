@@ -100,7 +100,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "auto",
-              "hint": "The name of the observation log, auto = sampling_log+@+provision",
+              "hint": "The name of the observation log, auto = sampling_log name + @ + provision name [+ # + preparation alias] [+ # + rescan_nr]; preparation 'none' and rescan_nr 0 are dropped",
               "schema_table": {
                 "schema": "observation",
                 "table": "observation_log",
@@ -111,7 +111,7 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "'%s@%s' %(sampling_log_id__sampling_log_name, provision_id__provision_name)"
+                "concat": "'%s@%s#%s#%s' %(sampling_log_id__sampling_log_name, provision_id__provision_name, preparation_id__preparation_alias?, rescan_nr?)"
               }
             },
             {
@@ -119,7 +119,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "auto",
-              "hint": "Tag of the observation log (unique per sampling log) used for auto naming production files and results, auto = sampling_log tag + @ + provision tag. A tag given by hand must not contain underscore, at (@), capitals or blank.",
+              "hint": "Tag of the observation log (unique per sampling log) used for auto naming production files and results, auto = sampling_log tag + @ + provision tag [+ . + preparation alias] [+ . + rescan_nr]. A tag given by hand must not contain underscore, at (@), hash (#), capitals or blank.",
               "schema_table": {
                 "schema": "observation",
                 "table": "observation_log",
@@ -130,7 +130,7 @@
                 "delete": false
               },
               "auto_name": {
-                "concat": "'%s@%s' %(sampling_log_id__sampling_log_tag, provision_id__provision_tag)"
+                "concat": "'%s@%s.%s.%s' %(sampling_log_id__sampling_log_tag, provision_id__provision_tag, preparation_id__preparation_alias?, rescan_nr?)"
               }
             },
             {
@@ -182,7 +182,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "none",
-              "hint": "The preparation of the samples analysed in this observation log (excluding preparation as part of method) ",
+              "hint": "The preparation (name or alias) of the samples analysed in this observation log (excluding preparation as part of method); unless 'none' its alias is added to the auto name and tag",
               "schema_table": {
                 "schema": "observation",
                 "table": "observation_log_meta",
@@ -191,6 +191,18 @@
               "permission": {
                 "update": false,
                 "delete": false
+              }
+            },
+            {
+              "parameter": "rescan_nr",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "Running number for a repeated analysis of the same samples with the same provision and preparation (e.g. stored samples rescanned years later); 0 = first analysis, not added to the auto name and tag",
+              "schema_table": {
+                "schema": "observation",
+                "table": "observation_log",
+                "write": false
               }
             },
             {
