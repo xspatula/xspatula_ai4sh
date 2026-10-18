@@ -6,6 +6,7 @@
     "db": "ai4sh",
     "user_name": "karttur",
     "password": "weg-iK8-tng-w9k",
+    "dump_path": "~/xspatula/db_dump/xspatula_ai4sh.dump",
     "db_users": [
       {
         "user_id": "community_admin",

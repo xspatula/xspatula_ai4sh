@@ -105,8 +105,6 @@ observation/campaign_v10_sql.json
 
 observation/dataset_v10_sql.json
 
-observation/measurement_v10_sql.json
-
 observation/observation_log_v10_sql.json
 
 observation/observation_v10_sql.json

@@ -55,7 +55,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "auto",
-              "hint": "Unique tag used for auto naming production files and results, auto = dataset tag + _ + territory code (0 if no territory) + _ + site (if given). A tag (and a site used in it) must not contain underscore, at (@), capitals or blank.",
+              "hint": "Unique tag used for auto naming production files and results, auto = dataset tag + _ + territory code (0 if no territory) + _ + site (if given). A tag (and a site used in it) must not contain, at (@), capitals or blank.",
               "schema_table": {
                 "schema": "observation",
                 "table": "campaign",
