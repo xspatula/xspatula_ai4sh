@@ -24,4 +24,6 @@ from .manage_process import Run_process
 
 from .setup_db_initiate import Initiate_database, Initiate_audit
 
+from .dump_restore_db import Dump_database, Restore_database
+
 __all__ = ['PGsession', 'parameter']
