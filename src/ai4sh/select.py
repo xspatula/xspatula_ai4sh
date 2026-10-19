@@ -485,38 +485,56 @@ class Process_select(Get_schema_table):
 
             for value in values:
 
-                matches = [id_ for id_, names in lookup if value.lower() in (n.lower() for n in names)]
+                matches = [(id_, names[0]) for id_, names in lookup if value.lower() in (n.lower() for n in names)]
 
-                if len(matches) != 1:
+                # Records sharing one name are the same class under different parents (e.g. a juxtaposition
+                # per setting system) and are all included; matches with different names are ambiguous
+                if not matches or len({name for _, name in matches}) > 1:
 
                     print('    ❌ ERROR: %s <%s> %s in %s.%s; valid classes: %s' % (
                         parameter, value, 'not found' if not matches else 'is ambiguous', schema, table,
-                        ', '.join(names[0] for _, names in lookup)))
+                        ', '.join(sorted({names[0] for _, names in lookup}))))
 
                     return None
 
-                value_ids_D[value] = matches[0]
+                value_ids_D[value] = [id_ for id_, _ in matches]
 
-            if kind == 'landscape' and filter_D['landscape']['hierarchical']:
+            # Every class id passing the filter → the entry it falls under; a hierarchical classification
+            # includes all classes below each entry
+            value_of_D = {}
 
-                class_value_D = {}
+            for value, ids in value_ids_D.items():
 
-                for class_id, root_id in self.pg_ai4sh_C._Retrieve_class_descendants(
-                        table, list(value_ids_D.values()), self.pg_session_C):
+                for id_ in ids:
 
-                    value = next(v for v, id_ in value_ids_D.items() if id_ == root_id)
+                    if value_of_D.setdefault(id_, value) != value:
 
-                    if class_value_D.get(class_id, value) != value:
-
-                        print('    ❌ ERROR: %s entries overlap (one lies within the other): %s and %s' % (
-                            parameter, class_value_D[class_id], value))
+                        print('    ❌ ERROR: %s entries name the same class: %s and %s' % (parameter, value_of_D[id_], value))
 
                         return None
 
-                    class_value_D[class_id] = value
+            if kind == 'landscape' and filter_D['landscape']['hierarchical']:
+
+                pairs = self.pg_ai4sh_C._Retrieve_class_descendants(table, list(value_of_D), self.pg_session_C)
+
             else:
 
-                class_value_D = {id_: value for value, id_ in value_ids_D.items()}
+                pairs = [(id_, id_) for ids in value_ids_D.values() for id_ in ids]
+
+            class_value_D = {}
+
+            for class_id, root_id in pairs:
+
+                value = value_of_D[root_id]
+
+                if class_value_D.get(class_id, value) != value:
+
+                    print('    ❌ ERROR: %s entries overlap (one lies within the other): %s and %s' % (
+                        parameter, class_value_D[class_id], value))
+
+                    return None
+
+                class_value_D[class_id] = value
 
             filter_D.update({'class_value_D': class_value_D, 'class_ids': list(class_value_D)})
 
