@@ -312,6 +312,59 @@ class PG_manage_AI4SH:
 
         return indicator_D
 
+    def _Diagnose_classification_indicators(self, provision_name, indicator_names, pg_session_C):
+        '''Explain why derived classification indicators are not registered for a
+        provision - walks the dependency chain quantity 'class' -> indicator ->
+        provision_indicator and returns a list of human-readable causes (empty if
+        nothing obvious is missing). Only called on failure, never on the hot path.
+        '''
+
+        causes = []
+
+        resolved = self._Retrieve_name_from_name_alias(
+            {'schema_table': 'observation_utility.provision', 'name': provision_name},
+            pg_session_C
+        )
+
+        if not resolved:
+
+            return ['provision "%s" not found in observation_utility.provision' % provision_name]
+
+        if not pg_session_C._Execute_search_single_sql(
+                "SELECT id FROM observation_utility.quantity WHERE name = 'class';"):
+
+            causes.append('quantity "class" missing in observation_utility.quantity (quantity.xlsx) - '
+                          'every derived class indicator depends on it')
+
+        for indicator_name in sorted(indicator_names):
+
+            sql = "SELECT OUI.id, OUQ.name FROM observation_utility.indicator AS OUI \
+                LEFT JOIN observation_utility.quantity AS OUQ ON OUQ.id = OUI.quantity_id \
+                WHERE OUI.name = '%(n)s' OR OUI.alias = '%(n)s';" % {'n': indicator_name}
+
+            rec = pg_session_C._Execute_search_single_sql(sql)
+
+            if not rec:
+
+                causes.append('indicator "%s" missing in observation_utility.indicator (indicator.xlsx)' % indicator_name)
+
+                continue
+
+            if rec[1] != 'class':
+
+                causes.append('indicator "%s" has quantity "%s", expected "class"' % (indicator_name, rec[1]))
+
+            sql = "SELECT OUPI.id FROM observation_utility.provision_indicator AS OUPI \
+                INNER JOIN observation_utility.provision AS OUP ON OUP.id = OUPI.provision_id \
+                WHERE OUP.name = '%s' AND OUPI.indicator_id = %d;" % (resolved, rec[0])
+
+            if not pg_session_C._Execute_search_single_sql(sql):
+
+                causes.append('indicator "%s" not registered for provision "%s" in '
+                              'observation_utility.provision_indicator (provision_indicator.xlsx)' % (indicator_name, resolved))
+
+        return causes
+
     def _Retrieve_nominal_classification_id(self, indicator_id, analysis_method_id, class_name, pg_session_C):
         '''observation_utility.nominal_classification.id for (indicator_id,
         analysis_method_id, name=class_name) - the value_id to store in

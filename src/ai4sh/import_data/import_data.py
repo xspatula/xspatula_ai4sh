@@ -22,7 +22,7 @@ from src.postgres import Get_schema_table
 
 from src.postgres.pg_ai4sh import PG_manage_AI4SH
 
-from src.ai4sh.import_data.nominal_classification import CLASSIFIER_FUNCTIONS, CLASSIFIER_INDICATOR_NAMES
+from src.ai4sh.import_data.nominal_classification import CLASSIFIER_FUNCTIONS
 from src.ai4sh.import_data.import_taxon import Process_import_taxon, TARGET_PROCESS as TAXON_PROCESS
 
 from src.ai4sh.import_data.import_edna_asv import Process_import_edna_asv, TARGET_PROCESS as EDNA_ASV_PROCESS
@@ -802,50 +802,106 @@ class Process_import_JSON(Get_schema_table):
 
         provision_name = main_query_D['provision_id__provision_name']
 
+        # Classifiers are pure and cheap - run them first so a missing database
+        # registration can be told apart from "this observation has no texture data"
+        derived_D = {}
+
+        for classifier_fn in CLASSIFIER_FUNCTIONS:
+
+            derived_D.update(classifier_fn(at_columns_D))
+
+        if not derived_D:
+
+            return None
+
         registered_D = self.pg_ai4sh_C._Retrieve_classification_indicators_for_provision(provision_name, self.pg_session_C)
 
-        if not registered_D or not (set(registered_D) & CLASSIFIER_INDICATOR_NAMES):
+        if not (set(registered_D) & set(derived_D)):
+
+            # Derivable but nothing registered: almost always a missing utility insert
+            # (quantity 'class', indicator, provision_indicator). Partial registration
+            # (e.g. no major group) is a deliberate per-provision opt-out, not an error.
+            if self._Report_classification_failure_once(('unregistered', provision_name)):
+
+                causes = self.pg_ai4sh_C._Diagnose_classification_indicators(
+                    provision_name, set(derived_D), self.pg_session_C)
+
+                self._Report_failure(
+                    '.  ❌ ERROR: soil texture can be derived for provision %s but no derived class '
+                    'indicator is registered - no observation_classification will be stored for this '
+                    'provision (reported once per run, import continues):\n%s'
+                    % (provision_name, '\n'.join('.      - %s' % c for c in causes)
+                       or '.      - no cause found; re-run the observation utility insert'))
 
             return None
 
         observation_id = updated_query_D['observation_id']
 
-        for classifier_fn in CLASSIFIER_FUNCTIONS:
+        for indicator_name, class_name in derived_D.items():
 
-            result_D = classifier_fn(at_columns_D)
+            if indicator_name not in registered_D:
 
-            for indicator_name, class_name in result_D.items():
+                continue
 
-                if indicator_name not in registered_D:
+            indicator_id, analysis_method_id = registered_D[indicator_name]
 
-                    continue
+            if analysis_method_id is None:
 
-                indicator_id, analysis_method_id = registered_D[indicator_name]
+                if self._Report_classification_failure_once(('no_method', provision_name, indicator_name)):
 
-                value_id = self.pg_ai4sh_C._Retrieve_nominal_classification_id(
-                    indicator_id, analysis_method_id, class_name, self.pg_session_C)
+                    self._Report_failure(
+                        '.  ❌ ERROR: provision_indicator "%s" for provision %s has no analysis_method '
+                        '(expected "derived") - skipped (reported once per run, import continues)'
+                        % (indicator_name, provision_name))
 
-                if value_id is None:
+                continue
+
+            value_id = self.pg_ai4sh_C._Retrieve_nominal_classification_id(
+                indicator_id, analysis_method_id, class_name, self.pg_session_C)
+
+            if value_id is None:
+
+                if self._Report_classification_failure_once(('no_class', indicator_name, class_name)):
 
                     self._Report_failure(
                         '.  ❌ ERROR: derived class "%s" for indicator "%s" is not a registered '
-                        'nominal_classification row (provision %s) - add it to nominal_classes.xlsx '
-                        'and re-run the insert_process' % (class_name, indicator_name, provision_name))
+                        'nominal_classification row for its analysis_method (provision %s) - add it to '
+                        'nominal_classes.xlsx and re-run the insert_process (reported once per run, '
+                        'import continues)' % (class_name, indicator_name, provision_name))
 
-                    continue
+                continue
 
-                classification_query_D = {
-                    'observation_id': observation_id,
-                    'indicator_id': indicator_id,
-                    'value_id': value_id,
-                }
+            classification_query_D = {
+                'observation_id': observation_id,
+                'indicator_id': indicator_id,
+                'value_id': value_id,
+            }
 
-                self._Manage_specifics(
-                    main_query_D, classification_query_D, 'observation_id',
-                    'observation', 'observation_classification', observation_id,
-                    '%s@%s' % (indicator_name, provision_name))
+            self._Manage_specifics(
+                main_query_D, classification_query_D, 'observation_id',
+                'observation', 'observation_classification', observation_id,
+                '%s@%s' % (indicator_name, provision_name))
 
         return None
+
+    def _Report_classification_failure_once(self, key):
+        ''' True the first time key is seen in this run. Kept on pg_session_C (shared by
+        every per-row Process_import_JSON instance, see _Report_failure) so a bulk import
+        reports a missing registration once instead of once per observation. '''
+
+        seen = getattr(self.pg_session_C, 'classification_failures_reported', None)
+
+        if seen is None:
+
+            seen = self.pg_session_C.classification_failures_reported = set()
+
+        if key in seen:
+
+            return False
+
+        seen.add(key)
+
+        return True
 
     def _Insert_at_records(self,updated_query_D,at_params_D, schema, table, provision_name):
 

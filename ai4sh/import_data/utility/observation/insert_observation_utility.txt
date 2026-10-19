@@ -180,6 +180,12 @@ profiling.json
 # You can add unit translations in unit_translate.xls and rerun this insert.
 #unit_translate.json
 
+# Nominal classes defines classes that can be either
+# A. generated from the observation measurements
+# B. directly estimated using some other means (e.g. senses)
+# require: indicator, analysis method and method tier
+nominal_classes.json
+
 #=======================================#
 #====== Dataset generic utilities ======#
 #==== Required dependent on dataset ====#
