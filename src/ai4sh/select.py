@@ -20,9 +20,19 @@ can thus be an indicator in one selection and a covariate in another.
 Separate selections are joined into one project dataset by the process compile_dataset (_Compile_dataset),
 on the key column sample_id.
 
+The samples in scope (dataset/campaign/sampling_log/sample_array) can be restricted by class filters
+(texture_class_array, landuse_array, landcover_array, biogeo16_array, juxtaposition_array, composition_array,
+proximity_array; see CLASS_FILTERS) and by sample_source, a saved selection whose sample ids are reused - e.g.
+select the spectra for exactly the samples of a class filtered indicator selection. Every filter applies to all
+roles, as all queries take their samples from PG_manage_AI4SH._Scope_sql. The process identify_indicator lists
+the number of samples per indicator and spectra provision for a scope and filter, before anything is saved.
+
 Output paths are built from tags (see _Ml_output_paths):
 
     {output_root_fp}/{output_sub_fp}/{output_name}.parquet (+ {output_name}.json)
+
+Every saved Parquet file is registered as the previous dataframe of its directory (.previous_dataframe,
+see src/ai4sh/previous_dataframe.py), so the next process can read it with an empty parquet_file.
 '''
 
 # Standard library imports
@@ -48,6 +58,8 @@ from src.ai4sh.feature_symbols import Load_target_units
 
 from src.ai4sh.parquet_units import Save_parquet_with_units, Read_parquet_with_units
 
+from src.ai4sh.previous_dataframe import Register_parquet
+
 from src.ai4sh.spectral_columns import Band_col_name, Normalize_signal_type, Set_signal_type, DEFAULT_SIGNAL_TYPE
 
 # Process → role of the selection
@@ -60,8 +72,30 @@ SELECT_ROLE_D = {
 
 # Key columns in every selected Parquet file; sample_id is the join key as sample names are only
 # unique within a sampling_log (e.g. the same LUCAS point id in 2009 and 2015)
-KEY_COLUMNS = ['sample_id', 'sample_name', 'sampling_log_tag', 'latitude_dd', 'longitude_dd',
+KEY_COLUMNS = ['sample_id', 'sample_name', 'campaign_tag', 'sampling_log_tag', 'latitude_dd', 'longitude_dd',
                'profile_min', 'profile_max']
+
+# Class filters restricting the samples in scope: (process parameter, label, kind, abbreviation in output names).
+# kind: 'classification' (nominal indicator, observation_classification), 'landscape' (landscape.<label>_observation,
+# joined by position) or 'sample' (observation.sample_<label>). Every selected sample carries the filter entry it
+# matched in the column CLASS_COLUMN_PREFIX + label (e.g. class_landuse)
+CLASS_FILTERS = [
+    ('texture_class_array', 'texture', 'classification', 'tx'),
+    ('landuse_array', 'landuse', 'landscape', 'lu'),
+    ('landcover_array', 'landcover', 'landscape', 'lc'),
+    ('biogeo16_array', 'biogeo16', 'landscape', 'bg'),
+    ('juxtaposition_array', 'juxtaposition', 'sample', 'jx'),
+    ('composition_array', 'composition', 'sample', 'cp'),
+    ('proximity_array', 'proximity', 'sample', 'px'),
+]
+
+CLASS_COLUMN_PREFIX = 'class_'
+
+# Classification applied to texture_class_array when texture_classification is not given
+DEFAULT_TEXTURE_CLASSIFICATION = 'soil texture usda'
+
+# identify_indicator flags indicators with fewer samples than this (min_samples) as too few for machine learning
+DEFAULT_MIN_SAMPLES = 30
 
 # Max length of the indicator/covariate part of an output name before it is cut and given a hash
 MAX_FEATURE_NAME_LENGTH = 60
@@ -123,9 +157,9 @@ class Process_select(Get_schema_table):
 
             self._Compile_dataset()
 
-        elif process == 'select_indicator':
+        elif process == 'identify_indicator':
 
-            self._Select_indicator()
+            self._Identify_indicator()
 
         else:
             raise ValueError('Unknown process type: %s' % process)
@@ -315,7 +349,220 @@ class Process_select(Get_schema_table):
 
             scope_D['scope_tag'] = (scope_D['sampling_log'] or scope_D['campaign'] or dataset)[2]
 
+        min_profile, max_profile = self._Param('min_profile'), self._Param('max_profile')
+
+        if min_profile != '' and max_profile != '':
+            scope_D['profile'] = [int(min_profile), int(max_profile)]
+
+        scope_D['source'] = self._Read_sample_source()
+
+        if scope_D['source'] is None:
+            return None
+
+        if scope_D['source']:
+            scope_D['sample_ids'] = scope_D['source']['df']['sample_id'].tolist()
+
+        scope_D['filters'] = self._Resolve_filters()
+
+        if scope_D['filters'] is None:
+            return None
+
+        # The class filter of the selection: inherited from the sample source, then this process's own filters
+        scope_D['sample_filter'] = dict(scope_D['source'].get('params', {}).get('sample_filter', {}) if scope_D['source'] else {})
+
+        for f in scope_D['filters']:
+
+            scope_D['sample_filter'][f['label']] = f['values']
+
+            if f['kind'] == 'classification':
+                scope_D['sample_filter']['texture_classification'] = f['classification']
+
         return scope_D
+
+    def _Read_sample_source(self):
+        '''Read the saved selection given by sample_source (a Parquet file relative to the project root).
+
+        Returns {} if no sample_source is given, None on error, else {file, df [sample_id + class columns],
+        params (the selection's params JSON, {} if missing)}.
+        '''
+        source = self._Param('sample_source')
+
+        if source in ('', 'none', 'default'):
+            return {}
+
+        fpn = source if os.path.isabs(source) or not self.project_root_FP else Get_project_path(self.project_root_FP, source)
+
+        if not fpn.endswith('.parquet'):
+            fpn += '.parquet'
+
+        if not os.path.exists(fpn):
+
+            print('    ❌ ERROR: sample_source not found: %s' % fpn)
+
+            return None
+
+        df, _ = Read_parquet_with_units(fpn)
+
+        if 'sample_id' not in df.columns:
+
+            print('    ❌ ERROR: sample_source %s has no sample_id column - re-run the select process that made it' % fpn)
+
+            return None
+
+        params_fpn = '%s.json' % fpn[:-len('.parquet')]
+
+        params_D = {}
+
+        if os.path.exists(params_fpn):
+
+            with open(params_fpn) as fh:
+                params_D = json.load(fh)
+
+        class_cols = [c for c in df.columns if c.startswith(CLASS_COLUMN_PREFIX)]
+
+        if self.verbose:
+            print('    Sample source: %d samples from %s' % (df['sample_id'].nunique(), fpn))
+
+        return {'file': source, 'df': df[['sample_id'] + class_cols].drop_duplicates('sample_id'), 'params': params_D}
+
+    def _Resolve_filters(self):
+        '''Resolve the class filter parameters (CLASS_FILTERS) to class ids.
+
+        A filter entry is the name, tag, alias or display name of a class. For a hierarchical landscape
+        classification (land use, land cover) an entry can be at any rank and includes all classes below it:
+        "cropland" selects every cropland family and genus. Entries of one filter must not overlap.
+
+        Returns a list of filter dicts {label, name, kind, abbrev, values, indicator_id, class_value_D, class_ids}
+        where class_value_D maps every class id passing the filter to the entry it falls under; None on error.
+        '''
+        filters = []
+
+        for parameter, label, kind, abbrev in CLASS_FILTERS:
+
+            values = self._Parse_array(parameter)
+
+            if not values:
+                continue
+
+            filter_D = {'label': label, 'name': label, 'kind': kind, 'abbrev': abbrev, 'values': values,
+                        'indicator_id': None}
+
+            if kind == 'classification':
+
+                classification = self._Param('texture_classification') or DEFAULT_TEXTURE_CLASSIFICATION
+
+                rec = self.pg_ai4sh_C._Retrieve_indicator_for_select(classification, self.pg_session_C)
+
+                if not rec or rec[3] != 'class':
+
+                    print('    ❌ ERROR: texture_classification <%s> is not a nominal (class) indicator' % classification)
+
+                    return None
+
+                filter_D.update({'indicator_id': rec[0], 'classification': rec[1]})
+
+                schema, table = 'observation_utility', 'nominal_classification'
+
+            elif kind == 'sample':
+
+                schema, table = 'observation_utility', label
+
+            else:
+
+                filter_D['landscape'] = self.pg_ai4sh_C._Retrieve_landscape_table(label, self.pg_session_C)
+
+                if not filter_D['landscape']:
+
+                    print('    ❌ ERROR: no landscape table for the %s filter' % label)
+
+                    return None
+
+                schema, table = 'landscape_utility', filter_D['landscape']['lookup_table']
+
+            lookup = self.pg_ai4sh_C._Retrieve_class_lookup(schema, table, filter_D['indicator_id'], self.pg_session_C)
+
+            value_ids_D = {}
+
+            for value in values:
+
+                matches = [id_ for id_, names in lookup if value.lower() in (n.lower() for n in names)]
+
+                if len(matches) != 1:
+
+                    print('    ❌ ERROR: %s <%s> %s in %s.%s; valid classes: %s' % (
+                        parameter, value, 'not found' if not matches else 'is ambiguous', schema, table,
+                        ', '.join(names[0] for _, names in lookup)))
+
+                    return None
+
+                value_ids_D[value] = matches[0]
+
+            if kind == 'landscape' and filter_D['landscape']['hierarchical']:
+
+                class_value_D = {}
+
+                for class_id, root_id in self.pg_ai4sh_C._Retrieve_class_descendants(
+                        table, list(value_ids_D.values()), self.pg_session_C):
+
+                    value = next(v for v, id_ in value_ids_D.items() if id_ == root_id)
+
+                    if class_value_D.get(class_id, value) != value:
+
+                        print('    ❌ ERROR: %s entries overlap (one lies within the other): %s and %s' % (
+                            parameter, class_value_D[class_id], value))
+
+                        return None
+
+                    class_value_D[class_id] = value
+            else:
+
+                class_value_D = {id_: value for value, id_ in value_ids_D.items()}
+
+            filter_D.update({'class_value_D': class_value_D, 'class_ids': list(class_value_D)})
+
+            filters.append(filter_D)
+
+        return filters
+
+    def _Class_columns_df(self, scope_D):
+        '''Return a DataFrame [sample_id + one class column per filter] for the samples in scope: the filter
+        entry each sample matched (own filters) or the class columns of the sample source. None if no filter.'''
+
+        frame_L = []
+
+        for f in scope_D['filters']:
+
+            col = CLASS_COLUMN_PREFIX + f['label']
+
+            recs = self.pg_ai4sh_C._Retrieve_filter_classes_for_scope(scope_D, f, self.pg_session_C)
+
+            frame = pd.DataFrame([(sample_id, f['class_value_D'][class_id]) for sample_id, class_id in recs
+                                  if class_id in f['class_value_D']], columns=['sample_id', col])
+
+            conflicting = frame.groupby('sample_id')[col].nunique()
+
+            if (conflicting > 1).any():
+
+                print('    ⚠️  %s: %d sample(s) recorded under more than one filter entry, first kept'
+                      % (col, int((conflicting > 1).sum())))
+
+            frame_L.append(frame.drop_duplicates('sample_id').set_index('sample_id'))
+
+        if scope_D['source']:
+
+            source_df = scope_D['source']['df'].set_index('sample_id')
+
+            own = [CLASS_COLUMN_PREFIX + f['label'] for f in scope_D['filters']]
+
+            source_df = source_df[[c for c in source_df.columns if c not in own]]
+
+            if len(source_df.columns):
+                frame_L.append(source_df)
+
+        if not frame_L:
+            return None
+
+        return pd.concat(frame_L, axis=1).reset_index()
 
     def _Resolve_features(self, labels):
         '''Resolve indicator/covariate names or aliases to what they are in the database.
@@ -406,6 +653,29 @@ class Process_select(Get_schema_table):
 
         return joined
 
+    def _Filter_name_part(self, sample_filter):
+        '''Return the name part for a class filter, e.g. lu-cropland_tx-loam-silt-loam: per filter its abbreviation
+        (CLASS_FILTERS) and entries, cut and given a hash of the full part if longer than MAX_FEATURE_NAME_LENGTH.'''
+
+        parts = []
+
+        for _, label, _, abbrev in CLASS_FILTERS:
+
+            if sample_filter.get(label):
+
+                parts.append('-'.join([abbrev] + [re.sub(r'[^a-z0-9.]+', '-', str(v).lower()).strip('-')
+                                                  for v in sample_filter[label]]))
+
+        joined = '_'.join(parts)
+
+        if len(joined) > MAX_FEATURE_NAME_LENGTH:
+
+            digest = hashlib.sha1(joined.encode('utf-8')).hexdigest()[:8]
+
+            joined = '%s-%s' % (joined[:MAX_FEATURE_NAME_LENGTH - 9].rstrip('-_'), digest)
+
+        return joined
+
     def _Ml_output_paths(self, role, scope_D, spectra_D, indicators, covariates):
         '''Build the output paths from tags.
 
@@ -416,6 +686,9 @@ class Process_select(Get_schema_table):
             output_name     {begin}-{end}_{bandwidth}                                        (spectra)
                             {aliases}_{min_profile}-{max_profile}                            (indicator, covariate)
                             {begin}-{end}_{bandwidth}+{indicator aliases}[+{covariate aliases}]_{min}-{max}  (all)
+
+        A class filtered selection gets __{filter part} appended to the default output_name (see _Filter_name_part);
+        output_suffix replaces the filter part (and is appended also to a given output_name), "none" leaves it out.
 
         Returns (out_dir, params_fpn, data_fpn, output_name).
         '''
@@ -457,6 +730,21 @@ class Process_select(Get_schema_table):
 
             if indicators or covariates:
                 output_name += '_%s-%s' % (p.min_profile, p.max_profile)
+
+            suffix = self._Param('output_suffix', 'default')
+
+            if suffix in ('', 'default'):
+                suffix = self._Filter_name_part(scope_D['sample_filter'])
+
+        else:
+
+            suffix = self._Param('output_suffix', 'default')
+
+            if suffix in ('', 'default'):
+                suffix = ''
+
+        if suffix and suffix != 'none':
+            output_name += '__%s' % suffix
 
         out_dir = os.path.join(root_fp, sub_fp)
 
@@ -791,37 +1079,73 @@ class Process_select(Get_schema_table):
     # Main select logic
     # ------------------------------------------------------------------
 
-    def _Select_indicator(self):
-        '''Print all provisions and indicators available for a dataset/campaign. No data saved.'''
+    def _Identify_indicator(self):
+        '''Print the number of samples in scope (dataset/campaign/sampling_log, class filters, sample_source)
+        per class filter entry, spectra provision and indicator, flagging counts below min_samples. No data saved.'''
 
-        p = self.process_S.process.parameters
+        scope_D = self._Resolve_scope()
 
-        dataset_name = p.dataset_name
-        campaign_name = getattr(p, 'campaign_name', '').strip()
+        if not scope_D:
+            return
 
-        scope = '"%s"' % dataset_name
-        if campaign_name:
-            scope += ' / campaign "%s"' % campaign_name
+        min_samples = self._Param('min_samples', DEFAULT_MIN_SAMPLES)
 
-        print('\n    Querying available data for %s\n' % scope)
+        min_samples = int(min_samples) if str(min_samples).strip() not in ('', 'default') else DEFAULT_MIN_SAMPLES
+
+        def flag(n):
+            return '  ⚠️  < %d' % min_samples if n < min_samples else ''
+
+        scope = ' / '.join('%s "%s"' % (level, scope_D[level][1]) for level in ('dataset', 'campaign', 'sampling_log')
+                           if scope_D[level])
+
+        print('\n    Querying available data for %s' % scope)
+
+        if scope_D['source']:
+            print('    Sample source: %s' % scope_D['source']['file'])
+
+        for label, values in scope_D['sample_filter'].items():
+            print('    Filter %s: %s' % (label, values))
+
+        n_samples = self.pg_ai4sh_C._Retrieve_n_samples_for_scope(scope_D, self.pg_session_C)
+
+        print('\n    Samples in scope: %d%s' % (n_samples, flag(n_samples)))
+
+        if not n_samples:
+            return
+
+        # ---- Samples per class filter entry ----
+        class_df = self._Class_columns_df(scope_D)
+
+        if class_df is not None:
+
+            for col in [c for c in class_df.columns if c != 'sample_id']:
+
+                print('\n    Samples per %s:' % col)
+
+                for value, n in class_df[col].value_counts().items():
+                    print('        - %s: %d%s' % (value, n, flag(n)))
 
         # ---- Spectral sensors (provisions) ----
-        provisions = self.pg_ai4sh_C._Retrieve_available_provisions_for_dataset(
-            {'dataset_name': dataset_name, 'campaign_name': campaign_name},
-            self.pg_session_C
-        )
+        provisions = self.pg_ai4sh_C._Retrieve_provision_counts_for_scope(scope_D, self.pg_session_C)
 
-        if provisions:
-            print('    Spectral sensors (provisions):')
-            for prov in provisions:
-                print('        - %s' % prov)
-        else:
-            print('    No spectral provisions found for %s.' % scope)
+        print('\n    Spectral sensors (provisions):' if provisions else '\n    No spectra found.')
 
-        print()
+        for name, n in provisions:
+            print('        - %s: %d samples%s' % (name, n, flag(n)))
 
         # ---- Indicators ----
-        self._Print_available_indicators(dataset_name, campaign_name)
+        indicators = self.pg_ai4sh_C._Retrieve_indicator_counts_for_scope(
+            scope_D, sorted(MISSING_VALUE_CODES), self.pg_session_C)
+
+        print('\n    Indicators (samples with a value):' if indicators else '\n    No indicators found.')
+
+        for name, alias, unit, n in indicators:
+
+            alias_str = ' (%s)' % alias if alias and alias != name else ''
+
+            unit_str = ' [%s]' % unit if unit else ''
+
+            print('        - %s%s%s: %d%s' % (name, alias_str, unit_str, n, flag(n)))
 
     def _Select_data(self, role):
         '''Select spectra, indicators and/or covariates for the samples in scope, apply the depth and data
@@ -920,6 +1244,19 @@ class Process_select(Get_schema_table):
             return
 
         units_D, wl_col_names, output_wl = {}, [], []
+
+        # Class columns (the filter entry each sample matched) follow the key columns
+        class_df = self._Class_columns_df(scope_D)
+
+        class_cols = []
+
+        if class_df is not None:
+
+            class_cols = [c for c in class_df.columns if c != 'sample_id']
+
+            df = df.merge(class_df, on='sample_id', how='left')
+
+            units_D.update({c: 'class' for c in class_cols})
 
         if spectra_D:
 
@@ -1028,8 +1365,11 @@ class Process_select(Get_schema_table):
             'covariate_array': feature_labels_D.get('covariate', []),
             'covariate_rank': {f['label']: f['rank'] for f in covariates if f['kind'] == 'landscape'},
             'class_labels': {k: v for k, v in self.class_labels_D.items() if k in df.columns},
-            'indicator_units': {k: v for k, v in units_D.items() if k not in wl_col_names},
+            'indicator_units': {k: v for k, v in units_D.items() if k not in wl_col_names and k not in class_cols},
             'data_range': data_range,
+            'sample_filter': scope_D['sample_filter'],
+            'sample_source': scope_D['source']['file'] if scope_D['source'] else '',
+            'class_columns': class_cols,
             'output_name': output_name,
             'n_samples': len(df),
         }
@@ -1049,6 +1389,14 @@ class Process_select(Get_schema_table):
             })
 
         Dump_json(params_fpn, params_D, verbose=self.verbose)
+
+        # The selection becomes the previous dataframe of its directory (read when parquet_file is empty)
+        note = '%s: %d samples' % (role, len(df))
+
+        if scope_D['sample_filter']:
+            note += ', filter %s' % scope_D['sample_filter']
+
+        Register_parquet(data_fpn, self.process_S.process.process, note)
 
         print('    Saved %d samples → %s' % (len(df), data_fpn))
 
@@ -1145,7 +1493,9 @@ class Process_select(Get_schema_table):
 
             else:
 
-                in_df = in_df.drop(columns=[c for c in KEY_COLUMNS if c != 'sample_id' and c in in_df.columns])
+                # Key columns and class columns already taken from an earlier input describe the same sample
+                in_df = in_df.drop(columns=[c for c in in_df.columns if c != 'sample_id' and (
+                    c in KEY_COLUMNS or (c.startswith(CLASS_COLUMN_PREFIX) and c in df.columns))])
 
                 duplicates = [c for c in in_df.columns if c != 'sample_id' and c in df.columns]
 
@@ -1164,6 +1514,10 @@ class Process_select(Get_schema_table):
             for key, value in in_params_D.items():
 
                 if key in ('indicator_array', 'covariate_array'):
+
+                    params_D[key] = params_D.get(key, []) + [v for v in value if v not in params_D.get(key, [])]
+
+                elif key == 'class_columns':
 
                     params_D[key] = params_D.get(key, []) + [v for v in value if v not in params_D.get(key, [])]
 
@@ -1190,6 +1544,9 @@ class Process_select(Get_schema_table):
         Save_parquet_with_units(df.reset_index(drop=True), data_fpn, units_D)
 
         Dump_json(params_fpn, params_D, verbose=self.verbose)
+
+        Register_parquet(data_fpn, 'compile_dataset', 'compiled: %d samples from %s' % (
+            len(df), ', '.join(i['file'] for i in inputs_L)))
 
         print('    Compiled %d samples (inputs: %s) → %s' % (
             len(df), ', '.join(str(i['n_samples']) for i in inputs_L), data_fpn))

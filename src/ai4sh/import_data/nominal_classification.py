@@ -22,7 +22,7 @@ sources:
           flagged in a comment on that branch below - would need the true diagonal
           boundary, like the sand/loamy sand fix in iuss_by_tg, to close those)
 Class names match observation_utility.nominal_classification exactly (see
-ai4sh/import_data/utility/observation/excel/nominal_classes.xlsx) - IUSS's high-clay
+<project>/import_data/utility/observation/excel/nominal_classes.xlsx) - IUSS's high-clay
 tier is "clay" / "silty clay" / "light clay" (formerly "heavy clay" / "silty clay" /
 "clay"), and IUSS uses "silt loam" (like USDA) for what used to be "silty loam".
 

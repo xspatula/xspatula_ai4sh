@@ -12,17 +12,13 @@ import pandas as pd
 from scipy.stats import boxcox
 from sklearn.preprocessing import PowerTransformer, QuantileTransformer, StandardScaler, normalize
 from sklearn.decomposition import PCA
+from src.ai4sh.project_paths import Default_fpn
 
-_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+_DEFAULT_STANDARDISE_FPN = Default_fpn('transform', 'indicator_standardise_default.json')
 
-_DEFAULT_STANDARDISE_FPN = os.path.join(
-    _REPO_ROOT, 'ai4sh', 'default', 'transform', 'indicator_standardise_default.json')
+_DEFAULT_TRANSFORMATION_FPN = Default_fpn('transform', 'indicator_transformation_default.json')
 
-_DEFAULT_TRANSFORMATION_FPN = os.path.join(
-    _REPO_ROOT, 'ai4sh', 'default', 'transform', 'indicator_transformation_default.json')
-
-_DEFAULT_CHEMOMETRIC_FPN = os.path.join(
-    _REPO_ROOT, 'ai4sh', 'default', 'chemometric', 'chemometric_default.json')
+_DEFAULT_CHEMOMETRIC_FPN = Default_fpn('chemometric', 'chemometric_default.json')
 
 
 def _load_transform_config(param, default_fpn, verbose):

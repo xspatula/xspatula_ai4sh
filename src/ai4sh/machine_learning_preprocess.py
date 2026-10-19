@@ -27,6 +27,9 @@ from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction,
                                      apply_scaling, apply_decomposition,
                                      apply_chemometrics, _load_chemometric_config)
 from src.ai4sh.filter import apply_filter, apply_multi_filter
+from src.ai4sh.previous_dataframe import (
+    Previous_df_path, Read_previous_df, Write_previous_df, Previous_parquet,
+)
 from src.ai4sh.parquet_units import (Read_parquet_with_units, Save_parquet_with_units,
                                     Find_selected_parquet, DERIVED_STEM_RE)
 from src.ai4sh.spectral_columns import (Band_col_name, Band_value, Is_band_col,
@@ -34,13 +37,17 @@ from src.ai4sh.spectral_columns import (Band_col_name, Band_value, Is_band_col,
 
 from src.postgres import Get_schema_table
 from src.lib.pilot import Get_project_path
-
-_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+from src.ai4sh.project_paths import Default_fpn
 
 _METADATA_COLS = frozenset([
-    'sample_id', 'sample_name', 'sampling_log_tag', 'campaign_name', 'latitude_dd', 'longitude_dd',
+    'sample_id', 'sample_name', 'campaign_tag', 'sampling_log_tag', 'campaign_name', 'latitude_dd', 'longitude_dd',
     'profile_min', 'profile_max',
 ])
+
+
+def _is_metadata_col(col):
+    '''True for key columns and the class columns (class_<filter>) of a class filtered selection.'''
+    return col in _METADATA_COLS or col.startswith('class_')
 
 
 def _build_detector(name, threshold):
@@ -267,49 +274,22 @@ def _resolve_input_parquet(project_root_fp, dataframe_param):
 
 
 def _prev_df_path(project_root_fp):
-    return os.path.join(project_root_fp, '.previous_dataframe')
+    return Previous_df_path(project_root_fp)
 
 
 def _read_previous_df(project_root_fp):
-    fp = _prev_df_path(project_root_fp)
-    if not os.path.exists(fp):
-        return None
-    try:
-        with open(fp) as fh:
-            return json.load(fh)
-    except Exception:
-        return None
+    '''Latest record of the .previous_dataframe history (see src/ai4sh/previous_dataframe.py).'''
+    return Read_previous_df(project_root_fp)
 
 
 def _write_previous_df(project_root_fp, process_name, entries):
-    from datetime import datetime
-    data = {
-        'process': process_name,
-        'created_at': datetime.now().isoformat(timespec='seconds'),
-        'entries': entries,
-    }
-    with open(_prev_df_path(project_root_fp), 'w') as fh:
-        json.dump(data, fh, indent=2)
+    '''Append a record to the .previous_dataframe history.'''
+    Write_previous_df(project_root_fp, process_name, entries)
 
 
 def _resolve_single_previous(project_root_fp):
-    '''For simple processes: read .previous_dataframe, confirm interactively, return path or None.'''
-    prev = _read_previous_df(project_root_fp)
-    if prev is None:
-        print('    ERROR: no .previous_dataframe found in %s' % project_root_fp)
-        return None
-    entries = prev.get('entries', [])
-    if not entries:
-        print('    ERROR: .previous_dataframe has no entries.')
-        return None
-    entry = entries[0]
-    parquet_name = entry.get('dataframe', '')
-    parquet_fp = os.path.join(project_root_fp, parquet_name)
-    if not os.path.exists(parquet_fp):
-        print('    ERROR: previous dataframe not found: %s' % parquet_fp)
-        return None
-    print('    Previous: %s — %s' % (prev.get('process', '?'), parquet_name))
-    return parquet_fp
+    '''For simple processes: return the path of the latest dataframe in .previous_dataframe, or None.'''
+    return Previous_parquet(project_root_fp)
 
 
 def _resolve_previous_for_arrays(project_root_fp, indicator_cols, reg_keys, sel_keys):
@@ -568,7 +548,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         all_indicators = [
             c for c in df.columns
-            if c not in _METADATA_COLS
+            if not _is_metadata_col(c)
             and not _is_spectral_col(c)
             and pd.api.types.is_numeric_dtype(df[c])
         ]
@@ -1507,7 +1487,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         all_indicators = [
             c for c in df.columns
-            if c not in _METADATA_COLS
+            if not _is_metadata_col(c)
             and not _is_spectral_col(c)
             and pd.api.types.is_numeric_dtype(df[c])
         ]
@@ -1697,8 +1677,7 @@ class Process_ml_preprocess(Get_schema_table):
             print('    WARNING: model_parameters file not found: %s' % mp_fp)
 
         # Selector defaults
-        sel_defaults_fp = os.path.join(
-            _REPO_ROOT, 'ai4sh', 'default', 'selector', 'selector_default_settings.json')
+        sel_defaults_fp = Default_fpn('selector', 'selector_default_settings.json')
         sel_defaults = {}
         if os.path.exists(sel_defaults_fp):
             with open(sel_defaults_fp) as fh:
@@ -1738,7 +1717,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         all_indicators = [
             c for c in df.columns
-            if c not in _METADATA_COLS
+            if not _is_metadata_col(c)
             and not _is_spectral_col(c)
             and pd.api.types.is_numeric_dtype(df[c])
         ]

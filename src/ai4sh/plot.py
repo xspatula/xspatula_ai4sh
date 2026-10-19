@@ -168,7 +168,7 @@ class Process_plot(Get_schema_table):
     def _Load_feature_symbols(self):
         '''Load targetfeaturesymbols JSON. Returns the inner dict keyed by indicator name.
 
-        "default" → loads from ai4sh/default/plot/targetfeaturesymbols.json.
+        "default" → loads from <project>/default/plot/targetfeaturesymbols.json.
         Any other value is treated as a file path.
         '''
         raw = getattr(self.process_S.process.parameters, 'targetfeaturesymbols', 'default')
@@ -643,11 +643,11 @@ class Process_plot(Get_schema_table):
 
         if not indicators:
             # Use all non-spectral, non-metadata columns
-            skip_cols = {'sample_id', 'sample_name', 'sampling_log_tag', 'campaign_name', 'latitude_dd', 'longitude_dd',
-                         'profile_min', 'profile_max'}
+            skip_cols = {'sample_id', 'sample_name', 'campaign_tag', 'sampling_log_tag', 'campaign_name', 'latitude_dd',
+                         'longitude_dd', 'profile_min', 'profile_max'}
             indicators = [
                 c for c in df.columns
-                if c not in skip_cols and not Is_band_col(c)
+                if c not in skip_cols and not c.startswith('class_') and not Is_band_col(c)
             ]
 
         # Keep only indicators that exist in the DataFrame

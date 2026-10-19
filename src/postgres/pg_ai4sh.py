@@ -2,6 +2,7 @@
 import re
 
 # Application package imports
+from src.ai4sh.project_paths import PROJECT_FOLDER
 
 
 
@@ -413,12 +414,12 @@ class PG_manage_AI4SH:
 
             raise Exception(
                 'Missing unit translation: "%s" -> "%s".\n'
-                '    Add a row to ai4sh/import_data/utility/observation/excel/unit_translate.xlsx:\n'
+                '    Add a row to %s/import_data/utility/observation/excel/unit_translate.xlsx:\n'
                 '      src_unit_id__unit_name = %s\n'
                 '      dst_unit_id__unit_name = %s\n'
                 '    You must determine factor, addon, exponent, process yourself.\n'
-                '    Then re-run ai4sh/import_data/insert_ai4sh_utility_data.ipynb to load it into the database.'
-                % (src_unit_name, dst_unit_name, src_unit_name, dst_unit_name))
+                '    Then re-run the utility data import (notebook in %s/import_data/) to load it into the database.'
+                % (src_unit_name, dst_unit_name, PROJECT_FOLDER, src_unit_name, dst_unit_name, PROJECT_FOLDER))
 
         factor, addon, exponent, process = trans
 
@@ -822,17 +823,174 @@ class PG_manage_AI4SH:
 
             params.append(list(scope_D['sample_names']))
 
+        # Depth filter, only applied to samples with profile data
+        if scope_D.get('profile'):
+
+            sql += ' AND NOT EXISTS (SELECT 1 FROM observation.sample_profile AS OSP \
+                WHERE OSP.sample_id = OS.id AND (OSP.profile_min < %s OR OSP.profile_max > %s))'
+
+            params.extend(scope_D['profile'])
+
+        if scope_D.get('sample_ids'):
+
+            sql += ' AND OS.id = ANY(%s)'
+
+            params.append([int(i) for i in scope_D['sample_ids']])
+
+        # Class filters: the sample must have a recorded class among the filter's class ids
+        for filter_D in scope_D.get('filters', []):
+
+            class_sql, class_params = self._Filter_class_sql(filter_D)
+
+            sql += ' AND EXISTS (SELECT 1 FROM (%s) AS F (class_id) WHERE F.class_id = ANY(%%s))' % class_sql
+
+            params.extend(class_params + [list(filter_D['class_ids'])])
+
         return sql, params
 
-    def _Retrieve_sample_keys_for_scope(self, scope_D, pg_session_C):
-        '''Return the key columns of all samples in scope:
-        (sample_id, sample_name, sampling_log_tag, latitude, longitude, profile_min, profile_max).'''
+    def _Filter_class_sql(self, filter_D):
+        '''Return (sql, params) for a subquery selecting the class id(s) recorded for sample OS under a class
+        filter (see Process_select._Resolve_filters). The subquery is correlated on OS.id.
+
+        kind 'classification': nominal indicator (e.g. soil texture class usda) in observation_classification
+        kind 'sample':         observation.sample_<name> (juxtaposition, composition, proximity)
+        kind 'landscape':      landscape.<name>_observation joined by position; as in _Retrieve_landscape_for_scope
+                               the observation from the sample's own sampling_log is preferred, then the most recent
+        '''
+        if filter_D['kind'] == 'classification':
+
+            return ('SELECT OOC.value_id FROM observation.observation_classification AS OOC \
+                INNER JOIN observation.observation AS OO ON OO.id = OOC.observation_id \
+                WHERE OO.sample_id = OS.id AND OOC.indicator_id = %s', [filter_D['indicator_id']])
+
+        if filter_D['kind'] == 'sample':
+
+            return ('SELECT T.%s FROM observation.%s AS T WHERE T.sample_id = OS.id' % (
+                pgsql_quote_col('%s_id' % filter_D['name']), pgsql_quote_col('sample_%s' % filter_D['name'])), [])
+
+        return ('SELECT LO.%s FROM observation.sample_geotag AS OSGT \
+            INNER JOIN landscape.%s AS LO ON LO.geolocation_id = OSGT.geolocation_id \
+            INNER JOIN observation.observation_log AS OOL ON OOL.id = LO.observation_log_id \
+            WHERE OSGT.sample_id = OS.id \
+            ORDER BY (OOL.sampling_log_id = OS.sampling_log_id) DESC, LO.observed_at DESC LIMIT 1' % (
+                pgsql_quote_col(filter_D['landscape']['value_column']),
+                pgsql_quote_col('%s_observation' % filter_D['name'])), [])
+
+    def _Retrieve_class_lookup(self, schema, table, indicator_id, pg_session_C):
+        '''Return (id, [name, tag, alias, display_name]) for all classes of a class lookup table, restricted to
+        indicator_id for observation_utility.nominal_classification. Columns the table lacks are left out.'''
+
+        cols = [r[0] for r in pg_session_C._Execute_search_all_sql(
+            "SELECT column_name FROM information_schema.columns WHERE table_schema = %s AND table_name = %s;",
+            (schema, table))]
+
+        label_cols = [c for c in ('name', 'tag', 'alias', 'display_name') if c in cols]
+
+        sql = 'SELECT id, %s FROM %s.%s' % (', '.join(pgsql_quote_col(c) for c in label_cols),
+                                            pgsql_quote_col(schema), pgsql_quote_col(table))
+
+        params = []
+
+        if indicator_id is not None:
+
+            sql += ' WHERE indicator_id = %s'
+
+            params.append(indicator_id)
+
+        recs = pg_session_C._Execute_search_all_sql(sql + ' ORDER BY id;', params) or []
+
+        return [(r[0], [v for v in r[1:] if v]) for r in recs]
+
+    def _Retrieve_class_descendants(self, lookup, class_ids, pg_session_C):
+        '''Return (descendant id, ancestor id) for the classes class_ids (themselves included) of a hierarchical
+        landscape_utility lookup table (parent_<lookup>_id), e.g. cropland → all cropland families and genera.
+        A class below more than one of class_ids is returned once per ancestor.'''
+
+        sql = 'WITH RECURSIVE tree AS ( \
+                SELECT id, id AS root_id FROM landscape_utility.%(lookup)s WHERE id = ANY(%%s) \
+                UNION \
+                SELECT LU.id, T.root_id FROM landscape_utility.%(lookup)s AS LU \
+                INNER JOIN tree AS T ON LU.%(parent)s = T.id) \
+            SELECT id, root_id FROM tree;' % {'lookup': pgsql_quote_col(lookup),
+                                             'parent': pgsql_quote_col('parent_%s_id' % lookup)}
+
+        return pg_session_C._Execute_search_all_sql(sql, [list(class_ids)]) or []
+
+    def _Retrieve_filter_classes_for_scope(self, scope_D, filter_D, pg_session_C):
+        '''Return (sample_id, class_id) for every class recorded for the samples in scope under a class filter.'''
 
         scope_sql, params = self._Scope_sql(scope_D)
 
-        sql = 'SELECT OS.id, OS.name, OSL.tag, ' + GEOLOCATION_LAT_LON_SQL + ', OSP.profile_min, OSP.profile_max \
+        class_sql, class_params = self._Filter_class_sql(filter_D)
+
+        sql = 'SELECT OS.id, F.class_id FROM observation.sample AS OS \
+            CROSS JOIN LATERAL (%s) AS F (class_id) \
+            WHERE OS.id IN (%s) ORDER BY OS.id;' % (class_sql, scope_sql)
+
+        return pg_session_C._Execute_search_all_sql(sql, class_params + params) or []
+
+    def _Retrieve_indicator_counts_for_scope(self, scope_D, missing_codes, pg_session_C):
+        '''Return (name, alias, unit_name, n_samples) for every indicator recorded for the samples in scope.
+
+        Numeric values equal to a missing-value code are not counted; nominal indicators get unit 'class'.
+        An indicator recorded in more than one unit is returned once per unit.
+        '''
+        scope_sql, params = self._Scope_sql(scope_D)
+
+        sql = 'SELECT OUI.name, OUI.alias, OUU.name, COUNT(DISTINCT OO.sample_id) \
+            FROM observation.observation_measurement AS OOM \
+            INNER JOIN observation.observation AS OO ON OOM.observation_id = OO.id \
+            INNER JOIN observation.observation_log AS OOL ON OO.observation_log_id = OOL.id \
+            INNER JOIN observation_utility.indicator AS OUI ON OOM.indicator_id = OUI.id \
+            LEFT JOIN observation_utility.provision_indicator AS OUPI \
+                ON OUPI.provision_id = OOL.provision_id AND OUPI.indicator_id = OOM.indicator_id \
+            LEFT JOIN observation_utility.unit AS OUU ON OUU.id = OUPI.unit_id \
+            WHERE OO.sample_id IN (%(scope)s) AND NOT OOM.value = ANY(%%s) \
+            GROUP BY 1, 2, 3 \
+            UNION ALL \
+            SELECT OUI.name, OUI.alias, \'class\', COUNT(DISTINCT OO.sample_id) \
+            FROM observation.observation_classification AS OOC \
+            INNER JOIN observation.observation AS OO ON OOC.observation_id = OO.id \
+            INNER JOIN observation_utility.indicator AS OUI ON OOC.indicator_id = OUI.id \
+            WHERE OO.sample_id IN (%(scope)s) \
+            GROUP BY 1, 2 \
+            ORDER BY 1;' % {'scope': scope_sql}
+
+        return pg_session_C._Execute_search_all_sql(sql, params + [list(missing_codes)] + params) or []
+
+    def _Retrieve_provision_counts_for_scope(self, scope_D, pg_session_C):
+        '''Return (provision name, n_samples) for the spectra recorded for the samples in scope.'''
+
+        scope_sql, params = self._Scope_sql(scope_D)
+
+        sql = 'SELECT OUP.name, COUNT(DISTINCT OO.sample_id) \
+            FROM observation.observation_measurement_array AS OOMA \
+            INNER JOIN observation.observation AS OO ON OOMA.observation_id = OO.id \
+            INNER JOIN observation.observation_log AS OOL ON OO.observation_log_id = OOL.id \
+            INNER JOIN observation_utility.provision AS OUP ON OUP.id = OOL.provision_id \
+            WHERE OO.sample_id IN (%s) GROUP BY 1 ORDER BY 1;' % scope_sql
+
+        return pg_session_C._Execute_search_all_sql(sql, params) or []
+
+    def _Retrieve_n_samples_for_scope(self, scope_D, pg_session_C):
+        '''Return the number of samples in scope.'''
+
+        scope_sql, params = self._Scope_sql(scope_D)
+
+        rec = pg_session_C._Execute_search_single_sql('SELECT COUNT(*) FROM (%s) AS S;' % scope_sql, params)
+
+        return rec[0] if rec else 0
+
+    def _Retrieve_sample_keys_for_scope(self, scope_D, pg_session_C):
+        '''Return the key columns of all samples in scope:
+        (sample_id, sample_name, campaign_tag, sampling_log_tag, latitude, longitude, profile_min, profile_max).'''
+
+        scope_sql, params = self._Scope_sql(scope_D)
+
+        sql = 'SELECT OS.id, OS.name, OC.tag, OSL.tag, ' + GEOLOCATION_LAT_LON_SQL + ', OSP.profile_min, OSP.profile_max \
             FROM observation.sample AS OS \
             INNER JOIN observation.sampling_log AS OSL ON OS.sampling_log_id = OSL.id \
+            INNER JOIN observation.campaign AS OC ON OSL.campaign_id = OC.id \
             LEFT JOIN observation.sample_profile AS OSP ON OSP.sample_id = OS.id \
             LEFT JOIN observation.sample_geotag AS OSGT ON OSGT.sample_id = OS.id \
             LEFT JOIN observation.geolocation AS OGE ON OGE.id = OSGT.geolocation_id \

@@ -3,7 +3,7 @@ Created on 8 September 2026
 
 @author: thomasgumbricht
 
-Shared loader for ai4sh/default/plot/targetfeaturesymbols.json, used by both
+Shared loader for <project>/default/plot/targetfeaturesymbols.json (see project_paths.py), used by both
 src/ai4sh/select.py (to know which unit each indicator must be translated into
 before saving a Parquet subset) and src/ai4sh/plot.py (to label plot axes).
 '''
@@ -11,11 +11,9 @@ before saving a Parquet subset) and src/ai4sh/plot.py (to label plot axes).
 # Standard library imports
 import os
 import json
+from src.ai4sh.project_paths import Default_fpn
 
-# Repo root: src/ai4sh/feature_symbols.py → up 2 levels
-_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-
-DEFAULT_SYMBOLS_FPN = os.path.join(_REPO_ROOT, 'ai4sh', 'default', 'plot', 'targetfeaturesymbols.json')
+DEFAULT_SYMBOLS_FPN = Default_fpn('plot', 'targetfeaturesymbols.json')
 
 
 def Load_feature_symbols(raw='default', verbose=0):

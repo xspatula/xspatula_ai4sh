@@ -133,6 +133,114 @@
               }
             },
             {
+              "parameter": "texture_class_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: soil texture classes to include (e.g. loam, silt loam); the samples carry the class matched in the column class_texture",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "nominal_classification",
+                "write": false
+              }
+            },
+            {
+              "parameter": "texture_classification",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "soil texture usda",
+              "hint": "Texture classification (nominal indicator name or alias) that texture_class_array refers to",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "indicator",
+                "write": false
+              }
+            },
+            {
+              "parameter": "landuse_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: land use classes (name, tag or alias, any rank) to include; a class includes all classes below it (e.g. agriculture); column class_landuse",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landuse",
+                "write": false
+              }
+            },
+            {
+              "parameter": "landcover_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: land cover classes (name, tag or alias, any rank) to include; a class includes all classes below it (e.g. cropland); column class_landcover",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "landcover",
+                "write": false
+              }
+            },
+            {
+              "parameter": "biogeo16_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: biogeographic regions (name, tag or alias) to include; column class_biogeo16",
+              "schema_table": {
+                "schema": "landscape_utility",
+                "table": "biogeo16",
+                "write": false
+              }
+            },
+            {
+              "parameter": "juxtaposition_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: sample juxtaposition classes to include; column class_juxtaposition",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "juxtaposition",
+                "write": false
+              }
+            },
+            {
+              "parameter": "composition_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: sample composition classes (e.g. individual, composite) to include; column class_composition",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "composition",
+                "write": false
+              }
+            },
+            {
+              "parameter": "proximity_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: sample proximity classes (e.g. central, peripheral, general) to include; column class_proximity",
+              "schema_table": {
+                "schema": "observation_utility",
+                "table": "proximity",
+                "write": false
+              }
+            },
+            {
+              "parameter": "sample_source",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: saved selection (Parquet, relative to the project root) whose samples (sample_id) and class columns are reused, e.g. to select spectra for a class filtered indicator selection",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
               "parameter": "output_root_fp",
               "parameter_type": "text",
               "required": false,
@@ -162,6 +270,18 @@
               "required": false,
               "default_value": "default",
               "hint": "Name of the Parquet subset, saved as {output_name}.parquet with {output_name}.json; default = {indicator aliases joined by -}_{min_profile}-{max_profile}",
+              "schema_table": {
+                "schema": "observation",
+                "table": "sample",
+                "write": false
+              }
+            },
+            {
+              "parameter": "output_suffix",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Appended to output_name as __{output_suffix}; default = the class filter (e.g. lu-agriculture_tx-loam) for a default output_name, none = nothing",
               "schema_table": {
                 "schema": "observation",
                 "table": "sample",

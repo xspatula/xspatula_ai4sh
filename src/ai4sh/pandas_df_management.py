@@ -18,6 +18,8 @@ from src.lib.pilot import Get_project_path
 
 from src.ai4sh.parquet_units import Read_parquet_with_units
 
+from src.ai4sh.previous_dataframe import Previous_parquet
+
 
 class Process_pandas(Get_schema_table):
     '''Inspect / display a saved pandas Parquet dataset.'''
@@ -88,6 +90,8 @@ class Process_pandas(Get_schema_table):
     def _Inspect_pandas_dataset(self):
         '''Print the structure and/or contents of a saved Parquet dataset.
 
+        An empty parquet_file reads the previous dataframe of project_root_fp (see previous_dataframe.py).
+
         The first of the following boolean parameters that is true selects the display mode
         (in this order — all remaining ones are skipped): columns_units_data, columns_data,
         columns_only, columns_units_only.
@@ -102,11 +106,17 @@ class Process_pandas(Get_schema_table):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
 
-        parquet_file = str(getattr(p, 'parquet_file', '')).strip()
+        parquet_file = str(getattr(p, 'parquet_file', '') or '').strip()
 
-        if not parquet_file:
-            print('    ERROR: parquet_file parameter is required.')
-            return
+        # Empty parquet_file: the previous dataframe saved in project_root_fp (.previous_dataframe)
+        if parquet_file.lower() in ('', 'none', 'previous'):
+
+            previous_fpn = Previous_parquet(project_root_fp)
+
+            if previous_fpn is None:
+                return
+
+            parquet_file = os.path.basename(previous_fpn)
 
         try:
             df, units_D = self._Load_parquet_data(project_root_fp, parquet_file)

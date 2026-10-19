@@ -23,6 +23,9 @@ import json
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+# Application package imports
+from src.ai4sh.previous_dataframe import Read_previous_history
+
 _UNITS_METADATA_KEY = b'ai4sh_indicator_units'
 
 # Any known machine learning preprocessing suffix at the end of a parquet stem (derived files)
@@ -35,10 +38,24 @@ def Find_selected_parquet(project_root_fp):
     '''Return (parquet_fpn, json_fpn or None) of the selected (not derived) dataset in project_root_fp.
 
     Selections are saved as {name}.parquet + {name}.json. Files with a preprocessing suffix
-    (DERIVED_STEM_RE) are skipped. If several
-    candidates remain, the most recently written one is used and the others are reported.
+    (DERIVED_STEM_RE) are skipped. The latest selected file registered in .previous_dataframe is used;
+    without one, the most recently written candidate is used and the others are reported.
     Raises FileNotFoundError if there is none.
     '''
+    for record in reversed(Read_previous_history(project_root_fp)):
+
+        for entry in record.get('entries', []):
+
+            fpn = os.path.join(project_root_fp, entry.get('dataframe', ''))
+
+            stem = os.path.splitext(os.path.basename(fpn))[0]
+
+            if fpn.endswith('.parquet') and os.path.exists(fpn) and not DERIVED_STEM_RE.search(stem):
+
+                json_fpn = os.path.join(project_root_fp, stem + '.json')
+
+                return fpn, json_fpn if os.path.exists(json_fpn) else None
+
     candidates = [fpn for fpn in glob.glob(os.path.join(project_root_fp, '*.parquet'))
                   if not DERIVED_STEM_RE.search(os.path.splitext(os.path.basename(fpn))[0])]
 
