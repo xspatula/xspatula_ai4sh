@@ -1,0 +1,51 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "predict_independent",
+        "min_user_stratum": 3,
+        "title": "Predict indicators for independent spectra with saved regression models",
+        "label": "Apply one or more models saved by regression_modeling (the whole fitted chain: preprocessing, regressor and indicator transformation) to unprocessed spectra. Saves <dataframe>_pred.parquet with one column per model in the native unit of the indicator; if the dataframe holds observed values, metrics are computed on the samples not used for training."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project (folder with the parquet file to predict)."
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe with unprocessed spectra to predict: raw = the selected parquet, previous = the latest saved parquet, or the name of a parquet file. The spectra must have the same bands and signal type as the source parquet of the model."
+            },
+            {
+              "parameter": "model_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Comma separated list of saved models: .joblib paths relative to the project root (each needs its .manifest.json) or names of registered models (ml_model.model)."
+            },
+            {
+              "parameter": "dst_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Folder for the predictions (<dataframe>_pred.parquet + .json), relative to the project root. Empty = <project_root_fp>/predictions."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

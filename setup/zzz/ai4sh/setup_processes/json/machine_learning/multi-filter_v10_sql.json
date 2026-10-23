@@ -40,8 +40,8 @@
               "parameter": "colormap",
               "parameter_type": "text",
               "required": false,
-              "default_value": "jet",
-              "hint": "Name of the matplotlib colormap to use"
+              "default_value": "default",
+              "hint": "Colour ramp for plotting spectra: a matplotlib colormap name, or default = the spectra_plot parameter set (ml_setting, \"jet\")."
             }
           ]
         }

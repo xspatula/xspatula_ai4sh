@@ -38,6 +38,9 @@ from src.ai4sh.spectral_columns import (Band_col_name, Band_value, Is_band_col,
 from src.postgres import Get_schema_table
 from src.lib.pilot import Get_project_path
 from src.ai4sh.project_paths import Default_fpn
+from src.ai4sh.provenance import Load_config_json
+from src.ai4sh.ml_setting import Load_settings, Is_path, Spectra_colormap
+from src.ai4sh.ml_transformers import Holdout_test_mask, Holdout_info
 
 _METADATA_COLS = frozenset([
     'sample_id', 'sample_name', 'campaign_tag', 'sampling_log_tag', 'campaign_name', 'latitude_dd', 'longitude_dd',
@@ -202,6 +205,8 @@ def _write_companion_json(project_root_fp, in_stem, out_stem, out_cols, step_inf
                           signal_type=None):
     '''Write companion JSON for an output parquet, inheriting input companion metadata.'''
     companion = _load_companion_json(project_root_fp, in_stem) or {}
+    # The unprocessed parquet the chain starts from — regression modeling refits the chain on it
+    companion.setdefault('source_parquet', in_stem + '.parquet')
     companion['output_data'] = _build_output_data(out_cols, signal_type)
     chain = list(companion.get('preprocessing_chain', []))
     step_num = len(chain) + 1
@@ -897,7 +902,7 @@ class Process_ml_preprocess(Get_schema_table):
         save        = getattr(p, 'save', False)
         overwrite   = bool(getattr(p, 'overwrite', False))
         max_spectra = int(getattr(p, 'max_spectra', 100))
-        colormap    = str(getattr(p, 'colormap', 'jet')).strip() or 'jet'
+        colormap    = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
         if dataframe_param.lower() == 'previous':
             parquet_fp = _resolve_single_previous(project_root_fp)
@@ -1063,6 +1068,16 @@ class Process_ml_preprocess(Get_schema_table):
             return s
         return Get_project_path(self.project_root_FP, s)
 
+    def _Load_named_settings(self, family, param, default_fpn=None):
+        '''Settings of a parameter set name (ml_setting), "default" or a JSON path relative to the project root;
+        {} for none or a missing file (warning).'''
+        try:
+            return Load_settings(family, param, default_fpn, resolve_path=self._Resolve_filter_fp,
+                                 verbose=self.verbose) or {}
+        except FileNotFoundError as e:
+            print('    ERROR: %s' % e)
+            return {}
+
     def _Filter_spectra(self):
         p = self.process_S.process.parameters
 
@@ -1074,16 +1089,10 @@ class Process_ml_preprocess(Get_schema_table):
             return
 
         filter_fp_param = str(getattr(p, 'filter_fp', 'none')).strip()
-        filter_fp       = self._Resolve_filter_fp(filter_fp_param)
-        if filter_fp is None:
-            print('    ERROR: filter_fp is required for filter_spectra.')
+        filter_cfg      = self._Load_named_settings('filter', filter_fp_param)
+        if not filter_cfg:
+            print('    ERROR: filter_fp (a filter parameter set name or JSON file) is required for filter_spectra.')
             return
-        if not os.path.exists(filter_fp):
-            print('    ERROR: filter file not found: %s' % filter_fp)
-            return
-
-        with open(filter_fp) as fh:
-            filter_cfg = json.load(fh)
 
         # Abbreviation from top-level key
         _abbrev_map = {'savitzky-golay': 'sg', 'gauss': 'gf',
@@ -1095,7 +1104,7 @@ class Process_ml_preprocess(Get_schema_table):
         save            = getattr(p, 'save', False)
         overwrite       = bool(getattr(p, 'overwrite', False))
         max_spectra     = int(getattr(p, 'max_spectra', 100))
-        colormap        = str(getattr(p, 'colormap', 'jet')).strip() or 'jet'
+        colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
         if dataframe_param.lower() == 'previous':
             parquet_fp = _resolve_single_previous(project_root_fp)
@@ -1158,23 +1167,17 @@ class Process_ml_preprocess(Get_schema_table):
 
         mf_fp_param = str(getattr(p, 'multi_filter_fp',
                            getattr(p, 'mulit_filter_fp', 'none'))).strip()
-        mf_fp = self._Resolve_filter_fp(mf_fp_param)
-        if mf_fp is None:
-            print('    ERROR: multi_filter_fp is required for multi_filter_spectra.')
+        mf_cfg = self._Load_named_settings('multi_filter', mf_fp_param)
+        if not mf_cfg:
+            print('    ERROR: multi_filter_fp (a multi_filter parameter set name or JSON file) is required.')
             return
-        if not os.path.exists(mf_fp):
-            print('    ERROR: multi-filter file not found: %s' % mf_fp)
-            return
-
-        with open(mf_fp) as fh:
-            mf_cfg = json.load(fh)
 
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show            = getattr(p, 'show', True)
         save            = getattr(p, 'save', False)
         overwrite       = bool(getattr(p, 'overwrite', False))
         max_spectra     = int(getattr(p, 'max_spectra', 100))
-        colormap        = str(getattr(p, 'colormap', 'jet')).strip() or 'jet'
+        colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
         if dataframe_param.lower() == 'previous':
             parquet_fp = _resolve_single_previous(project_root_fp)
@@ -1276,8 +1279,7 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: ward clustering file not found: %s' % wc_fp)
             return
 
-        with open(wc_fp) as fh:
-            cfg = json.load(fh)
+        cfg = Load_config_json(wc_fp)
         wc = cfg.get('ward_clustering', cfg)
 
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
@@ -1285,7 +1287,7 @@ class Process_ml_preprocess(Get_schema_table):
         save            = getattr(p, 'save', False)
         overwrite       = bool(getattr(p, 'overwrite', False))
         max_spectra     = int(getattr(p, 'max_spectra', 100))
-        colormap        = str(getattr(p, 'colormap', 'jet')).strip() or 'jet'
+        colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
         if dataframe_param.lower() == 'previous':
             parquet_fp = _resolve_single_previous(project_root_fp)
@@ -1448,10 +1450,10 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: univariate selector file not found: %s' % uv_fp)
             return
 
-        with open(uv_fp) as fh:
-            cfg = json.load(fh)
+        cfg = Load_config_json(uv_fp)
 
         n_features          = int(cfg.get('SelectKBest', {}).get('n_features', 20))
+        test_size           = float(getattr(p, 'test_size', 0.3))
         dataframe_param     = str(getattr(p, 'dataframe', 'raw')).strip()
         indicator_array     = _parse_array_param(getattr(p, 'indicator_array', []))
         separate_selections = bool(getattr(p, 'separate_selections', False))
@@ -1459,7 +1461,7 @@ class Process_ml_preprocess(Get_schema_table):
         save                = getattr(p, 'save', False)
         overwrite           = bool(getattr(p, 'overwrite', False))
         max_spectra         = int(getattr(p, 'max_spectra', 100))
-        colormap            = str(getattr(p, 'colormap', 'jet')).strip() or 'jet'
+        colormap            = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
         if dataframe_param.lower() == 'previous':
             parquet_fp = _resolve_single_previous(project_root_fp)
@@ -1508,10 +1510,16 @@ class Process_ml_preprocess(Get_schema_table):
         n_bands  = X_full.shape[1]
         k        = min(n_features, n_bands)
 
+        # Select from the training samples only — the test samples (same holdout as regression_modeling) stay unseen
+        train_rows = ~Holdout_test_mask(df, test_size)[0]
+        holdout    = Holdout_info(df, test_size)
+        if self.verbose >= 1:
+            print('    Selecting from %d training samples (test_size=%.2f held out)' % (int(train_rows.sum()), test_size))
+
         if separate_selections:
             for indicator in indicator_cols:
                 abbrev     = 'uv-' + indicator.replace(' ', '-')
-                valid_mask = ~df[indicator].isna()
+                valid_mask = ~df[indicator].isna() & train_rows
                 n_valid    = int(valid_mask.sum())
                 if n_valid < 5:
                     print('    WARNING: too few valid samples for "%s" (%d), skipping.' % (
@@ -1555,8 +1563,11 @@ class Process_ml_preprocess(Get_schema_table):
                         'univariate_selector_fp': uv_fp_param,
                         'indicator': indicator,
                         'n_features_selected': len(retained_cols),
+                        'test_size': test_size,
                     },
                     'univariate_selector': cfg,
+                    'selected_bands': retained_wl,
+                    'holdout': holdout,
                 }
                 self._Accept_and_save(df, spec_out_df, retained_wl, abbrev,
                                        stem, project_root_fp, overwrite, step_info, units_D)
@@ -1566,7 +1577,7 @@ class Process_ml_preprocess(Get_schema_table):
             scores_sum  = np.zeros(n_bands)
             n_valid_ind = 0
             for indicator in indicator_cols:
-                valid_mask = ~df[indicator].isna()
+                valid_mask = ~df[indicator].isna() & train_rows
                 if valid_mask.sum() < 5:
                     print('    WARNING: too few valid samples for "%s" (%d), skipping.' % (
                         indicator, int(valid_mask.sum())))
@@ -1616,8 +1627,11 @@ class Process_ml_preprocess(Get_schema_table):
                     'univariate_selector_fp': uv_fp_param,
                     'indicators': indicator_cols,
                     'n_features_selected': len(retained_cols),
+                    'test_size': test_size,
                 },
                 'univariate_selector': cfg,
+                'selected_bands': retained_wl,
+                'holdout': holdout,
             }
             self._Accept_and_save(df, spec_out_df, retained_wl, 'uv',
                                    stem, project_root_fp, overwrite, step_info, units_D)
@@ -1651,6 +1665,7 @@ class Process_ml_preprocess(Get_schema_table):
         separate_selections = bool(getattr(p, 'separate_selections', False))
         n_top               = int(getattr(p, 'n_top_features_in_plot', 0))
         overwrite           = bool(getattr(p, 'overwrite', False))
+        test_size           = float(getattr(p, 'test_size', 0.3))
 
         if not selector_array:
             print('    ERROR: selector_array is empty.')
@@ -1663,29 +1678,17 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: regressor_array is required for permutation / rfe selectors.')
             return
 
-        # Model hyperparameters
-        if model_params_param and model_params_param.lower() not in ('default', 'none', ''):
-            mp_fp = (model_params_param if os.path.isabs(model_params_param)
-                     else Get_project_path(self.project_root_FP, model_params_param))
-        else:
-            mp_fp = _DEFAULT_MODEL_PARAMS_FP
-        model_params = {}
-        if os.path.exists(mp_fp):
-            with open(mp_fp) as fh:
-                model_params = json.load(fh)
-        elif self.verbose >= 1:
-            print('    WARNING: model_parameters file not found: %s' % mp_fp)
-
-        # Selector defaults
-        sel_defaults_fp = Default_fpn('selector', 'selector_default_settings.json')
-        sel_defaults = {}
-        if os.path.exists(sel_defaults_fp):
-            with open(sel_defaults_fp) as fh:
-                sel_defaults = json.load(fh)
-        perm_repeats = int(sel_defaults.get('permutation_selector', {}).get('permutation_repeats', 6))
+        # Model hyperparameters and selector settings (parameter set name, default, none or JSON path)
+        model_params = self._Load_named_settings('regressor', model_params_param or 'default', _DEFAULT_MODEL_PARAMS_FP)
+        sel_defaults = self._Load_named_settings('selector', 'default',
+                                                 Default_fpn('selector', 'selector_default_settings.json'))
+        # keys of the settings file: permutation / tree_based (older code read permutation_selector / tree_based_selector)
+        perm_cfg     = sel_defaults.get('permutation', sel_defaults.get('permutation_selector', {}))
+        tree_cfg     = sel_defaults.get('tree_based', sel_defaults.get('tree_based_selector', {}))
+        perm_repeats = int(perm_cfg.get('permutation_repeats', 6))
         rfe_cv       = int(sel_defaults.get('rfe', {}).get('CV', 0))
         rfe_step     = int(sel_defaults.get('rfe', {}).get('step', 1))
-        tree_n_est   = int(sel_defaults.get('tree_based_selector', {}).get('n_estimators', 20))
+        tree_n_est   = int(tree_cfg.get('n_estimators', 20))
 
         # Load parquet
         if dataframe_param.lower() == 'previous':
@@ -1714,6 +1717,12 @@ class Process_ml_preprocess(Get_schema_table):
         wavelengths = [_col_to_index(c) for c in spectral_cols]
         X_all       = df[spectral_cols].values.astype(float)
         n_bands     = len(spectral_cols)
+
+        # Select from the training samples only — the test samples (same holdout as regression_modeling) stay unseen
+        train_rows = ~Holdout_test_mask(df, test_size)[0]
+        holdout    = Holdout_info(df, test_size)
+        if self.verbose >= 1:
+            print('    Selecting from %d training samples (test_size=%.2f held out)' % (int(train_rows.sum()), test_size))
 
         all_indicators = [
             c for c in df.columns
@@ -1923,7 +1932,10 @@ class Process_ml_preprocess(Get_schema_table):
                     'selector':           sel_key,
                     'indicator':          indicator,
                     'n_features_selected': n_retain,
+                    'test_size':          test_size,
                 },
+                'selected_bands': top_wl,
+                'holdout': holdout,
             }
             _write_companion_json(project_root_fp, stem, out_stem,
                                    list(spec_out.columns), step_info, signal_type)
@@ -1942,7 +1954,7 @@ class Process_ml_preprocess(Get_schema_table):
         # ---- main loop: indicator × regressor × selector ----
         if separate_selections:
             for indicator in indicator_cols:
-                valid_mask = ~df[indicator].isna()
+                valid_mask = ~df[indicator].isna() & train_rows
                 n_valid    = int(valid_mask.sum())
                 if n_valid < 10:
                     print('    WARNING: too few samples for "%s" (%d), skipping.' % (
@@ -1994,7 +2006,7 @@ class Process_ml_preprocess(Get_schema_table):
                     scores_sum  = np.zeros(n_bands)
                     n_valid_ind = 0
                     for indicator in indicator_cols:
-                        valid_mask = ~df[indicator].isna()
+                        valid_mask = ~df[indicator].isna() & train_rows
                         if valid_mask.sum() < 10:
                             continue
                         X = X_all[valid_mask]
@@ -2176,8 +2188,9 @@ class Process_ml_preprocess(Get_schema_table):
         # Build chain abbreviation and step_info_list from all steps except 'raw'
         chain_abbrevs  = []
         step_info_list = []
+        chem_config    = _load_chemometric_config(chemometrics_param, self.verbose)
         for step_name_key in chemometrics_array:
-            cfg = _load_chemometric_config(chemometrics_param, step_name_key)
+            cfg = chem_config.get(step_name_key, {})
             if step_name_key == 'derivative':
                 d = int(cfg.get('derivative', cfg.get('derive', 1)))
                 a = bool(cfg.get('append', False))

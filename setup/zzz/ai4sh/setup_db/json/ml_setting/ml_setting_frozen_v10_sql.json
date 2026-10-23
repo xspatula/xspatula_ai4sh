@@ -1,0 +1,63 @@
+{
+  "process": [
+    {
+      "process_id": "execute_sql",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "sql": [
+          "CREATE OR REPLACE FUNCTION ml_setting.block_frozen_set() RETURNS TRIGGER AS $body$\nBEGIN\n    IF NOT OLD.frozen THEN\n        IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n        RETURN NEW;\n    END IF;\n    IF TG_OP = 'DELETE' THEN\n        RAISE EXCEPTION 'parameter set %/%@% is frozen (used by a registered model) and can not be deleted', OLD.family, OLD.name, OLD.version;\n    END IF;\n    IF NEW.content IS DISTINCT FROM OLD.content OR NEW.content_hash IS DISTINCT FROM OLD.content_hash\n       OR NEW.family IS DISTINCT FROM OLD.family OR NEW.name IS DISTINCT FROM OLD.name\n       OR NEW.version IS DISTINCT FROM OLD.version OR NEW.category IS DISTINCT FROM OLD.category\n       OR NOT NEW.frozen THEN\n        RAISE EXCEPTION 'parameter set %/%@% is frozen (used by a registered model) - save the change as a new version', OLD.family, OLD.name, OLD.version;\n    END IF;\n    RETURN NEW;\nEND;\n$body$ LANGUAGE plpgsql;",
+          "CREATE OR REPLACE FUNCTION ml_setting.block_frozen_rows() RETURNS TRIGGER AS $body$\nBEGIN\n    IF EXISTS (SELECT 1 FROM ml_setting.parameter_set WHERE id = OLD.set_id AND frozen) THEN\n        RAISE EXCEPTION 'the rows of parameter set % are frozen (used by a registered model) - save the change as a new version', OLD.set_id;\n    END IF;\n    IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n    RETURN NEW;\nEND;\n$body$ LANGUAGE plpgsql;"
+        ]
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "parameter_set",
+        "trigger": "parameter_set_frozen",
+        "timing": "BEFORE",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "ml_setting.block_frozen_set"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "indicator_transformation",
+        "trigger": "indicator_transformation_frozen",
+        "timing": "BEFORE",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "ml_setting.block_frozen_rows"
+      }
+    },
+    {
+      "process_id": "create_trigger",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "indicator_standardisation",
+        "trigger": "indicator_standardisation_frozen",
+        "timing": "BEFORE",
+        "events": [
+          "UPDATE",
+          "DELETE"
+        ],
+        "function": "ml_setting.block_frozen_rows"
+      }
+    }
+  ]
+}

@@ -57,7 +57,7 @@
               "parameter_type": "test",
               "required": false,
               "default_value": "",
-              "hint": "Relative or absolute path to the JSON file with the multi_filter definition. If not set or set to none the default settings in the sci-kit learn package will be used."
+              "hint": "Regressor hyper-parameters: default (the standard regressor set), none (scikit-learn defaults), a parameter set name[@version] or a JSON file path relative to the project root."
             },
             {
               "parameter": "traintest",
@@ -81,18 +81,39 @@
               "hint": "whether or not to apply regression modeling using a k-fold approach"
             },
             {
-              "parameter": "folds",
-              "parameter_type": "integer",
+              "parameter": "indicator_transformation",
+              "parameter_type": "text",
               "required": false,
-              "default_value": 10,
-              "hint": "whether or not to apply regression modeling using a k-fold approach"
+              "default_value": "none",
+              "hint": "Transformation of the indicator(s) before modeling: none, default (the standard set), a parameter set name[@version] or a JSON file path relative to the project root. Fitted on the training samples; predictions are returned in the native unit."
+            },
+            {
+              "parameter": "indicator_standardisation",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "none",
+              "hint": "Z-score standardisation of the indicator(s) before modeling: none, default (the standard set), a parameter set name[@version] or a JSON file path relative to the project root."
+            },
+            {
+              "parameter": "refit_preprocessing",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "Refit the preprocessing chain of the input dataframe (from its companion JSON) on the training samples inside the model pipeline, starting from the unprocessed source parquet. false = train on the preprocessed dataframe as is (preprocessing fitted on all samples, optimistic test metrics)."
+            },
+            {
+              "parameter": "model_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Folder for the saved models (.joblib + .manifest.json), relative to the project root. Empty = <project_root_fp>/models."
             },
             {
               "parameter": "folds",
               "parameter_type": "integer",
               "required": false,
               "default_value": 10,
-              "hint": "whether or not to apply regression modeling using a k-fold approach"
+              "hint": "number of folds for the k-fold approach (used when kfold is true)"
             },
             {
               "parameter": "targetfeaturesymbols",

@@ -1,0 +1,1460 @@
+{
+  "process": [
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "parameter_set",
+        "command": {
+          "columns": [
+            "family",
+            "name",
+            "category",
+            "creator",
+            "abstract",
+            "content",
+            "content_hash"
+          ],
+          "values": [
+            [
+              "transformation",
+              "none",
+              "raw",
+              "setup",
+              "No indicator transformation (linear).",
+              {
+                "transformation": {}
+              },
+              "71006b9b2ae3abb70b4d5cdaedbb4cc853983bfd60174e9283c9afc6e1d4d9e6"
+            ],
+            [
+              "transformation",
+              "standard",
+              "preset",
+              "setup",
+              "Standard transformation of soil indicators (log for skewed indicators). Template per indicator name or alias; per-indicator rows are created by sync_indicator_parameter_sets.",
+              {
+                "transformation": {
+                  "caco3": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "carbonate": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "cec": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "cation exchange capacity": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "cf": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "coarse fraction": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "clay": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "clay (<0.002 mm)": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "ec": {
+                    "log": true,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "electrical conductivity": {
+                    "log": true,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "k-ext": {
+                    "log": true,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "extractable pottassium": {
+                    "log": true,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "n-tot": {
+                    "log": true,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "total nitrogen": {
+                    "log": true,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "c-org": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "organic carbon": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "p-ext": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "extractable phosphorus": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "ph-cacl2": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "ph-calcium-chloride": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "ph-h2o": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "ph-water": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "sand": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "sand (0.06-2.0 mm)": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "silt": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "silt (0.002-0.06 mm)": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "coarse sand": {
+                    "log": true,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "coarse sand (0.2 - 2.0 mm)": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "fine sand": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "fine sand (0.06-0.2 mm)": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "coarse silt": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "coarse silt (0.02-0.06 mm)": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "fine silt": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "fine silt (0.002-0.02 mm)": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "ca2+": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "calcium ion": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "k+": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "potassium ion": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "na+": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "sodium ion": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "mg2+": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "magnesium ion": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "landcover": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "landuse": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  },
+                  "biogeo16": {
+                    "log": false,
+                    "sqrt": false,
+                    "reciprocal": false,
+                    "boxcox": false,
+                    "yeojohnson": false,
+                    "quantile": false
+                  }
+                }
+              },
+              "4c66fc57de55421dd4764036dc792fd0d09d0e44ed1a109f6c495143ec338865"
+            ],
+            [
+              "standardisation",
+              "none",
+              "raw",
+              "setup",
+              "No indicator standardisation.",
+              {
+                "standardise": {}
+              },
+              "aa4317d778c7b407d103d7dd005066d5ae6c3c825151cc5ebc04e155777909e2"
+            ],
+            [
+              "standardisation",
+              "standard",
+              "preset",
+              "setup",
+              "Standard z-score standardisation of soil indicators. Template per indicator name or alias; per-indicator rows are created by sync_indicator_parameter_sets.",
+              {
+                "standardise": {
+                  "caco3": true,
+                  "carbonate": true,
+                  "cec": true,
+                  "cation exchange capacity": true,
+                  "cf": false,
+                  "coarse fraction": false,
+                  "clay": false,
+                  "clay (<0.002 mm)": false,
+                  "ec": false,
+                  "electrical conductivity": false,
+                  "k-ext": false,
+                  "extractable pottassium": false,
+                  "n-tot": false,
+                  "total nitrogen": false,
+                  "c-org": false,
+                  "organic carbon": false,
+                  "p-ext": false,
+                  "extractable phosphorus": false,
+                  "ph-cacl2": false,
+                  "ph-calcium-chloride": false,
+                  "ph-h2o": false,
+                  "ph-water": false,
+                  "sand": false,
+                  "sand (0.06-2.0 mm)": false,
+                  "silt": false,
+                  "silt (0.002-0.06 mm)": false,
+                  "coarse sand": false,
+                  "coarse sand (0.2 - 2.0 mm)": false,
+                  "fine sand": false,
+                  "fine sand (0.06-0.2 mm)": false,
+                  "coarse silt": false,
+                  "coarse silt (0.02-0.06 mm)": false,
+                  "fine silt": false,
+                  "fine silt (0.002-0.02 mm)": false,
+                  "ca2+": false,
+                  "calcium ion": false,
+                  "k+": false,
+                  "potassium ion": false,
+                  "na+": false,
+                  "sodium ion": false,
+                  "mg2+": false,
+                  "magnesium ion": false,
+                  "landcover": false,
+                  "landuse": false,
+                  "biogeo16": false
+                }
+              },
+              "106e888b37c463d555d32bdf6d8df5ce0427041b13f1df92529c79bab754c8ed"
+            ],
+            [
+              "chemometric",
+              "none",
+              "raw",
+              "setup",
+              "No chemometric settings: every step uses its built-in defaults.",
+              {},
+              "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+            ],
+            [
+              "chemometric",
+              "standard",
+              "preset",
+              "setup",
+              "Standard chemometric chain settings (derivative, scatter correction, scaling, decomposition).",
+              {
+                "derivative": {
+                  "comment": "the derive integer defines which derivate to get, 0=none, 1= first, 2 = second etc, if append is set to true the derivatives will be appended to the original bands; this is not recommended but can be used to explore which is more significant, the orignal bands or the derivatives, and then select only one for the coninued modeling.",
+                  "derivative": 1,
+                  "append": false
+                },
+                "scatter_correction": {
+                  "comment": "scattercorrection can apply the following: norm-1 (l1), norm-2 (l2) norm-max (max), snv (snv) or msc (msc). If two are given they will be done in series using output from the first as input to the second",
+                  "scaler": [
+                    "snv",
+                    "snv"
+                  ]
+                },
+                "scaling": {
+                  "comment": "Spectral scaling method options: meancentring, autoscaling, paretoscaling and poissonscaling",
+                  "method": "autoscaling"
+                },
+                "decomposition": {
+                  "comment": "Decomposition as a spectral compression/preparation process, method options: pca",
+                  "method": "pca",
+                  "n_components": 5
+                }
+              },
+              "c4843352797ea3417a62690d46ab17304cc7ffb3af2ddd5b2315cba9d31fca56"
+            ],
+            [
+              "filter",
+              "none",
+              "raw",
+              "setup",
+              "No filtering.",
+              {},
+              "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+            ],
+            [
+              "filter",
+              "moving-average",
+              "preset",
+              "setup",
+              "Standard moving-average filter.",
+              {
+                "moving_average": {
+                  "kernel": [
+                    1,
+                    1,
+                    1,
+                    1,
+                    1
+                  ],
+                  "mode": "nearest"
+                }
+              },
+              "c697c3d050dcbf15a28fd44be6b0776318b8b381dc045fba0f7c3cf6bfe31f76"
+            ],
+            [
+              "filter",
+              "gauss",
+              "preset",
+              "setup",
+              "Standard gauss filter.",
+              {
+                "gauss": {
+                  "sigma": 2,
+                  "mode": "nearest"
+                }
+              },
+              "bc47e21e67f936733392c2249a5cc159f22092032d80b3bf6c021785c509e12d"
+            ],
+            [
+              "filter",
+              "savitzky-golay",
+              "preset",
+              "setup",
+              "Standard savitzky-golay filter.",
+              {
+                "savitzky-golay": {
+                  "window_length": 5,
+                  "polyorder": 2,
+                  "deriv": 1,
+                  "mode": "nearest"
+                }
+              },
+              "35c5198e073248bfca2fac8a5a9a3617c938720cf63b441f41c668d41e7e520b"
+            ],
+            [
+              "filter",
+              "lowess",
+              "preset",
+              "setup",
+              "Standard lowess filter.",
+              {
+                "lowess": {
+                  "n_points": 21
+                }
+              },
+              "959730af48c07b936cab00e57e3a3ae74ed5df81966c81b0483b8a4b4888f1a1"
+            ],
+            [
+              "multi_filter",
+              "standard",
+              "preset",
+              "setup",
+              "Example multi-region filter settings.",
+              {
+                "single_filter": {
+                  "comment": "filter spectra using moving average, weighted kernel, Salitzy-Golay or Gaussian filter",
+                  "begin_wavelength": 550,
+                  "end_wavelength": 1100,
+                  "moving_average": {
+                    "kernel": [],
+                    "mode": "nearest"
+                  },
+                  "gauss": {
+                    "sigma": 0,
+                    "mode": "nearest"
+                  },
+                  "savitzky-golay": {
+                    "window_length": 5,
+                    "polyorder": 2,
+                    "deriv": 1,
+                    "mode": "nearest"
+                  }
+                },
+                "multi_filter": {
+                  "comment": "filter spectra using moving average, weighted kernel, Salitzy-Golay or Gaussian filter",
+                  "apply": false,
+                  "mode": "no_end_points",
+                  "begin_wavelength": [
+                    675,
+                    725
+                  ],
+                  "end_wavelength": [
+                    725,
+                    775
+                  ],
+                  "output_bandwidth": [
+                    25,
+                    10
+                  ],
+                  "moving_average": {
+                    "kernel": [
+                      [
+                        1,
+                        1,
+                        1
+                      ],
+                      [
+                        1,
+                        1,
+                        1
+                      ]
+                    ]
+                  },
+                  "savitzky-golay": {
+                    "window_length": [
+                      0,
+                      0
+                    ]
+                  },
+                  "gauss": {
+                    "sigma": [
+                      0,
+                      0
+                    ]
+                  }
+                }
+              },
+              "feaa3d6621c5e61e326c6a38c5438386f710767bbea438c90f73f4b19dfe736b"
+            ],
+            [
+              "selector",
+              "none",
+              "raw",
+              "setup",
+              "Band selectors with built-in defaults.",
+              {},
+              "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+            ],
+            [
+              "selector",
+              "standard",
+              "preset",
+              "setup",
+              "Standard settings for k-best, permutation, RFE and tree-based band selection.",
+              {
+                "k_best": {
+                  "apply": true,
+                  "n_features": 4
+                },
+                "permutation": {
+                  "permutation_repeats": 6,
+                  "step": 1
+                },
+                "rfe": {
+                  "CV": 0,
+                  "step": 1
+                },
+                "tree_based": {
+                  "n_estimators": 20
+                }
+              },
+              "3b243f762556b90d2075711d28c925481b46f55a50a17a9d49baf83810ec07e3"
+            ],
+            [
+              "regressor",
+              "none",
+              "raw",
+              "setup",
+              "scikit-learn default hyper-parameters for every regressor.",
+              {
+                "ols": {
+                  "hyper_parameters": {}
+                },
+                "theil_sen": {
+                  "hyper_parameters": {}
+                },
+                "huber": {
+                  "hyper_parameters": {}
+                },
+                "knn": {
+                  "hyper_parameters": {}
+                },
+                "dectree": {
+                  "hyper_parameters": {}
+                },
+                "svr": {
+                  "hyper_parameters": {}
+                },
+                "randfor": {
+                  "hyper_parameters": {}
+                },
+                "mlp": {
+                  "hyper_parameters": {}
+                },
+                "cubist": {
+                  "hyper_parameters": {}
+                }
+              },
+              "36588eb039681420488e28da5dcabcf497185835ea0e203a64d036ba14f6b0a8"
+            ],
+            [
+              "regressor",
+              "standard",
+              "preset",
+              "setup",
+              "Standard regressor hyper-parameters (random_state 42 for stochastic regressors).",
+              {
+                "ols": {
+                  "hyper_parameters": {
+                    "fit_intercept": true
+                  }
+                },
+                "theil_sen": {
+                  "hyper_parameters": {
+                    "random_state": 42
+                  }
+                },
+                "huber": {
+                  "hyper_parameters": {}
+                },
+                "knn": {
+                  "hyper_parameters": {}
+                },
+                "dectree": {
+                  "hyper_parameters": {
+                    "random_state": 42
+                  }
+                },
+                "svr": {
+                  "hyper_parameters": {
+                    "kernel": "linear",
+                    "C": 1.5,
+                    "epsilon": 0.05
+                  }
+                },
+                "randfor": {
+                  "hyper_parameters": {
+                    "n_estimators": 30,
+                    "random_state": 42
+                  }
+                },
+                "mlp": {
+                  "hyper_parameters": {
+                    "hidden_layer_sizes": [
+                      100,
+                      100
+                    ],
+                    "max_iter": 200,
+                    "tol": 0.001,
+                    "epsilon": 1e-08,
+                    "random_state": 42
+                  }
+                },
+                "cubist": {
+                  "hyper_parameters": {
+                    "random_state": 42
+                  }
+                }
+              },
+              "0dc1978338e2d194fcb6fb5b429589af6396914d4713cbdc43228b1a36ba7004"
+            ],
+            [
+              "spectra_plot",
+              "none",
+              "raw",
+              "setup",
+              "matplotlib default colour ramp for spectra.",
+              {
+                "colormap": "viridis"
+              },
+              "2bb65e8ee0bfe020eda73409ec5f17c7180ea7ef9213559124c77195d6f5a76f"
+            ],
+            [
+              "spectra_plot",
+              "standard",
+              "preset",
+              "setup",
+              "Colour ramp for plotting spectra.",
+              {
+                "colormap": "jet"
+              },
+              "e632c8fd1dc7023c3d379bdd1f0e3c070279065425eaf037ae7496d37456cd9b"
+            ],
+            [
+              "plot_symbol",
+              "targetfeaturesymbols",
+              "preset",
+              "setup",
+              "Plot symbols (targetfeaturesymbols); moves to the symbolisation schema in Part 5.",
+              {
+                "targetFeatureSymbols": {
+                  "caco3": {
+                    "color": "whitesmoke",
+                    "alpha": 0.2,
+                    "label": "CaCo3",
+                    "unit": "native"
+                  },
+                  "ca2+": {
+                    "color": "moccasin",
+                    "alpha": 0.2,
+                    "label": "Ca2+",
+                    "unit": "native"
+                  },
+                  "cec": {
+                    "color": "seagreen",
+                    "alpha": 0.2,
+                    "label": "Cation Exc. Cap.",
+                    "unit": "native"
+                  },
+                  "cf": {
+                    "color": "sienna",
+                    "alpha": 0.2,
+                    "label": "Coarse fraction",
+                    "unit": "native"
+                  },
+                  "clay": {
+                    "color": "tan",
+                    "alpha": 0.2,
+                    "label": "Clay cont.",
+                    "unit": "native"
+                  },
+                  "ec": {
+                    "color": "dodgerblue",
+                    "alpha": 0.2,
+                    "label": "Electric cond.",
+                    "unit": "native"
+                  },
+                  "k-ext": {
+                    "color": "lightcyan",
+                    "alpha": 0.2,
+                    "label": "Extractable potassium (K)",
+                    "unit": "native"
+                  },
+                  "n-tot": {
+                    "color": "darkcyan",
+                    "alpha": 0.2,
+                    "label": "Nitrogen (N) [tot]",
+                    "unit": "native"
+                  },
+                  "c-org": {
+                    "color": "dimgray",
+                    "alpha": 0.2,
+                    "label": "Organic carbon (C)",
+                    "unit": "native"
+                  },
+                  "p-ext": {
+                    "color": "firebrick",
+                    "alpha": 0.2,
+                    "label": "Phosphorus (P)",
+                    "unit": "native"
+                  },
+                  "ph-cacl2": {
+                    "color": "lemonchiffon",
+                    "alpha": 0.2,
+                    "label": "pH (CaCl)",
+                    "unit": "native"
+                  },
+                  "ph-h2o": {
+                    "color": "lightyellow",
+                    "alpha": 0.2,
+                    "label": "pH (H20)",
+                    "unit": "native"
+                  },
+                  "sand": {
+                    "color": "orange",
+                    "alpha": 0.2,
+                    "label": "Sand cont.",
+                    "unit": "native"
+                  },
+                  "fine sand": {
+                    "color": "orange",
+                    "alpha": 0.2,
+                    "label": "Sand cont.",
+                    "unit": "native"
+                  },
+                  "coarse sand": {
+                    "color": "orange",
+                    "alpha": 0.2,
+                    "label": "Sand cont.",
+                    "unit": "native"
+                  },
+                  "silt": {
+                    "color": "khaki",
+                    "alpha": 0.2,
+                    "label": "Silt cont.",
+                    "unit": "native"
+                  },
+                  "fine silt": {
+                    "color": "khaki",
+                    "alpha": 0.2,
+                    "label": "Silt cont.",
+                    "unit": "native"
+                  },
+                  "coarse silt": {
+                    "color": "khaki",
+                    "alpha": 0.2,
+                    "label": "Silt cont.",
+                    "unit": "native"
+                  },
+                  "landcover": {
+                    "color": "olivedrab",
+                    "alpha": 0.6,
+                    "hatch": "//",
+                    "label": "Land cover",
+                    "unit": "native"
+                  },
+                  "landuse": {
+                    "color": "goldenrod",
+                    "alpha": 0.6,
+                    "hatch": "\\\\",
+                    "label": "Land use",
+                    "unit": "native"
+                  },
+                  "biogeo16": {
+                    "color": "teal",
+                    "alpha": 0.6,
+                    "hatch": "xx",
+                    "label": "Biogeographic region",
+                    "unit": "native"
+                  }
+                },
+                "featureImportancePlot": {
+                  "comment": "Set any xticks arguments: https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.tick_params.html",
+                  "xticks": {
+                    "labelrotation": 45,
+                    "labelcolor": "black",
+                    "direction": "in",
+                    "labelsize": "small"
+                  }
+                },
+                "subtitlePlot": {
+                  "fontsize": "normal"
+                }
+              },
+              "a8668071bbcf9d0761bb18dd5b1325c29cd4d3a3e33c2cd63515283d8c13dbcd"
+            ],
+            [
+              "plot_symbol",
+              "regressionmodelsymbols",
+              "preset",
+              "setup",
+              "Plot symbols (regressionmodelsymbols); moves to the symbolisation schema in Part 5.",
+              {
+                "regressionModelSymbols": {
+                  "ols": {
+                    "marker": ".",
+                    "size": 100
+                  },
+                  "theil_sen": {
+                    "marker": "v",
+                    "size": 50
+                  },
+                  "huber": {
+                    "marker": "^",
+                    "size": 50
+                  },
+                  "knn": {
+                    "marker": "s",
+                    "size": 50
+                  },
+                  "dectree": {
+                    "marker": "P",
+                    "size": 50
+                  },
+                  "svr": {
+                    "marker": "*",
+                    "size": 50
+                  },
+                  "randfor": {
+                    "marker": "h",
+                    "size": 50
+                  },
+                  "mlp": {
+                    "marker": "D",
+                    "size": 50
+                  },
+                  "plsr": {
+                    "marker": "X",
+                    "size": 50
+                  },
+                  "cubist": {
+                    "marker": "8",
+                    "size": 50
+                  }
+                }
+              },
+              "09dcb46918c467d31127e7244a0570565ad689a96fc88a34c06c88f3b8781660"
+            ],
+            [
+              "plot_layout",
+              "enhancementplotlayout",
+              "preset",
+              "setup",
+              "Plot layout enhancementplotlayout (not yet used by the code).",
+              {
+                "enhancementPlotLayout": {
+                  "filterExtraction": {
+                    "apply": true,
+                    "supTitle": "Filtering",
+                    "subplotTitles": "auto",
+                    "annotate": {
+                      "x": 0.1,
+                      "y": 0.8,
+                      "original": "auto",
+                      "filtered": "auto"
+                    },
+                    "figSize": {
+                      "x": 8,
+                      "y": 8
+                    },
+                    "ylabels": [
+                      "reflectance",
+                      "reflectance"
+                    ]
+                  },
+                  "scatterCorrection": {
+                    "apply": true,
+                    "supTitle": "Scatter correction OSSL data, Sweden",
+                    "subplotTitles": "auto",
+                    "annotate": {
+                      "x": 0.1,
+                      "y": 0.8,
+                      "input": "auto",
+                      "firstcorrect": "auto",
+                      "secondcorrect": "auto"
+                    },
+                    "ylabels": [
+                      "reflectance",
+                      "normalised reflectance",
+                      "normalised reflectance"
+                    ]
+                  },
+                  "standardisation": {
+                    "apply": true,
+                    "supTitle": "Scaled OSSL data, Sweden",
+                    "subplotTitles": "auto",
+                    "annotate": {
+                      "x": 0.1,
+                      "y": 0.8,
+                      "input": "auto",
+                      "standard": "auto"
+                    },
+                    "ylabels": [
+                      "reflectance",
+                      "standardised reflectance"
+                    ]
+                  },
+                  "derivative": {
+                    "apply": true,
+                    "supTitle": "Derivated OSSL data, Sweden",
+                    "subplotTitles": "auto",
+                    "annotate": {
+                      "x": 0.1,
+                      "y": 0.8,
+                      "input": "auto",
+                      "derivative": "auto"
+                    },
+                    "ylabels": [
+                      "Norm-L2 scaled reflectance",
+                      "derivative"
+                    ]
+                  },
+                  "pca": {
+                    "apply": true,
+                    "supTitle": "Decomposed OSSL data, Sweden",
+                    "subplotTitles": "auto",
+                    "annotate": {
+                      "x": 0.1,
+                      "y": 0.8,
+                      "input": "auto",
+                      "output": "auto"
+                    },
+                    "ylabels": [
+                      "Reflectance",
+                      "Eigen values"
+                    ]
+                  },
+                  "varianceThreshold": {
+                    "apply": true,
+                    "supTitle": "Variance threshold covariate selection, OSSL data, Sweden",
+                    "subplotTitles": "auto",
+                    "annotate": {
+                      "x": 0.1,
+                      "y": 0.8,
+                      "input": "auto",
+                      "output": "auto"
+                    },
+                    "ylabels": [
+                      "auto",
+                      "auto"
+                    ]
+                  },
+                  "wardClustering": {
+                    "apply": true,
+                    "supTitle": "Ward clustering of covariates (%s), OSSL data, Sweden",
+                    "subplotTitles": "auto",
+                    "annotate": {
+                      "x": 0.1,
+                      "y": 0.8,
+                      "input": "auto",
+                      "output": "auto"
+                    },
+                    "ylabels": [
+                      "auto",
+                      "auto"
+                    ]
+                  },
+                  "univariateSelection": {
+                    "apply": true,
+                    "supTitle": "Univarate selection of covariates (%s), OSSL data, Sweden",
+                    "subplotTitles": "auto",
+                    "annotate": {
+                      "x": 0.1,
+                      "y": 0.8,
+                      "input": "auto",
+                      "output": "auto"
+                    },
+                    "ylabels": [
+                      "auto",
+                      "auto"
+                    ]
+                  },
+                  "permutationSelector": {
+                    "apply": true,
+                    "supTitle": "Permutation selection of covariates (%s), OSSL data, Sweden",
+                    "subplotTitles": "auto",
+                    "annotate": {
+                      "x": 0.1,
+                      "y": 0.8,
+                      "input": "auto",
+                      "output": "auto"
+                    },
+                    "ylabels": [
+                      "auto",
+                      "auto"
+                    ]
+                  },
+                  "RFE": {
+                    "apply": true,
+                    "supTitle": "RFE selection of covariates (%s), OSSL data, Sweden",
+                    "subplotTitles": "auto",
+                    "annotate": {
+                      "x": 0.1,
+                      "y": 0.8,
+                      "input": "auto",
+                      "output": "auto"
+                    },
+                    "ylabels": [
+                      "auto",
+                      "auto"
+                    ]
+                  },
+                  "outlierDetection": {
+                    "apply": true,
+                    "supTitle": "Inliers/outliers OSSL data (%s), Sweden",
+                    "subplotTitles": {
+                      "train": "auto",
+                      "test": "auto"
+                    },
+                    "annotate": {
+                      "apply": true,
+                      "x": 0.1,
+                      "y": 0.8,
+                      "train": "auto",
+                      "test": "auto"
+                    },
+                    "isolines": {
+                      "width": 1,
+                      "color": "blue"
+                    },
+                    "scatter": {
+                      "inliers": {
+                        "color": "green",
+                        "size": 20,
+                        "alpha": 0.1
+                      },
+                      "outliers": {
+                        "color": "red",
+                        "size": 20,
+                        "alpha": 0.1
+                      }
+                    },
+                    "ylabel": "auto",
+                    "xlabel": "auto"
+                  },
+                  "maxSpectra": 50,
+                  "axvspan": {
+                    "apply": true,
+                    "color": "lightgrey",
+                    "alpha": 0.8,
+                    "ymin": 0,
+                    "ymax": 1
+                  },
+                  "colorRamp": "jet",
+                  "linewidth": 1,
+                  "linestyle": "-",
+                  "pointsize": 2,
+                  "pointstyle": "o",
+                  "screenShow": false,
+                  "savePng": true,
+                  "tightLayout": true,
+                  "subFigSize": {
+                    "x": 3,
+                    "y": 3,
+                    "xadd": 0.1,
+                    "yadd": 0.1
+                  },
+                  "hwspace": {
+                    "hspace": 0.25,
+                    "wspace": 0.25
+                  }
+                }
+              },
+              "096f94db7fdb7b54935a801508adba93e5700228dc8268d1fd2e2b4105ac28c6"
+            ],
+            [
+              "plot_layout",
+              "modelplot",
+              "preset",
+              "setup",
+              "Plot layout modelplot (not yet used by the code).",
+              {
+                "modelPlot": {
+                  "apply": true,
+                  "tightLayout": false,
+                  "singles": {
+                    "apply": true,
+                    "figSize": {
+                      "x": 0,
+                      "y": 0,
+                      "xadd": 0.25,
+                      "yadd": 0.25
+                    },
+                    "screenShow": false,
+                    "savePng": true
+                  },
+                  "rows": {
+                    "apply": true,
+                    "subFigSize": {
+                      "x": 3,
+                      "y": 3,
+                      "xadd": 0.1,
+                      "yadd": 0.1
+                    },
+                    "screenShow": false,
+                    "savePng": true,
+                    "targetFeatures": {
+                      "apply": true,
+                      "figSize": {
+                        "x": 0,
+                        "y": 0,
+                        "xadd": 0,
+                        "yadd": 0
+                      },
+                      "hwspace": {
+                        "hspace": 0.25,
+                        "wspace": 0.25
+                      },
+                      "columns": [
+                        "permutationImportance",
+                        "treeBasedImportance",
+                        "featureImportance",
+                        "trainTest"
+                      ]
+                    },
+                    "regressionModels": {
+                      "apply": true,
+                      "figSize": {
+                        "x": 0,
+                        "y": 0,
+                        "xadd": 0.25,
+                        "yadd": 0.25
+                      },
+                      "hwspace": {
+                        "hspace": 0.25,
+                        "wspace": 0.25
+                      },
+                      "columns": [
+                        "permutationImportance",
+                        "treeBasedImportance",
+                        "trainTest"
+                      ]
+                    }
+                  }
+                }
+              },
+              "822771f21dd9806253a1cbb39cbbfa53c055c9e68bd1aadfc83f6c80d90db1de"
+            ],
+            [
+              "plot_layout",
+              "modelplotlayout",
+              "preset",
+              "setup",
+              "Plot layout modelplotlayout (not yet used by the code).",
+              {
+                "modelPlotLayout": {
+                  "tightLayout": false,
+                  "singles": {
+                    "apply": true,
+                    "figSize": {
+                      "x": 0,
+                      "y": 0,
+                      "xadd": 0.25,
+                      "yadd": 0.25
+                    },
+                    "screenShow": false,
+                    "savePng": true
+                  },
+                  "rows": {
+                    "apply": true,
+                    "subFigSize": {
+                      "x": 3,
+                      "y": 3,
+                      "xadd": 0.1,
+                      "yadd": 0.1
+                    },
+                    "screenShow": false,
+                    "savePng": true,
+                    "targetFeatures": {
+                      "apply": true,
+                      "figSize": {
+                        "x": 0,
+                        "y": 0,
+                        "xadd": 0,
+                        "yadd": 0
+                      },
+                      "hwspace": {
+                        "hspace": 0.25,
+                        "wspace": 0.25
+                      },
+                      "columns": [
+                        "permutationImportance",
+                        "featureImportance",
+                        "trainTest"
+                      ]
+                    },
+                    "regressionModels": {
+                      "apply": true,
+                      "figSize": {
+                        "x": 0,
+                        "y": 0,
+                        "xadd": 0.25,
+                        "yadd": 0.25
+                      },
+                      "hwspace": {
+                        "hspace": 0.25,
+                        "wspace": 0.25
+                      },
+                      "columns": [
+                        "permutationImportance",
+                        "trainTest"
+                      ]
+                    }
+                  }
+                }
+              },
+              "93923e99eee7553ba64c16ee4c098158db9d20905005c6077a700adaebf5805e"
+            ],
+            [
+              "plot_layout",
+              "outliersplotlayout",
+              "preset",
+              "setup",
+              "Plot layout outliersplotlayout (not yet used by the code).",
+              {
+                "outlierPlotLayout": {
+                  "tightLayout": false,
+                  "singles": {
+                    "apply": true,
+                    "figSize": {
+                      "x": 0,
+                      "y": 0,
+                      "xadd": 0.25,
+                      "yadd": 0.25
+                    },
+                    "screenShow": false,
+                    "savePng": true
+                  },
+                  "rows": {
+                    "apply": true,
+                    "subFigSize": {
+                      "x": 3,
+                      "y": 3,
+                      "xadd": 0.1,
+                      "yadd": 0.1
+                    },
+                    "screenShow": false,
+                    "savePng": true,
+                    "targetFeatures": {
+                      "apply": true,
+                      "figSize": {
+                        "x": 0,
+                        "y": 0,
+                        "xadd": 0,
+                        "yadd": 0
+                      },
+                      "hwspace": {
+                        "hspace": 0.25,
+                        "wspace": 0.25
+                      },
+                      "columns": [
+                        "permutationImportance",
+                        "featureImportance",
+                        "trainTest"
+                      ]
+                    },
+                    "regressionModels": {
+                      "apply": true,
+                      "figSize": {
+                        "x": 0,
+                        "y": 0,
+                        "xadd": 0.25,
+                        "yadd": 0.25
+                      },
+                      "hwspace": {
+                        "hspace": 0.25,
+                        "wspace": 0.25
+                      },
+                      "columns": [
+                        "permutationImportance",
+                        "trainTest"
+                      ]
+                    }
+                  }
+                }
+              },
+              "9c4ece07608682e233a3f63e924f38efde1258fb6414d9a00277395b12d9e64a"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

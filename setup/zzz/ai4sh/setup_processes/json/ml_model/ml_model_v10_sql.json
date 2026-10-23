@@ -1,0 +1,79 @@
+{
+  "process": [
+    {
+      "process": "add_root_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "ml_model",
+        "title": "Machine learning model registry.",
+        "label": "Register final machine learning models in the ml_model schema."
+      }
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "ml_model",
+        "process": "register_model",
+        "min_user_stratum": 4,
+        "title": "Register a saved regression model as a final model",
+        "label": "Writes the model path, sha256, manifest, preprocessing steps, metrics and parameter sets used to the ml_model schema and freezes those parameter sets. A registered model can be applied by name with predict_independent."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "model_array",
+              "parameter_type": "array",
+              "required": true,
+              "default_value": "",
+              "hint": "Comma separated list of saved models (.joblib) with their .manifest.json, paths relative to the project root."
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Registry name (single model only); empty = the model file name without .joblib."
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Short description of the model (purpose, data, limitations)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "ml_model",
+        "process": "retire_model",
+        "min_user_stratum": 4,
+        "title": "Retire registered models",
+        "label": "Sets the status of registered models to retired: they can no longer be applied by name. The record, metrics and frozen parameter sets are kept."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "model_array",
+              "parameter_type": "array",
+              "required": true,
+              "default_value": "",
+              "hint": "Comma separated list of registered model names."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

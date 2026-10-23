@@ -30,7 +30,7 @@ _UNITS_METADATA_KEY = b'ai4sh_indicator_units'
 
 # Any known machine learning preprocessing suffix at the end of a parquet stem (derived files)
 DERIVED_STEM_RE = re.compile(
-    r'_(?:ol|vt|ma|gf|sg|lw|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|snv|msc|l1|l2|max|l1snv|snvmsc|mc|as|ps|poi|pca\d+|(?:[\w-]+-)?(?:pms|rfe|tree))$'
+    r'_(?:pred|ol|vt|ma|gf|sg|lw|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|snv|msc|l1|l2|max|l1snv|snvmsc|mc|as|ps|poi|pca\d+|(?:[\w-]+-)?(?:pms|rfe|tree))$'
 )
 
 

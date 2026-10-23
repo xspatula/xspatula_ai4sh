@@ -1,0 +1,126 @@
+{
+  "process": [
+    {
+      "process": "add_root_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "ml_setting",
+        "title": "Machine learning parameter sets.",
+        "label": "Manage the machine learning parameter sets (raw, preset and custom) in the ml_setting schema."
+      }
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "ml_setting",
+        "process": "sync_indicator_parameter_sets",
+        "min_user_stratum": 4,
+        "title": "Create the per-indicator rows of the transformation and standardisation parameter sets and placeholder plot symbols",
+        "label": "For every indicator in observation_utility.indicator, write a row in each (not frozen) transformation / standardisation parameter set, with the value of the set template (by indicator name or alias) or linear / no standardisation, and a grey placeholder plot symbol for indicators without one. Runs automatically after manage_indicator."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "family_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Families to sync: transformation, standardisation, plot_symbol (empty = all three). plot_symbol adds a grey placeholder symbol (needs_review) for indicators without one."
+            },
+            {
+              "parameter": "rebuild",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Rewrite existing per-indicator rows from the set templates (false = only add rows for indicators that have none)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "ml_setting",
+        "process": "create_parameter_set",
+        "min_user_stratum": 4,
+        "title": "Create a custom parameter set",
+        "label": "Copies an existing parameter set (base_set), applies the changes in a settings JSON file and saves the result as a custom set. An existing custom name gets a new version; raw and preset names are reserved."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "family",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Family of the set: transformation, standardisation, chemometric, filter, multi_filter, selector, regressor, spectra_plot, plot_symbol, plot_layout."
+            },
+            {
+              "parameter": "name",
+              "parameter_type": "text",
+              "required": true,
+              "default_value": "",
+              "hint": "Name of the custom set (lowercase; not none or default, no @)."
+            },
+            {
+              "parameter": "base_set",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "standard",
+              "hint": "Set to start from: name[@version], default (= standard) or none."
+            },
+            {
+              "parameter": "settings_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "JSON file with the changes, same shape as the default settings files (e.g. {\"transformation\": {\"c-org\": {\"log\": true}}}); path relative to the project root. Empty = copy of the base set."
+            },
+            {
+              "parameter": "abstract",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Short description of the set (empty = based on <base set>)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "ml_setting",
+        "process": "list_parameter_sets",
+        "min_user_stratum": 1,
+        "title": "List the parameter sets",
+        "label": "Prints family, name, version, category, frozen, creator and abstract of the parameter sets."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "family",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Only list this family (empty = all)."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

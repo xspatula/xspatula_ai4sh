@@ -1,0 +1,150 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "transform",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE",
+          "abstract TEXT",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "transform",
+        "command": {
+          "columns": [
+            "id",
+            "name",
+            "abstract"
+          ],
+          "values": [
+            [
+              0,
+              "linear",
+              "no transformation"
+            ],
+            [
+              1,
+              "log",
+              "natural logarithm (values > 0)"
+            ],
+            [
+              2,
+              "sqrt",
+              "square root (values >= 0)"
+            ],
+            [
+              3,
+              "reciprocal",
+              "1/x (values != 0)"
+            ],
+            [
+              4,
+              "boxcox",
+              "Box-Cox power transformation, lambda fitted (values > 0)"
+            ],
+            [
+              5,
+              "yeojohnson",
+              "Yeo-Johnson power transformation, lambda fitted"
+            ],
+            [
+              6,
+              "quantile",
+              "quantile transformation to a normal distribution"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "parameter_set",
+        "command": [
+          "id SERIAL",
+          "family TEXT NOT NULL",
+          "name TEXT NOT NULL",
+          "version INTEGER NOT NULL DEFAULT 1",
+          "category TEXT NOT NULL CHECK (category IN ('raw', 'preset', 'custom'))",
+          "creator TEXT",
+          "created_at TIMESTAMP DEFAULT NOW()",
+          "abstract TEXT",
+          "frozen BOOLEAN NOT NULL DEFAULT FALSE",
+          "content JSONB",
+          "content_hash TEXT",
+          "UNIQUE (family, name, version)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "indicator_transformation",
+        "command": [
+          "id SERIAL",
+          "set_id INTEGER NOT NULL REFERENCES ml_setting.parameter_set (id) ON DELETE CASCADE",
+          "indicator_id INTEGER NOT NULL REFERENCES observation_utility.indicator (id)",
+          "transform_id INTEGER NOT NULL REFERENCES ml_setting.transform (id) DEFAULT 0",
+          "UNIQUE (set_id, indicator_id)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "indicator_standardisation",
+        "command": [
+          "id SERIAL",
+          "set_id INTEGER NOT NULL REFERENCES ml_setting.parameter_set (id) ON DELETE CASCADE",
+          "indicator_id INTEGER NOT NULL REFERENCES observation_utility.indicator (id)",
+          "standardise BOOLEAN NOT NULL DEFAULT FALSE",
+          "UNIQUE (set_id, indicator_id)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    }
+  ]
+}

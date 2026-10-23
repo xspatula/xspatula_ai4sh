@@ -51,11 +51,18 @@
               "hint": "The relative or absolute path to the univariate selector to apply, if set to none, no ward clustering will be applied even if the process is called. You have to define the ward clustering to apply and set the relative or absolute path to the ward_clustering.JSON file as the parameter."
             },
             {
+              "parameter": "test_size",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0.3,
+              "hint": "Fraction of the samples held out as test samples (hash of the sample id, the same holdout as regression_modeling). The bands are selected from the remaining training samples only. Must equal test_size of regression_modeling, otherwise the selection is flagged as made with test samples included. 0 = use all samples."
+            },
+            {
               "parameter": "colormap",
               "parameter_type": "text",
               "required": false,
-              "default_value": "jet",
-              "hint": "Name of the matplotlib colormap to use"
+              "default_value": "default",
+              "hint": "Colour ramp for plotting spectra: a matplotlib colormap name, or default = the spectra_plot parameter set (ml_setting, \"jet\")."
             }
           ]
         }

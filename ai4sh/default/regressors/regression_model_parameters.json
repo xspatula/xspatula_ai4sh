@@ -1,11 +1,13 @@
 {
   "ols": {
     "hyper_parameters": {
-      "fit_intercept": false
+      "fit_intercept": true
     }
   },
   "theil_sen": {
-    "hyper_parameters": {}
+    "hyper_parameters": {
+      "random_state": 42
+    }
   },
   "huber": {
     "hyper_parameters": {}
@@ -14,7 +16,9 @@
     "hyper_parameters": {}
   },
   "dectree": {
-    "hyper_parameters": {}
+    "hyper_parameters": {
+      "random_state": 42
+    }
   },
   "svr": {
     "hyper_parameters": {
@@ -25,7 +29,8 @@
   },
   "randfor": {
     "hyper_parameters": {
-      "n_estimators": 30
+      "n_estimators": 30,
+      "random_state": 42
     }
   },
   "mlp": {
@@ -36,10 +41,13 @@
       ],
       "max_iter": 200,
       "tol": 0.001,
-      "epsilon": 1e-8
+      "epsilon": 1e-08,
+      "random_state": 42
     }
   },
   "cubist": {
-    "hyper_parameters": {}
+    "hyper_parameters": {
+      "random_state": 42
+    }
   }
 }

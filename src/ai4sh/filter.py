@@ -12,6 +12,7 @@ from scipy.ndimage import convolve1d, gaussian_filter1d
 from scipy.signal import savgol_filter
 
 from src.ai4sh.project_paths import Default_fpn
+from src.ai4sh.ml_setting import Load_settings
 
 _DEFAULT_FILTER_DIR = Path(Default_fpn('filter'))
 
@@ -23,22 +24,18 @@ _FILTER_DEFAULT_FILES = {
 }
 
 
-def _load_filter_config(param):
+def _load_filter_config(param, family='filter'):
     '''Load filter config dict from param.
 
     param=None / "none" / "no" → None (no filtering).
-    param=filter-name           → load ai4sh/default/filter/<name>_default.json.
+    param=set name              → the filter (or multi_filter) parameter set of that name (ml_setting; file
+                                  default/filter/ until set up).
     param=path string           → load from that path.
     '''
-    if param is None or str(param).lower() in ('none', 'no', ''):
-        return None
-    name = str(param).lower()
-    if name in _FILTER_DEFAULT_FILES:
-        fp = _DEFAULT_FILTER_DIR / _FILTER_DEFAULT_FILES[name]
-    else:
-        fp = Path(param)
-    with open(fp) as fh:
-        return json.load(fh)
+    name = str(param).strip().lower() if param is not None else ''
+    default_fpn = str(_DEFAULT_FILTER_DIR / _FILTER_DEFAULT_FILES[name]) \
+        if family == 'filter' and name in _FILTER_DEFAULT_FILES else None
+    return Load_settings(family, param, default_fpn)
 
 
 def _lowess_1d(y, n_points):
