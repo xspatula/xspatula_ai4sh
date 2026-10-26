@@ -1,0 +1,14 @@
+{
+  "process": [
+    {
+      "process": "spectra_indicator_univariate_selection",
+      "parameters": {
+        "project_root_fp": "./project_lucas_2009/data",
+        "indicator_array": ["c-org","sand"],
+        "separate_selections": true,
+        "dataframe":"raw",
+        "univariate_selector_fp": "./project_lucas_2009/spectral_band_selector/univariate_selector_neospectra.json"
+      }
+    }
+  ]
+}

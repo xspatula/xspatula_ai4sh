@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process": "identify_indicator",
+      "overwrite": false,
+      "parameters": {
+        "dataset": "ai4sh",
+        "campaign": "",
+        "sampling_log": "",
+        "min_profile": 0,
+        "max_profile": 20,
+        "texture_class_array": [],
+        "texture_classification": "soil texture usda",
+        "juxtaposition_array": [],
+        "composition_array": [],
+        "proximity_array": [],
+        "sample_source": "",
+        "min_samples": 30
+      }
+    }
+  ]
+}

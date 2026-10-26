@@ -1,0 +1,22 @@
+{
+  "process": [
+    {
+      "process": "select_spectra_only",
+      "overwrite": false,
+      "parameters": {
+        "dataset": "ai4sh",
+        "campaign": "",
+        "sampling_log": "",
+        "min_profile": 0,
+        "max_profile": 20,
+        "spectra_provision": "neospectra",
+        "spectra_preparation_name": "ds2",
+        "begin_wavelength": 1350,
+        "end_wavelength": 2500,
+        "output_bandwidth": 10,
+        "output_spectra_signal": "reflectance",
+        "output_root_fp": "./project_neospectra/data"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "process": [
+    {
+      "process": "create_parameter_set",
+      "parameters": {
+        "family": "transformation",
+        "name": "ai4sh_log_carbon",
+        "base_set": "standard",
+        "settings_fp": "./project_neospectra/settings/transformation_log_carbon.json",
+        "abstract": "standard, with log-transformed organic and total carbon"
+      }
+    }
+  ]
+}
