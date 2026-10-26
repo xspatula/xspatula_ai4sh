@@ -1,0 +1,14 @@
+{
+  "process": [
+    {
+      "process": "register_model",
+      "parameters": {
+        "model_array": [
+          "./project_neospectra/data/neospectra/ai4sh_1350-2550_5/models/data-neospectra_1350-2550_5_tt/data-neospectra_1350-2550_5_c-org_ols_tt.joblib"
+        ],
+        "name": "",
+        "abstract": ""
+      }
+    }
+  ]
+}

@@ -194,4 +194,14 @@ machine_learning/spectra_univariate_indicator_selection_v10_sql.json
 
 machine_learning/regression_models_v10_sql.json
 
+machine_learning/predict_independent_v10_sql.json
+
 machine_learning/spectra_indicator_permutation_selection_v10_sql.json
+
+### MACHINE LEARNING SETTINGS ###
+
+ml_setting/ml_setting_v10_sql.json
+
+### MACHINE LEARNING MODEL REGISTRY ###
+
+ml_model/ml_model_v10_sql.json

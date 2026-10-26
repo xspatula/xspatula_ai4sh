@@ -26,6 +26,7 @@ from os import path
 
 # Third-party imports
 from psycopg2 import sql as pgsql
+from psycopg2.extras import Json
 
 # Package application imports
 
@@ -40,6 +41,17 @@ _LIB_SETUP_DIR = path.dirname(path.abspath(__file__))
 REVOKE_D = Read_json(path.join(_LIB_SETUP_DIR, 'revoke_privileges.json'))
 
 ROLES_D = Read_json(path.join(_LIB_SETUP_DIR, 'roles_grants.json'))
+
+def _Unstruct(value):
+    '''Plain dicts/lists from Struct-wrapped JSON (the process parameters are Struct objects).'''
+
+    if isinstance(value, Struct):
+        return {k: _Unstruct(v) for k, v in vars(value).items()}
+
+    if isinstance(value, (list, tuple)):
+        return [_Unstruct(v) for v in value]
+
+    return value
 
 class parameter():
     """
@@ -787,6 +799,8 @@ class PG_session:
 
         TEXT_TYPES = {'text', 'character varying', 'character'}
 
+        JSON_TYPES = {'json', 'jsonb'}
+
         text_unique_cols = {col for col in unique_cols if col_types.get(col) in TEXT_TYPES}
 
         for values in valueL:
@@ -872,6 +886,12 @@ class PG_session:
             insert_values = [
                 v.lower() if (isinstance(v, str) and columns[i].lower().strip() in text_unique_cols) else v
                 for i, v in enumerate(values)
+            ]
+
+            # JSON objects/arrays given for json/jsonb columns (e.g. ml_setting.parameter_set.content)
+            insert_values = [
+                Json(_Unstruct(v)) if (isinstance(v, (Struct, dict, list)) and col_types.get(columns[i].lower().strip()) in JSON_TYPES) else v
+                for i, v in enumerate(insert_values)
             ]
 
             if self.verbose > 1:
@@ -1536,7 +1556,6 @@ def Setup_schemas_tables(scheme_params_D, pilot_L):
 
     # To delete the complete database, open a session with the database source and delete
 
-    print (user_parameter)
 
     if user_parameter['process'][0]['process_id'] == 'delete_database' and user_parameter['process'][0]['delete']:
 

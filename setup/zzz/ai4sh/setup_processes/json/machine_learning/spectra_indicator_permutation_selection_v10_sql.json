@@ -50,7 +50,6 @@
               "default_value": "",
               "hint": "Comma separated list of the regressor to apply, valid entries: ols, theilsen, huber, knn, detree, svr, mlp, cubist, plsr."
             },
-
             {
               "parameter": "selector_parameters",
               "parameter_type": "text",
@@ -79,13 +78,19 @@
               "default_value": 0,
               "hint": "Maximum number of features to show in the selector bar plot. 0 = show all. Y-axis labels are suppressed when showing more than 40 features."
             },
-
+            {
+              "parameter": "test_size",
+              "parameter_type": "float",
+              "required": false,
+              "default_value": 0.3,
+              "hint": "Fraction of the samples held out as test samples (hash of the sample id, the same holdout as regression_modeling). The bands are selected from the remaining training samples only. Must equal test_size of regression_modeling, otherwise the selection is flagged as made with test samples included. 0 = use all samples."
+            },
             {
               "parameter": "colormap",
               "parameter_type": "text",
               "required": false,
-              "default_value": "jet",
-              "hint": "Name of the matplotlib colormap to use"
+              "default_value": "default",
+              "hint": "Colour ramp for plotting spectra: a matplotlib colormap name, or default = the spectra_plot parameter set (ml_setting, \"jet\")."
             }
           ]
         }

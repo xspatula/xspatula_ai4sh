@@ -21,6 +21,9 @@ records are the history of all dataframes created in the directory, oldest first
 Entries may carry the keys indicator, regressor and selector (None when the dataframe is shared by all),
 used by the array processes of machine_learning_preprocess to find one dataframe per combination.
 
+Each record also carries "provenance" (see src/ai4sh/provenance.py): the process parameters, the path, sha256
+and content of every settings file the process loaded, and the software versions.
+
 Files written before the history format (a single record, no "history" key) are read as a one-record history.
 '''
 
@@ -29,6 +32,8 @@ import os
 import json
 
 from datetime import datetime
+
+from src.ai4sh.provenance import Provenance_snapshot
 
 PREVIOUS_DF_FN = '.previous_dataframe'
 
@@ -71,14 +76,14 @@ def Read_previous_df(directory):
 
 
 def Write_previous_df(directory, process_name, entries, note=''):
-    '''Append a record {process, created_at, note, entries} to .previous_dataframe of directory.
+    '''Append a record {process, created_at, note, entries, provenance} to .previous_dataframe of directory.
 
     entries: list of dicts with at least 'dataframe' (file name relative to directory).
     '''
     history = Read_previous_history(directory)
 
     history.append({'process': process_name, 'created_at': datetime.now().isoformat(timespec='seconds'),
-                    'note': note, 'entries': entries})
+                    'note': note, 'entries': entries, 'provenance': Provenance_snapshot()})
 
     with open(Previous_df_path(directory), 'w') as fh:
         json.dump({'history': history}, fh, indent=2)

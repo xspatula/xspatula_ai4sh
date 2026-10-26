@@ -15,8 +15,15 @@ from src.ai4sh.select import Process_select
 
 from src.ai4sh.machine_learning_preprocess import Process_ml_preprocess
 from src.ai4sh.machine_learning_model import Process_regression_model
+from src.ai4sh.machine_learning_predict import Process_predict
 
 from src.ai4sh.pandas_df_management import Process_pandas
+
+from src.ai4sh.provenance import Begin_provenance
+
+from src.ai4sh.ml_setting import Set_settings_session, Process_ml_setting, Fill_new_indicators
+
+from src.ai4sh.ml_model import Process_ml_model
 
 from src.lib.login import Get_set_database_session
 
@@ -35,6 +42,12 @@ def Run_process(structured_process_D, scheme_params_D):
     if not user_status_D:
 
         return None
+
+    # Parameter sets (ml_setting schema) are read with the same session
+    Set_settings_session(pg_session_C)
+
+    # Set when a process inserts indicators: they get their ml settings after the last process
+    new_indicators = False
     
     print ('\n########### STARTING PROCESSES ########### \n')
     
@@ -68,6 +81,12 @@ def Run_process(structured_process_D, scheme_params_D):
                 continue
         
             root_process = process_S.process.root_process
+
+            if 'manage_indicator' in (process_S.process.process, getattr(process_S.process.parameters, 'process', None)):
+
+                new_indicators = new_indicators or not process_S.process.delete
+
+            Begin_provenance(process_S, key)
 
             if process_S.process.verbose > 0:
 
@@ -131,9 +150,24 @@ def Run_process(structured_process_D, scheme_params_D):
                 if process_S.process.process == 'regression_modeling':
                     model_C = Process_regression_model(process_S, pg_session_C, scheme_params_D['project_root_FP'])
                     model_C._Sub_process(key)
+                elif process_S.process.process == 'predict_independent':
+                    predict_C = Process_predict(process_S, pg_session_C, scheme_params_D['project_root_FP'])
+                    predict_C._Sub_process(key)
                 else:
                     ml_C = Process_ml_preprocess(process_S, pg_session_C, scheme_params_D['project_root_FP'])
                     ml_C._Sub_process(key)
+
+            elif root_process == 'ml_setting':
+
+                setting_C = Process_ml_setting(process_S, pg_session_C, scheme_params_D['project_root_FP'])
+
+                setting_C._Sub_process(key)
+
+            elif root_process == 'ml_model':
+
+                registry_C = Process_ml_model(process_S, pg_session_C, scheme_params_D['project_root_FP'])
+
+                registry_C._Sub_process(key)
 
             elif root_process == 'pandas':
 
@@ -151,6 +185,10 @@ def Run_process(structured_process_D, scheme_params_D):
                 Log(error_msg)
 
                 return
+
+    if new_indicators and pg_session_C is not None:
+
+        Fill_new_indicators(pg_session_C, scheme_params_D['process'][0]['verbose'])
 
     if pg_session_C is not None:
 

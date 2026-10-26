@@ -1,0 +1,109 @@
+{
+  "process": [
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_model",
+        "table": "model",
+        "command": [
+          "id SERIAL",
+          "name TEXT UNIQUE NOT NULL",
+          "indicator_id INTEGER NOT NULL REFERENCES observation_utility.indicator (id)",
+          "regressor TEXT NOT NULL",
+          "mode TEXT NOT NULL",
+          "signal_type TEXT",
+          "n_bands INTEGER",
+          "n_train INTEGER",
+          "n_test INTEGER",
+          "model_fp TEXT NOT NULL",
+          "model_sha256 TEXT UNIQUE NOT NULL",
+          "source_parquet TEXT",
+          "source_sha256 TEXT",
+          "manifest JSONB NOT NULL",
+          "status TEXT NOT NULL DEFAULT 'registered' CHECK (status IN ('registered', 'retired'))",
+          "abstract TEXT",
+          "registered_by TEXT NOT NULL DEFAULT current_user",
+          "registered_at TIMESTAMP NOT NULL DEFAULT now()",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_model",
+        "table": "model_step",
+        "command": [
+          "id SERIAL",
+          "model_id INTEGER NOT NULL REFERENCES ml_model.model (id) ON DELETE CASCADE",
+          "step_no INTEGER NOT NULL",
+          "step_id TEXT",
+          "process TEXT NOT NULL",
+          "parameters JSONB",
+          "UNIQUE (model_id, step_no)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_model",
+        "table": "model_parameter_set",
+        "command": [
+          "id SERIAL",
+          "model_id INTEGER NOT NULL REFERENCES ml_model.model (id) ON DELETE CASCADE",
+          "set_id INTEGER NOT NULL REFERENCES ml_setting.parameter_set (id)",
+          "used_by TEXT NOT NULL",
+          "UNIQUE (model_id, set_id, used_by)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    },
+    {
+      "process_id": "create_table",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_model",
+        "table": "model_metric",
+        "command": [
+          "id SERIAL",
+          "model_id INTEGER NOT NULL REFERENCES ml_model.model (id) ON DELETE CASCADE",
+          "dataset TEXT NOT NULL",
+          "metric TEXT NOT NULL",
+          "value DOUBLE PRECISION",
+          "n INTEGER",
+          "UNIQUE (model_id, dataset, metric)",
+          "PRIMARY KEY (id)"
+        ]
+      },
+      "audit": {
+        "INSERT": true,
+        "UPDATE": true,
+        "DELETE": true
+      }
+    }
+  ]
+}

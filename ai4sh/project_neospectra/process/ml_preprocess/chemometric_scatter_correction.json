@@ -1,0 +1,12 @@
+{
+  "process": [
+    {
+      "process": "spectra_scatter_correction",
+      "parameters": {
+        "project_root_fp": "./project_lucas_2009/data/compiled/lucas_2009_10nm",
+        "dataframe":"raw",
+        "scaler": ["snv","snv"]
+      }
+    }
+  ]
+}

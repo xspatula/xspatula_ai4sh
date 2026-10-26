@@ -1,0 +1,18 @@
+{
+  "process": [
+    {
+      "process": "regression_modeling",
+      "overwrite": true,
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/compiled/neospectra_10nm",
+        "dataframe": "previous",
+        "indicator_array": ["c-org","n-tot"],
+        "regressor_array": ["ols","huber"],
+        "model_parameters_fp":"./project_neospectra/regressors/regression_model_parameters.json",
+        "traintest": true,
+        "test_size": 0.3,
+        "kfold": false
+      }
+    }
+  ]
+}

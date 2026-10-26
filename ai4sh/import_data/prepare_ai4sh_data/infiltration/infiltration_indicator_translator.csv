@@ -1,0 +1,29 @@
+source_columns,xspatula_column
+Porosity(%),@porspace
+Final_infiltration_rate(m/day),@final infiltration rate
+Sorptivity(m/day1/2),@sorptivity
+Saturated_hydraulic_conductivity(m/day),@saturated hydraulic conductivity
+Field_capacity,@field capacity
+Plant_available_water,@plant available water
+Theta_sat,@theta sat
+hg,@hg water pressure head scale parameter
+n,@n shape parameter of retention curve
+m,@m shape parameter of retention curve
+accumulative_volume_in_1000s(cm),@accumulative infiltration 1000s
+accumulative_volume_in_100s(cm),@accumulative infiltration 100s
+Suction_m/sqrt(day)],@soil water tension
+gravity_rate_[m/day],@gravitational water rate
+"Clay(<0,002 mm)",@clay (<0.002 mm)
+"Silt(0,002-0,06 mm)",@silt (0.002-0.06 mm)
+"Sand(0,06 - 2,0 mm)",@sand (0.06-2.0 mm)
+TOC(%),@c-org
+Bulk_Density(g/cm3),@bulk density
+Initial_water_content(v/v),
+Final_water_content(v/v),
+Saturation,
+Land_use,
+Category,
+Number_of_points,
+Accumulative_time_in_experiment_[sec],
+Infinity,
+Note,

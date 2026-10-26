@@ -1,0 +1,19 @@
+{
+  "process": [
+    {
+      "process": "spectra_scaling",
+      "parameters": {
+        "project_root_fp": "./project_lucas_2009/data/compiled/lucas_2009_wetlab_foss-xds_10nm",
+      }
+    },
+    {
+      "process": "spectra_scatter_correction",
+      "parameters": {
+        "project_root_fp": "./project_lucas_2009/data/compiled/lucas_2009_wetlab_foss-xds_10nm",
+        "scaler": [
+          "snv"
+        ]
+      }
+    }
+  ]
+}

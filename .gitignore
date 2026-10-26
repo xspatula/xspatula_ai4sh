@@ -171,3 +171,6 @@ setup/zzz/ai4sh/setup_db/db_audit.txt
 
 # Exception: utility reference tables are not sensitive - track them
 !ai4sh/import_data/utility/**/*.xlsx
+
+# Raw partner lab results (Digit Soil EEA/enzymes) - not for a public repo
+ai4sh/import_data/digit_soil/analys-suelo/

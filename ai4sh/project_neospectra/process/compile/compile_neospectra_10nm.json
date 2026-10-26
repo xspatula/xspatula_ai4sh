@@ -1,0 +1,16 @@
+{
+  "process": [
+    {
+      "process": "compile_dataset",
+      "overwrite": false,
+      "parameters": {
+        "input_array": [
+          "./project_neospectra/data/indicator/ai4sh/cec-clay-ca2-ec-n-tot-c-org-ph-water_0-20.parquet",
+          "./project_neospectra/data/spectra/neospectra/ds2/ai4sh/1350-2500_10.parquet"
+        ],
+        "output_root_fp": "./project_neospectra/data",
+        "output_name": "neospectra_10nm"
+      }
+    }
+  ]
+}

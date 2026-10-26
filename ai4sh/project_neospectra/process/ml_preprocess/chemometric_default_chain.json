@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "process": "chemometric_default",
+      "parameters": {
+        "project_root_fp": "./project_lucas_2009/data/compiled/lucas_2009_10nm",
+        "dataframe":"raw",
+        "chemometrics": "default",
+        "chemometrics_array": ["meancentring","scatter_correction","decomposition"]
+      }
+    }
+  ]
+}

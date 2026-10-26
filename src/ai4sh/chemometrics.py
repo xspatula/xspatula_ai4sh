@@ -10,9 +10,10 @@ import json
 import numpy as np
 import pandas as pd
 from scipy.stats import boxcox
-from sklearn.preprocessing import PowerTransformer, QuantileTransformer, StandardScaler, normalize
+from sklearn.preprocessing import PowerTransformer, QuantileTransformer, normalize
 from sklearn.decomposition import PCA
 from src.ai4sh.project_paths import Default_fpn
+from src.ai4sh.ml_setting import Load_settings
 
 _DEFAULT_STANDARDISE_FPN = Default_fpn('transform', 'indicator_standardise_default.json')
 
@@ -21,28 +22,24 @@ _DEFAULT_TRANSFORMATION_FPN = Default_fpn('transform', 'indicator_transformation
 _DEFAULT_CHEMOMETRIC_FPN = Default_fpn('chemometric', 'chemometric_default.json')
 
 
-def _load_transform_config(param, default_fpn, verbose):
-    if not param or str(param).strip().lower() == 'none':
-        return None
-    fpn = default_fpn if str(param).strip().lower() == 'default' else str(param).strip()
-    if not os.path.exists(fpn):
+def _load_transform_config(param, default_fpn, verbose, family='transformation'):
+    '''param: none | default | parameter set name (ml_setting) | path to a transformation / standardise JSON.'''
+    try:
+        return Load_settings(family, param, default_fpn, verbose=verbose)
+    except FileNotFoundError as e:
         if verbose >= 1:
-            print('    Warning: transform config not found: %s' % fpn)
+            print('    Warning: %s' % e)
         return None
-    with open(fpn) as f:
-        return json.load(f)
 
 
 def _load_chemometric_config(param, verbose=0):
-    if not param or str(param).strip().lower() == 'none':
-        return {}
-    fpn = _DEFAULT_CHEMOMETRIC_FPN if str(param).strip().lower() == 'default' else str(param).strip()
-    if not os.path.exists(fpn):
+    '''param: none | default | parameter set name (ml_setting) | path to a chemometric JSON.'''
+    try:
+        return Load_settings('chemometric', param, _DEFAULT_CHEMOMETRIC_FPN, verbose=verbose) or {}
+    except FileNotFoundError as e:
         if verbose >= 1:
-            print('    Warning: chemometric config not found: %s' % fpn)
+            print('    Warning: %s' % e)
         return {}
-    with open(fpn) as f:
-        return json.load(f)
 
 
 def _snv(X):
@@ -82,7 +79,7 @@ def _Mask_outside_domain(series, outside, col, transform, condition):
 def apply_transformations(df, indicators, param, verbose=0):
     '''Apply per-indicator transformations to a copy of df.
 
-    param: 'default' | 'none' | path to transformation JSON
+    param: 'default' | 'none' | parameter set name | path to transformation JSON
     Returns (df_out, transform_dict) where transform_dict[col] names the applied transform.
     '''
     transform_dict = {col: 'linear' for col in indicators}
@@ -152,12 +149,12 @@ def apply_transformations(df, indicators, param, verbose=0):
 def apply_standardisation(df, indicators, param, verbose=0):
     '''Apply z-score standardisation to a copy of df for selected indicators.
 
-    param: 'default' | 'none' | path to standardisation JSON
+    param: 'default' | 'none' | parameter set name | path to standardisation JSON
     Returns (df_out, standard_dict) where standard_dict[col] is a stats dict or 'none'.
     '''
     standard_dict = {col: 'none' for col in indicators}
 
-    raw = _load_transform_config(param, _DEFAULT_STANDARDISE_FPN, verbose)
+    raw = _load_transform_config(param, _DEFAULT_STANDARDISE_FPN, verbose, 'standardisation')
     if raw is None:
         return df.copy(), standard_dict
 
@@ -199,7 +196,7 @@ def apply_derivative(df, columns, cfg):
     Columns must be numeric wavelengths (int) or 'd<int>' strings from a prior derivative step.
     Returns (df_out, columns_out, label).
     '''
-    derive = int(cfg.get('derive', 1))
+    derive = int(cfg.get('derivative', cfg.get('derive', 1)))
     if derive == 0:
         return df[columns].copy(), list(columns), 'raw'
 
@@ -246,6 +243,33 @@ def apply_scatter_correction(df, columns, cfg):
     return work, list(columns), '+'.join(scalers)
 
 
+def Scaling_parameters(X, method):
+    '''Return (mean, scale) per band for a spectral scaling method; scaled = (X - mean) / scale.
+
+    meancentring: mean, 1 | autoscaling: mean, std | paretoscaling: mean, sqrt(std) |
+    poissonscaling: 0, sqrt(mean) | anything else: 0, 1. A zero scale is set to 1.
+    '''
+    X = np.asarray(X, dtype=float)
+    mean = X.mean(axis=0)
+    std = X.std(axis=0)
+    ones = np.ones(X.shape[1])
+
+    if method == 'meancentring':
+        center, scale = mean, ones
+    elif method == 'autoscaling':
+        center, scale = mean, std
+    elif method == 'paretoscaling':
+        center, scale = mean, np.sqrt(std)
+    elif method == 'poissonscaling':
+        # Divides each band by sqrt of its mean — Poisson noise model
+        center, scale = np.zeros(X.shape[1]), np.sqrt(mean)
+    else:
+        center, scale = np.zeros(X.shape[1]), ones
+
+    scale = np.where((scale == 0) | ~np.isfinite(scale), 1.0, scale)
+    return center, scale
+
+
 def apply_scaling(df, columns, cfg):
     '''Apply one scaling method to spectral DataFrame.
 
@@ -254,31 +278,9 @@ def apply_scaling(df, columns, cfg):
     '''
     method = cfg.get('method', 'meancentring')
     X = df[columns].values.astype(float)
+    center, scale = Scaling_parameters(X, method)
 
-    if method == 'meancentring':
-        X_out = StandardScaler(with_std=False).fit_transform(X)
-
-    elif method == 'autoscaling':
-        X_out = StandardScaler().fit_transform(X)
-
-    elif method == 'paretoscaling':
-        scaler = StandardScaler().fit(X)
-        scaler.mean_ = np.zeros(X.shape[1])
-        scaler.var_ = np.sqrt(scaler.var_)
-        scaler.scale_ = np.sqrt(scaler.var_)
-        X_out = scaler.transform(X)
-
-    elif method == 'poissonscaling':
-        # Divides each band by sqrt of its mean — Poisson noise model
-        scaler = StandardScaler(with_mean=False).fit(X)
-        scaler.var_ = scaler.mean_.copy()
-        scaler.scale_ = np.sqrt(scaler.var_)
-        X_out = scaler.transform(X)
-
-    else:
-        X_out = X.copy()
-
-    df_out = pd.DataFrame(data=X_out, columns=columns, index=df.index)
+    df_out = pd.DataFrame(data=(X - center) / scale, columns=columns, index=df.index)
     return df_out, list(columns), method
 
 
@@ -308,7 +310,7 @@ def apply_decomposition(df, columns, cfg):
 
 
 _CHEMOMETRIC_FUNCS = {
-    'derivative': (apply_derivative, 'derivatives'),
+    'derivative': (apply_derivative, 'derivative'),
     'scatter_correction': (apply_scatter_correction, 'scatter_correction'),
     'scaling': (apply_scaling, 'scaling'),
     'decomposition': (apply_decomposition, 'decomposition'),

@@ -1,0 +1,12 @@
+{
+  "process": [
+    {
+      "process": "spectra_scaling",
+      "parameters": {
+        "project_root_fp": "./project_lucas_2009/data/compiled/lucas_2009_10nm",
+        "dataframe":"lucas_2009_10nm_sg_wc",
+        "method": "meancentring"
+      }
+    }
+  ]
+}

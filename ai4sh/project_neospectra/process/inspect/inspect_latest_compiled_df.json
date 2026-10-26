@@ -1,0 +1,13 @@
+{
+  "process": [
+    {
+      "process": "inspect_pandas_dataset",
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/compiled/neospectra_10nm",
+        "parquet_file": "",
+        "column_array": "",
+        "max_rows": 10
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "process": [
+    {
+      "process": "retire_model",
+      "parameters": {
+        "model_array": []
+      }
+    }
+  ]
+}

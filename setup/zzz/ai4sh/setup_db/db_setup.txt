@@ -399,3 +399,23 @@ landscape/observation_lucc_v10_sql.json
 # observation_biogeo16 contains the table for:
 # - biogeo16 observation
 landscape/observation_biogeo16_v10_sql.json
+
+###===========================================###
+### MACHINE LEARNING SETTINGS ###
+###===========================================###
+# Parameter sets (raw / preset / custom) for indicator transformation and standardisation, filters,
+# chemometrics, band selectors, regressors and plotting. Requires observation_utility.indicator.
+# Per-indicator rows are created by the process sync_indicator_parameter_sets after indicators are inserted.
+ml_setting/ml_setting_v10_sql.json
+
+ml_setting/ml_setting_records_v10_sql.json
+
+# Frozen parameter sets (used by a registered model) can not be changed or deleted; edits = new version
+ml_setting/ml_setting_frozen_v10_sql.json
+
+###===========================================###
+### MACHINE LEARNING MODEL REGISTRY ###
+###===========================================###
+# Registered (final) models: path + sha256 of the saved pipeline, manifest, preprocessing steps,
+# parameter sets used (frozen on registration) and metrics. Written by the process register_model.
+ml_model/ml_model_v10_sql.json

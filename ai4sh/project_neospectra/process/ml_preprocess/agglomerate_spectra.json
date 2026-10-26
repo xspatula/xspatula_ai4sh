@@ -1,0 +1,12 @@
+{
+  "process": [
+    {
+      "process": "ward_clustering",
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/compiled/neospectra_10nm",
+        "dataframe":"",
+        "ward_clustering_fp": "./project_neospectra/agglomeration/ward_clustering_neospectra.json"
+      }
+    }
+  ]
+}

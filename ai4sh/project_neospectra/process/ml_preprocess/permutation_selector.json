@@ -1,0 +1,17 @@
+{
+  "process": [
+    {
+      "process": "spectra_indicator_permutation_selection",
+      "parameters": {
+        "project_root_fp": "./project_lucas_2009/data/compiled/lucas_2009_10nm",
+        "dataframe":"raw",
+        "indicator_array": ["c-org","sand"],
+        "selector_array": ["permutation","rfe"],
+        "regressor_array": ["knn"],
+        "model_parameters_fp":"default",
+        "separate_selections": true,
+        "n_top_features_in_plot": 16
+      }
+    }
+  ]
+}

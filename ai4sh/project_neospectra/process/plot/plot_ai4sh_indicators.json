@@ -1,0 +1,26 @@
+{
+  "process": [
+    {
+      "process": "plot_indicators",
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/indicator/ai4sh",
+        "indicator_array": [
+          "cec",
+          "clay",
+          "c-org",
+          "n-tot",
+          "ph-water"
+        ],
+        "targetfeaturesymbols": "default",
+        "standardisation": "default",
+        "transformation": "default",
+        "single_canvas_plot": true,
+        "individual_canvas_plot": false,
+        "boxplot": true,
+        "histogram": true,
+        "show": true,
+        "save": true
+      }
+    }
+  ]
+}
