@@ -77,6 +77,10 @@ def _parse_array_param(raw):
     return [x.strip() for x in s.split(',') if x.strip()]
 
 
+# Options offered by scaler/method "select": per-spectrum scatter corrections and band-wise variable scalings
+SCATTER_CORRECTIONS = ['l1', 'l2', 'max', 'snv', 'msc']
+VARIABLE_SCALINGS   = ['meancentring', 'autoscaling', 'paretoscaling', 'poissonscaling']
+
 # Regex matching any known preprocessing suffix at the end of a parquet stem.
 _DERIVED_RE = DERIVED_STEM_RE
 
@@ -2165,15 +2169,51 @@ class Process_ml_preprocess(Get_schema_table):
             inp['units_D'],
         )
 
+    def _Select_method(self, inp, kind, options, apply_fn):
+        '''Plot raw + every option stacked, ask 0..n for the one to apply.
+
+        options: list of (option, label); apply_fn(option) → (spec_out, cols_out, label).
+        Returns (option, spec_out, cols_out, label), or None for 0 = none.
+        '''
+        steps, results = [('raw', inp['spec_df'], inp['wavelengths'])], []
+        for opt, label in options:
+            spec_out, cols_out, lab = apply_fn(opt)
+            steps.append(('%d: %s' % (len(results) + 1, label), spec_out, cols_out))
+            results.append((opt, spec_out, cols_out, lab))
+        self._Plot_chem_chain(steps, inp['max_spectra'], inp['colormap'], inp['ann'],
+                              inp['show'], inp['save'], inp['plot_dir'],
+                              'compare_%s.png' % kind.replace(' ', '_'))
+        menu = ', '.join('%d = %s' % (i + 1, label) for i, (_, label) in enumerate(options))
+        while True:
+            raw = input('\n    %s to apply (0 = none, %s): ' % (kind.capitalize(), menu)).strip()
+            if raw.isdigit() and 0 <= int(raw) <= len(options):
+                break
+            print('    Enter a number 0-%d.' % len(options))
+        if raw == '0':
+            print('    No %s applied.' % kind)
+            return None
+        return results[int(raw) - 1]
+
     def _Spectra_scatter_correction(self):
+        '''Scatter correction per spectrum (l1, l2, max, snv, msc); scaler "select" compares all and asks.'''
         p   = self.process_S.process.parameters
         inp = self._Load_spec_inputs(p)
         if inp is None:
             return
 
         scalers = _parse_array_param(getattr(p, 'scaler', ['snv']))
-        spec_out, cols_out, label = apply_scatter_correction(
-            inp['spec_df'], inp['wavelengths'], {'scaler': scalers})
+        apply_fn = lambda sc: apply_scatter_correction(inp['spec_df'], inp['wavelengths'],
+                                                       {'scaler': sc if isinstance(sc, list) else [sc]})
+        confirm = True
+        if scalers == ['select']:
+            picked = self._Select_method(inp, 'scatter correction',
+                                         [(sc, sc) for sc in SCATTER_CORRECTIONS], apply_fn)
+            if picked is None:
+                return
+            sc, spec_out, cols_out, label = picked
+            scalers, confirm = [sc], False
+        else:
+            spec_out, cols_out, label = apply_fn(scalers)
 
         sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
         sub_out, _,      _       = self._Sub_spec(spec_out,       inp['max_spectra'], inp['colormap'])
@@ -2191,18 +2231,28 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_scatter_correction',
              'parameters': {'scaler': scalers}},
-            inp['units_D'],
+            inp['units_D'], confirm=confirm,
         )
 
     def _Spectra_scaling(self):
+        '''Variable (band-wise) scaling; method "select" compares all four and asks.'''
         p   = self.process_S.process.parameters
         inp = self._Load_spec_inputs(p)
         if inp is None:
             return
 
-        method = str(getattr(p, 'method', 'meancentring')).strip()
-        spec_out, cols_out, label = apply_scaling(
-            inp['spec_df'], inp['wavelengths'], {'method': method})
+        method   = str(getattr(p, 'method', 'meancentring')).strip()
+        apply_fn = lambda m: apply_scaling(inp['spec_df'], inp['wavelengths'], {'method': m})
+        confirm  = True
+        if method == 'select':
+            picked = self._Select_method(inp, 'variable scaling',
+                                         [(m, m) for m in VARIABLE_SCALINGS], apply_fn)
+            if picked is None:
+                return
+            method, spec_out, cols_out, label = picked
+            confirm = False
+        else:
+            spec_out, cols_out, label = apply_fn(method)
 
         sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
         sub_out, _,      _       = self._Sub_spec(spec_out,       inp['max_spectra'], inp['colormap'])
@@ -2212,7 +2262,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         self._Plot_input_output(
             sub_in, sub_out, inp['wavelengths'], cols_out, colors,
-            'Input spectra', 'Scaling: %s' % method,
+            'Input spectra', 'Variable scaling: %s' % method,
             ann_shown, inp['show'], inp['save'], inp['plot_dir'],
             'chemometric_%s.png' % abbrev,
         )
@@ -2221,7 +2271,7 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_scaling',
              'parameters': {'method': method}},
-            inp['units_D'],
+            inp['units_D'], confirm=confirm,
         )
 
     def _Spectra_decomposition(self):

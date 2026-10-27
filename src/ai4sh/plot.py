@@ -107,13 +107,16 @@ class Process_plot(Get_schema_table):
 
             self._Plot_spectra()
 
-        elif self.process_S.process.process == 'plot_spectra_scattercorrection_scalers':
+        # Old names (renamed 2026-10-27) kept as aliases
+        elif self.process_S.process.process in ('plot_spectra_scatter_correction',
+                                                'plot_spectra_scattercorrection_scalers'):
 
-            self._Plot_spectra_scattercorrection_scalers()
+            self._Plot_spectra_scatter_correction()
 
-        elif self.process_S.process.process == 'plot_spectra_scaling_methods':
+        elif self.process_S.process.process in ('plot_spectra_variable_scaling',
+                                                'plot_spectra_scaling_methods'):
 
-            self._Plot_spectra_scaling_methods()
+            self._Plot_spectra_variable_scaling()
 
     # ------------------------------------------------------------------
     # Helpers
@@ -904,8 +907,8 @@ class Process_plot(Get_schema_table):
 
         plt.close(fig)
 
-    def _Plot_spectra_scattercorrection_scalers(self):
-        '''Compare all scatter correction methods in a stacked multiplot.'''
+    def _Plot_spectra_scatter_correction(self):
+        '''Compare all scatter corrections (per spectrum: l1, l2, max, snv, msc) in a stacked multiplot.'''
         p = self.process_S.process.parameters
         spec_df, wavelengths, colors, ann, _, show, save, plot_dir = self._Load_spec_df(p)
         if spec_df is None:
@@ -926,11 +929,11 @@ class Process_plot(Get_schema_table):
         self._Plot_spectra_comparison(
             panels, colors, ann,
             title='Scatter correction comparison',
-            filename_stem='compare_scattercorrection',
+            filename_stem='compare_scatter_correction',
             show=show, save=save, plot_dir=plot_dir)
 
-    def _Plot_spectra_scaling_methods(self):
-        '''Compare all scaling methods in a stacked multiplot.'''
+    def _Plot_spectra_variable_scaling(self):
+        '''Compare all variable (band-wise) scaling methods in a stacked multiplot.'''
         p = self.process_S.process.parameters
         spec_df, wavelengths, colors, ann, _, show, save, plot_dir = self._Load_spec_df(p)
         if spec_df is None:
@@ -952,6 +955,6 @@ class Process_plot(Get_schema_table):
 
         self._Plot_spectra_comparison(
             panels, colors, ann,
-            title='Scaling method comparison',
-            filename_stem='compare_scaling',
+            title='Variable scaling comparison',
+            filename_stem='compare_variable_scaling',
             show=show, save=save, plot_dir=plot_dir)

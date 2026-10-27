@@ -2,13 +2,13 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
         "process": "chemometric_default",
         "min_user_stratum": 3,
-        "title": "Chemometric deault chain of processes",
-        "label": "Convert spectra to derivates and either append to or replace the original bands in the dataframe."
+        "title": "Chemometric default chain of processes",
+        "label": "Run a sequence of chemometric steps (e.g. scatter correction, derivative, variable scaling, decomposition) in one go and save the result with the full preprocessing chain."
       },
       "nodes": [
         {
@@ -110,13 +110,13 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
         "process": "spectra_scatter_correction",
         "min_user_stratum": 3,
         "title": "Scatter correction of spectral data",
-        "label": "Run a single or sequence of scatter correction to remove noise from spectral signals."
+        "label": "Run a single or a sequence of scatter corrections. Scatter correction works per spectrum and removes additive and multiplicative effects of light scattering (particle size, packing, path length)."
       },
       "nodes": [
         {
@@ -144,7 +144,7 @@
               "default_value": [
                 "snv"
               ],
-              "hint": "Scaler, or array of 2 scalers to apply for scatter correction."
+              "hint": "Scatter correction, or array of 2 to apply in sequence. Available options: l1, l2, max, snv, msc; or select = plot all and choose interactively which one to apply."
             },
             {
               "parameter": "colormap",
@@ -159,13 +159,13 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
         "process": "spectra_scaling",
         "min_user_stratum": 3,
-        "title": "Scaling of spectral data",
-        "label": "Run a scaling algroithm for leveling the spectral signals."
+        "title": "Variable scaling of spectral data",
+        "label": "Run a variable scaling: every band (variable) is centred and/or scaled across all samples, to balance the influence of the bands in the modelling."
       },
       "nodes": [
         {
@@ -191,7 +191,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "meancentring",
-              "hint": "Available options: meancentring, autoscaling, paretoscaling, poissonscaling."
+              "hint": "Available options: meancentring, autoscaling, paretoscaling, poissonscaling; or select = plot all and choose interactively which one to apply."
             },
             {
               "parameter": "colormap",
@@ -206,13 +206,13 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
         "process": "spectra_decomposition",
         "min_user_stratum": 3,
         "title": "Decomposition of spectral data",
-        "label": "Run a decomposition for compressing the information of spectral signals.."
+        "label": "Run a decomposition for compressing the information of spectral signals."
       },
       "nodes": [
         {
@@ -238,7 +238,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "pca",
-              "hint": "Available options: Pricipal Component Analysis (pca)."
+              "hint": "Available options: Principal Component Analysis (pca)."
             },
             {
               "parameter": "n_components",
