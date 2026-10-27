@@ -3,9 +3,9 @@
     {
       "process": "filter_spectra",
       "parameters": {
-        "project_root_fp": "./project_lucas_2009/data/compiled/lucas_2009_10nm",
+        "project_root_fp": "./project_neospectra/data/spectra/neospectra/ds2/ai4sh",
         "dataframe":"raw",
-        "filter_fp": "./project_lucas_2009/filter/savitzky-golay_neospectra.json"
+        "filter_fp": "./project_neospectra/filter/savitzky-golay_neospectra.json"
       }
     }
   ]

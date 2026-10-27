@@ -20,7 +20,6 @@ from sklearn.neighbors import LocalOutlierFactor
 from sklearn.svm import OneClassSVM
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_regression
-from sklearn.cluster import FeatureAgglomeration
 from sklearn.model_selection import KFold
 
 from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction,
@@ -40,7 +39,7 @@ from src.lib.pilot import Get_project_path
 from src.ai4sh.project_paths import Default_fpn
 from src.ai4sh.provenance import Load_config_json
 from src.ai4sh.ml_setting import Load_settings, Is_path, Spectra_colormap
-from src.ai4sh.ml_transformers import Holdout_test_mask, Holdout_info
+from src.ai4sh.ml_transformers import Holdout_test_mask, Holdout_info, Ward_fit
 
 _METADATA_COLS = frozenset([
     'sample_id', 'sample_name', 'campaign_tag', 'sampling_log_tag', 'campaign_name', 'latitude_dd', 'longitude_dd',
@@ -238,7 +237,7 @@ def _write_companion_json(project_root_fp, in_stem, out_stem, out_cols, step_inf
         json.dump(ordered, fh, indent=2)
 
 
-def _Ward_tune(X, n_clusters_list, kfolds):
+def _Ward_tune(X, n_clusters_list, kfolds, connectivity=False):
     '''K-fold cross-validated reconstruction MSE for each candidate n_clusters.
 
     Returns {n_clusters: (mean_mse, std_mse)}.
@@ -249,8 +248,7 @@ def _Ward_tune(X, n_clusters_list, kfolds):
         fold_errors = []
         for train_idx, test_idx in kf.split(X):
             X_train, X_test = X[train_idx], X[test_idx]
-            ward = FeatureAgglomeration(n_clusters=nc, linkage='ward')
-            ward.fit(X_train)
+            ward, _ = Ward_fit(X_train, nc, connectivity)
             X_rec = ward.inverse_transform(ward.transform(X_test))
             fold_errors.append(float(np.mean((X_test - X_rec) ** 2)))
         scores[nc] = (float(np.mean(fold_errors)), float(np.std(fold_errors)))
@@ -1015,8 +1013,9 @@ class Process_ml_preprocess(Get_schema_table):
             plt.close(fig)
 
     def _Accept_and_save(self, df_orig, spec_out_full, out_cols, abbrev,
-                          stem, project_root_fp, overwrite, step_info, units_D=None):
-        '''Prompt y/n, save parquet + companion JSON. Returns (out_fp, skipped).'''
+                          stem, project_root_fp, overwrite, step_info, units_D=None,
+                          confirm=True):
+        '''Prompt y/n (unless confirm=False), save parquet + companion JSON. Returns (out_fp, skipped).'''
         out_stem = '%s_%s' % (stem, abbrev)
         out_fp   = os.path.join(project_root_fp, out_stem + '.parquet')
 
@@ -1030,10 +1029,11 @@ class Process_ml_preprocess(Get_schema_table):
             ])
             return out_fp, True
 
-        ans = input('\n    Accept and save %s result? [y/n]: ' % abbrev).strip().lower()
-        if ans != 'y':
-            print('    Result discarded.')
-            return None, False
+        if confirm:
+            ans = input('\n    Accept and save %s result? [y/n]: ' % abbrev).strip().lower()
+            if ans != 'y':
+                print('    Result discarded.')
+                return None, False
 
         non_spectral = [c for c in df_orig.columns if not _is_spectral_col(c)]
         signal_type  = Signal_type_of(units_D or {}, [c for c in df_orig.columns if _is_spectral_col(c)])
@@ -1317,37 +1317,57 @@ class Process_ml_preprocess(Get_schema_table):
         plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
         ann      = 'n=%d' % len(df)
 
-        # Determine n_clusters
+        connectivity = bool(getattr(p, 'connectivity', True))
+        n_bands      = X.shape[1]
+
+        # Check for an existing result before spending time on tuning
+        if os.path.exists(os.path.join(project_root_fp, stem + '_wc.parquet')) and not overwrite:
+            self._Accept_and_save(df, None, [], 'wc', stem, project_root_fp, overwrite,
+                                  {'process': 'ward_clustering'}, units_D)
+            return
+
+        # Suggested n_clusters: tuned best, or n_clusters from the ward clustering file
         tune_cfg = wc.get('tune_ward_clustering', {})
+        n_tuned  = None
         if tune_cfg.get('apply', False):
-            clusters_list = [c for c in tune_cfg.get('clusters', []) if 0 < c < X.shape[1]]
+            clusters_list = [c for c in tune_cfg.get('clusters', []) if 0 < c < n_bands]
             kfolds        = int(tune_cfg.get('kfolds', 3))
             if not clusters_list:
                 print('    ERROR: tune_ward_clustering.clusters list is empty or exceeds n_bands.')
                 return
-            print('    Tuning Ward clustering over %d candidate cluster counts ...' % len(clusters_list))
-            scores    = _Ward_tune(X, clusters_list, kfolds)
-            n_clusters = _Ward_pick_best(scores)
-            print('    Tuned: best n_clusters = %d' % n_clusters)
-            self._Plot_ward_tune(scores, n_clusters, show, save, plot_dir)
+            print('    Tuning Ward clustering over %d candidate cluster counts (connectivity=%s) ...'
+                  % (len(clusters_list), connectivity))
+            scores  = _Ward_tune(X, clusters_list, kfolds, connectivity)
+            n_tuned = _Ward_pick_best(scores)
+            print('    Tuned: best n_clusters = %d' % n_tuned)
+            self._Plot_ward_tune(scores, n_tuned, show, save, plot_dir)
+            n_suggest = n_tuned
         else:
-            n_clusters = int(wc.get('n_clusters', 0))
-            if n_clusters <= 0:
+            n_suggest = int(wc.get('n_clusters', 0))
+            if n_suggest <= 0:
                 print('    ERROR: n_clusters must be > 0 when tune_ward_clustering.apply is false.')
                 return
+        n_suggest = min(n_suggest, n_bands - 1)
 
-        if n_clusters >= X.shape[1]:
-            print('    WARNING: n_clusters (%d) >= n_bands (%d); clamping.' % (n_clusters, X.shape[1]))
-            n_clusters = X.shape[1] - 1
+        n_clusters = self._Ward_ask_n_clusters(n_suggest, n_bands)
+        if n_clusters == 0:
+            print('    No clustering saved.')
+            return
 
-        ward   = FeatureAgglomeration(n_clusters=n_clusters, linkage='ward')
-        ward.fit(X)
-        X_out  = ward.transform(X)
+        ward, order = Ward_fit(X, n_clusters, connectivity)
+        X_out    = ward.transform(X)[:, order]
         out_cols = ['wc%d' % (i + 1) for i in range(n_clusters)]
+        rank     = np.empty(n_clusters, dtype=int)
+        rank[order] = np.arange(n_clusters)
+        band_labels = rank[ward.labels_]            # 0-based wc index of every band
+        cluster_bands = {'wc%d' % (k + 1): [wavelengths[i] for i in np.where(band_labels == k)[0]]
+                         for k in range(n_clusters)}
 
         spec_out  = pd.DataFrame(X_out, columns=out_cols, index=spec_df.index)
+        spec_rec  = pd.DataFrame(X_out[:, band_labels], columns=wavelengths, index=spec_df.index)
         sub_in,  colors, n_shown = self._Sub_spec(spec_df, max_spectra, colormap)
         sub_out, _,      _       = self._Sub_spec(spec_out, max_spectra, colormap)
+        sub_rec, _,      _       = self._Sub_spec(spec_rec, max_spectra, colormap)
         ann_shown = '%s  shown=%d' % (ann, n_shown)
 
         self._Plot_input_output(
@@ -1356,16 +1376,76 @@ class Process_ml_preprocess(Get_schema_table):
             ann_shown, show, save, plot_dir,
             'ward_clustering_wc.png',
         )
+        self._Plot_ward_wavelength(sub_in, sub_rec, wavelengths, band_labels, colors,
+                                   n_clusters, connectivity, ann_shown, show, save, plot_dir)
 
         step_info = {
             '_id': 'wc',
             'process': 'ward_clustering',
             'parameters': {'ward_clustering_fp': wc_fp_param,
+                           'connectivity': connectivity,
+                           'n_clusters_tuned_best': n_tuned,
+                           'n_clusters_selected': n_clusters,
                            'n_clusters_applied': n_clusters},
             'agglomeration': cfg,
+            'cluster_bands': cluster_bands,
         }
         self._Accept_and_save(df, spec_out, out_cols, 'wc',
-                               stem, project_root_fp, overwrite, step_info, units_D)
+                               stem, project_root_fp, overwrite, step_info, units_D,
+                               confirm=False)
+
+    def _Ward_ask_n_clusters(self, n_suggest, n_bands):
+        '''Ask for the number of clusters to save: Enter = n_suggest, 0 = save nothing.'''
+        while True:
+            raw = input('\n    Number of clusters to save (0 = no clustering, Enter = %d) [1-%d]: '
+                        % (n_suggest, n_bands - 1)).strip()
+            if raw == '':
+                return n_suggest
+            try:
+                n = int(raw)
+            except ValueError:
+                print('    Enter an integer.')
+                continue
+            if n == 0 or 0 < n < n_bands:
+                return n
+            print('    n_clusters must be 0 or between 1 and %d.' % (n_bands - 1))
+
+    def _Plot_ward_wavelength(self, spec_in, spec_rec, wavelengths, band_labels, colors,
+                              n_clusters, connectivity, ann, show, save, plot_dir):
+        '''2-panel plot on the wavelength axis: input spectra / every band replaced by its cluster mean.
+
+        With connectivity the cluster borders are drawn as thin vertical lines.
+        '''
+        wl, xl = _spectra_x_axis_ml(wavelengths)
+
+        fig, (ax_in, ax_rec) = plt.subplots(2, 1, figsize=(10, 5), sharex=True, sharey=True)
+        for i, row in enumerate(spec_in.values):
+            ax_in.plot(wl, row, color=colors[i], linewidth=0.5, alpha=0.6)
+        for i, row in enumerate(spec_rec.values):
+            ax_rec.plot(wl, row, color=colors[i], linewidth=0.5, alpha=0.6, drawstyle='steps-mid')
+        if connectivity:
+            for j in np.where(np.diff(band_labels) != 0)[0]:
+                border = (wl[j] + wl[j + 1]) / 2.0
+                ax_rec.axvline(border, color='lightgray', linewidth=0.4, zorder=0)
+        ax_in.set_ylabel('Value')
+        ax_in.set_title('Input spectra')
+        ax_in.text(0.98, 0.97, ann, transform=ax_in.transAxes,
+                   ha='right', va='top', fontsize=7, color='dimgray')
+        ax_rec.set_xlabel(xl)
+        ax_rec.set_ylabel('Cluster mean')
+        ax_rec.set_title('Ward clustering (%d clusters%s) on the wavelength axis'
+                         % (n_clusters, ', contiguous bands' if connectivity else ''))
+        plt.tight_layout()
+
+        if save and plot_dir:
+            fp = os.path.join(plot_dir, 'ward_clustering_wl.png')
+            fig.savefig(fp, dpi=150, bbox_inches='tight')
+            if self.verbose >= 1:
+                print('    Plot saved: %s' % fp)
+        if show:
+            plt.show()
+        else:
+            plt.close(fig)
 
     # ------------------------------------------------------------------ univariate selection
 

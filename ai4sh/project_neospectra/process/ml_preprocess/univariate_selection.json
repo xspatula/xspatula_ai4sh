@@ -3,11 +3,11 @@
     {
       "process": "spectra_indicator_univariate_selection",
       "parameters": {
-        "project_root_fp": "./project_lucas_2009/data",
-        "indicator_array": ["c-org","sand"],
+        "project_root_fp": "./project_neospectra/data/compiled/neospectra_10nm",
+        "indicator_array": ["c-org","n-tot"],
         "separate_selections": true,
         "dataframe":"raw",
-        "univariate_selector_fp": "./project_lucas_2009/spectral_band_selector/univariate_selector_neospectra.json"
+        "univariate_selector_fp": "./project_neospectra/spectral_band_selector/univariate_selector_neospectra.json"
       }
     }
   ]

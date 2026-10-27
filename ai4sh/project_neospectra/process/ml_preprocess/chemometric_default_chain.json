@@ -3,7 +3,7 @@
     {
       "process": "chemometric_default",
       "parameters": {
-        "project_root_fp": "./project_lucas_2009/data/compiled/lucas_2009_10nm",
+        "project_root_fp": "./project_neospectra/data/spectra/neospectra/ds2/ai4sh",
         "dataframe":"raw",
         "chemometrics": "default",
         "chemometrics_array": ["meancentring","scatter_correction","decomposition"]
