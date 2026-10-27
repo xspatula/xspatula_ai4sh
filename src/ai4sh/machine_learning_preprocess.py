@@ -703,14 +703,25 @@ class Process_ml_preprocess(Get_schema_table):
         wl = np.array(wavelengths)
         var = np.array(variances_scaled)
 
-        # Top panel: variance per wavelength with threshold line and discard shading
+        # Top panel: variance per wavelength with threshold line and discard shading.
+        # actual_threshold None = no threshold set yet: reference line at the lowest band variance
         ax_top.plot(wl, var, color='steelblue', linewidth=0.9, label='variance (scaled)')
-        ax_top.axhline(actual_threshold, color='red', linestyle='--', linewidth=1.0,
-                       label='threshold = %.4f' % actual_threshold)
-        ax_top.fill_between(wl, 0, var, where=discard_mask,
+        if actual_threshold is None:
+            ax_top.axhline(var.min(), color='red', linestyle='--', linewidth=1.0,
+                           label='min variance = %.4f' % var.min())
+            title_thr = 'min variance: %.4f' % var.min()
+        else:
+            ax_top.axhline(actual_threshold, color='red', linestyle='--', linewidth=1.0,
+                           label='threshold = %.4f' % actual_threshold)
+            title_thr = 'threshold: %.4f' % actual_threshold
+        # Same y-range in every redraw (variance range + 5 % margin); discard shading from its bottom
+        margin = 0.05 * (var.max() - var.min())
+        y_lo, y_hi = var.min() - margin, var.max() + margin
+        ax_top.fill_between(wl, y_lo, var, where=discard_mask,
                             color='red', alpha=0.25, label='discard')
+        ax_top.set_ylim(y_lo, y_hi)
         ax_top.set_ylabel('Variance (%s scaled)' % scaler_name)
-        ax_top.set_title('Band variance   scaler: %s   threshold: %.4f' % (scaler_name, actual_threshold))
+        ax_top.set_title('Band variance   scaler: %s   %s' % (scaler_name, title_thr))
         ax_top.legend(fontsize=8, loc='upper right')
 
         # Bottom panel: spectra subsample with discard regions shaded
@@ -744,8 +755,8 @@ class Process_ml_preprocess(Get_schema_table):
         plt.tight_layout()
 
         if save and plot_dir:
-            out_fp = os.path.join(plot_dir, 'variance_threshold_%s_%.4f.png' % (
-                scaler_name, actual_threshold))
+            out_fp = os.path.join(plot_dir, 'variance_threshold_%s_%s.png' % (
+                scaler_name, 'min' if actual_threshold is None else '%.4f' % actual_threshold))
             fig.savefig(out_fp, dpi=150, bbox_inches='tight')
             if self.verbose >= 1:
                 print('    Plot saved: %s' % out_fp)
@@ -772,11 +783,6 @@ class Process_ml_preprocess(Get_schema_table):
             print('    Variance threshold skipped (scaler=none).')
             return
 
-        threshold   = float(getattr(p, 'threshold', 0.025))
-        if threshold == 0:
-            print('    Variance threshold skipped (threshold=0).')
-            return
-
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show      = getattr(p, 'show', True)
         save      = getattr(p, 'save', False)
@@ -798,16 +804,13 @@ class Process_ml_preprocess(Get_schema_table):
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
 
-        # Derive _vt output path
+        # Derive _vt output path; check for an existing result before computing
         stem   = os.path.splitext(os.path.basename(parquet_fp))[0]
         vt_fp  = os.path.join(project_root_fp, '%s_vt.parquet' % stem)
 
         if os.path.exists(vt_fp) and not overwrite:
-            print('    Variance threshold already applied. Use overwrite=True to rerun.')
-            _write_previous_df(project_root_fp, 'select_variance_threshold', [
-                {'dataframe': os.path.basename(vt_fp),
-                 'indicator': None, 'regressor': None, 'selector': None}
-            ])
+            self._Accept_and_save(df, None, [], 'vt', stem, project_root_fp, overwrite,
+                                  {'process': 'select_variance_threshold'}, units_D)
             return
 
         # Extract spectral columns
@@ -825,64 +828,69 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: unknown scaler "%s". Use minmax, standard, or robust.' % scaler_name)
             return
 
-        scaler = scalers[scaler_name]
-        X_scaled = scaler.fit_transform(X)
+        X_scaled = scalers[scaler_name].fit_transform(X)
+        variances_scaled = VarianceThreshold(threshold=0.0).fit(X_scaled).variances_
+        var_min, var_med, var_max = (float(np.min(variances_scaled)),
+                                     float(np.median(variances_scaled)),
+                                     float(np.max(variances_scaled)))
 
-        # Variance threshold
-        selector = VarianceThreshold(threshold=threshold)
-        selector.fit(X_scaled)
-        support      = selector.get_support()
-        discard_mask = ~support
-        variances_scaled = selector.variances_
-
-        n_retain  = int(support.sum())
-        n_discard = int(discard_mask.sum())
-
-        if self.verbose >= 1:
-            print('    Bands retained: %d   discarded: %d   (scaler: %s, threshold: %.4f)' % (
-                n_retain, n_discard, scaler_name, threshold))
-
-        # Plot
         plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
-        self._Plot_variance_threshold(
-            df, spectral_cols, wavelengths, variances_scaled, discard_mask,
-            threshold, scaler_name, max_spectra, show, save, plot_dir,
-        )
 
-        if n_discard == 0:
-            print('    No bands below threshold — nothing to remove.')
-            return
+        # Interactive threshold loop: first plot shows the lowest band variance, every new
+        # threshold is redrawn with the bands it removes; Enter accepts, 0 or < min skips.
+        # VarianceThreshold keeps a band only if its variance is strictly above the threshold.
+        threshold    = None
+        discard_mask = np.zeros(len(spectral_cols), dtype=bool)
+        redraw       = True
+        while True:
+            if redraw:
+                self._Plot_variance_threshold(
+                    df, spectral_cols, wavelengths, variances_scaled, discard_mask,
+                    threshold, scaler_name, max_spectra, show, save, plot_dir,
+                )
+                n_discard = int(discard_mask.sum())
+                if threshold is None:
+                    print('    Band variance (%s scaled): min %.4f   median %.4f   max %.4f' % (
+                        scaler_name, var_min, var_med, var_max))
+                else:
+                    print('    Threshold %.4f: %d band%s retained, %d discarded' % (
+                        threshold, len(spectral_cols) - n_discard,
+                        's' if len(spectral_cols) - n_discard != 1 else '', n_discard))
+                redraw = False
 
-        ans = input('\n    Remove %d low-variance band%s? [y/n]: ' % (
-            n_discard, 's' if n_discard != 1 else '')).strip().lower()
+            prompt = '\n    Variance threshold (0 = skip%s) [min %.4f, max %.4f]: ' % (
+                '' if threshold is None else ', Enter = accept %.4f' % threshold, var_min, var_max)
+            raw = input(prompt).strip()
+            if raw == '':
+                if threshold is None:
+                    print('    Enter a threshold, or 0 to skip.')
+                    continue
+                break
+            try:
+                val = float(raw)
+            except ValueError:
+                print('    Enter a number.')
+                continue
+            if val <= 0 or val < var_min:
+                print('    Variance threshold skipped — no bands removed.')
+                return
+            if val >= var_max:
+                print('    Threshold %.4f would remove every band; set it below %.4f.' % (val, var_max))
+                continue
+            threshold    = val
+            discard_mask = variances_scaled <= threshold
+            redraw       = True
 
-        if ans != 'y':
-            print('    No bands removed.')
-            return
-
+        support     = ~discard_mask
         retain_cols = [c for c, keep in zip(spectral_cols, support) if keep]
-        non_spectral = [c for c in df.columns if not _is_spectral_col(c)]
-        df_out = df[non_spectral + retain_cols].copy()
-
-        Save_parquet_with_units(df_out, vt_fp, units_D)
-        _write_previous_df(project_root_fp, 'select_variance_threshold', [
-            {'dataframe': os.path.basename(vt_fp),
-             'indicator': None, 'regressor': None, 'selector': None}
-        ])
-
-        out_stem = os.path.splitext(os.path.basename(vt_fp))[0]
-        _write_companion_json(
-            project_root_fp, stem, out_stem, retain_cols,
-            {'process': 'select_variance_threshold',
-             'parameters': {'scaler': scaler_name, 'threshold': threshold}},
-            Signal_type_of(units_D, retain_cols),
-        )
-
-        print('    Removed %d band%s. %d band%s retained. Saved: %s' % (
-            n_discard, 's' if n_discard != 1 else '',
-            n_retain,  's' if n_retain  != 1 else '',
-            vt_fp,
-        ))
+        step_info   = {'process': 'select_variance_threshold',
+                       'parameters': {'scaler': scaler_name, 'threshold': threshold}}
+        out_fp, _ = self._Accept_and_save(df, df[retain_cols], retain_cols, 'vt',
+                                          stem, project_root_fp, overwrite, step_info, units_D,
+                                          confirm=False)
+        if out_fp and self.verbose >= 1:
+            print('    Removed %d band%s, %d retained.' % (
+                n_discard, 's' if n_discard != 1 else '', len(retain_cols)))
 
     # ================================================================== chemometric processing
 
