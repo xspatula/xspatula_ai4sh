@@ -280,6 +280,23 @@ def _resolve_input_parquet(project_root_fp, dataframe_param):
     return fp
 
 
+def _resolve_dataframe(project_root_fp, dataframe_param):
+    '''Input parquet path from a dataframe parameter, or None (error printed).
+
+    "raw"      → the selected dataset (see Find_selected_parquet), never a derived file
+    "previous" → the latest dataframe in .previous_dataframe
+    otherwise  → a parquet file name in project_root_fp, the .parquet ending is optional
+    '''
+    param = str(dataframe_param).strip()
+    if param.lower() == 'previous':
+        return _resolve_single_previous(project_root_fp)
+    try:
+        return _resolve_input_parquet(project_root_fp, param)
+    except FileNotFoundError as e:
+        print('    ERROR: %s' % e)
+        return None
+
+
 def _prev_df_path(project_root_fp):
     return Previous_df_path(project_root_fp)
 
@@ -532,16 +549,9 @@ class Process_ml_preprocess(Get_schema_table):
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
 
         # Load parquet
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
         df, units_D = Read_parquet_with_units(parquet_fp)
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
@@ -794,16 +804,9 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra = int(getattr(p, 'max_spectra', 100))
 
         # Resolve input parquet
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
         df, units_D = Read_parquet_with_units(parquet_fp)
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
@@ -914,16 +917,9 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra = int(getattr(p, 'max_spectra', 100))
         colormap    = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return None
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return None
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return None
 
         df, units_D = Read_parquet_with_units(parquet_fp)
         if self.verbose >= 1:
@@ -1118,16 +1114,9 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
 
         df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -1191,16 +1180,9 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
 
         df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -1301,16 +1283,9 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
 
         df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -1555,16 +1530,9 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra         = int(getattr(p, 'max_spectra', 100))
         colormap            = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
 
         df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]

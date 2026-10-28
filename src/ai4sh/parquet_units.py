@@ -28,17 +28,37 @@ from src.ai4sh.previous_dataframe import Read_previous_history
 
 _UNITS_METADATA_KEY = b'ai4sh_indicator_units'
 
-# Any known machine learning preprocessing suffix at the end of a parquet stem (derived files)
+# Any known machine learning preprocessing suffix at the end of a parquet stem (derived files).
+# Scatter corrections in sequence are saved as their concatenation (snv+snv → snvsnv, l1+msc → l1msc).
 DERIVED_STEM_RE = re.compile(
-    r'_(?:pred|ol|vt|ma|gf|sg|lw|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|snv|msc|l1|l2|max|l1snv|snvmsc|mc|as|ps|poi|pca\d+|(?:[\w-]+-)?(?:pms|rfe|tree))$'
+    r'_(?:pred|ol|vt|ma|gf|sg|lw|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|(?:l1|l2|max|snv|msc)+|mc|as|ps|poi|pca\d+|(?:[\w-]+-)?(?:pms|rfe|tree))$'
 )
+
+
+def Is_derived_parquet(parquet_fpn):
+    '''True if the parquet is the output of a preprocessing step, not a selected (raw) dataset.
+
+    A derived file has a preprocessing suffix (DERIVED_STEM_RE) or a companion JSON with a non-empty
+    preprocessing_chain. The companion check catches any suffix the regex does not know.
+    '''
+    stem = os.path.splitext(os.path.basename(parquet_fpn))[0]
+    if DERIVED_STEM_RE.search(stem):
+        return True
+    json_fpn = os.path.join(os.path.dirname(parquet_fpn), stem + '.json')
+    if os.path.exists(json_fpn):
+        try:
+            with open(json_fpn) as fh:
+                return bool(json.load(fh).get('preprocessing_chain'))
+        except (OSError, ValueError, AttributeError):
+            return False
+    return False
 
 
 def Find_selected_parquet(project_root_fp):
     '''Return (parquet_fpn, json_fpn or None) of the selected (not derived) dataset in project_root_fp.
 
     Selections are saved as {name}.parquet + {name}.json. Files with a preprocessing suffix
-    (DERIVED_STEM_RE) are skipped. The latest selected file registered in .previous_dataframe is used;
+    (Is_derived_parquet) are skipped. The latest selected file registered in .previous_dataframe is used;
     without one, the most recently written candidate is used and the others are reported.
     Raises FileNotFoundError if there is none.
     '''
@@ -50,14 +70,14 @@ def Find_selected_parquet(project_root_fp):
 
             stem = os.path.splitext(os.path.basename(fpn))[0]
 
-            if fpn.endswith('.parquet') and os.path.exists(fpn) and not DERIVED_STEM_RE.search(stem):
+            if fpn.endswith('.parquet') and os.path.exists(fpn) and not Is_derived_parquet(fpn):
 
                 json_fpn = os.path.join(project_root_fp, stem + '.json')
 
                 return fpn, json_fpn if os.path.exists(json_fpn) else None
 
     candidates = [fpn for fpn in glob.glob(os.path.join(project_root_fp, '*.parquet'))
-                  if not DERIVED_STEM_RE.search(os.path.splitext(os.path.basename(fpn))[0])]
+                  if not Is_derived_parquet(fpn)]
 
     if not candidates:
         raise FileNotFoundError('No selected .parquet file found in: %s' % project_root_fp)
