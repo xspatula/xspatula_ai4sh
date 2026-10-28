@@ -219,7 +219,7 @@
         "process": "spectra_decomposition",
         "min_user_stratum": 3,
         "title": "Decomposition of spectral data",
-        "label": "Run a decomposition for compressing the information of spectral signals."
+        "label": "Run a decomposition for compressing the information of spectral signals; with dataframe_array, compare the decomposition of several preprocessed dataframes and select one interactively."
       },
       "nodes": [
         {
@@ -239,6 +239,13 @@
               "required": false,
               "default_value": "raw",
               "hint": "The dataframe to use as input, raw = original spectra, previous = the latest saved parquet file(s), or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
+            },
+            {
+              "parameter": "dataframe_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": [],
+              "hint": "Compare mode: two or more input dataframes (raw, previous or parquet file names, .parquet optional), e.g. raw and the outputs of different preprocessing pipelines. The decomposition of every input is plotted with its explained variance and you choose which one to save. Overrides dataframe."
             },
             {
               "parameter": "method",

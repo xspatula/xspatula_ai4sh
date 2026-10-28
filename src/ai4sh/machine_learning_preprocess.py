@@ -2189,11 +2189,11 @@ class Process_ml_preprocess(Get_schema_table):
             return None
         return results[n - 1]
 
-    def _Compare_inputs(self, p, kind, transform_fn):
+    def _Compare_inputs(self, p, kind, transform_fn, menu_label=None):
         '''Apply transform_fn to every dataframe in dataframe_array, plot the results stacked, ask 0..n.
 
         transform_fn(inp) → (spec_out, cols_out, label). Returns (inp, spec_out, cols_out, label) of the
-        chosen input, or None for 0 = none or an error.
+        chosen input, or None for 0 = none or an error. menu_label(result) → prompt text (default: input stem).
         '''
         steps, results = [], []
         for name in _parse_array_param(getattr(p, 'dataframe_array', [])):
@@ -2207,7 +2207,8 @@ class Process_ml_preprocess(Get_schema_table):
         self._Plot_chem_chain(steps, first['max_spectra'], first['colormap'], '',
                               first['show'], first['save'], first['plot_dir'],
                               'compare_%s.png' % kind.replace(' ', '_'))
-        n = _Ask_choice('Input dataframe to apply %s to' % kind, [r[0]['stem'] for r in results])
+        n = _Ask_choice('Input dataframe to apply %s to' % kind,
+                        [menu_label(r) if menu_label else r[0]['stem'] for r in results])
         if n == 0:
             print('    No %s applied.' % kind)
             return None
@@ -2294,16 +2295,38 @@ class Process_ml_preprocess(Get_schema_table):
         )
 
     def _Spectra_decomposition(self):
-        p   = self.process_S.process.parameters
-        inp = self._Load_spec_inputs(p)
-        if inp is None:
-            return
+        '''Decomposition (PCA); with more than one dataframe in dataframe_array the decomposition of every
+        input is compared (scores + explained variance) and the user chooses which one to save.'''
+        p      = self.process_S.process.parameters
+        inputs = _parse_array_param(getattr(p, 'dataframe_array', []))
+        inp    = None
+        if len(inputs) <= 1:
+            inp = self._Load_spec_inputs(p, inputs[0] if inputs else None)
+            if inp is None:
+                return
 
         method       = str(getattr(p, 'method', 'pca')).strip().lower()
         n_components = int(getattr(p, 'n_components', 5))
-        spec_out, cols_out, label = apply_decomposition(
-            inp['spec_df'], inp['wavelengths'],
-            {'method': method, 'n_components': n_components})
+
+        def decomposition(inp):
+            spec_out, cols_out, _ = apply_decomposition(
+                inp['spec_df'], inp['wavelengths'],
+                {'method': method, 'n_components': n_components})
+            # Share of the total spectral variance captured by the components (PCA score variances)
+            total = float(inp['spec_df'].values.astype(float).var(axis=0).sum())
+            share = float(spec_out.values.var(axis=0).sum()) / total if total > 0 else float('nan')
+            return spec_out, cols_out, '%s %d (%.1f %% variance)' % (method.upper(), len(cols_out), 100 * share)
+
+        confirm = True
+        if len(inputs) > 1:
+            picked = self._Compare_inputs(p, '%s %d' % (method, n_components), decomposition,
+                                          menu_label=lambda r: '%s (%s)' % (r[0]['stem'], r[3].split('(')[-1].rstrip(')')))
+            if picked is None:
+                return
+            inp, spec_out, cols_out, label = picked
+            confirm = False
+        else:
+            spec_out, cols_out, label = decomposition(inp)
 
         n_actual  = len(cols_out)
         abbrev    = 'pca%d' % n_actual
@@ -2314,7 +2337,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         self._Plot_input_output(
             sub_in, sub_out, inp['wavelengths'], cols_out, colors,
-            'Input spectra', '%s (%d components)' % (method.upper(), n_actual),
+            'Input spectra: %s' % inp['stem'], label,
             ann_shown, inp['show'], inp['save'], inp['plot_dir'],
             'chemometric_%s.png' % abbrev,
         )
@@ -2323,7 +2346,7 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_decomposition',
              'parameters': {'method': method, 'n_components': n_actual}},
-            inp['units_D'],
+            inp['units_D'], confirm=confirm,
         )
 
     def _Chemometric_default(self):
