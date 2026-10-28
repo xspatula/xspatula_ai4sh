@@ -80,6 +80,9 @@ def _parse_array_param(raw):
 # Options offered by scaler/method "select": per-spectrum scatter corrections and band-wise variable scalings
 SCATTER_CORRECTIONS = ['l1', 'l2', 'max', 'snv', 'msc']
 VARIABLE_SCALINGS   = ['meancentring', 'autoscaling', 'paretoscaling', 'poissonscaling']
+# Filter parameter sets compared by filter_fp "select" when no filter_array is given; key → file abbreviation
+FILTER_PRESETS = ['moving-average', 'gauss', 'savitzky-golay', 'lowess']
+_FILTER_ABBREV = {'moving_average': 'ma', 'gauss': 'gf', 'savitzky-golay': 'sg', 'lowess': 'lw'}
 
 # Regex matching any known preprocessing suffix at the end of a parquet stem.
 _DERIVED_RE = DERIVED_STEM_RE
@@ -278,6 +281,16 @@ def _resolve_input_parquet(project_root_fp, dataframe_param):
     if not os.path.exists(fp):
         raise FileNotFoundError('Dataframe file not found: %s' % fp)
     return fp
+
+
+def _Ask_choice(question, labels):
+    '''Ask "question (0 = none, 1 = a, 2 = b ...)" until a valid number is entered; return it (0 = none).'''
+    menu = ', '.join('%d = %s' % (i + 1, label) for i, label in enumerate(labels))
+    while True:
+        raw = input('\n    %s (0 = none, %s): ' % (question, menu)).strip()
+        if raw.isdigit() and 0 <= int(raw) <= len(labels):
+            return int(raw)
+        print('    Enter a number 0-%d.' % len(labels))
 
 
 def _resolve_dataframe(project_root_fp, dataframe_param):
@@ -901,8 +914,11 @@ class Process_ml_preprocess(Get_schema_table):
 
     # ================================================================== chemometric processing
 
-    def _Load_spec_inputs(self, p):
-        '''Parse common params, load full parquet, return input dict or None on error.'''
+    def _Load_spec_inputs(self, p, dataframe_param=None):
+        '''Parse common params, load full parquet, return input dict or None on error.
+
+        dataframe_param overrides the dataframe parameter (used for each entry of dataframe_array).
+        '''
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
             project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
@@ -910,7 +926,8 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return None
 
-        dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
+        if dataframe_param is None:
+            dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show        = getattr(p, 'show', True)
         save        = getattr(p, 'save', False)
         overwrite   = bool(getattr(p, 'overwrite', False))
@@ -1082,79 +1099,78 @@ class Process_ml_preprocess(Get_schema_table):
         try:
             return Load_settings(family, param, default_fpn, resolve_path=self._Resolve_filter_fp,
                                  verbose=self.verbose) or {}
-        except FileNotFoundError as e:
+        except (FileNotFoundError, ValueError) as e:
             print('    ERROR: %s' % e)
             return {}
 
     def _Filter_spectra(self):
-        p = self.process_S.process.parameters
+        '''Single smoothing filter; filter_fp "select" compares the filters in filter_array and asks.
 
-        project_root_fp = str(p.project_root_fp).strip()
-        if not os.path.isabs(project_root_fp):
-            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
-        if not os.path.exists(project_root_fp):
-            print('    ERROR: project_root_fp not found: %s' % project_root_fp)
+        filter_fp and every filter_array entry: a filter parameter set name (ml_setting) or a JSON path
+        relative to the project root, the .json ending is optional.
+        '''
+        p   = self.process_S.process.parameters
+        _json = lambda x: x + '.json' if Is_path(x) and not x.lower().endswith('.json') else x
+
+        filter_fp_param = _json(str(getattr(p, 'filter_fp', 'none')).strip())
+        if filter_fp_param.lower() in ('', 'none', 'no'):
+            print('    ERROR: filter_fp (a filter parameter set name, JSON file or select) is required for filter_spectra.')
             return
 
-        filter_fp_param = str(getattr(p, 'filter_fp', 'none')).strip()
-        filter_cfg      = self._Load_named_settings('filter', filter_fp_param)
-        if not filter_cfg:
-            print('    ERROR: filter_fp (a filter parameter set name or JSON file) is required for filter_spectra.')
+        if filter_fp_param.lower() == 'select':
+            entries = [_json(e) for e in _parse_array_param(getattr(p, 'filter_array', []))] or list(FILTER_PRESETS)
+        else:
+            entries = [filter_fp_param]
+        filters = []                                   # (entry, cfg, abbrev, label)
+        for e in entries:
+            cfg = self._Load_named_settings('filter', e)
+            if not cfg:
+                print('    ERROR: filter "%s" could not be loaded.' % e)
+                return
+            kind = next((k for k in _FILTER_ABBREV if k in cfg), None)
+            if kind is None:
+                print('    ERROR: no known filter (%s) in "%s".' % (', '.join(_FILTER_ABBREV), e))
+                return
+            name = os.path.splitext(os.path.basename(e))[0] if Is_path(e) else e
+            filters.append((e, cfg, _FILTER_ABBREV[kind], name))
+
+        inp = self._Load_spec_inputs(p)
+        if inp is None:
             return
+        apply_fn = lambda i: apply_filter(inp['spec_df'], inp['wavelengths'], filters[i][1])
 
-        # Abbreviation from top-level key
-        _abbrev_map = {'savitzky-golay': 'sg', 'gauss': 'gf',
-                       'moving_average': 'ma', 'lowess': 'lw'}
-        abbrev = next((_abbrev_map[k] for k in _abbrev_map if k in filter_cfg), 'flt')
+        confirm = True
+        if filter_fp_param.lower() == 'select':
+            picked = self._Select_method(inp, 'filter', [(i, f[3]) for i, f in enumerate(filters)], apply_fn)
+            if picked is None:
+                return
+            i, df_filtered, cols_out, _ = picked
+            confirm = False
+        else:
+            i = 0
+            df_filtered, cols_out, _ = apply_fn(0)
+        entry, filter_cfg, abbrev, name = filters[i]
 
-        dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
-        show            = getattr(p, 'show', True)
-        save            = getattr(p, 'save', False)
-        overwrite       = bool(getattr(p, 'overwrite', False))
-        max_spectra     = int(getattr(p, 'max_spectra', 100))
-        colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
-
-        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
-        if parquet_fp is None:
-            return
-
-        df, units_D = Read_parquet_with_units(parquet_fp)
-        stem = os.path.splitext(os.path.basename(parquet_fp))[0]
-        if self.verbose >= 1:
-            print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
-
-        spectral_cols = [c for c in df.columns if _is_spectral_col(c)]
-        if not spectral_cols:
-            print('    ERROR: no spectral columns found.')
-            return
-        wavelengths = [_col_to_index(c) for c in spectral_cols]
-        spec_df     = df[spectral_cols].copy()
-        spec_df.columns = wavelengths
-
-        plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
-        ann      = 'n=%d' % len(df)
-
-        df_filtered, cols_out, _ = apply_filter(spec_df, wavelengths, filter_cfg)
-
-        sub_in,  colors, n_shown = self._Sub_spec(spec_df,    max_spectra, colormap)
-        sub_out, _,      _       = self._Sub_spec(df_filtered, max_spectra, colormap)
-        ann_shown = '%s  shown=%d' % (ann, n_shown)
+        sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
+        sub_out, _,      _       = self._Sub_spec(df_filtered,    inp['max_spectra'], inp['colormap'])
+        ann_shown = '%s  shown=%d' % (inp['ann'], n_shown)
 
         self._Plot_input_output(
-            sub_in, sub_out, wavelengths, list(cols_out), colors,
-            'Input spectra', 'Filter: %s' % abbrev,
-            ann_shown, show, save, plot_dir,
+            sub_in, sub_out, inp['wavelengths'], list(cols_out), colors,
+            'Input spectra', 'Filter: %s' % name,
+            ann_shown, inp['show'], inp['save'], inp['plot_dir'],
             'filter_%s.png' % abbrev,
         )
 
         step_info = {
             '_id': abbrev,
             'process': 'filter_spectra',
-            'parameters': {'filter_fp': filter_fp_param},
+            'parameters': {'filter_fp': entry},
             'filter': filter_cfg,
         }
-        self._Accept_and_save(df, df_filtered, list(cols_out), abbrev,
-                               stem, project_root_fp, overwrite, step_info, units_D)
+        self._Accept_and_save(inp['df'], df_filtered, list(cols_out), abbrev,
+                               inp['stem'], inp['project_root_fp'], inp['overwrite'], step_info,
+                               inp['units_D'], confirm=confirm)
 
     def _Multi_filter_spectra(self):
         p = self.process_S.process.parameters
@@ -2099,23 +2115,39 @@ class Process_ml_preprocess(Get_schema_table):
     # ------------------------------------------------------------------ individual steps
 
     def _Spectra_derivative(self):
-        p   = self.process_S.process.parameters
-        inp = self._Load_spec_inputs(p)
-        if inp is None:
-            return
+        '''Derivative; with more than one dataframe in dataframe_array the derivative of every input is
+        compared and the user chooses which one to save.'''
+        p      = self.process_S.process.parameters
+        inputs = _parse_array_param(getattr(p, 'dataframe_array', []))
+        inp    = None
+        if len(inputs) <= 1:
+            inp = self._Load_spec_inputs(p, inputs[0] if inputs else None)
+            if inp is None:
+                return
 
         derive = int(getattr(p, 'derivative', 1))
         append = bool(getattr(p, 'append', False))
 
-        spec_out, cols_out, label = apply_derivative(
-            inp['spec_df'], inp['wavelengths'], {'derive': derive})
+        def derivative(inp):
+            spec_out, cols_out, label = apply_derivative(
+                inp['spec_df'], inp['wavelengths'], {'derive': derive})
+            if append:
+                cols_all = inp['wavelengths'] + list(cols_out)
+                spec_out = pd.concat([inp['spec_df'].reset_index(drop=True),
+                                       spec_out.reset_index(drop=True)], axis=1)
+                spec_out.columns = cols_all
+                cols_out = cols_all
+            return spec_out, cols_out, 'derivative %d' % derive
 
-        if append:
-            cols_all = inp['wavelengths'] + list(cols_out)
-            spec_out = pd.concat([inp['spec_df'].reset_index(drop=True),
-                                   spec_out.reset_index(drop=True)], axis=1)
-            spec_out.columns = cols_all
-            cols_out = cols_all
+        confirm = True
+        if len(_parse_array_param(getattr(p, 'dataframe_array', []))) > 1:
+            picked = self._Compare_inputs(p, 'derivative %d' % derive, derivative)
+            if picked is None:
+                return
+            inp, spec_out, cols_out, _ = picked
+            confirm = False
+        else:
+            spec_out, cols_out, _ = derivative(inp)
 
         sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
         sub_out, _,      _       = self._Sub_spec(spec_out,       inp['max_spectra'], inp['colormap'])
@@ -2124,7 +2156,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         self._Plot_input_output(
             sub_in, sub_out, inp['wavelengths'], list(cols_out), colors,
-            'Input spectra',
+            'Input spectra: %s' % inp['stem'],
             'Derivative order %d%s' % (derive, ' (appended)' if append else ''),
             ann_shown, inp['show'], inp['save'], inp['plot_dir'],
             'chemometric_%s.png' % abbrev,
@@ -2134,7 +2166,7 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_derivative',
              'parameters': {'derivative': derive, 'append': append}},
-            inp['units_D'],
+            inp['units_D'], confirm=confirm,
         )
 
     def _Select_method(self, inp, kind, options, apply_fn):
@@ -2151,16 +2183,35 @@ class Process_ml_preprocess(Get_schema_table):
         self._Plot_chem_chain(steps, inp['max_spectra'], inp['colormap'], inp['ann'],
                               inp['show'], inp['save'], inp['plot_dir'],
                               'compare_%s.png' % kind.replace(' ', '_'))
-        menu = ', '.join('%d = %s' % (i + 1, label) for i, (_, label) in enumerate(options))
-        while True:
-            raw = input('\n    %s to apply (0 = none, %s): ' % (kind.capitalize(), menu)).strip()
-            if raw.isdigit() and 0 <= int(raw) <= len(options):
-                break
-            print('    Enter a number 0-%d.' % len(options))
-        if raw == '0':
+        n = _Ask_choice('%s to apply' % kind.capitalize(), [label for _, label in options])
+        if n == 0:
             print('    No %s applied.' % kind)
             return None
-        return results[int(raw) - 1]
+        return results[n - 1]
+
+    def _Compare_inputs(self, p, kind, transform_fn):
+        '''Apply transform_fn to every dataframe in dataframe_array, plot the results stacked, ask 0..n.
+
+        transform_fn(inp) → (spec_out, cols_out, label). Returns (inp, spec_out, cols_out, label) of the
+        chosen input, or None for 0 = none or an error.
+        '''
+        steps, results = [], []
+        for name in _parse_array_param(getattr(p, 'dataframe_array', [])):
+            inp = self._Load_spec_inputs(p, name)
+            if inp is None:
+                return None
+            spec_out, cols_out, label = transform_fn(inp)
+            steps.append(('%d: %s → %s' % (len(results) + 1, inp['stem'], label), spec_out, cols_out))
+            results.append((inp, spec_out, cols_out, label))
+        first = results[0][0]
+        self._Plot_chem_chain(steps, first['max_spectra'], first['colormap'], '',
+                              first['show'], first['save'], first['plot_dir'],
+                              'compare_%s.png' % kind.replace(' ', '_'))
+        n = _Ask_choice('Input dataframe to apply %s to' % kind, [r[0]['stem'] for r in results])
+        if n == 0:
+            print('    No %s applied.' % kind)
+            return None
+        return results[n - 1]
 
     def _Spectra_scatter_correction(self):
         '''Scatter correction per spectrum (l1, l2, max, snv, msc); scaler "select" compares all and asks.'''

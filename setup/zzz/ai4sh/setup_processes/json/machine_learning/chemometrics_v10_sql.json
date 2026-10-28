@@ -56,13 +56,13 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
         "process": "spectra_derivative",
         "min_user_stratum": 3,
         "title": "Convert spectra to derivatives",
-        "label": "Convert spectra to derivates and either append to or replace the original bands in the dataframe."
+        "label": "Convert spectra to derivatives and either append to or replace the original bands in the dataframe; with dataframe_array, compare the derivatives of several preprocessed dataframes and select one interactively."
       },
       "nodes": [
         {
@@ -82,6 +82,13 @@
               "required": false,
               "default_value": "raw",
               "hint": "The dataframe to use as input, raw = original spectra, previous = the latest saved parquet file(s), or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
+            },
+            {
+              "parameter": "dataframe_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": [],
+              "hint": "Compare mode: two or more input dataframes (raw, previous or parquet file names, .parquet optional), e.g. raw and the outputs of different preprocessing pipelines. The derivative of every input is plotted and you choose which one to save. Overrides dataframe."
             },
             {
               "parameter": "derivative",
