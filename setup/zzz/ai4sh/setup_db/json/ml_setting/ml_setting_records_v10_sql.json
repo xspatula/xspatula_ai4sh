@@ -562,11 +562,11 @@
                 "savitzky-golay": {
                   "window_length": 5,
                   "polyorder": 2,
-                  "deriv": 1,
+                  "deriv": 0,
                   "mode": "nearest"
                 }
               },
-              "35c5198e073248bfca2fac8a5a9a3617c938720cf63b441f41c668d41e7e520b"
+              "f094fd8aaa8a3d444a9924232025804189c184ddd401fa4926f376e3ce2d0e71"
             ],
             [
               "filter",

@@ -1,7 +1,7 @@
 {
   "process": [
     {
-      "process": "plot_spectra_scattercorrection_scalers",
+      "process": "plot_spectra_variable_scaling",
       "parameters": {
         "project_root_fp": "./project_neospectra/data/spectra/neospectra/ds2/ai4sh",
         "colormap": "jet",

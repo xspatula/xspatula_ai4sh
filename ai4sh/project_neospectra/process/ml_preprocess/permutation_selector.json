@@ -3,9 +3,9 @@
     {
       "process": "spectra_indicator_permutation_selection",
       "parameters": {
-        "project_root_fp": "./project_lucas_2009/data/compiled/lucas_2009_10nm",
+        "project_root_fp": "./project_neospectra/data/compiled/neospectra_10nm",
         "dataframe":"raw",
-        "indicator_array": ["c-org","sand"],
+        "indicator_array": ["c-org","n-tot"],
         "selector_array": ["permutation","rfe"],
         "regressor_array": ["knn"],
         "model_parameters_fp":"default",

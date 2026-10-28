@@ -37,6 +37,13 @@
               "hint": "The ward clustering to apply, if set to none, no ward clustering will be applied even if the process is called. You have to define the ward clustering to apply and set the relative or absolute path to the ward_clustering.JSON file as the parameter."
             },
             {
+              "parameter": "connectivity",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "true = only neighbouring bands can be merged, so every cluster is a contiguous wavelength range; false = unconstrained Ward clustering (bands far apart can end up in the same cluster)."
+            },
+            {
               "parameter": "colormap",
               "parameter_type": "text",
               "required": false,

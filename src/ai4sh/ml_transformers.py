@@ -276,21 +276,44 @@ class VarianceThresholdSelect(BaseEstimator, TransformerMixin):
         return _Numeric_frame(X)[self.columns_out_]
 
 
-class WardAgglomeration(BaseEstimator, TransformerMixin):
-    '''Ward feature agglomeration; output columns wc1 .. wcn.'''
+def Ward_fit(X, n_clusters, connectivity=False):
+    '''Fit Ward feature agglomeration on X (samples × bands, bands in wavelength order).
 
-    def __init__(self, n_clusters=10):
+    connectivity=True only merges neighbouring bands, so every cluster is a contiguous wavelength range.
+    Returns (ward, order): order lists the sklearn cluster labels sorted by the mean band position of their
+    members, so that wc1 is the cluster at the shortest wavelengths.
+    '''
+    conn = None
+    if connectivity:
+        from scipy.sparse import diags
+        n_bands = X.shape[1]
+        conn = diags([np.ones(n_bands - 1), np.ones(n_bands - 1)], [-1, 1])
+    ward = FeatureAgglomeration(n_clusters=n_clusters, linkage='ward', connectivity=conn).fit(X)
+    positions = np.arange(X.shape[1])
+    order = np.argsort([positions[ward.labels_ == k].mean() for k in range(ward.n_clusters_)])
+    return ward, order
+
+
+class WardAgglomeration(BaseEstimator, TransformerMixin):
+    '''Ward feature agglomeration; output columns wc1 .. wcn, ordered by wavelength.'''
+
+    def __init__(self, n_clusters=10, connectivity=False):
         self.n_clusters = n_clusters
+        self.connectivity = connectivity
 
     def fit(self, X, y=None):
         X = _Numeric_frame(X)
         n = min(int(self.n_clusters), X.shape[1] - 1)
-        self.ward_ = FeatureAgglomeration(n_clusters=n, linkage='ward').fit(X.values)
+        self.ward_, self.order_ = Ward_fit(X.values, n, getattr(self, 'connectivity', False))
         return self
 
     def transform(self, X):
         X = _Numeric_frame(X)
         A = self.ward_.transform(X.values)
+        # Models saved before cluster ordering was added have no order_
+        order = getattr(self, 'order_', None)
+        if order is not None:
+            A = A[:, order]
         return pd.DataFrame(A, columns=['wc%d' % (i + 1) for i in range(A.shape[1])], index=X.index)
 
 
@@ -504,7 +527,7 @@ def Chain_to_steps(chain, indicator, test_size):
             step = Decomposition(par.get('method', 'pca'), int(par.get('n_components', 5)))
 
         elif proc == 'ward_clustering':
-            step = WardAgglomeration(int(par['n_clusters_applied']))
+            step = WardAgglomeration(int(par['n_clusters_applied']), bool(par.get('connectivity', False)))
 
         elif proc in _SUPERVISED:
             if proc == 'spectra_indicator_univariate_selection' and par.get('indicator') == indicator:

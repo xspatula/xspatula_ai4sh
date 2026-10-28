@@ -20,7 +20,6 @@ from sklearn.neighbors import LocalOutlierFactor
 from sklearn.svm import OneClassSVM
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_regression
-from sklearn.cluster import FeatureAgglomeration
 from sklearn.model_selection import KFold
 
 from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction,
@@ -40,7 +39,7 @@ from src.lib.pilot import Get_project_path
 from src.ai4sh.project_paths import Default_fpn
 from src.ai4sh.provenance import Load_config_json
 from src.ai4sh.ml_setting import Load_settings, Is_path, Spectra_colormap
-from src.ai4sh.ml_transformers import Holdout_test_mask, Holdout_info
+from src.ai4sh.ml_transformers import Holdout_test_mask, Holdout_info, Ward_fit
 
 _METADATA_COLS = frozenset([
     'sample_id', 'sample_name', 'campaign_tag', 'sampling_log_tag', 'campaign_name', 'latitude_dd', 'longitude_dd',
@@ -77,6 +76,13 @@ def _parse_array_param(raw):
         s = s[1:-1]
     return [x.strip() for x in s.split(',') if x.strip()]
 
+
+# Options offered by scaler/method "select": per-spectrum scatter corrections and band-wise variable scalings
+SCATTER_CORRECTIONS = ['l1', 'l2', 'max', 'snv', 'msc']
+VARIABLE_SCALINGS   = ['meancentring', 'autoscaling', 'paretoscaling', 'poissonscaling']
+# Filter parameter sets compared by filter_fp "select" when no filter_array is given; key → file abbreviation
+FILTER_PRESETS = ['moving-average', 'gauss', 'savitzky-golay', 'lowess']
+_FILTER_ABBREV = {'moving_average': 'ma', 'gauss': 'gf', 'savitzky-golay': 'sg', 'lowess': 'lw'}
 
 # Regex matching any known preprocessing suffix at the end of a parquet stem.
 _DERIVED_RE = DERIVED_STEM_RE
@@ -238,7 +244,7 @@ def _write_companion_json(project_root_fp, in_stem, out_stem, out_cols, step_inf
         json.dump(ordered, fh, indent=2)
 
 
-def _Ward_tune(X, n_clusters_list, kfolds):
+def _Ward_tune(X, n_clusters_list, kfolds, connectivity=False):
     '''K-fold cross-validated reconstruction MSE for each candidate n_clusters.
 
     Returns {n_clusters: (mean_mse, std_mse)}.
@@ -249,8 +255,7 @@ def _Ward_tune(X, n_clusters_list, kfolds):
         fold_errors = []
         for train_idx, test_idx in kf.split(X):
             X_train, X_test = X[train_idx], X[test_idx]
-            ward = FeatureAgglomeration(n_clusters=nc, linkage='ward')
-            ward.fit(X_train)
+            ward, _ = Ward_fit(X_train, nc, connectivity)
             X_rec = ward.inverse_transform(ward.transform(X_test))
             fold_errors.append(float(np.mean((X_test - X_rec) ** 2)))
         scores[nc] = (float(np.mean(fold_errors)), float(np.std(fold_errors)))
@@ -276,6 +281,33 @@ def _resolve_input_parquet(project_root_fp, dataframe_param):
     if not os.path.exists(fp):
         raise FileNotFoundError('Dataframe file not found: %s' % fp)
     return fp
+
+
+def _Ask_choice(question, labels):
+    '''Ask "question (0 = none, 1 = a, 2 = b ...)" until a valid number is entered; return it (0 = none).'''
+    menu = ', '.join('%d = %s' % (i + 1, label) for i, label in enumerate(labels))
+    while True:
+        raw = input('\n    %s (0 = none, %s): ' % (question, menu)).strip()
+        if raw.isdigit() and 0 <= int(raw) <= len(labels):
+            return int(raw)
+        print('    Enter a number 0-%d.' % len(labels))
+
+
+def _resolve_dataframe(project_root_fp, dataframe_param):
+    '''Input parquet path from a dataframe parameter, or None (error printed).
+
+    "raw"      → the selected dataset (see Find_selected_parquet), never a derived file
+    "previous" → the latest dataframe in .previous_dataframe
+    otherwise  → a parquet file name in project_root_fp, the .parquet ending is optional
+    '''
+    param = str(dataframe_param).strip()
+    if param.lower() == 'previous':
+        return _resolve_single_previous(project_root_fp)
+    try:
+        return _resolve_input_parquet(project_root_fp, param)
+    except FileNotFoundError as e:
+        print('    ERROR: %s' % e)
+        return None
 
 
 def _prev_df_path(project_root_fp):
@@ -530,16 +562,9 @@ class Process_ml_preprocess(Get_schema_table):
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
 
         # Load parquet
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
         df, units_D = Read_parquet_with_units(parquet_fp)
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
@@ -705,14 +730,25 @@ class Process_ml_preprocess(Get_schema_table):
         wl = np.array(wavelengths)
         var = np.array(variances_scaled)
 
-        # Top panel: variance per wavelength with threshold line and discard shading
+        # Top panel: variance per wavelength with threshold line and discard shading.
+        # actual_threshold None = no threshold set yet: reference line at the lowest band variance
         ax_top.plot(wl, var, color='steelblue', linewidth=0.9, label='variance (scaled)')
-        ax_top.axhline(actual_threshold, color='red', linestyle='--', linewidth=1.0,
-                       label='threshold = %.4f' % actual_threshold)
-        ax_top.fill_between(wl, 0, var, where=discard_mask,
+        if actual_threshold is None:
+            ax_top.axhline(var.min(), color='red', linestyle='--', linewidth=1.0,
+                           label='min variance = %.4f' % var.min())
+            title_thr = 'min variance: %.4f' % var.min()
+        else:
+            ax_top.axhline(actual_threshold, color='red', linestyle='--', linewidth=1.0,
+                           label='threshold = %.4f' % actual_threshold)
+            title_thr = 'threshold: %.4f' % actual_threshold
+        # Same y-range in every redraw (variance range + 5 % margin); discard shading from its bottom
+        margin = 0.05 * (var.max() - var.min())
+        y_lo, y_hi = var.min() - margin, var.max() + margin
+        ax_top.fill_between(wl, y_lo, var, where=discard_mask,
                             color='red', alpha=0.25, label='discard')
+        ax_top.set_ylim(y_lo, y_hi)
         ax_top.set_ylabel('Variance (%s scaled)' % scaler_name)
-        ax_top.set_title('Band variance   scaler: %s   threshold: %.4f' % (scaler_name, actual_threshold))
+        ax_top.set_title('Band variance   scaler: %s   %s' % (scaler_name, title_thr))
         ax_top.legend(fontsize=8, loc='upper right')
 
         # Bottom panel: spectra subsample with discard regions shaded
@@ -746,8 +782,8 @@ class Process_ml_preprocess(Get_schema_table):
         plt.tight_layout()
 
         if save and plot_dir:
-            out_fp = os.path.join(plot_dir, 'variance_threshold_%s_%.4f.png' % (
-                scaler_name, actual_threshold))
+            out_fp = os.path.join(plot_dir, 'variance_threshold_%s_%s.png' % (
+                scaler_name, 'min' if actual_threshold is None else '%.4f' % actual_threshold))
             fig.savefig(out_fp, dpi=150, bbox_inches='tight')
             if self.verbose >= 1:
                 print('    Plot saved: %s' % out_fp)
@@ -774,11 +810,6 @@ class Process_ml_preprocess(Get_schema_table):
             print('    Variance threshold skipped (scaler=none).')
             return
 
-        threshold   = float(getattr(p, 'threshold', 0.025))
-        if threshold == 0:
-            print('    Variance threshold skipped (threshold=0).')
-            return
-
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show      = getattr(p, 'show', True)
         save      = getattr(p, 'save', False)
@@ -786,30 +817,20 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra = int(getattr(p, 'max_spectra', 100))
 
         # Resolve input parquet
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
         df, units_D = Read_parquet_with_units(parquet_fp)
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
 
-        # Derive _vt output path
+        # Derive _vt output path; check for an existing result before computing
         stem   = os.path.splitext(os.path.basename(parquet_fp))[0]
         vt_fp  = os.path.join(project_root_fp, '%s_vt.parquet' % stem)
 
         if os.path.exists(vt_fp) and not overwrite:
-            print('    Variance threshold already applied. Use overwrite=True to rerun.')
-            _write_previous_df(project_root_fp, 'select_variance_threshold', [
-                {'dataframe': os.path.basename(vt_fp),
-                 'indicator': None, 'regressor': None, 'selector': None}
-            ])
+            self._Accept_and_save(df, None, [], 'vt', stem, project_root_fp, overwrite,
+                                  {'process': 'select_variance_threshold'}, units_D)
             return
 
         # Extract spectral columns
@@ -827,69 +848,77 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: unknown scaler "%s". Use minmax, standard, or robust.' % scaler_name)
             return
 
-        scaler = scalers[scaler_name]
-        X_scaled = scaler.fit_transform(X)
+        X_scaled = scalers[scaler_name].fit_transform(X)
+        variances_scaled = VarianceThreshold(threshold=0.0).fit(X_scaled).variances_
+        var_min, var_med, var_max = (float(np.min(variances_scaled)),
+                                     float(np.median(variances_scaled)),
+                                     float(np.max(variances_scaled)))
 
-        # Variance threshold
-        selector = VarianceThreshold(threshold=threshold)
-        selector.fit(X_scaled)
-        support      = selector.get_support()
-        discard_mask = ~support
-        variances_scaled = selector.variances_
-
-        n_retain  = int(support.sum())
-        n_discard = int(discard_mask.sum())
-
-        if self.verbose >= 1:
-            print('    Bands retained: %d   discarded: %d   (scaler: %s, threshold: %.4f)' % (
-                n_retain, n_discard, scaler_name, threshold))
-
-        # Plot
         plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
-        self._Plot_variance_threshold(
-            df, spectral_cols, wavelengths, variances_scaled, discard_mask,
-            threshold, scaler_name, max_spectra, show, save, plot_dir,
-        )
 
-        if n_discard == 0:
-            print('    No bands below threshold — nothing to remove.')
-            return
+        # Interactive threshold loop: first plot shows the lowest band variance, every new
+        # threshold is redrawn with the bands it removes; Enter accepts, 0 or < min skips.
+        # VarianceThreshold keeps a band only if its variance is strictly above the threshold.
+        threshold    = None
+        discard_mask = np.zeros(len(spectral_cols), dtype=bool)
+        redraw       = True
+        while True:
+            if redraw:
+                self._Plot_variance_threshold(
+                    df, spectral_cols, wavelengths, variances_scaled, discard_mask,
+                    threshold, scaler_name, max_spectra, show, save, plot_dir,
+                )
+                n_discard = int(discard_mask.sum())
+                if threshold is None:
+                    print('    Band variance (%s scaled): min %.4f   median %.4f   max %.4f' % (
+                        scaler_name, var_min, var_med, var_max))
+                else:
+                    print('    Threshold %.4f: %d band%s retained, %d discarded' % (
+                        threshold, len(spectral_cols) - n_discard,
+                        's' if len(spectral_cols) - n_discard != 1 else '', n_discard))
+                redraw = False
 
-        ans = input('\n    Remove %d low-variance band%s? [y/n]: ' % (
-            n_discard, 's' if n_discard != 1 else '')).strip().lower()
+            prompt = '\n    Variance threshold (0 = skip%s) [min %.4f, max %.4f]: ' % (
+                '' if threshold is None else ', Enter = accept %.4f' % threshold, var_min, var_max)
+            raw = input(prompt).strip()
+            if raw == '':
+                if threshold is None:
+                    print('    Enter a threshold, or 0 to skip.')
+                    continue
+                break
+            try:
+                val = float(raw)
+            except ValueError:
+                print('    Enter a number.')
+                continue
+            if val <= 0 or val < var_min:
+                print('    Variance threshold skipped — no bands removed.')
+                return
+            if val >= var_max:
+                print('    Threshold %.4f would remove every band; set it below %.4f.' % (val, var_max))
+                continue
+            threshold    = val
+            discard_mask = variances_scaled <= threshold
+            redraw       = True
 
-        if ans != 'y':
-            print('    No bands removed.')
-            return
-
+        support     = ~discard_mask
         retain_cols = [c for c, keep in zip(spectral_cols, support) if keep]
-        non_spectral = [c for c in df.columns if not _is_spectral_col(c)]
-        df_out = df[non_spectral + retain_cols].copy()
-
-        Save_parquet_with_units(df_out, vt_fp, units_D)
-        _write_previous_df(project_root_fp, 'select_variance_threshold', [
-            {'dataframe': os.path.basename(vt_fp),
-             'indicator': None, 'regressor': None, 'selector': None}
-        ])
-
-        out_stem = os.path.splitext(os.path.basename(vt_fp))[0]
-        _write_companion_json(
-            project_root_fp, stem, out_stem, retain_cols,
-            {'process': 'select_variance_threshold',
-             'parameters': {'scaler': scaler_name, 'threshold': threshold}},
-            Signal_type_of(units_D, retain_cols),
-        )
-
-        print('    Removed %d band%s. %d band%s retained. Saved: %s' % (
-            n_discard, 's' if n_discard != 1 else '',
-            n_retain,  's' if n_retain  != 1 else '',
-            vt_fp,
-        ))
+        step_info   = {'process': 'select_variance_threshold',
+                       'parameters': {'scaler': scaler_name, 'threshold': threshold}}
+        out_fp, _ = self._Accept_and_save(df, df[retain_cols], retain_cols, 'vt',
+                                          stem, project_root_fp, overwrite, step_info, units_D,
+                                          confirm=False)
+        if out_fp and self.verbose >= 1:
+            print('    Removed %d band%s, %d retained.' % (
+                n_discard, 's' if n_discard != 1 else '', len(retain_cols)))
 
     # ================================================================== chemometric processing
 
-    def _Load_spec_inputs(self, p):
-        '''Parse common params, load full parquet, return input dict or None on error.'''
+    def _Load_spec_inputs(self, p, dataframe_param=None):
+        '''Parse common params, load full parquet, return input dict or None on error.
+
+        dataframe_param overrides the dataframe parameter (used for each entry of dataframe_array).
+        '''
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
             project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
@@ -897,23 +926,17 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return None
 
-        dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
+        if dataframe_param is None:
+            dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show        = getattr(p, 'show', True)
         save        = getattr(p, 'save', False)
         overwrite   = bool(getattr(p, 'overwrite', False))
         max_spectra = int(getattr(p, 'max_spectra', 100))
         colormap    = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return None
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return None
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return None
 
         df, units_D = Read_parquet_with_units(parquet_fp)
         if self.verbose >= 1:
@@ -1015,8 +1038,9 @@ class Process_ml_preprocess(Get_schema_table):
             plt.close(fig)
 
     def _Accept_and_save(self, df_orig, spec_out_full, out_cols, abbrev,
-                          stem, project_root_fp, overwrite, step_info, units_D=None):
-        '''Prompt y/n, save parquet + companion JSON. Returns (out_fp, skipped).'''
+                          stem, project_root_fp, overwrite, step_info, units_D=None,
+                          confirm=True):
+        '''Prompt y/n (unless confirm=False), save parquet + companion JSON. Returns (out_fp, skipped).'''
         out_stem = '%s_%s' % (stem, abbrev)
         out_fp   = os.path.join(project_root_fp, out_stem + '.parquet')
 
@@ -1030,10 +1054,11 @@ class Process_ml_preprocess(Get_schema_table):
             ])
             return out_fp, True
 
-        ans = input('\n    Accept and save %s result? [y/n]: ' % abbrev).strip().lower()
-        if ans != 'y':
-            print('    Result discarded.')
-            return None, False
+        if confirm:
+            ans = input('\n    Accept and save %s result? [y/n]: ' % abbrev).strip().lower()
+            if ans != 'y':
+                print('    Result discarded.')
+                return None, False
 
         non_spectral = [c for c in df_orig.columns if not _is_spectral_col(c)]
         signal_type  = Signal_type_of(units_D or {}, [c for c in df_orig.columns if _is_spectral_col(c)])
@@ -1074,86 +1099,78 @@ class Process_ml_preprocess(Get_schema_table):
         try:
             return Load_settings(family, param, default_fpn, resolve_path=self._Resolve_filter_fp,
                                  verbose=self.verbose) or {}
-        except FileNotFoundError as e:
+        except (FileNotFoundError, ValueError) as e:
             print('    ERROR: %s' % e)
             return {}
 
     def _Filter_spectra(self):
-        p = self.process_S.process.parameters
+        '''Single smoothing filter; filter_fp "select" compares the filters in filter_array and asks.
 
-        project_root_fp = str(p.project_root_fp).strip()
-        if not os.path.isabs(project_root_fp):
-            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
-        if not os.path.exists(project_root_fp):
-            print('    ERROR: project_root_fp not found: %s' % project_root_fp)
+        filter_fp and every filter_array entry: a filter parameter set name (ml_setting) or a JSON path
+        relative to the project root, the .json ending is optional.
+        '''
+        p   = self.process_S.process.parameters
+        _json = lambda x: x + '.json' if Is_path(x) and not x.lower().endswith('.json') else x
+
+        filter_fp_param = _json(str(getattr(p, 'filter_fp', 'none')).strip())
+        if filter_fp_param.lower() in ('', 'none', 'no'):
+            print('    ERROR: filter_fp (a filter parameter set name, JSON file or select) is required for filter_spectra.')
             return
 
-        filter_fp_param = str(getattr(p, 'filter_fp', 'none')).strip()
-        filter_cfg      = self._Load_named_settings('filter', filter_fp_param)
-        if not filter_cfg:
-            print('    ERROR: filter_fp (a filter parameter set name or JSON file) is required for filter_spectra.')
-            return
-
-        # Abbreviation from top-level key
-        _abbrev_map = {'savitzky-golay': 'sg', 'gauss': 'gf',
-                       'moving_average': 'ma', 'lowess': 'lw'}
-        abbrev = next((_abbrev_map[k] for k in _abbrev_map if k in filter_cfg), 'flt')
-
-        dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
-        show            = getattr(p, 'show', True)
-        save            = getattr(p, 'save', False)
-        overwrite       = bool(getattr(p, 'overwrite', False))
-        max_spectra     = int(getattr(p, 'max_spectra', 100))
-        colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
-
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
+        if filter_fp_param.lower() == 'select':
+            entries = [_json(e) for e in _parse_array_param(getattr(p, 'filter_array', []))] or list(FILTER_PRESETS)
         else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
+            entries = [filter_fp_param]
+        filters = []                                   # (entry, cfg, abbrev, label)
+        for e in entries:
+            cfg = self._Load_named_settings('filter', e)
+            if not cfg:
+                print('    ERROR: filter "%s" could not be loaded.' % e)
                 return
+            kind = next((k for k in _FILTER_ABBREV if k in cfg), None)
+            if kind is None:
+                print('    ERROR: no known filter (%s) in "%s".' % (', '.join(_FILTER_ABBREV), e))
+                return
+            name = os.path.splitext(os.path.basename(e))[0] if Is_path(e) else e
+            filters.append((e, cfg, _FILTER_ABBREV[kind], name))
 
-        df, units_D = Read_parquet_with_units(parquet_fp)
-        stem = os.path.splitext(os.path.basename(parquet_fp))[0]
-        if self.verbose >= 1:
-            print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
-
-        spectral_cols = [c for c in df.columns if _is_spectral_col(c)]
-        if not spectral_cols:
-            print('    ERROR: no spectral columns found.')
+        inp = self._Load_spec_inputs(p)
+        if inp is None:
             return
-        wavelengths = [_col_to_index(c) for c in spectral_cols]
-        spec_df     = df[spectral_cols].copy()
-        spec_df.columns = wavelengths
+        apply_fn = lambda i: apply_filter(inp['spec_df'], inp['wavelengths'], filters[i][1])
 
-        plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
-        ann      = 'n=%d' % len(df)
+        confirm = True
+        if filter_fp_param.lower() == 'select':
+            picked = self._Select_method(inp, 'filter', [(i, f[3]) for i, f in enumerate(filters)], apply_fn)
+            if picked is None:
+                return
+            i, df_filtered, cols_out, _ = picked
+            confirm = False
+        else:
+            i = 0
+            df_filtered, cols_out, _ = apply_fn(0)
+        entry, filter_cfg, abbrev, name = filters[i]
 
-        df_filtered, cols_out, _ = apply_filter(spec_df, wavelengths, filter_cfg)
-
-        sub_in,  colors, n_shown = self._Sub_spec(spec_df,    max_spectra, colormap)
-        sub_out, _,      _       = self._Sub_spec(df_filtered, max_spectra, colormap)
-        ann_shown = '%s  shown=%d' % (ann, n_shown)
+        sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
+        sub_out, _,      _       = self._Sub_spec(df_filtered,    inp['max_spectra'], inp['colormap'])
+        ann_shown = '%s  shown=%d' % (inp['ann'], n_shown)
 
         self._Plot_input_output(
-            sub_in, sub_out, wavelengths, list(cols_out), colors,
-            'Input spectra', 'Filter: %s' % abbrev,
-            ann_shown, show, save, plot_dir,
+            sub_in, sub_out, inp['wavelengths'], list(cols_out), colors,
+            'Input spectra', 'Filter: %s' % name,
+            ann_shown, inp['show'], inp['save'], inp['plot_dir'],
             'filter_%s.png' % abbrev,
         )
 
         step_info = {
             '_id': abbrev,
             'process': 'filter_spectra',
-            'parameters': {'filter_fp': filter_fp_param},
+            'parameters': {'filter_fp': entry},
             'filter': filter_cfg,
         }
-        self._Accept_and_save(df, df_filtered, list(cols_out), abbrev,
-                               stem, project_root_fp, overwrite, step_info, units_D)
+        self._Accept_and_save(inp['df'], df_filtered, list(cols_out), abbrev,
+                               inp['stem'], inp['project_root_fp'], inp['overwrite'], step_info,
+                               inp['units_D'], confirm=confirm)
 
     def _Multi_filter_spectra(self):
         p = self.process_S.process.parameters
@@ -1179,16 +1196,9 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
 
         df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -1289,16 +1299,9 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
 
         df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -1317,37 +1320,57 @@ class Process_ml_preprocess(Get_schema_table):
         plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
         ann      = 'n=%d' % len(df)
 
-        # Determine n_clusters
+        connectivity = bool(getattr(p, 'connectivity', True))
+        n_bands      = X.shape[1]
+
+        # Check for an existing result before spending time on tuning
+        if os.path.exists(os.path.join(project_root_fp, stem + '_wc.parquet')) and not overwrite:
+            self._Accept_and_save(df, None, [], 'wc', stem, project_root_fp, overwrite,
+                                  {'process': 'ward_clustering'}, units_D)
+            return
+
+        # Suggested n_clusters: tuned best, or n_clusters from the ward clustering file
         tune_cfg = wc.get('tune_ward_clustering', {})
+        n_tuned  = None
         if tune_cfg.get('apply', False):
-            clusters_list = [c for c in tune_cfg.get('clusters', []) if 0 < c < X.shape[1]]
+            clusters_list = [c for c in tune_cfg.get('clusters', []) if 0 < c < n_bands]
             kfolds        = int(tune_cfg.get('kfolds', 3))
             if not clusters_list:
                 print('    ERROR: tune_ward_clustering.clusters list is empty or exceeds n_bands.')
                 return
-            print('    Tuning Ward clustering over %d candidate cluster counts ...' % len(clusters_list))
-            scores    = _Ward_tune(X, clusters_list, kfolds)
-            n_clusters = _Ward_pick_best(scores)
-            print('    Tuned: best n_clusters = %d' % n_clusters)
-            self._Plot_ward_tune(scores, n_clusters, show, save, plot_dir)
+            print('    Tuning Ward clustering over %d candidate cluster counts (connectivity=%s) ...'
+                  % (len(clusters_list), connectivity))
+            scores  = _Ward_tune(X, clusters_list, kfolds, connectivity)
+            n_tuned = _Ward_pick_best(scores)
+            print('    Tuned: best n_clusters = %d' % n_tuned)
+            self._Plot_ward_tune(scores, n_tuned, show, save, plot_dir)
+            n_suggest = n_tuned
         else:
-            n_clusters = int(wc.get('n_clusters', 0))
-            if n_clusters <= 0:
+            n_suggest = int(wc.get('n_clusters', 0))
+            if n_suggest <= 0:
                 print('    ERROR: n_clusters must be > 0 when tune_ward_clustering.apply is false.')
                 return
+        n_suggest = min(n_suggest, n_bands - 1)
 
-        if n_clusters >= X.shape[1]:
-            print('    WARNING: n_clusters (%d) >= n_bands (%d); clamping.' % (n_clusters, X.shape[1]))
-            n_clusters = X.shape[1] - 1
+        n_clusters = self._Ward_ask_n_clusters(n_suggest, n_bands)
+        if n_clusters == 0:
+            print('    No clustering saved.')
+            return
 
-        ward   = FeatureAgglomeration(n_clusters=n_clusters, linkage='ward')
-        ward.fit(X)
-        X_out  = ward.transform(X)
+        ward, order = Ward_fit(X, n_clusters, connectivity)
+        X_out    = ward.transform(X)[:, order]
         out_cols = ['wc%d' % (i + 1) for i in range(n_clusters)]
+        rank     = np.empty(n_clusters, dtype=int)
+        rank[order] = np.arange(n_clusters)
+        band_labels = rank[ward.labels_]            # 0-based wc index of every band
+        cluster_bands = {'wc%d' % (k + 1): [wavelengths[i] for i in np.where(band_labels == k)[0]]
+                         for k in range(n_clusters)}
 
         spec_out  = pd.DataFrame(X_out, columns=out_cols, index=spec_df.index)
+        spec_rec  = pd.DataFrame(X_out[:, band_labels], columns=wavelengths, index=spec_df.index)
         sub_in,  colors, n_shown = self._Sub_spec(spec_df, max_spectra, colormap)
         sub_out, _,      _       = self._Sub_spec(spec_out, max_spectra, colormap)
+        sub_rec, _,      _       = self._Sub_spec(spec_rec, max_spectra, colormap)
         ann_shown = '%s  shown=%d' % (ann, n_shown)
 
         self._Plot_input_output(
@@ -1356,16 +1379,76 @@ class Process_ml_preprocess(Get_schema_table):
             ann_shown, show, save, plot_dir,
             'ward_clustering_wc.png',
         )
+        self._Plot_ward_wavelength(sub_in, sub_rec, wavelengths, band_labels, colors,
+                                   n_clusters, connectivity, ann_shown, show, save, plot_dir)
 
         step_info = {
             '_id': 'wc',
             'process': 'ward_clustering',
             'parameters': {'ward_clustering_fp': wc_fp_param,
+                           'connectivity': connectivity,
+                           'n_clusters_tuned_best': n_tuned,
+                           'n_clusters_selected': n_clusters,
                            'n_clusters_applied': n_clusters},
             'agglomeration': cfg,
+            'cluster_bands': cluster_bands,
         }
         self._Accept_and_save(df, spec_out, out_cols, 'wc',
-                               stem, project_root_fp, overwrite, step_info, units_D)
+                               stem, project_root_fp, overwrite, step_info, units_D,
+                               confirm=False)
+
+    def _Ward_ask_n_clusters(self, n_suggest, n_bands):
+        '''Ask for the number of clusters to save: Enter = n_suggest, 0 = save nothing.'''
+        while True:
+            raw = input('\n    Number of clusters to save (0 = no clustering, Enter = %d) [1-%d]: '
+                        % (n_suggest, n_bands - 1)).strip()
+            if raw == '':
+                return n_suggest
+            try:
+                n = int(raw)
+            except ValueError:
+                print('    Enter an integer.')
+                continue
+            if n == 0 or 0 < n < n_bands:
+                return n
+            print('    n_clusters must be 0 or between 1 and %d.' % (n_bands - 1))
+
+    def _Plot_ward_wavelength(self, spec_in, spec_rec, wavelengths, band_labels, colors,
+                              n_clusters, connectivity, ann, show, save, plot_dir):
+        '''2-panel plot on the wavelength axis: input spectra / every band replaced by its cluster mean.
+
+        With connectivity the cluster borders are drawn as thin vertical lines.
+        '''
+        wl, xl = _spectra_x_axis_ml(wavelengths)
+
+        fig, (ax_in, ax_rec) = plt.subplots(2, 1, figsize=(10, 5), sharex=True, sharey=True)
+        for i, row in enumerate(spec_in.values):
+            ax_in.plot(wl, row, color=colors[i], linewidth=0.5, alpha=0.6)
+        for i, row in enumerate(spec_rec.values):
+            ax_rec.plot(wl, row, color=colors[i], linewidth=0.5, alpha=0.6, drawstyle='steps-mid')
+        if connectivity:
+            for j in np.where(np.diff(band_labels) != 0)[0]:
+                border = (wl[j] + wl[j + 1]) / 2.0
+                ax_rec.axvline(border, color='lightgray', linewidth=0.4, zorder=0)
+        ax_in.set_ylabel('Value')
+        ax_in.set_title('Input spectra')
+        ax_in.text(0.98, 0.97, ann, transform=ax_in.transAxes,
+                   ha='right', va='top', fontsize=7, color='dimgray')
+        ax_rec.set_xlabel(xl)
+        ax_rec.set_ylabel('Cluster mean')
+        ax_rec.set_title('Ward clustering (%d clusters%s) on the wavelength axis'
+                         % (n_clusters, ', contiguous bands' if connectivity else ''))
+        plt.tight_layout()
+
+        if save and plot_dir:
+            fp = os.path.join(plot_dir, 'ward_clustering_wl.png')
+            fig.savefig(fp, dpi=150, bbox_inches='tight')
+            if self.verbose >= 1:
+                print('    Plot saved: %s' % fp)
+        if show:
+            plt.show()
+        else:
+            plt.close(fig)
 
     # ------------------------------------------------------------------ univariate selection
 
@@ -1463,16 +1546,9 @@ class Process_ml_preprocess(Get_schema_table):
         max_spectra         = int(getattr(p, 'max_spectra', 100))
         colormap            = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
-        if dataframe_param.lower() == 'previous':
-            parquet_fp = _resolve_single_previous(project_root_fp)
-            if parquet_fp is None:
-                return
-        else:
-            try:
-                parquet_fp = _resolve_input_parquet(project_root_fp, dataframe_param)
-            except FileNotFoundError as e:
-                print('    ERROR: %s' % e)
-                return
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
 
         df, units_D = Read_parquet_with_units(parquet_fp)
         stem = os.path.splitext(os.path.basename(parquet_fp))[0]
@@ -2039,23 +2115,39 @@ class Process_ml_preprocess(Get_schema_table):
     # ------------------------------------------------------------------ individual steps
 
     def _Spectra_derivative(self):
-        p   = self.process_S.process.parameters
-        inp = self._Load_spec_inputs(p)
-        if inp is None:
-            return
+        '''Derivative; with more than one dataframe in dataframe_array the derivative of every input is
+        compared and the user chooses which one to save.'''
+        p      = self.process_S.process.parameters
+        inputs = _parse_array_param(getattr(p, 'dataframe_array', []))
+        inp    = None
+        if len(inputs) <= 1:
+            inp = self._Load_spec_inputs(p, inputs[0] if inputs else None)
+            if inp is None:
+                return
 
         derive = int(getattr(p, 'derivative', 1))
         append = bool(getattr(p, 'append', False))
 
-        spec_out, cols_out, label = apply_derivative(
-            inp['spec_df'], inp['wavelengths'], {'derive': derive})
+        def derivative(inp):
+            spec_out, cols_out, label = apply_derivative(
+                inp['spec_df'], inp['wavelengths'], {'derive': derive})
+            if append:
+                cols_all = inp['wavelengths'] + list(cols_out)
+                spec_out = pd.concat([inp['spec_df'].reset_index(drop=True),
+                                       spec_out.reset_index(drop=True)], axis=1)
+                spec_out.columns = cols_all
+                cols_out = cols_all
+            return spec_out, cols_out, 'derivative %d' % derive
 
-        if append:
-            cols_all = inp['wavelengths'] + list(cols_out)
-            spec_out = pd.concat([inp['spec_df'].reset_index(drop=True),
-                                   spec_out.reset_index(drop=True)], axis=1)
-            spec_out.columns = cols_all
-            cols_out = cols_all
+        confirm = True
+        if len(_parse_array_param(getattr(p, 'dataframe_array', []))) > 1:
+            picked = self._Compare_inputs(p, 'derivative %d' % derive, derivative)
+            if picked is None:
+                return
+            inp, spec_out, cols_out, _ = picked
+            confirm = False
+        else:
+            spec_out, cols_out, _ = derivative(inp)
 
         sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
         sub_out, _,      _       = self._Sub_spec(spec_out,       inp['max_spectra'], inp['colormap'])
@@ -2064,7 +2156,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         self._Plot_input_output(
             sub_in, sub_out, inp['wavelengths'], list(cols_out), colors,
-            'Input spectra',
+            'Input spectra: %s' % inp['stem'],
             'Derivative order %d%s' % (derive, ' (appended)' if append else ''),
             ann_shown, inp['show'], inp['save'], inp['plot_dir'],
             'chemometric_%s.png' % abbrev,
@@ -2074,18 +2166,74 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_derivative',
              'parameters': {'derivative': derive, 'append': append}},
-            inp['units_D'],
+            inp['units_D'], confirm=confirm,
         )
 
+    def _Select_method(self, inp, kind, options, apply_fn):
+        '''Plot raw + every option stacked, ask 0..n for the one to apply.
+
+        options: list of (option, label); apply_fn(option) → (spec_out, cols_out, label).
+        Returns (option, spec_out, cols_out, label), or None for 0 = none.
+        '''
+        steps, results = [('raw', inp['spec_df'], inp['wavelengths'])], []
+        for opt, label in options:
+            spec_out, cols_out, lab = apply_fn(opt)
+            steps.append(('%d: %s' % (len(results) + 1, label), spec_out, cols_out))
+            results.append((opt, spec_out, cols_out, lab))
+        self._Plot_chem_chain(steps, inp['max_spectra'], inp['colormap'], inp['ann'],
+                              inp['show'], inp['save'], inp['plot_dir'],
+                              'compare_%s.png' % kind.replace(' ', '_'))
+        n = _Ask_choice('%s to apply' % kind.capitalize(), [label for _, label in options])
+        if n == 0:
+            print('    No %s applied.' % kind)
+            return None
+        return results[n - 1]
+
+    def _Compare_inputs(self, p, kind, transform_fn, menu_label=None):
+        '''Apply transform_fn to every dataframe in dataframe_array, plot the results stacked, ask 0..n.
+
+        transform_fn(inp) → (spec_out, cols_out, label). Returns (inp, spec_out, cols_out, label) of the
+        chosen input, or None for 0 = none or an error. menu_label(result) → prompt text (default: input stem).
+        '''
+        steps, results = [], []
+        for name in _parse_array_param(getattr(p, 'dataframe_array', [])):
+            inp = self._Load_spec_inputs(p, name)
+            if inp is None:
+                return None
+            spec_out, cols_out, label = transform_fn(inp)
+            steps.append(('%d: %s → %s' % (len(results) + 1, inp['stem'], label), spec_out, cols_out))
+            results.append((inp, spec_out, cols_out, label))
+        first = results[0][0]
+        self._Plot_chem_chain(steps, first['max_spectra'], first['colormap'], '',
+                              first['show'], first['save'], first['plot_dir'],
+                              'compare_%s.png' % kind.replace(' ', '_'))
+        n = _Ask_choice('Input dataframe to apply %s to' % kind,
+                        [menu_label(r) if menu_label else r[0]['stem'] for r in results])
+        if n == 0:
+            print('    No %s applied.' % kind)
+            return None
+        return results[n - 1]
+
     def _Spectra_scatter_correction(self):
+        '''Scatter correction per spectrum (l1, l2, max, snv, msc); scaler "select" compares all and asks.'''
         p   = self.process_S.process.parameters
         inp = self._Load_spec_inputs(p)
         if inp is None:
             return
 
         scalers = _parse_array_param(getattr(p, 'scaler', ['snv']))
-        spec_out, cols_out, label = apply_scatter_correction(
-            inp['spec_df'], inp['wavelengths'], {'scaler': scalers})
+        apply_fn = lambda sc: apply_scatter_correction(inp['spec_df'], inp['wavelengths'],
+                                                       {'scaler': sc if isinstance(sc, list) else [sc]})
+        confirm = True
+        if scalers == ['select']:
+            picked = self._Select_method(inp, 'scatter correction',
+                                         [(sc, sc) for sc in SCATTER_CORRECTIONS], apply_fn)
+            if picked is None:
+                return
+            sc, spec_out, cols_out, label = picked
+            scalers, confirm = [sc], False
+        else:
+            spec_out, cols_out, label = apply_fn(scalers)
 
         sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
         sub_out, _,      _       = self._Sub_spec(spec_out,       inp['max_spectra'], inp['colormap'])
@@ -2103,18 +2251,28 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_scatter_correction',
              'parameters': {'scaler': scalers}},
-            inp['units_D'],
+            inp['units_D'], confirm=confirm,
         )
 
     def _Spectra_scaling(self):
+        '''Variable (band-wise) scaling; method "select" compares all four and asks.'''
         p   = self.process_S.process.parameters
         inp = self._Load_spec_inputs(p)
         if inp is None:
             return
 
-        method = str(getattr(p, 'method', 'meancentring')).strip()
-        spec_out, cols_out, label = apply_scaling(
-            inp['spec_df'], inp['wavelengths'], {'method': method})
+        method   = str(getattr(p, 'method', 'meancentring')).strip()
+        apply_fn = lambda m: apply_scaling(inp['spec_df'], inp['wavelengths'], {'method': m})
+        confirm  = True
+        if method == 'select':
+            picked = self._Select_method(inp, 'variable scaling',
+                                         [(m, m) for m in VARIABLE_SCALINGS], apply_fn)
+            if picked is None:
+                return
+            method, spec_out, cols_out, label = picked
+            confirm = False
+        else:
+            spec_out, cols_out, label = apply_fn(method)
 
         sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
         sub_out, _,      _       = self._Sub_spec(spec_out,       inp['max_spectra'], inp['colormap'])
@@ -2124,7 +2282,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         self._Plot_input_output(
             sub_in, sub_out, inp['wavelengths'], cols_out, colors,
-            'Input spectra', 'Scaling: %s' % method,
+            'Input spectra', 'Variable scaling: %s' % method,
             ann_shown, inp['show'], inp['save'], inp['plot_dir'],
             'chemometric_%s.png' % abbrev,
         )
@@ -2133,20 +2291,42 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_scaling',
              'parameters': {'method': method}},
-            inp['units_D'],
+            inp['units_D'], confirm=confirm,
         )
 
     def _Spectra_decomposition(self):
-        p   = self.process_S.process.parameters
-        inp = self._Load_spec_inputs(p)
-        if inp is None:
-            return
+        '''Decomposition (PCA); with more than one dataframe in dataframe_array the decomposition of every
+        input is compared (scores + explained variance) and the user chooses which one to save.'''
+        p      = self.process_S.process.parameters
+        inputs = _parse_array_param(getattr(p, 'dataframe_array', []))
+        inp    = None
+        if len(inputs) <= 1:
+            inp = self._Load_spec_inputs(p, inputs[0] if inputs else None)
+            if inp is None:
+                return
 
         method       = str(getattr(p, 'method', 'pca')).strip().lower()
         n_components = int(getattr(p, 'n_components', 5))
-        spec_out, cols_out, label = apply_decomposition(
-            inp['spec_df'], inp['wavelengths'],
-            {'method': method, 'n_components': n_components})
+
+        def decomposition(inp):
+            spec_out, cols_out, _ = apply_decomposition(
+                inp['spec_df'], inp['wavelengths'],
+                {'method': method, 'n_components': n_components})
+            # Share of the total spectral variance captured by the components (PCA score variances)
+            total = float(inp['spec_df'].values.astype(float).var(axis=0).sum())
+            share = float(spec_out.values.var(axis=0).sum()) / total if total > 0 else float('nan')
+            return spec_out, cols_out, '%s %d (%.1f %% variance)' % (method.upper(), len(cols_out), 100 * share)
+
+        confirm = True
+        if len(inputs) > 1:
+            picked = self._Compare_inputs(p, '%s %d' % (method, n_components), decomposition,
+                                          menu_label=lambda r: '%s (%s)' % (r[0]['stem'], r[3].split('(')[-1].rstrip(')')))
+            if picked is None:
+                return
+            inp, spec_out, cols_out, label = picked
+            confirm = False
+        else:
+            spec_out, cols_out, label = decomposition(inp)
 
         n_actual  = len(cols_out)
         abbrev    = 'pca%d' % n_actual
@@ -2157,7 +2337,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         self._Plot_input_output(
             sub_in, sub_out, inp['wavelengths'], cols_out, colors,
-            'Input spectra', '%s (%d components)' % (method.upper(), n_actual),
+            'Input spectra: %s' % inp['stem'], label,
             ann_shown, inp['show'], inp['save'], inp['plot_dir'],
             'chemometric_%s.png' % abbrev,
         )
@@ -2166,7 +2346,7 @@ class Process_ml_preprocess(Get_schema_table):
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
             {'process': 'spectra_decomposition',
              'parameters': {'method': method, 'n_components': n_actual}},
-            inp['units_D'],
+            inp['units_D'], confirm=confirm,
         )
 
     def _Chemometric_default(self):

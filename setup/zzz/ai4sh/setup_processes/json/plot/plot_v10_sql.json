@@ -213,10 +213,10 @@
       "overwrite": false,
       "parameters": {
         "root_process": "plot",
-        "process": "plot_spectra_scattercorrection_scalers",
+        "process": "plot_spectra_scatter_correction",
         "min_user_stratum": 1,
         "title": "Plot scatter corrections",
-        "label": "Plot a comparison of scatter correction scaler results."
+        "label": "Plot a comparison of the scatter corrections (per spectrum): l1, l2, max, snv and msc."
       },
       "nodes": [
         {
@@ -267,10 +267,10 @@
       "overwrite": false,
       "parameters": {
         "root_process": "plot",
-        "process": "plot_spectra_scaling_methods",
+        "process": "plot_spectra_variable_scaling",
         "min_user_stratum": 1,
-        "title": "Plot scatter corrections",
-        "label": "Plot a comparison of scatter correction scaler results."
+        "title": "Plot variable scaling methods",
+        "label": "Plot a comparison of the variable (band-wise) scaling methods: meancentring, autoscaling, paretoscaling and poissonscaling."
       },
       "nodes": [
         {
@@ -283,13 +283,6 @@
               "required": false,
               "default_value": "",
               "hint": "The root fp of the project"
-            },
-            {
-              "parameter": "filter",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "none",
-              "hint": "Set path to the JSON file defining the filter. Available filter options: moving-average, gauss, savitszky-golay. To run the default settings of any of these filter set the parameter to the filter name"
             },
             {
               "parameter": "colormap",

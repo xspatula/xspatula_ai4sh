@@ -2,13 +2,13 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
         "process": "filter_spectra",
         "min_user_stratum": 3,
         "title": "Filter spectral data with a single filter",
-        "label": "Filter spectral data with a single filter: Available filter: moving-average, gauss, savitzky-golay and LOWESS."
+        "label": "Filter (smooth) spectral data with a single filter: moving-average, gauss, savitzky-golay or LOWESS; or compare several and select one interactively."
       },
       "nodes": [
         {
@@ -34,7 +34,19 @@
               "parameter_type": "text",
               "required": true,
               "default_value": "none",
-              "hint": "The filter to apply, if set to none, no filter will be applied even if the process is called. You have to define the filter to apply and set the relative or absolute path to the filter.JSON file as the parameter."
+              "hint": "The filter to apply: a filter parameter set name (moving-average, gauss, savitzky-golay, lowess or a custom set) or the path (relative to the project root, .json optional) to a filter JSON file; select = compare the filters in filter_array and choose interactively which one to apply; none = no filter."
+            },
+            {
+              "parameter": "filter_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": [
+                "moving-average",
+                "gauss",
+                "savitzky-golay",
+                "lowess"
+              ],
+              "hint": "Only used when filter_fp is select: the filters to compare, each a filter parameter set name or a path (relative to the project root, .json optional) to a filter JSON file."
             },
             {
               "parameter": "colormap",

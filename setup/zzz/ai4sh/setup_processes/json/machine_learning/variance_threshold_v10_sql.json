@@ -8,7 +8,7 @@
         "process": "select_variance_threshold",
         "min_user_stratum": 3,
         "title": "Select spectra variance threshold",
-        "label": "Select and remove spectral bands with variance below a given threshold after scaling to reduce the number of input bands in the Machine Learning modelling: Available scalers: minmax, standard and robust."
+        "label": "Select and remove spectral bands with variance below a threshold set interactively after scaling to reduce the number of input bands in the Machine Learning modelling: Available scalers: minmax, standard and robust."
       },
       "nodes": [
         {
@@ -35,13 +35,6 @@
               "required": false,
               "default_value": "none",
               "hint": "Scaler to apply before detecting variance, available options: minmax, standard and robust. If set to none, no variance threshold selection will be applied."
-            },
-            {
-              "parameter": "threshold",
-              "parameter_type": "float",
-              "required": false,
-              "default_value": 0.025,
-              "hint": "The threshold to set for detecting spectral bands with low variance. If set to 0, no variance threshold selection will be applied"
             }
           ]
         }
