@@ -30,7 +30,8 @@ from src.ai4sh.previous_dataframe import (
     Previous_df_path, Read_previous_df, Write_previous_df, Previous_parquet,
 )
 from src.ai4sh.parquet_units import (Read_parquet_with_units, Save_parquet_with_units,
-                                    Find_selected_parquet, DERIVED_STEM_RE)
+                                    Find_selected_parquet, DERIVED_STEM_RE,
+                                    SUFFIX_SEP, Derived_stem)
 from src.ai4sh.spectral_columns import (Band_col_name, Band_value, Is_band_col,
                                        Set_signal_type, Signal_type_of)
 
@@ -442,6 +443,10 @@ class Process_ml_preprocess(Get_schema_table):
         self.pg_session_C = pg_session_C
         self.project_root_FP = project_root_FP
 
+    def _Overwrite(self, p):
+        '''"overwrite" is set on the process block (next to "parameters"); a parameter of that name also counts.'''
+        return bool(getattr(self.process_S.process, 'overwrite', False)) or bool(getattr(p, 'overwrite', False))
+
     def _Sub_process(self, _json_file_key):
         if self.process_S.process.process == 'detect_outliers':
             self._Detect_outliers()
@@ -558,7 +563,7 @@ class Process_ml_preprocess(Get_schema_table):
         threshold       = float(getattr(p, 'threshold', 0.1))
         show            = getattr(p, 'show', True)
         save            = getattr(p, 'save', False)
-        overwrite       = bool(getattr(p, 'overwrite', False))
+        overwrite       = self._Overwrite(p)
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
 
         # Load parquet
@@ -569,9 +574,9 @@ class Process_ml_preprocess(Get_schema_table):
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
 
-        # Derive _ol output path
+        # Derive .ol output path
         stem      = os.path.splitext(os.path.basename(parquet_fp))[0]
-        ol_del_fp = os.path.join(project_root_fp, '%s_ol.parquet' % stem)
+        ol_del_fp = os.path.join(project_root_fp, Derived_stem(stem, 'ol') + '.parquet')
 
         # Determine which indicators to process
         requested = _parse_array_param(getattr(p, 'indicator_array', []))
@@ -813,7 +818,7 @@ class Process_ml_preprocess(Get_schema_table):
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show      = getattr(p, 'show', True)
         save      = getattr(p, 'save', False)
-        overwrite = bool(getattr(p, 'overwrite', False))
+        overwrite = self._Overwrite(p)
         max_spectra = int(getattr(p, 'max_spectra', 100))
 
         # Resolve input parquet
@@ -824,9 +829,9 @@ class Process_ml_preprocess(Get_schema_table):
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
 
-        # Derive _vt output path; check for an existing result before computing
+        # Derive .vt output path; check for an existing result before computing
         stem   = os.path.splitext(os.path.basename(parquet_fp))[0]
-        vt_fp  = os.path.join(project_root_fp, '%s_vt.parquet' % stem)
+        vt_fp  = os.path.join(project_root_fp, Derived_stem(stem, 'vt') + '.parquet')
 
         if os.path.exists(vt_fp) and not overwrite:
             self._Accept_and_save(df, None, [], 'vt', stem, project_root_fp, overwrite,
@@ -930,7 +935,7 @@ class Process_ml_preprocess(Get_schema_table):
             dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show        = getattr(p, 'show', True)
         save        = getattr(p, 'save', False)
-        overwrite   = bool(getattr(p, 'overwrite', False))
+        overwrite   = self._Overwrite(p)
         max_spectra = int(getattr(p, 'max_spectra', 100))
         colormap    = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
@@ -1041,7 +1046,7 @@ class Process_ml_preprocess(Get_schema_table):
                           stem, project_root_fp, overwrite, step_info, units_D=None,
                           confirm=True):
         '''Prompt y/n (unless confirm=False), save parquet + companion JSON. Returns (out_fp, skipped).'''
-        out_stem = '%s_%s' % (stem, abbrev)
+        out_stem = Derived_stem(stem, abbrev)
         out_fp   = os.path.join(project_root_fp, out_stem + '.parquet')
 
         if os.path.exists(out_fp) and not overwrite:
@@ -1192,7 +1197,7 @@ class Process_ml_preprocess(Get_schema_table):
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show            = getattr(p, 'show', True)
         save            = getattr(p, 'save', False)
-        overwrite       = bool(getattr(p, 'overwrite', False))
+        overwrite       = self._Overwrite(p)
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
@@ -1295,7 +1300,7 @@ class Process_ml_preprocess(Get_schema_table):
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show            = getattr(p, 'show', True)
         save            = getattr(p, 'save', False)
-        overwrite       = bool(getattr(p, 'overwrite', False))
+        overwrite       = self._Overwrite(p)
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
@@ -1324,7 +1329,7 @@ class Process_ml_preprocess(Get_schema_table):
         n_bands      = X.shape[1]
 
         # Check for an existing result before spending time on tuning
-        if os.path.exists(os.path.join(project_root_fp, stem + '_wc.parquet')) and not overwrite:
+        if os.path.exists(os.path.join(project_root_fp, Derived_stem(stem, 'wc') + '.parquet')) and not overwrite:
             self._Accept_and_save(df, None, [], 'wc', stem, project_root_fp, overwrite,
                                   {'process': 'ward_clustering'}, units_D)
             return
@@ -1542,7 +1547,7 @@ class Process_ml_preprocess(Get_schema_table):
         separate_selections = bool(getattr(p, 'separate_selections', False))
         show                = getattr(p, 'show', True)
         save                = getattr(p, 'save', False)
-        overwrite           = bool(getattr(p, 'overwrite', False))
+        overwrite           = self._Overwrite(p)
         max_spectra         = int(getattr(p, 'max_spectra', 100))
         colormap            = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
@@ -1740,7 +1745,7 @@ class Process_ml_preprocess(Get_schema_table):
         model_params_param  = str(getattr(p, 'model_parameters_fp', 'default')).strip()
         separate_selections = bool(getattr(p, 'separate_selections', False))
         n_top               = int(getattr(p, 'n_top_features_in_plot', 0))
-        overwrite           = bool(getattr(p, 'overwrite', False))
+        overwrite           = self._Overwrite(p)
         test_size           = float(getattr(p, 'test_size', 0.3))
 
         if not selector_array:
@@ -1979,7 +1984,7 @@ class Process_ml_preprocess(Get_schema_table):
             top_cols = [spectral_cols[i] for i in top_idx]
             top_wl   = [wavelengths[i]   for i in top_idx]
             abbrev   = '%s-%s-%s' % (ind_s, reg_key, suffix)
-            out_stem = '%s_%s' % (stem, abbrev)
+            out_stem = Derived_stem(stem, abbrev)
             out_fp   = os.path.join(project_root_fp, out_stem + '.parquet')
             if os.path.exists(out_fp) and not overwrite:
                 print('    "%s" already exists. Use overwrite=True to rerun.' % out_stem)
@@ -2395,7 +2400,7 @@ class Process_ml_preprocess(Get_schema_table):
                 step_info_list.append({'process': 'spectra_decomposition',
                                        'parameters': {'method': m, 'n_components': n}})
 
-        abbrev = '_'.join(chain_abbrevs) if chain_abbrevs else 'default'
+        abbrev = SUFFIX_SEP.join(chain_abbrevs) if chain_abbrevs else 'default'
 
         self._Plot_chem_chain(
             steps, inp['max_spectra'], inp['colormap'], inp['ann'],
