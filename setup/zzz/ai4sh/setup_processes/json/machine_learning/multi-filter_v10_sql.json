@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
         "process": "multi_filter_spectra",
@@ -35,6 +35,13 @@
               "required": true,
               "default_value": "none",
               "hint": "The multi filter to apply, if set to none, no filter will be applied even if the process is called. You have to define the multi filter to apply and set the relative or absolute path to the multi_filter.JSON file as the parameter."
+            },
+            {
+              "parameter": "name_extension",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional user extension (1-6 letters, digits or -) added to the file suffix after a hashtag, e.g. .ma5#12321, to tell apart outputs with settings the suffix does not show."
             },
             {
               "parameter": "colormap",

@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
         "process": "ward_clustering",
@@ -42,6 +42,13 @@
               "required": false,
               "default_value": true,
               "hint": "true = only neighbouring bands can be merged, so every cluster is a contiguous wavelength range; false = unconstrained Ward clustering (bands far apart can end up in the same cluster)."
+            },
+            {
+              "parameter": "name_extension",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional user extension (1-6 letters, digits or -) added to the file suffix after a hashtag, e.g. .ma5#12321, to tell apart outputs with settings the suffix does not show."
             },
             {
               "parameter": "colormap",

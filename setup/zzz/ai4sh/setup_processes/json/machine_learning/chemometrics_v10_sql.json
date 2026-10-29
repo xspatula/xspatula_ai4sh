@@ -44,6 +44,13 @@
               "hint": "Array of chemometric methods to actually apply, leave empty for none; if multiple methods are selected, the methods will be applied in the listed order."
             },
             {
+              "parameter": "name_extension",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional user extension (1-6 letters, digits or -) added to the file suffix after a hashtag, e.g. .ma5#12321, to tell apart outputs with settings the suffix does not show."
+            },
+            {
               "parameter": "colormap",
               "parameter_type": "text",
               "required": false,
