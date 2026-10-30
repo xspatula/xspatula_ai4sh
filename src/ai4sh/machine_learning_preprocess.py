@@ -24,14 +24,16 @@ from sklearn.model_selection import KFold
 
 from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction,
                                      apply_scaling, apply_decomposition)
-from src.ai4sh.chemometric_chain import (Parse_chain, Apply_chain, Num_tag as _num_tag,
+from src.ai4sh.chemometric_chain import (Parse_chain, Apply_chain, Chain_from_companion, Check_spectral_range,
+                                         Num_tag as _num_tag,
                                          Filter_suffix as _filter_suffix)
 from src.ai4sh.filter import apply_filter, apply_multi_filter
 from src.ai4sh.previous_dataframe import (
-    Previous_df_path, Read_previous_df, Write_previous_df, Previous_parquet,
+    Previous_df_path, Read_previous_df, Write_previous_df, Previous_parquet, Prune_previous_history,
+    PREVIOUS_DF_FN,
 )
 from src.ai4sh.parquet_units import (Read_parquet_with_units, Save_parquet_with_units,
-                                    Find_selected_parquet, DERIVED_STEM_RE,
+                                    Find_selected_parquet, Is_derived_parquet, DERIVED_STEM_RE,
                                     SUFFIX_SEP, Derived_stem)
 from src.ai4sh.spectral_columns import (Band_col_name, Band_value, Is_band_col,
                                        Set_signal_type, Signal_type_of)
@@ -486,6 +488,8 @@ class Process_ml_preprocess(Get_schema_table):
             self._Detect_outliers()
         elif self.process_S.process.process == 'select_variance_threshold':
             self._Variance_threshold()
+        elif self.process_S.process.process == 'delete_dataframes':
+            self._Delete_dataframes()
         elif self.process_S.process.process in ('chemometric_chain', 'chemometric_default'):
             self._Chemometric_chain()
         elif self.process_S.process.process == 'spectra_derivative':
@@ -1142,8 +1146,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         if os.path.exists(out_fp) and not overwrite:
             print('    "%s" already applied. Use overwrite=True to rerun.' % abbrev)
-            _proc = (step_info[0].get('process', 'unknown') if isinstance(step_info, list)
-                     else step_info.get('process', 'unknown'))
+            _proc = self.process_S.process.process
             _write_previous_df(project_root_fp, _proc, [
                 {'dataframe': os.path.basename(out_fp),
                  'indicator': None, 'regressor': None, 'selector': None}
@@ -1168,8 +1171,7 @@ class Process_ml_preprocess(Get_schema_table):
             save_df.reset_index(drop=True),
         ], axis=1)
         Save_parquet_with_units(df_save, out_fp, Set_signal_type(units_D, saved_cols, signal_type))
-        _proc = (step_info[0].get('process', 'unknown') if isinstance(step_info, list)
-                 else step_info.get('process', 'unknown'))
+        _proc = self.process_S.process.process     # the process run (chemometric_chain, not its first step)
         _write_previous_df(project_root_fp, _proc, [
             {'dataframe': os.path.basename(out_fp),
              'indicator': None, 'regressor': None, 'selector': None}
@@ -2450,26 +2452,61 @@ class Process_ml_preprocess(Get_schema_table):
             inp['units_D'], confirm=confirm,
         )
 
+    def _Chain_from_fpn(self, p, chain_from):
+        '''Companion JSON named by chain_from: a dataframe name in project_root_fp or a path relative to the
+        project root; .json (or .parquet) ending optional.'''
+        name = chain_from[:-len('.parquet')] if chain_from.endswith('.parquet') else chain_from
+        name = name if name.endswith('.json') else name + '.json'
+        if '/' in chain_from or chain_from.startswith('~'):
+            return Get_project_path(self.project_root_FP, name)
+        root = str(p.project_root_fp).strip()
+        root = root if os.path.isabs(root) else Get_project_path(self.project_root_FP, root)
+        return os.path.join(root, name)
+
     def _Chemometric_chain(self):
         '''Run the steps of chemometrics_array in order (see src/ai4sh/chemometric_chain.py), plot every step,
-        ask y/n and save the result with the suffixes of all steps (e.g. .snv.sg5.d1.mc.wc40.pca5).'''
+        ask y/n and save the result with the suffixes of all steps (e.g. .snv.sg5.d1.mc.wc40.pca5).
+
+        chain_from: instead of chemometrics_array, run the preprocessing_chain recorded in the companion JSON of a
+        saved dataframe (on a dataframe with the same spectral range and resolution).'''
         p   = self.process_S.process.parameters
         ext = _name_extension(p)
         if ext is None:
             return
-        try:
-            steps = Parse_chain(getattr(p, 'chemometrics_array', []), self._Resolve_filter_fp)
-        except ValueError as e:
-            print('    ERROR: %s' % e)
-            return
-        if not steps:
-            print('    No chemometrics_array specified — nothing to do.')
-            return
+        chain_from = str(getattr(p, 'chain_from', '') or '').strip()
+        chain_companion = None
+        if chain_from.lower() in ('', 'none'):
+            try:
+                steps = Parse_chain(getattr(p, 'chemometrics_array', []), self._Resolve_filter_fp)
+            except ValueError as e:
+                print('    ERROR: %s' % e)
+                return
+            if not steps:
+                print('    No chemometrics_array specified — nothing to do.')
+                return
+        else:
+            if _parse_array_param(getattr(p, 'chemometrics_array', [])):
+                print('    ERROR: give either chain_from or chemometrics_array, not both.')
+                return
+            fpn = self._Chain_from_fpn(p, chain_from)
+            if not os.path.exists(fpn):
+                print('    ERROR: chain_from not found: %s' % fpn)
+                return
+            chain_companion = Load_config_json(fpn)
+            try:
+                steps = Chain_from_companion(chain_companion)
+            except ValueError as e:
+                print('    ERROR: chain_from %s: %s' % (os.path.basename(fpn), e))
+                return
+            if self.verbose >= 1:
+                print('    Chain from %s: %s' % (os.path.basename(fpn), ' → '.join(st['suffix'] for st in steps)))
 
         inp = self._Load_spec_inputs(p)
         if inp is None:
             return
         try:
+            if chain_companion is not None:
+                Check_spectral_range(chain_companion, inp['wavelengths'])
             results = Apply_chain(inp['spec_df'], inp['wavelengths'], steps)
         except ValueError as e:
             print('    ERROR: %s' % e)
@@ -2487,3 +2524,73 @@ class Process_ml_preprocess(Get_schema_table):
             [r['step_info'] for r in results[1:]],
             inp['units_D'],
         )
+
+    # ------------------------------------------------------------------ housekeeping
+
+    def _Delete_dataframes(self):
+        '''Delete the pre-processed dataframes (parquet + companion JSON) of project_root_fp that are not kept, and
+        remove them (and any already missing file) from .previous_dataframe.
+
+        keep_array: raw (the selected datasets), previous (the dataframe(s) of the latest .previous_dataframe
+        record) and/or dataframe names (.parquet optional); empty = raw and previous. Selected (not pre-processed)
+        datasets are never deleted, and a kept name that does not exist stops the process before anything is
+        deleted. The files to delete are listed and confirmed with y/n.
+        '''
+        p = self.process_S.process.parameters
+
+        project_root_fp = str(p.project_root_fp).strip()
+        if not os.path.isabs(project_root_fp):
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
+        if not os.path.isdir(project_root_fp):
+            print('    ERROR: project_root_fp not found: %s' % project_root_fp)
+            return
+
+        keep_param = _parse_array_param(getattr(p, 'keep_array', [])) or ['raw', 'previous']
+
+        parquets = sorted(f for f in os.listdir(project_root_fp) if f.endswith('.parquet'))
+        derived  = [f for f in parquets if Is_derived_parquet(os.path.join(project_root_fp, f))]
+
+        keep = set()
+        for k in keep_param:
+            if k.lower() == 'raw':
+                continue                                   # selected datasets are never deleted
+            if k.lower() == 'previous':
+                prev = Read_previous_df(project_root_fp)
+                keep.update(e.get('dataframe') for e in (prev or {}).get('entries', []))
+                continue
+            name = k if k.endswith('.parquet') else k + '.parquet'
+            if name not in parquets:
+                print('    ERROR: dataframe to keep not found: %s — nothing deleted.' % name)
+                return
+            keep.add(name)
+
+        to_delete = [f for f in derived if f not in keep]
+        kept      = [f for f in derived if f in keep]
+
+        print('    Selected (raw) dataframes, never deleted: %s' % (
+            ', '.join(f for f in parquets if f not in derived) or 'none'))
+        print('    Pre-processed dataframes kept (%d): %s' % (len(kept), ', '.join(kept) or 'none'))
+        if not to_delete:
+            n = Prune_previous_history(project_root_fp)
+            print('    No pre-processed dataframes to delete.%s' % (
+                ' Removed %d missing file(s) from %s.' % (n, PREVIOUS_DF_FN) if n else ''))
+            return
+
+        mb = sum(os.path.getsize(os.path.join(project_root_fp, f)) for f in to_delete) / 1e6
+        print('    Pre-processed dataframes to delete (%d, %.1f MB):' % (len(to_delete), mb))
+        for f in to_delete:
+            print('      %s' % f)
+        ans = input('\n    Delete %s (parquet + companion JSON)? [y/n]: ' % (
+            'this dataframe' if len(to_delete) == 1 else 'these %d dataframes' % len(to_delete))).strip().lower()
+        if ans != 'y':
+            print('    Nothing deleted.')
+            return
+
+        for f in to_delete:
+            stem = os.path.splitext(f)[0]
+            for fpn in (os.path.join(project_root_fp, f), os.path.join(project_root_fp, stem + '.json')):
+                if os.path.exists(fpn):
+                    os.remove(fpn)
+        n = Prune_previous_history(project_root_fp)
+        print('    Deleted %d dataframe%s; %d entr%s removed from %s.' % (
+            len(to_delete), '' if len(to_delete) == 1 else 's', n, 'y' if n == 1 else 'ies', PREVIOUS_DF_FN))

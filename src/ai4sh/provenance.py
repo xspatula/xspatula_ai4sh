@@ -38,9 +38,10 @@ _ENVIRONMENT = {}
 
 
 def _Jsonable(obj):
-    '''Return obj as plain JSON types (unknown types as str).'''
+    '''Return obj as plain JSON types: attribute objects (Struct, e.g. the {step: settings} items of an array
+    parameter) as dicts, other unknown types as str.'''
 
-    return json.loads(json.dumps(obj, default=str))
+    return json.loads(json.dumps(obj, default=lambda o: vars(o) if hasattr(o, '__dict__') else str(o)))
 
 
 def _Git_state():

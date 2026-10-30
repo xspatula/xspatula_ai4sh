@@ -37,6 +37,13 @@
               "hint": "Steps applied in the listed order. Each item is a method name with default settings: moving-average, gauss, savitzky-golay, lowess (filters), l1, l2, max, snv, msc (scatter correction), derivative (1st), meancentring, autoscaling, paretoscaling, poissonscaling (variable scaling), pca (5 components); or an object with custom settings: {\"filter\": <set name, JSON path or settings>}, {\"multi_filter\": ...}, {\"scatter_correction\": [\"snv\",\"snv\"]}, {\"derivative\": 2}, {\"scaling\": \"autoscaling\"}, {\"variance_threshold\": {\"threshold\": 0.03, \"scaler\": \"minmax\"}}, {\"ward_clustering\": {\"n_clusters\": 40, \"connectivity\": true}} (n_clusters required), {\"pca\": 5}."
             },
             {
+              "parameter": "chain_from",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Instead of chemometrics_array: run the pre-processing chain recorded in the companion JSON of a saved dataframe, given as a dataframe name in project_root_fp or a path relative to the project root (.json optional), e.g. 1350-2500_10.snv.sg5.d1.mc.wc40.pca5. The input dataframe must have the same spectral range and resolution."
+            },
+            {
               "parameter": "name_extension",
               "parameter_type": "text",
               "required": false,

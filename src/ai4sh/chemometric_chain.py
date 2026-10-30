@@ -37,6 +37,9 @@ Objects (custom settings)
 Each step records the same companion-JSON chain entry and file suffix as the corresponding single process, so a chain
 gives the same file (e.g. 1350-2500_10.snv.sg5.d1.mc.wc40.pca5) and the same model replay as running the steps one
 by one. Parse_chain validates the whole array before anything is computed; Apply_chain runs it.
+
+Chain_from_companion reads the chain back from the companion JSON of a saved dataframe, so the same pipeline can
+be run on another dataframe (parameter chain_from of chemometric_chain).
 '''
 
 # Standard library imports
@@ -239,6 +242,71 @@ def Parse_chain(raw, resolve_path=None):
         except (ValueError, FileNotFoundError) as e:
             raise ValueError('chemometrics_array item %d: %s' % (i + 1, e))
     return steps
+
+
+def Chain_from_companion(companion):
+    '''The preprocessing_chain of a companion JSON as parsed steps, to run the same chain on another dataframe.
+
+    Settings are taken as recorded (the filter settings themselves, the applied number of Ward clusters), so the
+    chain no longer depends on the settings files. Raises ValueError for a step that cannot be rerun.
+    '''
+    chain = companion.get('preprocessing_chain') or []
+    if not chain:
+        raise ValueError('the companion JSON has no preprocessing_chain')
+    steps = []
+    for i, entry in enumerate(chain):
+        proc, par = entry.get('process', ''), entry.get('parameters', {})
+        if proc == 'filter_spectra':
+            item, source = {'filter': entry.get('filter')}, par.get('filter_fp', 'inline')
+        elif proc in ('multi_filter_spectra', 'mulit_filter_spectra'):
+            item, source = {'multi_filter': entry.get('multi_filter')}, par.get('multi_filter_fp', 'inline')
+        elif proc == 'spectra_scatter_correction':
+            item, source = {'scatter_correction': par.get('scaler', ['snv'])}, None
+        elif proc == 'spectra_derivative':
+            if par.get('append'):
+                raise ValueError('step %d: an appended derivative (d%dapp) cannot be run in a chain'
+                                 % (i + 1, par.get('derivative', 1)))
+            item, source = {'derivative': par.get('derivative', 1)}, None
+        elif proc == 'spectra_scaling':
+            item, source = {'scaling': par.get('method', 'meancentring')}, None
+        elif proc == 'select_variance_threshold':
+            item, source = {'variance_threshold': {'threshold': par.get('threshold'),
+                                                   'scaler': par.get('scaler', 'minmax')}}, None
+        elif proc == 'ward_clustering':
+            item = {'ward_clustering': {'n_clusters': par.get('n_clusters_applied'),
+                                        'connectivity': par.get('connectivity', False)}}
+            source = par.get('ward_clustering_fp', 'inline')
+        elif proc == 'spectra_decomposition':
+            item, source = {'pca': par.get('n_components', 5)}, None
+        else:
+            raise ValueError('step %d: "%s" cannot be run in a chain (only spectral pre-processes without '
+                             'indicators: filter, scatter correction, derivative, scaling, variance threshold, '
+                             'ward clustering, pca)' % (i + 1, proc))
+        if item[next(iter(item))] is None:
+            raise ValueError('step %d (%s): the settings are not recorded in the chain' % (i + 1, proc))
+        try:
+            step = _Step(item, None)
+        except ValueError as e:
+            raise ValueError('step %d (%s): %s' % (i + 1, proc, e))
+        if source is not None:
+            step['source'] = source
+        steps.append(step)
+    return steps
+
+
+def Check_spectral_range(companion, wavelengths):
+    '''ValueError if the bands of the input (wavelengths) differ from the spectral range and resolution recorded
+    in companion (begin_wavelength, end_wavelength, output_bandwidth); not checked when they are not recorded.'''
+    try:
+        begin, end = float(companion['begin_wavelength']), float(companion['end_wavelength'])
+        bw = float(companion['output_bandwidth'])
+    except (KeyError, TypeError, ValueError):
+        return
+    wl = np.array(sorted(float(w) for w in wavelengths))
+    step = float(np.median(np.diff(wl))) if len(wl) > 1 else bw
+    if abs(wl[0] - begin) > bw / 2 or abs(wl[-1] - end) > bw / 2 or abs(step - bw) > 1e-6 * max(bw, 1):
+        raise ValueError('the input has the bands %g-%g nm at %g nm, the chain was made for %g-%g nm at %g nm'
+                         % (wl[0], wl[-1], step, begin, end, bw))
 
 
 def _Variance_select(df, cols, scaler, threshold):

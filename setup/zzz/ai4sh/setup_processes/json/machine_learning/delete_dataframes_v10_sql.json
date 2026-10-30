@@ -1,0 +1,40 @@
+{
+  "process": [
+    {
+      "process": "add_process",
+      "overwrite": false,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "delete_dataframes",
+        "min_user_stratum": 3,
+        "title": "Delete redundant pre-processed dataframes",
+        "label": "Delete the pre-processed dataframes (parquet + companion JSON) that are no longer needed and clean up the .previous_dataframe history; selected (raw) datasets are never deleted and the files to delete are confirmed interactively."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "keep_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": [
+                "raw",
+                "previous"
+              ],
+              "hint": "Dataframes to keep: raw = the selected datasets (never deleted anyway), previous = the dataframe(s) of the latest .previous_dataframe record, and/or names of pre-processed dataframes (.parquet optional), e.g. [\"raw\", \"1350-2500_10.snv.sg5.d1.mc.wc40.pca5\"]. Empty = raw and previous. A name that does not exist stops the process before anything is deleted."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

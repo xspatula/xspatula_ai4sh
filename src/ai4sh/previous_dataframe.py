@@ -101,6 +101,29 @@ def Write_previous_df(directory, process_name, entries, note=''):
         json.dump({'history': history}, fh, indent=2)
 
 
+def Prune_previous_history(directory):
+    '''Remove the entries of dataframes that no longer exist from .previous_dataframe; empty records are dropped.
+
+    Returns the number of entries removed.
+    '''
+    history = Read_previous_history(directory)
+
+    if not history:
+        return 0
+
+    kept, n_removed = [], 0
+    for rec in history:
+        entries = [e for e in rec.get('entries', []) if os.path.exists(os.path.join(directory, e.get('dataframe', '')))]
+        n_removed += len(rec.get('entries', [])) - len(entries)
+        if entries:
+            kept.append(dict(rec, entries=entries))
+
+    with open(Previous_df_path(directory), 'w') as fh:
+        json.dump({'history': kept}, fh, indent=2)
+
+    return n_removed
+
+
 def Register_parquet(parquet_fpn, process_name, note=''):
     '''Register a saved Parquet file as the previous dataframe of its directory.'''
 

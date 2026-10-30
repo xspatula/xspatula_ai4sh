@@ -256,7 +256,7 @@ class Process_plot(Get_schema_table):
         '''Render one spectral panel and optionally save/show it.
 
         chain_ann: accumulated preprocessing history shown upper-right (e.g. "snv→mc").
-        file_suffix: filename stem derived from chain_ann (e.g. "snv_mc").
+        file_suffix: filename stem derived from chain_ann (e.g. "snv.mc").
         '''
         x_vals, x_label = _spectra_x_axis(step_cols)
         y_label = 'Score' if step_cols and str(step_cols[0]).startswith('pc') else self.signal_label
@@ -819,7 +819,7 @@ class Process_plot(Get_schema_table):
             if step_label != 'raw':
                 chain_abbrevs.append(abbrev)
             chain_ann = '→'.join(chain_abbrevs) if chain_abbrevs else 'raw'
-            file_suffix = '_'.join(chain_abbrevs) if chain_abbrevs else 'raw'
+            file_suffix = '.'.join(chain_abbrevs) if chain_abbrevs else 'raw'
             self._Plot_spectra_panel(df_step, step_cols, colors, step_label, ann,
                                      chain_ann, file_suffix, show, save, plot_dir)
 
