@@ -62,7 +62,7 @@
               "parameter_type": "text",
               "required": true,
               "default_value": "",
-              "hint": "Family of the set: transformation, standardisation, chemometric, filter, multi_filter, selector, regressor, spectra_plot, plot_symbol, plot_layout."
+              "hint": "Family of the set: transformation, standardisation, filter, multi_filter, selector, regressor, spectra_plot, plot_symbol, plot_layout."
             },
             {
               "parameter": "name",

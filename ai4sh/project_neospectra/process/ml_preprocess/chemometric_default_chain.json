@@ -1,12 +1,11 @@
 {
   "process": [
     {
-      "process": "chemometric_default",
+      "process": "chemometric_chain",
       "parameters": {
         "project_root_fp": "./project_neospectra/data/spectra/neospectra/ds2/ai4sh",
-        "dataframe":"raw",
-        "chemometrics": "default",
-        "chemometrics_array": ["meancentring","scatter_correction","decomposition"]
+        "dataframe": "raw",
+        "chemometrics_array": ["snv", "derivative", "meancentring", "pca"]
       }
     }
   ]

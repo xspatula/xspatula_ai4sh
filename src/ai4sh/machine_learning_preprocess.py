@@ -23,8 +23,9 @@ from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_regressi
 from sklearn.model_selection import KFold
 
 from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction,
-                                     apply_scaling, apply_decomposition,
-                                     apply_chemometrics, _load_chemometric_config)
+                                     apply_scaling, apply_decomposition)
+from src.ai4sh.chemometric_chain import (Parse_chain, Apply_chain, Num_tag as _num_tag,
+                                         Filter_suffix as _filter_suffix)
 from src.ai4sh.filter import apply_filter, apply_multi_filter
 from src.ai4sh.previous_dataframe import (
     Previous_df_path, Read_previous_df, Write_previous_df, Previous_parquet,
@@ -88,29 +89,6 @@ VARIABLE_SCALINGS   = ['meancentring', 'autoscaling', 'paretoscaling', 'poissons
 # Filter parameter sets compared by filter_fp "select" when no filter_array is given; key → file abbreviation
 FILTER_PRESETS = ['moving-average', 'gauss', 'savitzky-golay', 'lowess']
 _FILTER_ABBREV = {'moving_average': 'ma', 'gauss': 'gf', 'savitzky-golay': 'sg', 'lowess': 'lw'}
-
-
-def _num_tag(v):
-    '''Number as a suffix part: 5 → 5, 1.5 → 1p5, 0.028 → 028 (leading "0." dropped; no dot inside a suffix).'''
-    t = np.format_float_positional(float(v), trim='-')
-    if t.startswith('0.'):
-        t = t[2:]
-    return t.replace('.', 'p')
-
-
-def _filter_suffix(kind, cfg):
-    '''File suffix of a single filter from its parameters: ma<kernel length>, gf<sigma>, sg<window_length>
-    (+ .d1 / .d2 when deriv > 0), lw<n_points>; e.g. ma5, gf1p5, sg7, sg7.d1, lw7.'''
-    fc = cfg[kind]
-    if kind == 'moving_average':
-        return 'ma%d' % len(fc.get('kernel', []))
-    if kind == 'gauss':
-        return 'gf' + _num_tag(fc.get('sigma', 0))
-    if kind == 'savitzky-golay':
-        tag = 'sg%d' % int(fc.get('window_length', 0))
-        deriv = int(fc.get('deriv', 0))
-        return tag + ('.d%d' % deriv if deriv > 0 else '')
-    return 'lw%d' % int(fc.get('n_points', 0))
 
 
 # Outlier detector → file suffix (.olif, .olee, .ollof, .ol1csvm); select compares the four
@@ -508,8 +486,8 @@ class Process_ml_preprocess(Get_schema_table):
             self._Detect_outliers()
         elif self.process_S.process.process == 'select_variance_threshold':
             self._Variance_threshold()
-        elif self.process_S.process.process == 'chemometric_default':
-            self._Chemometric_default()
+        elif self.process_S.process.process in ('chemometric_chain', 'chemometric_default'):
+            self._Chemometric_chain()
         elif self.process_S.process.process == 'spectra_derivative':
             self._Spectra_derivative()
         elif self.process_S.process.process == 'spectra_scatter_correction':
@@ -1125,7 +1103,7 @@ class Process_ml_preprocess(Get_schema_table):
                           show, save, plot_dir, fname):
         '''Stacked 2-inch-per-panel plot for all steps in a chemometric chain.
 
-        steps: list of (label, spec_df_full, cols) from apply_chemometrics.
+        steps: list of (label, spec_df_full, cols), e.g. from Apply_chain.
         '''
         n    = len(steps)
         fig, axes = plt.subplots(n, 1, figsize=(10, 2.0 * n),
@@ -2472,67 +2450,40 @@ class Process_ml_preprocess(Get_schema_table):
             inp['units_D'], confirm=confirm,
         )
 
-    def _Chemometric_default(self):
+    def _Chemometric_chain(self):
+        '''Run the steps of chemometrics_array in order (see src/ai4sh/chemometric_chain.py), plot every step,
+        ask y/n and save the result with the suffixes of all steps (e.g. .snv.sg5.d1.mc.wc40.pca5).'''
         p   = self.process_S.process.parameters
-        inp = self._Load_spec_inputs(p)
-        if inp is None:
-            return
-
-        chemometrics_param = str(getattr(p, 'chemometrics', 'default')).strip() or 'default'
-        chemometrics_array = _parse_array_param(getattr(p, 'chemometrics_array', []))
-
-        if not chemometrics_array:
-            print('    No chemometrics_array specified — nothing to do.')
-            return
-
-        steps = apply_chemometrics(inp['spec_df'], inp['wavelengths'],
-                                    chemometrics_array, chemometrics_param, self.verbose)
-
-        # Build chain abbreviation and step_info_list from all steps except 'raw'
-        chain_abbrevs  = []
-        step_info_list = []
-        chem_config    = _load_chemometric_config(chemometrics_param, self.verbose)
-        for step_name_key in chemometrics_array:
-            cfg = chem_config.get(step_name_key, {})
-            if step_name_key == 'derivative':
-                d = int(cfg.get('derivative', cfg.get('derive', 1)))
-                a = bool(cfg.get('append', False))
-                chain_abbrevs.append('d%dapp' % d if a else 'd%d' % d)
-                step_info_list.append({'process': 'spectra_derivative',
-                                       'parameters': {'derivative': d, 'append': a}})
-            elif step_name_key == 'scatter_correction':
-                sc = cfg.get('scaler', ['snv'])
-                chain_abbrevs.append(''.join(sc))
-                step_info_list.append({'process': 'spectra_scatter_correction',
-                                       'parameters': {'scaler': sc}})
-            elif step_name_key == 'scaling':
-                m = cfg.get('method', 'meancentring')
-                chain_abbrevs.append({'meancentring': 'mc', 'autoscaling': 'as',
-                                      'paretoscaling': 'ps', 'poissonscaling': 'poi'}.get(m, m[:4]))
-                step_info_list.append({'process': 'spectra_scaling',
-                                       'parameters': {'method': m}})
-            elif step_name_key == 'decomposition':
-                m = cfg.get('method', 'pca')
-                n = int(cfg.get('n_components', 5))
-                chain_abbrevs.append('pca%d' % n)
-                step_info_list.append({'process': 'spectra_decomposition',
-                                       'parameters': {'method': m, 'n_components': n}})
-
         ext = _name_extension(p)
         if ext is None:
             return
-        abbrev = (SUFFIX_SEP.join(chain_abbrevs) if chain_abbrevs else 'default') + ext
+        try:
+            steps = Parse_chain(getattr(p, 'chemometrics_array', []), self._Resolve_filter_fp)
+        except ValueError as e:
+            print('    ERROR: %s' % e)
+            return
+        if not steps:
+            print('    No chemometrics_array specified — nothing to do.')
+            return
 
+        inp = self._Load_spec_inputs(p)
+        if inp is None:
+            return
+        try:
+            results = Apply_chain(inp['spec_df'], inp['wavelengths'], steps)
+        except ValueError as e:
+            print('    ERROR: %s' % e)
+            return
+
+        abbrev = SUFFIX_SEP.join(r['suffix'] for r in results[1:]) + ext
         self._Plot_chem_chain(
-            steps, inp['max_spectra'], inp['colormap'], inp['ann'],
-            inp['show'], inp['save'], inp['plot_dir'],
+            [(r['label'], r['df'], r['cols']) for r in results], inp['max_spectra'], inp['colormap'],
+            inp['ann'], inp['show'], inp['save'], inp['plot_dir'],
             'chemometric_%s.png' % abbrev,
         )
-
-        _, spec_final, cols_final = steps[-1]
         self._Accept_and_save(
-            inp['df'], spec_final, cols_final, abbrev,
+            inp['df'], results[-1]['df'], results[-1]['cols'], abbrev,
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
-            step_info_list,
+            [r['step_info'] for r in results[1:]],
             inp['units_D'],
         )

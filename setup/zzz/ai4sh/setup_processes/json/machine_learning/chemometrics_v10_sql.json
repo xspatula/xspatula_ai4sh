@@ -5,10 +5,10 @@
       "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
-        "process": "chemometric_default",
+        "process": "chemometric_chain",
         "min_user_stratum": 3,
-        "title": "Chemometric default chain of processes",
-        "label": "Run a sequence of chemometric steps (e.g. scatter correction, derivative, variable scaling, decomposition) in one go and save the result with the full preprocessing chain."
+        "title": "Chemometric chain of spectral pre-processes",
+        "label": "Run a chain of spectral pre-processing steps (filter, scatter correction, derivative, variable scaling, variance threshold, ward clustering, PCA) in one go and save the result with the suffixes and preprocessing chain of all steps; the result is the same as running the steps one by one."
       },
       "nodes": [
         {
@@ -30,18 +30,11 @@
               "hint": "The dataframe to use as input, raw = original spectra, previous = the latest saved parquet file(s), or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
             },
             {
-              "parameter": "chemometrics",
-              "parameter_type": "text",
-              "required": false,
-              "default_value": "default",
-              "hint": "Chemometric methods applied before plotting, default applies a predefined methods set for each type of chemometric method (derivatives, scattercorrection,  scaling and decomposition)."
-            },
-            {
               "parameter": "chemometrics_array",
               "parameter_type": "array",
               "required": false,
               "default_value": "",
-              "hint": "Array of chemometric methods to actually apply, leave empty for none; if multiple methods are selected, the methods will be applied in the listed order."
+              "hint": "Steps applied in the listed order. Each item is a method name with default settings: moving-average, gauss, savitzky-golay, lowess (filters), l1, l2, max, snv, msc (scatter correction), derivative (1st), meancentring, autoscaling, paretoscaling, poissonscaling (variable scaling), pca (5 components); or an object with custom settings: {\"filter\": <set name, JSON path or settings>}, {\"multi_filter\": ...}, {\"scatter_correction\": [\"snv\",\"snv\"]}, {\"derivative\": 2}, {\"scaling\": \"autoscaling\"}, {\"variance_threshold\": {\"threshold\": 0.03, \"scaler\": \"minmax\"}}, {\"ward_clustering\": {\"n_clusters\": 40, \"connectivity\": true}} (n_clusters required), {\"pca\": 5}."
             },
             {
               "parameter": "name_extension",

@@ -23,8 +23,8 @@ from src.postgres.pg_ai4sh import PG_manage_AI4SH
 from src.lib.pilot import Get_project_path
 
 from src.ai4sh.chemometrics import (apply_transformations, apply_standardisation,
-                                    apply_chemometrics, apply_scatter_correction,
-                                    apply_scaling)
+                                    apply_scatter_correction, apply_scaling)
+from src.ai4sh.chemometric_chain import Parse_chain, Apply_chain
 
 from src.ai4sh.filter import apply_filter, apply_multi_filter, _load_filter_config
 
@@ -772,9 +772,13 @@ class Process_plot(Get_schema_table):
         filter_param       = str(getattr(p, 'filter', 'none')).strip() or 'none'
         multi_filter_param = str(getattr(p, 'multi_filter', 'none')).strip() or 'none'
 
-        # Parse chemometrics parameters
-        chemometrics_param = str(getattr(p, 'chemometrics', 'default')).strip() or 'default'
-        chemometrics_array = self._Parse_chemometrics_array(getattr(p, 'chemometrics_array', []))
+        # Parse the chemometric chain (same syntax as chemometric_chain, see src/ai4sh/chemometric_chain.py)
+        try:
+            chem_steps = Parse_chain(getattr(p, 'chemometrics_array', []),
+                                     lambda s: Get_project_path(self.project_root_FP, s))
+        except ValueError as e:
+            print('    ERROR: %s' % e)
+            return
 
         # Build panels list: always start with raw
         panels   = [('raw', spec_df, wavelengths)]
@@ -795,10 +799,14 @@ class Process_plot(Get_schema_table):
                 panels.append((flabel, df_f, cols_f))
                 base_df, base_cols = df_f, cols_f
 
-        # Append chemometric steps (apply_chemometrics prepends 'raw'; skip it)
-        chem_steps = apply_chemometrics(base_df, base_cols, chemometrics_array,
-                                        chemometrics_param, self.verbose)
-        panels.extend(chem_steps[1:])
+        # Append chemometric steps (Apply_chain starts with the input; skip it)
+        try:
+            chem_results = Apply_chain(base_df, base_cols, chem_steps)
+        except ValueError as e:
+            print('    ERROR: %s' % e)
+            return
+        chain_suffix = {r['label']: r['suffix'] for r in chem_results[1:]}
+        panels.extend((r['label'], r['df'], r['cols']) for r in chem_results[1:])
 
         bw = params_D.get('output_bandwidth', '')
         ann = 'n=%d  shown=%d' % (n_total, n_plot)
@@ -807,7 +815,7 @@ class Process_plot(Get_schema_table):
 
         chain_abbrevs = []
         for step_label, df_step, step_cols in panels:
-            abbrev = _step_to_abbrev(step_label)
+            abbrev = chain_suffix.get(step_label) or _step_to_abbrev(step_label)
             if step_label != 'raw':
                 chain_abbrevs.append(abbrev)
             chain_ann = '→'.join(chain_abbrevs) if chain_abbrevs else 'raw'
