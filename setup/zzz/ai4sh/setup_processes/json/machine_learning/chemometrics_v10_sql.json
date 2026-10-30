@@ -94,7 +94,7 @@
               "parameter": "dataframe_array",
               "parameter_type": "array",
               "required": false,
-              "default_value": [],
+              "default_value": "",
               "hint": "Compare mode: two or more input dataframes (raw, previous or parquet file names, .parquet optional), e.g. raw and the outputs of different preprocessing pipelines. The derivative of every input is plotted and you choose which one to save. Overrides dataframe."
             },
             {
@@ -251,7 +251,7 @@
               "parameter": "dataframe_array",
               "parameter_type": "array",
               "required": false,
-              "default_value": [],
+              "default_value": "",
               "hint": "Compare mode: two or more input dataframes (raw, previous or parquet file names, .parquet optional), e.g. raw and the outputs of different preprocessing pipelines. The decomposition of every input is plotted with its explained variance and you choose which one to save. Overrides dataframe."
             },
             {

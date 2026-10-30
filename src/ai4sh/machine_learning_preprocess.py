@@ -67,15 +67,19 @@ def _build_detector(name, threshold):
 
 
 def _parse_array_param(raw):
-    '''Coerce list / CSV string / postgres {a,b} string to a Python list.'''
+    '''Coerce list / CSV string / postgres {a,b} string to a Python list.
+
+    Nested braces are stripped and empty entries dropped: an empty database default arrives as "{}", which
+    the parameter check wraps once more ("{{}}"), and must give [], not ["{}"].
+    '''
     if not raw:
         return []
     if isinstance(raw, list):
-        return [str(x).strip() for x in raw if str(x).strip()]
+        return [x for item in raw for x in _parse_array_param(str(item))]
     s = str(raw).strip()
-    if s.startswith('{') and s.endswith('}'):
-        s = s[1:-1]
-    return [x.strip() for x in s.split(',') if x.strip()]
+    while len(s) >= 2 and s[0] + s[-1] in ('{}', '[]'):
+        s = s[1:-1].strip()
+    return [x.strip().strip('"').strip() for x in s.split(',') if x.strip().strip('"').strip()]
 
 
 # Options offered by scaler/method "select": per-spectrum scatter corrections and band-wise variable scalings
@@ -181,9 +185,16 @@ def _load_companion_json(project_root_fp, stem):
     return d
 
 
-def _build_output_data(out_cols, signal_type=None):
-    '''Build output_data dict from output column names.'''
+def _build_output_data(out_cols, signal_type=None, indicator_cols=None):
+    '''Build output_data dict from output column names.
+
+    Without spectral columns (an indicator dataframe) only data_type "indicator" and the indicators.
+    '''
+    if not out_cols:
+        return {'data_type': 'indicator', 'indicators': list(indicator_cols or [])}
     out = _build_output_format(out_cols)
+    if indicator_cols:
+        out['indicators'] = list(indicator_cols)
     if signal_type:
         out['signal_type'] = signal_type
     return out
@@ -254,12 +265,12 @@ def _step_abbrev_from_info(process_name, parameters):
 
 
 def _write_companion_json(project_root_fp, in_stem, out_stem, out_cols, step_info_or_list,
-                          signal_type=None):
+                          signal_type=None, indicator_cols=None):
     '''Write companion JSON for an output parquet, inheriting input companion metadata.'''
     companion = _load_companion_json(project_root_fp, in_stem) or {}
     # The unprocessed parquet the chain starts from — regression modeling refits the chain on it
     companion.setdefault('source_parquet', in_stem + '.parquet')
-    companion['output_data'] = _build_output_data(out_cols, signal_type)
+    companion['output_data'] = _build_output_data(out_cols, signal_type, indicator_cols)
     chain = list(companion.get('preprocessing_chain', []))
     step_num = len(chain) + 1
     steps = step_info_or_list if isinstance(step_info_or_list, list) else [step_info_or_list]
@@ -815,7 +826,8 @@ class Process_ml_preprocess(Get_schema_table):
              'process': 'detect_outliers',
              'parameters': {'detector': detector_name, 'threshold': threshold,
                             'indicator_array': list(approved)}},
-            Signal_type_of(units_D, spectral_kept),
+            Signal_type_of(units_D, spectral_kept) if spectral_kept else None,
+            indicator_cols=all_indicators,
         )
 
         n_removed = sum(int(masks[c].sum()) for c in approved)
