@@ -2,7 +2,7 @@
   "process": [
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
         "process": "select_variance_threshold",
@@ -35,6 +35,13 @@
               "required": false,
               "default_value": "none",
               "hint": "Scaler to apply before detecting variance, available options: minmax, standard and robust. If set to none, no variance threshold selection will be applied."
+            },
+            {
+              "parameter": "name_extension",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional user extension (1-6 letters, digits or -) added to the file suffix after a hashtag, e.g. .ma5#12321, to tell apart outputs with settings the suffix does not show."
             }
           ]
         }

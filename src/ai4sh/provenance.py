@@ -14,7 +14,7 @@ actually used even if a settings file is later edited or deleted:
     "provenance": {
         "process": "spectra_scaling", "process_file": ".../scaling.json",
         "parameters": {...},
-        "configs": {"/abs/path/chemometric_default.json": {"sha256": "...", "content": {...}}},
+        "configs": {"/abs/path/savitzky-golay.json": {"sha256": "...", "content": {...}}},
         "environment": {"python": "3.12.4", "scikit-learn": "1.5.1", ..., "git_commit": "2c9b551", "git_dirty": true}
     }
 '''

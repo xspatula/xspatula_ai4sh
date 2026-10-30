@@ -28,10 +28,26 @@ from src.ai4sh.previous_dataframe import Read_previous_history
 
 _UNITS_METADATA_KEY = b'ai4sh_indicator_units'
 
+# Separator between a parquet stem and the suffix every preprocessing step adds (1350-2500_10.mc.snv);
+# a dot, as in the import naming, is safe on every platform.
+SUFFIX_SEP = '.'
+
+
+def Derived_stem(stem, abbrev):
+    '''Stem of the output of a preprocessing step: stem + SUFFIX_SEP + abbrev.'''
+    return '%s%s%s' % (stem, SUFFIX_SEP, abbrev)
+
+
 # Any known machine learning preprocessing suffix at the end of a parquet stem (derived files).
 # Scatter corrections in sequence are saved as their concatenation (snv+snv → snvsnv, l1+msc → l1msc).
+# Suffixes with a parameter value only after a dot: filters (.ma5, .gf1p5, .sg7, .lw7), outlier detector
+# (.olif, .olee, .ollof, .ol1csvm), variance threshold (.vtm028), Ward clusters (.wc40).
+# Any suffix may end with a user name extension: #<1-6 letters, digits or ->.
+# Both separators match: "." (current) and "_" (files written before 2026-10-29).
 DERIVED_STEM_RE = re.compile(
-    r'_(?:pred|ol|vt|ma|gf|sg|lw|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|(?:l1|l2|max|snv|msc)+|mc|as|ps|poi|pca\d+|(?:[\w-]+-)?(?:pms|rfe|tree))$'
+    r'(?:[._](?:pred|ol|vt|ma|gf|sg|lw|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|(?:l1|l2|max|snv|msc)+|mc|as|ps|poi|pca\d+|(?:[\w-]+-)?(?:pms|rfe|tree))'
+    r'|\.(?:(?:ma|gf|sg|lw)[0-9p]+|ol(?:if|ee|lof|1csvm)|vt[msr][0-9p]+|wc\d+|default))'
+    r'(?:#[A-Za-z0-9-]{1,6})?$'
 )
 
 

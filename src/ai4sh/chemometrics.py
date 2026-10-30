@@ -19,8 +19,6 @@ _DEFAULT_STANDARDISE_FPN = Default_fpn('transform', 'indicator_standardise_defau
 
 _DEFAULT_TRANSFORMATION_FPN = Default_fpn('transform', 'indicator_transformation_default.json')
 
-_DEFAULT_CHEMOMETRIC_FPN = Default_fpn('chemometric', 'chemometric_default.json')
-
 
 def _load_transform_config(param, default_fpn, verbose, family='transformation'):
     '''param: none | default | parameter set name (ml_setting) | path to a transformation / standardise JSON.'''
@@ -30,16 +28,6 @@ def _load_transform_config(param, default_fpn, verbose, family='transformation')
         if verbose >= 1:
             print('    Warning: %s' % e)
         return None
-
-
-def _load_chemometric_config(param, verbose=0):
-    '''param: none | default | parameter set name (ml_setting) | path to a chemometric JSON.'''
-    try:
-        return Load_settings('chemometric', param, _DEFAULT_CHEMOMETRIC_FPN, verbose=verbose) or {}
-    except FileNotFoundError as e:
-        if verbose >= 1:
-            print('    Warning: %s' % e)
-        return {}
 
 
 def _snv(X):
@@ -307,47 +295,3 @@ def apply_decomposition(df, columns, cfg):
 
     df_out = pd.DataFrame(data=X_out, columns=new_cols, index=df.index)
     return df_out, new_cols, label
-
-
-_CHEMOMETRIC_FUNCS = {
-    'derivative': (apply_derivative, 'derivative'),
-    'scatter_correction': (apply_scatter_correction, 'scatter_correction'),
-    'scaling': (apply_scaling, 'scaling'),
-    'decomposition': (apply_decomposition, 'decomposition'),
-}
-
-
-def apply_chemometrics(df, columns, chemometrics_array, config_param, verbose=0):
-    '''Apply chemometric steps in user-defined order.
-
-    chemometrics_array: list of step names, e.g. ['scatter_correction', 'scaling'].
-    config_param: 'default' | 'none' | path to chemometric config JSON.
-
-    Returns list of (label, df_out, columns_out).
-    First entry is always ('raw', raw_df, columns) so the caller can plot all steps.
-    Each subsequent entry is the output of the named step, fed the prior step's output.
-    '''
-    config = _load_chemometric_config(config_param, verbose)
-    results = [('raw', df[columns].copy(), list(columns))]
-
-    if not chemometrics_array:
-        return results
-
-    current_df, current_cols = results[0][1], results[0][2]
-
-    for step in chemometrics_array:
-        if step not in _CHEMOMETRIC_FUNCS:
-            if verbose >= 1:
-                print('    Warning: unknown chemometric step "%s" — skipping.' % step)
-            continue
-        func, cfg_key = _CHEMOMETRIC_FUNCS[step]
-        step_cfg = config.get(cfg_key, {})
-        try:
-            df_out, cols_out, label = func(current_df, current_cols, step_cfg)
-            results.append(('%s: %s' % (step, label), df_out, cols_out))
-            current_df, current_cols = df_out, cols_out
-        except Exception as exc:
-            if verbose >= 1:
-                print('    Warning: chemometric step "%s" failed: %s' % (step, exc))
-
-    return results

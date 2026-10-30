@@ -23,14 +23,16 @@ from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_regressi
 from sklearn.model_selection import KFold
 
 from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction,
-                                     apply_scaling, apply_decomposition,
-                                     apply_chemometrics, _load_chemometric_config)
+                                     apply_scaling, apply_decomposition)
+from src.ai4sh.chemometric_chain import (Parse_chain, Apply_chain, Num_tag as _num_tag,
+                                         Filter_suffix as _filter_suffix)
 from src.ai4sh.filter import apply_filter, apply_multi_filter
 from src.ai4sh.previous_dataframe import (
     Previous_df_path, Read_previous_df, Write_previous_df, Previous_parquet,
 )
 from src.ai4sh.parquet_units import (Read_parquet_with_units, Save_parquet_with_units,
-                                    Find_selected_parquet, DERIVED_STEM_RE)
+                                    Find_selected_parquet, DERIVED_STEM_RE,
+                                    SUFFIX_SEP, Derived_stem)
 from src.ai4sh.spectral_columns import (Band_col_name, Band_value, Is_band_col,
                                        Set_signal_type, Signal_type_of)
 
@@ -66,15 +68,19 @@ def _build_detector(name, threshold):
 
 
 def _parse_array_param(raw):
-    '''Coerce list / CSV string / postgres {a,b} string to a Python list.'''
+    '''Coerce list / CSV string / postgres {a,b} string to a Python list.
+
+    Nested braces are stripped and empty entries dropped: an empty database default arrives as "{}", which
+    the parameter check wraps once more ("{{}}"), and must give [], not ["{}"].
+    '''
     if not raw:
         return []
     if isinstance(raw, list):
-        return [str(x).strip() for x in raw if str(x).strip()]
+        return [x for item in raw for x in _parse_array_param(str(item))]
     s = str(raw).strip()
-    if s.startswith('{') and s.endswith('}'):
-        s = s[1:-1]
-    return [x.strip() for x in s.split(',') if x.strip()]
+    while len(s) >= 2 and s[0] + s[-1] in ('{}', '[]'):
+        s = s[1:-1].strip()
+    return [x.strip().strip('"').strip() for x in s.split(',') if x.strip().strip('"').strip()]
 
 
 # Options offered by scaler/method "select": per-spectrum scatter corrections and band-wise variable scalings
@@ -83,6 +89,28 @@ VARIABLE_SCALINGS   = ['meancentring', 'autoscaling', 'paretoscaling', 'poissons
 # Filter parameter sets compared by filter_fp "select" when no filter_array is given; key → file abbreviation
 FILTER_PRESETS = ['moving-average', 'gauss', 'savitzky-golay', 'lowess']
 _FILTER_ABBREV = {'moving_average': 'ma', 'gauss': 'gf', 'savitzky-golay': 'sg', 'lowess': 'lw'}
+
+
+# Outlier detector → file suffix (.olif, .olee, .ollof, .ol1csvm); select compares the four
+OUTLIER_DETECTORS = ['iforest', 'ee', 'lof', '1csvm']
+_OUTLIER_SUFFIX = {'iforest': 'olif', 'isolationforest': 'olif',
+                   'ee': 'olee', 'eenvelope': 'olee', 'ellipticenvelope': 'olee',
+                   'lof': 'ollof', 'lofactor': 'ollof', 'localoutlierfactor': 'ollof',
+                   '1csvm': 'ol1csvm', '1c-svm': 'ol1csvm', 'oneclasssvm': 'ol1csvm'}
+
+_NAME_EXT_RE = re.compile(r'^[A-Za-z0-9-]{1,6}$')
+
+
+def _name_extension(p):
+    '''"#<name_extension>" to append to the suffix, "" when not set, None (error printed) when invalid.'''
+    ext = str(getattr(p, 'name_extension', '') or '').strip()
+    if ext.lower() in ('', 'none'):
+        return ''
+    if not _NAME_EXT_RE.match(ext):
+        print('    ERROR: name_extension "%s": use 1-6 letters, digits or "-".' % ext)
+        return None
+    return '#' + ext
+
 
 # Regex matching any known preprocessing suffix at the end of a parquet stem.
 _DERIVED_RE = DERIVED_STEM_RE
@@ -135,9 +163,16 @@ def _load_companion_json(project_root_fp, stem):
     return d
 
 
-def _build_output_data(out_cols, signal_type=None):
-    '''Build output_data dict from output column names.'''
+def _build_output_data(out_cols, signal_type=None, indicator_cols=None):
+    '''Build output_data dict from output column names.
+
+    Without spectral columns (an indicator dataframe) only data_type "indicator" and the indicators.
+    '''
+    if not out_cols:
+        return {'data_type': 'indicator', 'indicators': list(indicator_cols or [])}
     out = _build_output_format(out_cols)
+    if indicator_cols:
+        out['indicators'] = list(indicator_cols)
     if signal_type:
         out['signal_type'] = signal_type
     return out
@@ -190,7 +225,7 @@ def _step_abbrev_from_info(process_name, parameters):
     if process_name == 'select_variance_threshold':
         return 'vt'
     if process_name == 'detect_outliers':
-        return 'ol'
+        return _OUTLIER_SUFFIX.get(str(parameters.get('detector', '')).lower(), 'ol')
     if process_name == 'filter_spectra':
         cfg = parameters.get('filter_cfg', {})
         if 'savitzky-golay' in cfg: return 'sg'
@@ -208,12 +243,12 @@ def _step_abbrev_from_info(process_name, parameters):
 
 
 def _write_companion_json(project_root_fp, in_stem, out_stem, out_cols, step_info_or_list,
-                          signal_type=None):
+                          signal_type=None, indicator_cols=None):
     '''Write companion JSON for an output parquet, inheriting input companion metadata.'''
     companion = _load_companion_json(project_root_fp, in_stem) or {}
     # The unprocessed parquet the chain starts from — regression modeling refits the chain on it
     companion.setdefault('source_parquet', in_stem + '.parquet')
-    companion['output_data'] = _build_output_data(out_cols, signal_type)
+    companion['output_data'] = _build_output_data(out_cols, signal_type, indicator_cols)
     chain = list(companion.get('preprocessing_chain', []))
     step_num = len(chain) + 1
     steps = step_info_or_list if isinstance(step_info_or_list, list) else [step_info_or_list]
@@ -442,13 +477,17 @@ class Process_ml_preprocess(Get_schema_table):
         self.pg_session_C = pg_session_C
         self.project_root_FP = project_root_FP
 
+    def _Overwrite(self, p):
+        '''"overwrite" is set on the process block (next to "parameters"); a parameter of that name also counts.'''
+        return bool(getattr(self.process_S.process, 'overwrite', False)) or bool(getattr(p, 'overwrite', False))
+
     def _Sub_process(self, _json_file_key):
         if self.process_S.process.process == 'detect_outliers':
             self._Detect_outliers()
         elif self.process_S.process.process == 'select_variance_threshold':
             self._Variance_threshold()
-        elif self.process_S.process.process == 'chemometric_default':
-            self._Chemometric_default()
+        elif self.process_S.process.process in ('chemometric_chain', 'chemometric_default'):
+            self._Chemometric_chain()
         elif self.process_S.process.process == 'spectra_derivative':
             self._Spectra_derivative()
         elif self.process_S.process.process == 'spectra_scatter_correction':
@@ -542,6 +581,42 @@ class Process_ml_preprocess(Get_schema_table):
         else:
             plt.close(fig)
 
+    def _Plot_outliers_compare(self, df, indicator_cols, results, threshold, show, save, plot_dir):
+        '''Grid: one row per indicator, one column per detector (detector "select").'''
+        plt.close('all')
+        n_r, n_c = len(indicator_cols), len(results)
+        fig, axes = plt.subplots(nrows=n_r, ncols=n_c, figsize=(3.2 * n_c, 2.2 * n_r), squeeze=False)
+        for c_i, (det, (masks, used)) in enumerate(results.items()):
+            for r_i, col in enumerate(indicator_cols):
+                ax    = axes[r_i][c_i]
+                vals  = df[col].values.astype(float)
+                valid = ~np.isnan(vals)
+                plot_df = pd.DataFrame({'value': vals[valid], '_': '',
+                                        'status': np.where(masks[col][valid], 'outlier', 'inlier')})
+                sns.stripplot(data=plot_df, x='value', y='_', hue='status',
+                              palette={'inlier': 'steelblue', 'outlier': 'red'},
+                              hue_order=['inlier', 'outlier'], alpha=0.55, jitter=True, size=3,
+                              orient='h', ax=ax, legend=False)
+                n_out = int(masks[col].sum())
+                note  = ' [fallback %s]' % used[col] if used[col] != det else ''
+                ax.set_title('%d: %s%s  (%d)' % (c_i + 1, det, note, n_out), fontsize=8)
+                ax.set_ylabel(col if c_i == 0 else '', fontsize=8)
+                ax.set_xlabel('')
+                ax.tick_params(labelsize=7)
+        fig.suptitle('Outlier detectors compared, %s = %.3f (nu for 1csvm)' % ('contamination', threshold),
+                     fontsize=9)
+        plt.tight_layout()
+        if save and plot_dir:
+            out_fp = os.path.join(plot_dir, 'outliers_compare_%s.png' % '_'.join(
+                c.replace(' ', '_') for c in indicator_cols))
+            fig.savefig(out_fp, dpi=150, bbox_inches='tight')
+            if self.verbose >= 1:
+                print('    Plot saved: %s' % out_fp)
+        if show:
+            plt.show()
+        else:
+            plt.close(fig)
+
     # ------------------------------------------------------------------ main
 
     def _Detect_outliers(self):
@@ -554,11 +629,14 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
 
-        detector_name   = str(getattr(p, 'detector', 'iforest')).strip()
+        detector_name   = str(getattr(p, 'detector', 'iforest')).strip().lower()
+        ext             = _name_extension(p)
+        if ext is None:
+            return
         threshold       = float(getattr(p, 'threshold', 0.1))
         show            = getattr(p, 'show', True)
         save            = getattr(p, 'save', False)
-        overwrite       = bool(getattr(p, 'overwrite', False))
+        overwrite       = self._Overwrite(p)
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
 
         # Load parquet
@@ -569,9 +647,7 @@ class Process_ml_preprocess(Get_schema_table):
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
 
-        # Derive _ol output path
         stem      = os.path.splitext(os.path.basename(parquet_fp))[0]
-        ol_del_fp = os.path.join(project_root_fp, '%s_ol.parquet' % stem)
 
         # Determine which indicators to process
         requested = _parse_array_param(getattr(p, 'indicator_array', []))
@@ -599,11 +675,11 @@ class Process_ml_preprocess(Get_schema_table):
             print('    Detecting outliers for: %s' % ', '.join(indicator_cols))
             print('    Detector: %s  threshold: %.3f' % (detector_name, threshold))
 
-        if _build_detector(detector_name, threshold) is None:
-            print('    ERROR: unknown detector "%s".' % detector_name)
+        if detector_name != 'select' and _build_detector(detector_name, threshold) is None:
+            print('    ERROR: unknown detector "%s" (iforest, ee, lof, 1csvm or select).' % detector_name)
             return
 
-        def _run_detection(thr):
+        def _run_detection(thr, detector_name):
             m = {}; ad = {}
             for col in indicator_cols:
                 vals  = df[col].values.astype(float)
@@ -628,10 +704,28 @@ class Process_ml_preprocess(Get_schema_table):
                 m[col] = full_mask
             return m, ad
 
-        # Interactive threshold loop — user can adjust until satisfied
         plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
+
+        # select: all four detectors at the same threshold side by side, the user picks one
+        if detector_name == 'select':
+            results = {d: _run_detection(threshold, d) for d in OUTLIER_DETECTORS}
+            for d, (m, _) in results.items():
+                print('    %-6s %s' % (d, '  '.join('%s: %d' % (c, int(m[c].sum())) for c in indicator_cols)))
+            self._Plot_outliers_compare(df, indicator_cols, results, threshold, show, save, plot_dir)
+            k = _Ask_choice('Outlier detector to apply', [
+                '%s (%d)' % (d, sum(int(m[c].sum()) for c in indicator_cols)) for d, (m, _) in results.items()])
+            if k == 0:
+                print('    Outlier detection skipped.')
+                return
+            detector_name = OUTLIER_DETECTORS[k - 1]
+
+        # Output .ol<detector>[#name_extension], e.g. .olif
+        ol_del_fp = os.path.join(project_root_fp,
+                                 Derived_stem(stem, _OUTLIER_SUFFIX[detector_name] + ext) + '.parquet')
+
+        # Interactive threshold loop — user can adjust until satisfied
         while True:
-            masks, actual_detectors = _run_detection(threshold)
+            masks, actual_detectors = _run_detection(threshold, detector_name)
             summary = '  '.join('%s: %d' % (c, int(masks[c].sum())) for c in indicator_cols)
             print('    Outliers detected (threshold=%.3f) — %s' % (threshold, summary))
             self._Plot_outliers(df, indicator_cols, masks, actual_detectors,
@@ -706,10 +800,12 @@ class Process_ml_preprocess(Get_schema_table):
         spectral_kept = [c for c in df.columns if _is_spectral_col(c)]
         _write_companion_json(
             project_root_fp, stem, out_stem, spectral_kept,
-            {'process': 'detect_outliers',
+            {'_id': _OUTLIER_SUFFIX[detector_name] + ext,
+             'process': 'detect_outliers',
              'parameters': {'detector': detector_name, 'threshold': threshold,
                             'indicator_array': list(approved)}},
-            Signal_type_of(units_D, spectral_kept),
+            Signal_type_of(units_D, spectral_kept) if spectral_kept else None,
+            indicator_cols=all_indicators,
         )
 
         n_removed = sum(int(masks[c].sum()) for c in approved)
@@ -805,6 +901,9 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
 
+        ext = _name_extension(p)
+        if ext is None:
+            return
         scaler_name = str(getattr(p, 'scaler', 'none')).strip().lower()
         if scaler_name == 'none':
             print('    Variance threshold skipped (scaler=none).')
@@ -813,7 +912,7 @@ class Process_ml_preprocess(Get_schema_table):
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show      = getattr(p, 'show', True)
         save      = getattr(p, 'save', False)
-        overwrite = bool(getattr(p, 'overwrite', False))
+        overwrite = self._Overwrite(p)
         max_spectra = int(getattr(p, 'max_spectra', 100))
 
         # Resolve input parquet
@@ -824,14 +923,9 @@ class Process_ml_preprocess(Get_schema_table):
         if self.verbose >= 1:
             print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
 
-        # Derive _vt output path; check for an existing result before computing
+        # Output .vt<scaler letter><threshold> (e.g. .vtm028); the name depends on the threshold set below,
+        # so an existing file is only detected when saving
         stem   = os.path.splitext(os.path.basename(parquet_fp))[0]
-        vt_fp  = os.path.join(project_root_fp, '%s_vt.parquet' % stem)
-
-        if os.path.exists(vt_fp) and not overwrite:
-            self._Accept_and_save(df, None, [], 'vt', stem, project_root_fp, overwrite,
-                                  {'process': 'select_variance_threshold'}, units_D)
-            return
 
         # Extract spectral columns
         spectral_cols = [c for c in df.columns if _is_spectral_col(c)]
@@ -905,10 +999,12 @@ class Process_ml_preprocess(Get_schema_table):
         retain_cols = [c for c, keep in zip(spectral_cols, support) if keep]
         step_info   = {'process': 'select_variance_threshold',
                        'parameters': {'scaler': scaler_name, 'threshold': threshold}}
-        out_fp, _ = self._Accept_and_save(df, df[retain_cols], retain_cols, 'vt',
+        abbrev      = 'vt%s%s%s' % (scaler_name[0], _num_tag(threshold), ext)
+        step_info['_id'] = abbrev
+        out_fp, skipped = self._Accept_and_save(df, df[retain_cols], retain_cols, abbrev,
                                           stem, project_root_fp, overwrite, step_info, units_D,
                                           confirm=False)
-        if out_fp and self.verbose >= 1:
+        if out_fp and not skipped and self.verbose >= 1:
             print('    Removed %d band%s, %d retained.' % (
                 n_discard, 's' if n_discard != 1 else '', len(retain_cols)))
 
@@ -930,7 +1026,7 @@ class Process_ml_preprocess(Get_schema_table):
             dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show        = getattr(p, 'show', True)
         save        = getattr(p, 'save', False)
-        overwrite   = bool(getattr(p, 'overwrite', False))
+        overwrite   = self._Overwrite(p)
         max_spectra = int(getattr(p, 'max_spectra', 100))
         colormap    = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
@@ -1007,7 +1103,7 @@ class Process_ml_preprocess(Get_schema_table):
                           show, save, plot_dir, fname):
         '''Stacked 2-inch-per-panel plot for all steps in a chemometric chain.
 
-        steps: list of (label, spec_df_full, cols) from apply_chemometrics.
+        steps: list of (label, spec_df_full, cols), e.g. from Apply_chain.
         '''
         n    = len(steps)
         fig, axes = plt.subplots(n, 1, figsize=(10, 2.0 * n),
@@ -1041,7 +1137,7 @@ class Process_ml_preprocess(Get_schema_table):
                           stem, project_root_fp, overwrite, step_info, units_D=None,
                           confirm=True):
         '''Prompt y/n (unless confirm=False), save parquet + companion JSON. Returns (out_fp, skipped).'''
-        out_stem = '%s_%s' % (stem, abbrev)
+        out_stem = Derived_stem(stem, abbrev)
         out_fp   = os.path.join(project_root_fp, out_stem + '.parquet')
 
         if os.path.exists(out_fp) and not overwrite:
@@ -1111,6 +1207,9 @@ class Process_ml_preprocess(Get_schema_table):
         '''
         p   = self.process_S.process.parameters
         _json = lambda x: x + '.json' if Is_path(x) and not x.lower().endswith('.json') else x
+        ext = _name_extension(p)
+        if ext is None:
+            return
 
         filter_fp_param = _json(str(getattr(p, 'filter_fp', 'none')).strip())
         if filter_fp_param.lower() in ('', 'none', 'no'):
@@ -1132,7 +1231,7 @@ class Process_ml_preprocess(Get_schema_table):
                 print('    ERROR: no known filter (%s) in "%s".' % (', '.join(_FILTER_ABBREV), e))
                 return
             name = os.path.splitext(os.path.basename(e))[0] if Is_path(e) else e
-            filters.append((e, cfg, _FILTER_ABBREV[kind], name))
+            filters.append((e, cfg, _filter_suffix(kind, cfg), name))
 
         inp = self._Load_spec_inputs(p)
         if inp is None:
@@ -1150,6 +1249,7 @@ class Process_ml_preprocess(Get_schema_table):
             i = 0
             df_filtered, cols_out, _ = apply_fn(0)
         entry, filter_cfg, abbrev, name = filters[i]
+        abbrev += ext
 
         sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
         sub_out, _,      _       = self._Sub_spec(df_filtered,    inp['max_spectra'], inp['colormap'])
@@ -1182,6 +1282,9 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
 
+        ext = _name_extension(p)
+        if ext is None:
+            return
         mf_fp_param = str(getattr(p, 'multi_filter_fp',
                            getattr(p, 'mulit_filter_fp', 'none'))).strip()
         mf_cfg = self._Load_named_settings('multi_filter', mf_fp_param)
@@ -1192,7 +1295,7 @@ class Process_ml_preprocess(Get_schema_table):
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show            = getattr(p, 'show', True)
         save            = getattr(p, 'save', False)
-        overwrite       = bool(getattr(p, 'overwrite', False))
+        overwrite       = self._Overwrite(p)
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
@@ -1230,12 +1333,12 @@ class Process_ml_preprocess(Get_schema_table):
         )
 
         step_info = {
-            '_id': 'mf',
+            '_id': 'mf' + ext,
             'process': 'multi_filter_spectra',
             'parameters': {'multi_filter_fp': mf_fp_param},
             'multi_filter': mf_cfg,
         }
-        self._Accept_and_save(df, df_filtered, list(cols_out), 'mf',
+        self._Accept_and_save(df, df_filtered, list(cols_out), 'mf' + ext,
                                stem, project_root_fp, overwrite, step_info, units_D)
 
     # ------------------------------------------------------------------ ward clustering
@@ -1295,7 +1398,7 @@ class Process_ml_preprocess(Get_schema_table):
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show            = getattr(p, 'show', True)
         save            = getattr(p, 'save', False)
-        overwrite       = bool(getattr(p, 'overwrite', False))
+        overwrite       = self._Overwrite(p)
         max_spectra     = int(getattr(p, 'max_spectra', 100))
         colormap        = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
@@ -1323,10 +1426,8 @@ class Process_ml_preprocess(Get_schema_table):
         connectivity = bool(getattr(p, 'connectivity', True))
         n_bands      = X.shape[1]
 
-        # Check for an existing result before spending time on tuning
-        if os.path.exists(os.path.join(project_root_fp, stem + '_wc.parquet')) and not overwrite:
-            self._Accept_and_save(df, None, [], 'wc', stem, project_root_fp, overwrite,
-                                  {'process': 'ward_clustering'}, units_D)
+        ext = _name_extension(p)
+        if ext is None:
             return
 
         # Suggested n_clusters: tuned best, or n_clusters from the ward clustering file
@@ -1383,7 +1484,7 @@ class Process_ml_preprocess(Get_schema_table):
                                    n_clusters, connectivity, ann_shown, show, save, plot_dir)
 
         step_info = {
-            '_id': 'wc',
+            '_id': 'wc%d%s' % (n_clusters, ext),
             'process': 'ward_clustering',
             'parameters': {'ward_clustering_fp': wc_fp_param,
                            'connectivity': connectivity,
@@ -1393,7 +1494,7 @@ class Process_ml_preprocess(Get_schema_table):
             'agglomeration': cfg,
             'cluster_bands': cluster_bands,
         }
-        self._Accept_and_save(df, spec_out, out_cols, 'wc',
+        self._Accept_and_save(df, spec_out, out_cols, 'wc%d%s' % (n_clusters, ext),
                                stem, project_root_fp, overwrite, step_info, units_D,
                                confirm=False)
 
@@ -1542,7 +1643,7 @@ class Process_ml_preprocess(Get_schema_table):
         separate_selections = bool(getattr(p, 'separate_selections', False))
         show                = getattr(p, 'show', True)
         save                = getattr(p, 'save', False)
-        overwrite           = bool(getattr(p, 'overwrite', False))
+        overwrite           = self._Overwrite(p)
         max_spectra         = int(getattr(p, 'max_spectra', 100))
         colormap            = Spectra_colormap(getattr(p, 'colormap', 'default'), self.verbose)
 
@@ -1740,7 +1841,7 @@ class Process_ml_preprocess(Get_schema_table):
         model_params_param  = str(getattr(p, 'model_parameters_fp', 'default')).strip()
         separate_selections = bool(getattr(p, 'separate_selections', False))
         n_top               = int(getattr(p, 'n_top_features_in_plot', 0))
-        overwrite           = bool(getattr(p, 'overwrite', False))
+        overwrite           = self._Overwrite(p)
         test_size           = float(getattr(p, 'test_size', 0.3))
 
         if not selector_array:
@@ -1979,7 +2080,7 @@ class Process_ml_preprocess(Get_schema_table):
             top_cols = [spectral_cols[i] for i in top_idx]
             top_wl   = [wavelengths[i]   for i in top_idx]
             abbrev   = '%s-%s-%s' % (ind_s, reg_key, suffix)
-            out_stem = '%s_%s' % (stem, abbrev)
+            out_stem = Derived_stem(stem, abbrev)
             out_fp   = os.path.join(project_root_fp, out_stem + '.parquet')
             if os.path.exists(out_fp) and not overwrite:
                 print('    "%s" already exists. Use overwrite=True to rerun.' % out_stem)
@@ -2349,64 +2450,40 @@ class Process_ml_preprocess(Get_schema_table):
             inp['units_D'], confirm=confirm,
         )
 
-    def _Chemometric_default(self):
+    def _Chemometric_chain(self):
+        '''Run the steps of chemometrics_array in order (see src/ai4sh/chemometric_chain.py), plot every step,
+        ask y/n and save the result with the suffixes of all steps (e.g. .snv.sg5.d1.mc.wc40.pca5).'''
         p   = self.process_S.process.parameters
-        inp = self._Load_spec_inputs(p)
-        if inp is None:
+        ext = _name_extension(p)
+        if ext is None:
             return
-
-        chemometrics_param = str(getattr(p, 'chemometrics', 'default')).strip() or 'default'
-        chemometrics_array = _parse_array_param(getattr(p, 'chemometrics_array', []))
-
-        if not chemometrics_array:
+        try:
+            steps = Parse_chain(getattr(p, 'chemometrics_array', []), self._Resolve_filter_fp)
+        except ValueError as e:
+            print('    ERROR: %s' % e)
+            return
+        if not steps:
             print('    No chemometrics_array specified — nothing to do.')
             return
 
-        steps = apply_chemometrics(inp['spec_df'], inp['wavelengths'],
-                                    chemometrics_array, chemometrics_param, self.verbose)
+        inp = self._Load_spec_inputs(p)
+        if inp is None:
+            return
+        try:
+            results = Apply_chain(inp['spec_df'], inp['wavelengths'], steps)
+        except ValueError as e:
+            print('    ERROR: %s' % e)
+            return
 
-        # Build chain abbreviation and step_info_list from all steps except 'raw'
-        chain_abbrevs  = []
-        step_info_list = []
-        chem_config    = _load_chemometric_config(chemometrics_param, self.verbose)
-        for step_name_key in chemometrics_array:
-            cfg = chem_config.get(step_name_key, {})
-            if step_name_key == 'derivative':
-                d = int(cfg.get('derivative', cfg.get('derive', 1)))
-                a = bool(cfg.get('append', False))
-                chain_abbrevs.append('d%dapp' % d if a else 'd%d' % d)
-                step_info_list.append({'process': 'spectra_derivative',
-                                       'parameters': {'derivative': d, 'append': a}})
-            elif step_name_key == 'scatter_correction':
-                sc = cfg.get('scaler', ['snv'])
-                chain_abbrevs.append(''.join(sc))
-                step_info_list.append({'process': 'spectra_scatter_correction',
-                                       'parameters': {'scaler': sc}})
-            elif step_name_key == 'scaling':
-                m = cfg.get('method', 'meancentring')
-                chain_abbrevs.append({'meancentring': 'mc', 'autoscaling': 'as',
-                                      'paretoscaling': 'ps', 'poissonscaling': 'poi'}.get(m, m[:4]))
-                step_info_list.append({'process': 'spectra_scaling',
-                                       'parameters': {'method': m}})
-            elif step_name_key == 'decomposition':
-                m = cfg.get('method', 'pca')
-                n = int(cfg.get('n_components', 5))
-                chain_abbrevs.append('pca%d' % n)
-                step_info_list.append({'process': 'spectra_decomposition',
-                                       'parameters': {'method': m, 'n_components': n}})
-
-        abbrev = '_'.join(chain_abbrevs) if chain_abbrevs else 'default'
-
+        abbrev = SUFFIX_SEP.join(r['suffix'] for r in results[1:]) + ext
         self._Plot_chem_chain(
-            steps, inp['max_spectra'], inp['colormap'], inp['ann'],
-            inp['show'], inp['save'], inp['plot_dir'],
+            [(r['label'], r['df'], r['cols']) for r in results], inp['max_spectra'], inp['colormap'],
+            inp['ann'], inp['show'], inp['save'], inp['plot_dir'],
             'chemometric_%s.png' % abbrev,
         )
-
-        _, spec_final, cols_final = steps[-1]
         self._Accept_and_save(
-            inp['df'], spec_final, cols_final, abbrev,
+            inp['df'], results[-1]['df'], results[-1]['cols'], abbrev,
             inp['stem'], inp['project_root_fp'], inp['overwrite'],
-            step_info_list,
+            [r['step_info'] for r in results[1:]],
             inp['units_D'],
         )

@@ -14,7 +14,8 @@ steps) appends a record to .previous_dataframe in the directory it saved to:
         ...
     ]}
 
-The last record is the previous dataframe: a process whose parquet_file/dataframe parameter is empty reads
+Each dataframe is listed once: writing a record removes earlier entries of the same file (an overwritten or
+re-registered parquet moves to the end). The last record is the previous dataframe: a process whose parquet_file/dataframe parameter is empty reads
 it, so a notebook can run select → inspect → plot → preprocess without repeating file names. The earlier
 records are the history of all dataframes created in the directory, oldest first.
 
@@ -78,9 +79,20 @@ def Read_previous_df(directory):
 def Write_previous_df(directory, process_name, entries, note=''):
     '''Append a record {process, created_at, note, entries, provenance} to .previous_dataframe of directory.
 
-    entries: list of dicts with at least 'dataframe' (file name relative to directory).
+    entries: list of dicts with at least 'dataframe' (file name relative to directory). Earlier records of the
+    same dataframe(s) are removed first, so each file appears once, at its latest position.
     '''
     history = Read_previous_history(directory)
+
+    # A dataframe is listed once: an earlier record of the same file (overwritten, or re-registered because
+    # it already existed) is removed, so the new record at the end is the only one
+    names = {e.get('dataframe') for e in entries}
+    kept = []
+    for rec in history:
+        rec_entries = [e for e in rec.get('entries', []) if e.get('dataframe') not in names]
+        if rec_entries:
+            kept.append(dict(rec, entries=rec_entries) if len(rec_entries) != len(rec.get('entries', [])) else rec)
+    history = kept
 
     history.append({'process': process_name, 'created_at': datetime.now().isoformat(timespec='seconds'),
                     'note': note, 'entries': entries, 'provenance': Provenance_snapshot()})

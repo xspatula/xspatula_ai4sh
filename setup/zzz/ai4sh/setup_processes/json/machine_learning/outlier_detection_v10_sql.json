@@ -11,7 +11,7 @@
     },
     {
       "process": "add_process",
-      "overwrite": false,
+      "overwrite": true,
       "parameters": {
         "root_process": "machine_learning",
         "process": "detect_outliers",
@@ -50,7 +50,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "none",
-              "hint": "Abbreviation of the outlier detector to apply"
+              "hint": "Outlier detector: iforest, ee, lof or 1csvm; or select = run all four with the same threshold, plot them side by side and choose interactively which one to apply. Suffix .olif, .olee, .ollof or .ol1csvm."
             },
             {
               "parameter": "threshold",
@@ -58,6 +58,13 @@
               "required": false,
               "default_value": 0.1,
               "hint": "The threshold (contamination/nu) to set for detecting"
+            },
+            {
+              "parameter": "name_extension",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional user extension (1-6 letters, digits or -) added to the file suffix after a hashtag, e.g. .ma5#12321, to tell apart outputs with settings the suffix does not show."
             }
           ]
         }

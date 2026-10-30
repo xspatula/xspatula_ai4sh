@@ -5,7 +5,6 @@
       "parameters": {
         "project_root_fp": "./project_neospectra/data/spectra/neospectra/ds2/ai4sh",
         "filter": "lowess",
-        "chemometrics": "default",
         "chemometrics_array": [
           "derivative"
         ],

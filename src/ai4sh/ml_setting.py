@@ -6,7 +6,7 @@ Created on 23 October 2026
 Machine learning parameter sets from the database schema ml_setting.
 
 A parameter set is one named, versioned group of settings of one family (transformation, standardisation,
-chemometric, filter, multi_filter, selector, regressor, spectra_plot, plot_symbol, plot_layout), in one of three
+filter, multi_filter, selector, regressor, spectra_plot, plot_symbol, plot_layout), in one of three
 categories:
 
     raw     library defaults / no operation          (name "none")
@@ -49,7 +49,7 @@ INDICATOR_FAMILIES = {'transformation': 'transformation', 'standardisation': 'st
 
 SYNC_FAMILIES = ('transformation', 'standardisation', 'plot_symbol')
 
-FAMILIES = ('transformation', 'standardisation', 'chemometric', 'filter', 'multi_filter', 'selector', 'regressor',
+FAMILIES = ('transformation', 'standardisation', 'filter', 'multi_filter', 'selector', 'regressor',
             'spectra_plot', 'plot_symbol', 'plot_layout')
 
 RESERVED_NAMES = ('', 'none', 'no', 'default')
