@@ -37,6 +37,46 @@ def _snv(X):
     return out
 
 
+def _detrend(X, order=2):
+    '''Subtract a polynomial (default 2nd order) fitted to each spectrum against band position (Barnes et al. 1989).'''
+    X = np.asarray(X, dtype=float)
+    x = np.linspace(-1.0, 1.0, X.shape[1])
+    coefs = np.polyfit(x, X.T, order)
+    return X - (np.vander(x, order + 1) @ coefs).T
+
+
+# Scatter corrections (per spectrum) and their file abbreviations; sequences concatenate (snv+detrend → snvdt)
+SCATTER_CORRECTIONS = ['l1', 'l2', 'max', 'snv', 'msc', 'detrend']
+_SCATTER_ABBREV = {'detrend': 'dt'}
+
+
+def Scatter_abbrev(scalers):
+    '''File abbreviation of a scatter correction sequence: ["snv", "detrend"] → "snvdt".'''
+    if isinstance(scalers, str):
+        scalers = scalers.split('+')
+    return ''.join(_SCATTER_ABBREV.get(sc, sc) for sc in scalers)
+
+
+def Scatter_sequence_warnings(scalers):
+    '''Messages for steps in a scatter correction sequence that have no effect on the result.
+
+    snv removes any per-spectrum offset and scale, so l1, l2, max, snv and msc before a later snv change nothing
+    (identical result). l1, l2 and max (a per-spectrum scale only) before a later msc are nearly redundant: msc
+    removes the scale of each spectrum, only its reference (mean) spectrum changes slightly. detrend changes the
+    spectral shape and is never redundant.
+    '''
+    msgs = []
+    for i, sc in enumerate(scalers):
+        later = scalers[i + 1:]
+        if sc in ('l1', 'l2', 'max', 'snv', 'msc') and 'snv' in later:
+            msgs.append('%s before snv has no effect: snv removes the offset and scale of each spectrum, '
+                        'the result equals the sequence without %s.' % (sc, sc))
+        elif sc in ('l1', 'l2', 'max') and 'msc' in later:
+            msgs.append('%s before msc has almost no effect: msc removes the scale of each spectrum, '
+                        'only the msc reference spectrum changes slightly.' % sc)
+    return msgs
+
+
 def _msc(X, reference=None):
     X = X.copy().astype(float)
     for i in range(X.shape[0]):
@@ -208,13 +248,17 @@ def apply_derivative(df, columns, cfg):
 def apply_scatter_correction(df, columns, cfg):
     '''Apply one or more scatter corrections in series to spectral DataFrame.
 
-    cfg['scaler']: single string or list — 'l1', 'l2', 'max', 'snv', 'msc'.
-    Chained scalers are applied left-to-right, each using the previous output as input.
+    cfg['scaler']: single string or list — 'l1', 'l2', 'max', 'snv', 'msc', 'detrend'.
+    Chained scalers are applied left-to-right, each using the previous output as input; a warning is printed
+    for a step that has no effect on the result (Scatter_sequence_warnings).
     Returns (df_out, columns_out, label).
     '''
     scalers = cfg.get('scaler', ['snv'])
     if isinstance(scalers, str):
         scalers = [scalers]
+
+    for msg in Scatter_sequence_warnings(scalers):
+        print('    Warning: %s' % msg)
 
     work = df[columns].copy()
 
@@ -226,6 +270,10 @@ def apply_scatter_correction(df, columns, cfg):
             X = _snv(X)
         elif sc == 'msc':
             X, _ = _msc(X)
+        elif sc == 'detrend':
+            X = _detrend(X)
+        else:
+            raise ValueError('unknown scatter correction "%s"; use %s' % (sc, ', '.join(SCATTER_CORRECTIONS)))
         work = pd.DataFrame(data=X, columns=columns, index=df.index)
 
     return work, list(columns), '+'.join(scalers)

@@ -35,7 +35,7 @@ from sklearn.feature_selection import SelectKBest, VarianceThreshold, f_regressi
 from sklearn.preprocessing import (MinMaxScaler, StandardScaler, RobustScaler,
                                    PowerTransformer, QuantileTransformer)
 
-from src.ai4sh.chemometrics import apply_derivative, _snv, _msc, Scaling_parameters
+from src.ai4sh.chemometrics import apply_derivative, _snv, _msc, _detrend, Scaling_parameters
 from src.ai4sh.filter import apply_filter, apply_multi_filter
 from src.ai4sh.spectral_columns import Is_band_col, Band_value
 
@@ -183,7 +183,7 @@ class Derivative(_Stateless, BaseEstimator, TransformerMixin):
 
 
 class ScatterCorrection(BaseEstimator, TransformerMixin):
-    '''l1 / l2 / max / snv / msc in series; msc keeps the mean training spectrum as reference.'''
+    '''l1 / l2 / max / snv / msc / detrend in series; msc keeps the mean training spectrum as reference.'''
 
     def __init__(self, scaler=('snv',)):
         self.scaler = scaler
@@ -210,6 +210,8 @@ class ScatterCorrection(BaseEstimator, TransformerMixin):
                 else:
                     A, _ = _msc(A, self.references_[n_msc])
                 n_msc += 1
+            elif sc == 'detrend':
+                A = _detrend(A)
         return pd.DataFrame(A, columns=cols, index=idx)
 
     def fit(self, X, y=None):
@@ -259,7 +261,8 @@ class Decomposition(BaseEstimator, TransformerMixin):
 
 
 class VarianceThresholdSelect(BaseEstimator, TransformerMixin):
-    '''Drop bands whose variance (after minmax / standard / robust scaling) is below threshold.'''
+    '''Drop bands whose variance (after minmax scaling) is below threshold; scaler is kept for models fitted before
+    2026-10-31 (standard / robust).'''
 
     def __init__(self, scaler='minmax', threshold=0.025):
         self.scaler = scaler

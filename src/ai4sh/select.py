@@ -97,6 +97,10 @@ DEFAULT_TEXTURE_CLASSIFICATION = 'soil texture usda'
 # identify_indicator flags indicators with fewer samples than this (min_samples) as too few for machine learning
 DEFAULT_MIN_SAMPLES = 30
 
+# Aggregation of several observations of one sample (subsamples, replicates) within one observation log:
+# process parameter value → pandas function
+AGGREGATE_D = {'average': 'mean', 'median': 'median', 'min': 'min', 'max': 'max'}
+
 # Max length of the indicator/covariate part of an output name before it is cut and given a hash
 MAX_FEATURE_NAME_LENGTH = 60
 
@@ -214,6 +218,47 @@ class Process_select(Get_schema_table):
             s = s[1:-1]
 
         return [x.strip().strip('"') for x in s.split(',') if x.strip()]
+
+    def _Aggregate(self):
+        '''The aggregate parameter (average, median, min or max) as a pandas function name; None on error.'''
+
+        method = (self._Param('aggregate', 'average') or 'average').lower()
+
+        if method not in AGGREGATE_D:
+
+            print('    ❌ ERROR: aggregate <%s> - use %s' % (method, ', '.join(AGGREGATE_D)))
+
+            return None
+
+        return AGGREGATE_D[method]
+
+    def _Single_observation_log(self, log_df, keys, what):
+        '''True if every group of keys (e.g. sample_id, or sample_id + label) comes from one observation log.
+
+        log_df columns: keys + log_id, log_name, log_tag. Several observation logs of the same sample (e.g. a dried
+        and sieved and an in-lab mixed scan, or rescans in different years) must not be mixed: prints the logs
+        involved and returns False.
+        '''
+        n_logs = log_df.groupby(keys)['log_id'].nunique()
+
+        multi = n_logs[n_logs > 1]
+
+        if multi.empty:
+
+            return True
+
+        conflict_df = log_df.set_index(keys).loc[multi.index].reset_index()
+
+        print('    ❌ ERROR: %d %s have data from more than one observation log:' % (len(multi), what))
+
+        for (name, tag), group in conflict_df.groupby(['log_name', 'log_tag'], dropna=False):
+
+            print('        %s (tag %s): %d samples' % (name, tag, group['sample_id'].nunique()))
+
+        print('    Set observation_log_array to the names or tags of the observation logs to use '
+              '(and spectra_preparation_name to separate sample preparations, e.g. ds2 and ilmx).')
+
+        return False
 
     def _Parse_data_range(self):
         '''Return dict of {indicator: {min, max}} from the data_range text parameter.
@@ -798,7 +843,8 @@ class Process_select(Get_schema_table):
         '''Retrieve, clip and resample the spectra of the samples in scope.
 
         Returns (DataFrame [sample_id + band columns], band column names, output wavelengths), or None.
-        Replicate spectra of a sample are averaged.
+        Spectra from more than one observation log of a sample are an error (_Single_observation_log); several
+        spectra of a sample in one log (subsamples, replicates) are aggregated by the aggregate parameter.
         '''
         p = self.process_S.process.parameters
 
@@ -833,7 +879,13 @@ class Process_select(Get_schema_table):
 
         preparation_id = spectra_D['preparation'][0] if spectra_D['preparation'] else None
 
-        spectra_recs = self.pg_ai4sh_C._Retrieve_spectra_for_scope(scope_D, provision[0], preparation_id, self.pg_session_C)
+        aggregate = self._Aggregate()
+
+        if aggregate is None:
+            return None
+
+        spectra_recs = self.pg_ai4sh_C._Retrieve_spectra_for_scope(
+            scope_D, provision[0], preparation_id, self.pg_session_C, self._Parse_array('observation_log_array'))
 
         if not spectra_recs:
 
@@ -844,6 +896,12 @@ class Process_select(Get_schema_table):
         if self.verbose:
 
             print('    Spectral records from DB: %d' % len(spectra_recs))
+
+        log_df = pd.DataFrame([(r[0], r[2], r[3], r[4]) for r in spectra_recs],
+                              columns=['sample_id', 'log_id', 'log_name', 'log_tag'])
+
+        if not self._Single_observation_log(log_df, ['sample_id'], 'samples'):
+            return None
 
         as_absorbance = DEFAULT_SIGNAL_TYPE == 'refl' and output_signal_type == 'absorb'
 
@@ -862,7 +920,7 @@ class Process_select(Get_schema_table):
 
         rows = []
 
-        for sample_id, signal_array in spectra_recs:
+        for sample_id, signal_array, *_ in spectra_recs:
 
             # Resample to output grid using native spacing (no assumed input_bandwidth)
             resampled = np.interp(output_wl, clipped_wl, np.array(signal_array, dtype=float)[mask])
@@ -879,9 +937,11 @@ class Process_select(Get_schema_table):
 
         if n_replicates:
 
-            print('    Averaging %d replicate spectra (same sample)' % n_replicates)
+            print('    Aggregating (%s) %d subsample/replicate spectra of %d samples' % (
+                self._Param('aggregate', 'average') or 'average', len(spectra_df),
+                int((spectra_df['sample_id'].value_counts() > 1).sum())))
 
-            spectra_df = spectra_df.groupby('sample_id', as_index=False).mean()
+            spectra_df = spectra_df.groupby('sample_id', as_index=False).agg(aggregate)
 
         spectra_df[wl_col_names] = spectra_df[wl_col_names].round(6)
 
@@ -1009,9 +1069,21 @@ class Process_select(Get_schema_table):
 
             label_D = {f['id']: f['label'] for f in numeric}
 
-            recs = self.pg_ai4sh_C._Retrieve_measurements_for_scope(scope_D, list(label_D), self.pg_session_C)
+            aggregate = self._Aggregate()
+
+            if aggregate is None:
+                return None
+
+            recs = self.pg_ai4sh_C._Retrieve_measurements_for_scope(
+                scope_D, list(label_D), self.pg_session_C, self._Parse_array('observation_log_array'))
 
             if recs:
+
+                log_df = pd.DataFrame([(r[0], label_D[r[1]], r[4], r[5], r[6]) for r in recs],
+                                      columns=['sample_id', 'label', 'log_id', 'log_name', 'log_tag'])
+
+                if not self._Single_observation_log(log_df, ['sample_id', 'label'], 'sample/indicator pairs'):
+                    return None
 
                 lab_df = pd.DataFrame([(r[0], label_D[r[1]], r[2], r[3]) for r in recs],
                                       columns=['sample_id', 'label', 'value', 'unit_name'])
@@ -1027,7 +1099,14 @@ class Process_select(Get_schema_table):
 
                 lab_df = self._Screen_values(lab_df, numeric_units_D)
 
-                frames.append(lab_df.pivot_table(index='sample_id', columns='label', values='value', aggfunc='first', dropna=False))
+                n_multi = int((lab_df.groupby(['sample_id', 'label']).size() > 1).sum())
+
+                if n_multi and self.verbose:
+
+                    print('    Aggregating (%s) subsample/replicate values of %d sample/indicator pairs' % (
+                        self._Param('aggregate', 'average') or 'average', n_multi))
+
+                frames.append(lab_df.pivot_table(index='sample_id', columns='label', values='value', aggfunc=aggregate, dropna=False))
 
         classes = [f for f in features if f['kind'] == 'classification']
 
@@ -1388,6 +1467,8 @@ class Process_select(Get_schema_table):
             'sample_filter': scope_D['sample_filter'],
             'sample_source': scope_D['source']['file'] if scope_D['source'] else '',
             'class_columns': class_cols,
+            'observation_log_array': self._Parse_array('observation_log_array'),
+            'aggregate': self._Param('aggregate', 'average') or 'average',
             'output_name': output_name,
             'n_samples': len(df),
         }
@@ -1427,6 +1508,12 @@ class Process_select(Get_schema_table):
 
         The inputs are inner joined on sample_id, so only samples present in all inputs are kept. Key
         columns are kept once (from the first input); a feature column found in two inputs is an error.
+
+        Inputs must be selections, not pre-processed dataframes: a preprocessing chain is fitted on all samples of
+        its dataframe, and the model can only refit it on the training samples from the unprocessed source in the
+        same folder. Pre-process the compiled dataset instead (chemometric_chain with chain_from reruns a chain
+        explored in the spectra folder). Outlier removal is the exception: it only removes samples (rows), and is
+        recorded per input under "inputs".
         Saves {output_name}.parquet + {output_name}.json under
         {output_root_fp}/{output_sub_fp}/{output_name}/, a folder ready to use as project_root_fp in the
         machine learning processes.
@@ -1503,7 +1590,25 @@ class Process_select(Get_schema_table):
                 with open(in_params_fpn) as fh:
                     in_params_D = json.load(fh)
 
-            inputs_L.append({'file': path, 'role': in_params_D.get('role', ''), 'n_samples': len(in_df)})
+            chain = in_params_D.get('preprocessing_chain') or []
+
+            fitted = [st.get('process') for st in chain if st.get('process') != 'detect_outliers']
+
+            if fitted:
+
+                print('    ❌ ERROR: %s is pre-processed (%s). Compile the unprocessed selection and pre-process the '
+                      'compiled dataset, e.g. chemometric_chain with chain_from = "%s.json"'
+                      % (path, ' → '.join(fitted), path[:-len('.parquet')] if path.endswith('.parquet') else path))
+
+                return
+
+            input_D = {'file': path, 'role': in_params_D.get('role', ''), 'n_samples': len(in_df)}
+
+            if chain:
+
+                input_D['preprocessing_chain'] = chain
+
+            inputs_L.append(input_D)
 
             if df is None:
 
@@ -1531,7 +1636,11 @@ class Process_select(Get_schema_table):
             # indicator/covariate lists and units are merged
             for key, value in in_params_D.items():
 
-                if key in ('indicator_array', 'covariate_array'):
+                if key in ('preprocessing_chain', 'source_parquet', 'source_sha256', 'output_data'):
+
+                    continue
+
+                elif key in ('indicator_array', 'covariate_array'):
 
                     params_D[key] = params_D.get(key, []) + [v for v in value if v not in params_D.get(key, [])]
 

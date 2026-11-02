@@ -1051,11 +1051,22 @@ class PG_manage_AI4SH:
 
         return pg_session_C._Execute_search_all_sql(sql, params) or []
 
-    def _Retrieve_spectra_for_scope(self, scope_D, provision_id, preparation_id, pg_session_C):
-        '''Return (sample_id, signal_array) for all spectra of the provision for samples in scope,
-        optionally restricted to a sample preparation.'''
+    def _Observation_log_sql(self, observation_logs):
+        '''(sql, params) restricting OOL (observation.observation_log) to the given names or tags; ('', []) if none.'''
+
+        if not observation_logs:
+            return '', []
+
+        return ' AND (OOL.name = ANY(%s) OR OOL.tag = ANY(%s))', [list(observation_logs), list(observation_logs)]
+
+    def _Retrieve_spectra_for_scope(self, scope_D, provision_id, preparation_id, pg_session_C, observation_logs=None):
+        '''Return (sample_id, signal_array, observation_log_id, observation_log_name, observation_log_tag,
+        subsample, replicate) for all spectra of the provision for samples in scope, optionally restricted to a
+        sample preparation and to observation logs (names or tags).'''
 
         scope_sql, params = self._Scope_sql(scope_D)
+
+        log_sql, log_params = self._Observation_log_sql(observation_logs)
 
         prep_sql = ''
 
@@ -1064,14 +1075,14 @@ class PG_manage_AI4SH:
             prep_sql = 'INNER JOIN observation.observation_log_meta AS OOLM \
                 ON OOLM.observation_log_id = OOL.id AND OOLM.preparation_id = %s ' % int(preparation_id)
 
-        sql = 'SELECT OO.sample_id, OOMA.value \
+        sql = 'SELECT OO.sample_id, OOMA.value, OOL.id, OOL.name, OOL.tag, OO.subsample, OO.replicate \
             FROM observation.observation_measurement_array AS OOMA \
             INNER JOIN observation.observation AS OO ON OOMA.observation_id = OO.id \
             INNER JOIN observation.observation_log AS OOL ON OO.observation_log_id = OOL.id \
             %s\
-            WHERE OOL.provision_id = %%s AND OO.sample_id IN (%s) ORDER BY OO.sample_id;' % (prep_sql, scope_sql)
+            WHERE OOL.provision_id = %%s AND OO.sample_id IN (%s)%s ORDER BY OO.sample_id;' % (prep_sql, scope_sql, log_sql)
 
-        return pg_session_C._Execute_search_all_sql(sql, [provision_id] + params) or []
+        return pg_session_C._Execute_search_all_sql(sql, [provision_id] + params + log_params) or []
 
     def _Retrieve_indicator_for_select(self, value, pg_session_C):
         '''Return (id, name, alias, quantity_name) of the indicator with name or alias value, or None.'''
@@ -1082,24 +1093,28 @@ class PG_manage_AI4SH:
 
         return pg_session_C._Execute_search_single_sql(sql, (value, value))
 
-    def _Retrieve_measurements_for_scope(self, scope_D, indicator_ids, pg_session_C):
-        '''Return (sample_id, indicator_id, value, unit_name) for numeric indicators of samples in scope.
+    def _Retrieve_measurements_for_scope(self, scope_D, indicator_ids, pg_session_C, observation_logs=None):
+        '''Return (sample_id, indicator_id, value, unit_name, observation_log_id, observation_log_name,
+        observation_log_tag, subsample, replicate) for numeric indicators of samples in scope, optionally restricted
+        to observation logs (names or tags).
 
         unit_name is the unit the provision behind the measurement records the indicator in
         (observation_utility.provision_indicator.unit_id), or None if no provision/unit link exists.
         '''
         scope_sql, params = self._Scope_sql(scope_D)
 
-        sql = 'SELECT OO.sample_id, OOM.indicator_id, OOM.value, OUU.name \
+        log_sql, log_params = self._Observation_log_sql(observation_logs)
+
+        sql = 'SELECT OO.sample_id, OOM.indicator_id, OOM.value, OUU.name, OOL.id, OOL.name, OOL.tag, OO.subsample, OO.replicate \
             FROM observation.observation_measurement AS OOM \
             INNER JOIN observation.observation AS OO ON OOM.observation_id = OO.id \
             INNER JOIN observation.observation_log AS OOL ON OO.observation_log_id = OOL.id \
             LEFT JOIN observation_utility.provision_indicator AS OUPI \
                 ON OUPI.provision_id = OOL.provision_id AND OUPI.indicator_id = OOM.indicator_id \
             LEFT JOIN observation_utility.unit AS OUU ON OUU.id = OUPI.unit_id \
-            WHERE OOM.indicator_id = ANY(%%s) AND OO.sample_id IN (%s);' % scope_sql
+            WHERE OOM.indicator_id = ANY(%%s) AND OO.sample_id IN (%s)%s;' % (scope_sql, log_sql)
 
-        return pg_session_C._Execute_search_all_sql(sql, [list(indicator_ids)] + params) or []
+        return pg_session_C._Execute_search_all_sql(sql, [list(indicator_ids)] + params + log_params) or []
 
     def _Retrieve_classifications_for_scope(self, scope_D, indicator_ids, pg_session_C):
         '''Return (sample_id, indicator_id, class_name) for nominal (class) indicators of samples in scope.'''

@@ -121,6 +121,20 @@
               }
             },
             {
+              "parameter": "observation_log_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional: observation logs (names or tags) to take the data from. Required when a sample has data from more than one observation log (e.g. rescans in different years, or several labs for one indicator); the selection stops with an error listing the logs involved. Observation log tags can repeat across sampling logs, so one tag can select the matching log in every sampling log."
+            },
+            {
+              "parameter": "aggregate",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "average",
+              "hint": "How several observations of the same sample within one observation log (subsamples and/or replicates) are combined into one value or spectrum: average (default), median, min or max (per band for spectra)."
+            },
+            {
               "parameter": "begin_wavelength",
               "parameter_type": "integer",
               "required": true,

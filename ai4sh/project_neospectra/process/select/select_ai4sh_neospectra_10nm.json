@@ -11,6 +11,18 @@
         "max_profile": 20,
         "spectra_provision": "neospectra",
         "spectra_preparation_name": "ds2",
+        "observation_log_array": [
+          "ai4sh_dk_foulum_2024@neospectra.ds2",
+          "ai4sh_es_arkaute_2024@neospectra.ds2",
+          "ai4sh_fi_jokioinen_2024@neospectra.ds2",
+          "ai4sh_fr_estrees-mons_2025@neospectra.ds2",
+          "ai4sh_gb-eng_woodoaks_2025@neospectra.ds2",
+          "ai4sh_gb-wls_plynlimon_2025@neospectra.ds2",
+          "ai4sh_gr_ktima-gerovassiliou_2023@neospectra.ds2",
+          "ai4sh_hr_neretva_2024@neospectra.ds2",
+          "ai4sh_nl_boermarke-zeijen_2025@neospectra.ds2",
+          "ai4sh_se_loennstorp_2024@neospectra.ds2"
+        ],
         "begin_wavelength": 1350,
         "end_wavelength": 2500,
         "output_bandwidth": 10,

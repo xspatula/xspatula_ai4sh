@@ -18,12 +18,12 @@ from sklearn.ensemble import IsolationForest
 from sklearn.covariance import EllipticEnvelope
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.svm import OneClassSVM
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_regression
 from sklearn.model_selection import KFold
 
 from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction,
-                                     apply_scaling, apply_decomposition)
+                                     apply_scaling, apply_decomposition, SCATTER_CORRECTIONS, Scatter_abbrev)
 from src.ai4sh.chemometric_chain import (Parse_chain, Apply_chain, Chain_from_companion, Check_spectral_range,
                                          Num_tag as _num_tag,
                                          Filter_suffix as _filter_suffix)
@@ -86,7 +86,6 @@ def _parse_array_param(raw):
 
 
 # Options offered by scaler/method "select": per-spectrum scatter corrections and band-wise variable scalings
-SCATTER_CORRECTIONS = ['l1', 'l2', 'max', 'snv', 'msc']
 VARIABLE_SCALINGS   = ['meancentring', 'autoscaling', 'paretoscaling', 'poissonscaling']
 # Filter parameter sets compared by filter_fp "select" when no filter_array is given; key → file abbreviation
 FILTER_PRESETS = ['moving-average', 'gauss', 'savitzky-golay', 'lowess']
@@ -217,7 +216,7 @@ def _step_abbrev_from_info(process_name, parameters):
         n = parameters.get('derivative', 1)
         return 'd%dapp' % n if parameters.get('append', False) else 'd%d' % n
     if process_name == 'spectra_scatter_correction':
-        return ''.join(parameters.get('scaler', ['snv']))
+        return Scatter_abbrev(parameters.get('scaler', ['snv']))
     if process_name == 'spectra_scaling':
         return {'meancentring': 'mc', 'autoscaling': 'as',
                 'paretoscaling': 'ps', 'poissonscaling': 'poi'}.get(
@@ -300,9 +299,24 @@ def _Ward_tune(X, n_clusters_list, kfolds, connectivity=False):
 
 
 def _Ward_pick_best(scores):
-    '''Smallest n_clusters whose mean MSE is within 5 % of the global minimum.'''
-    min_mse = min(v[0] for v in scores.values())
-    return min(nc for nc, (m, _) in sorted(scores.items()) if m <= min_mse * 1.05)
+    '''n_clusters at the elbow of the reconstruction MSE curve.
+
+    The MSE keeps falling as clusters are added, so a "near the minimum" rule always ends at the largest candidate.
+    The elbow is the candidate furthest below the straight line from the first to the last candidate, with both axes
+    scaled to 0-1: where adding clusters stops paying off. With fewer than 3 candidates the smallest MSE is used.
+    '''
+    ncs   = sorted(scores)
+    if len(ncs) < 3:
+        return min(ncs, key=lambda nc: scores[nc][0])
+    x     = np.array(ncs, dtype=float)
+    y     = np.array([scores[nc][0] for nc in ncs])
+    x     = (x - x[0]) / (x[-1] - x[0])
+    y_rng = y.max() - y.min()
+    if y_rng == 0:
+        return ncs[0]
+    y     = (y - y.min()) / y_rng
+    chord = y[0] + (y[-1] - y[0]) * x
+    return ncs[int(np.argmax(chord - y))]
 
 
 def _resolve_input_parquet(project_root_fp, dataframe_param):
@@ -455,7 +469,7 @@ def _chem_abbrev(step_name, label, append=False):
             n = 1
         return 'd%dapp' % n if append else 'd%d' % n
     if step_name == 'scatter_correction':
-        return label.replace('+', '')
+        return Scatter_abbrev(label)
     if step_name == 'scaling':
         return {'meancentring': 'mc', 'autoscaling': 'as',
                 'paretoscaling': 'ps', 'poissonscaling': 'poi'}.get(label, label[:4])
@@ -908,10 +922,9 @@ class Process_ml_preprocess(Get_schema_table):
         ext = _name_extension(p)
         if ext is None:
             return
-        scaler_name = str(getattr(p, 'scaler', 'none')).strip().lower()
-        if scaler_name == 'none':
-            print('    Variance threshold skipped (scaler=none).')
-            return
+        # Band variances are always computed on minmax-scaled bands (0-1 per band): standard scaling gives every
+        # band variance 1 and robust scaling near-constant variances, so neither can separate bands
+        scaler_name = 'minmax'
 
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         show      = getattr(p, 'show', True)
@@ -941,12 +954,7 @@ class Process_ml_preprocess(Get_schema_table):
         X = df[spectral_cols].values.astype(float)
 
         # Scale
-        scalers = {'minmax': MinMaxScaler(), 'standard': StandardScaler(), 'robust': RobustScaler()}
-        if scaler_name not in scalers:
-            print('    ERROR: unknown scaler "%s". Use minmax, standard, or robust.' % scaler_name)
-            return
-
-        X_scaled = scalers[scaler_name].fit_transform(X)
+        X_scaled = MinMaxScaler().fit_transform(X)
         variances_scaled = VarianceThreshold(threshold=0.0).fit(X_scaled).variances_
         var_min, var_med, var_max = (float(np.min(variances_scaled)),
                                      float(np.median(variances_scaled)),
@@ -1002,8 +1010,8 @@ class Process_ml_preprocess(Get_schema_table):
         support     = ~discard_mask
         retain_cols = [c for c, keep in zip(spectral_cols, support) if keep]
         step_info   = {'process': 'select_variance_threshold',
-                       'parameters': {'scaler': scaler_name, 'threshold': threshold}}
-        abbrev      = 'vt%s%s%s' % (scaler_name[0], _num_tag(threshold), ext)
+                       'parameters': {'threshold': threshold}}
+        abbrev      = 'vt%s%s' % (_num_tag(threshold), ext)
         step_info['_id'] = abbrev
         out_fp, skipped = self._Accept_and_save(df, df[retain_cols], retain_cols, abbrev,
                                           stem, project_root_fp, overwrite, step_info, units_D,
@@ -1358,7 +1366,7 @@ class Process_ml_preprocess(Get_schema_table):
                         [m + s for m, s in zip(means, stds)],
                         alpha=0.2, color='steelblue')
         ax.axvline(best_nc, color='red', linestyle='--', linewidth=1,
-                   label='best n_clusters = %d' % best_nc)
+                   label='elbow n_clusters = %d' % best_nc)
         ax.set_xlabel('n_clusters')
         ax.set_ylabel('Reconstruction MSE')
         ax.set_title('Ward clustering — reconstruction error vs n_clusters')
@@ -1445,7 +1453,7 @@ class Process_ml_preprocess(Get_schema_table):
                   % (len(clusters_list), connectivity))
             scores  = _Ward_tune(X, clusters_list, kfolds, connectivity)
             n_tuned = _Ward_pick_best(scores)
-            print('    Tuned: best n_clusters = %d' % n_tuned)
+            print('    Tuned: n_clusters at the elbow of the MSE curve = %d' % n_tuned)
             self._Plot_ward_tune(scores, n_tuned, show, save, plot_dir)
             n_suggest = n_tuned
         else:
@@ -2318,7 +2326,7 @@ class Process_ml_preprocess(Get_schema_table):
         return results[n - 1]
 
     def _Spectra_scatter_correction(self):
-        '''Scatter correction per spectrum (l1, l2, max, snv, msc); scaler "select" compares all and asks.'''
+        '''Scatter correction per spectrum (l1, l2, max, snv, msc, detrend); scaler "select" compares all and asks.'''
         p   = self.process_S.process.parameters
         inp = self._Load_spec_inputs(p)
         if inp is None:
@@ -2340,7 +2348,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
         sub_out, _,      _       = self._Sub_spec(spec_out,       inp['max_spectra'], inp['colormap'])
-        abbrev    = label.replace('+', '')
+        abbrev    = Scatter_abbrev(label)
         ann_shown = '%s  shown=%d' % (inp['ann'], n_shown)
 
         self._Plot_input_output(

@@ -1,7 +1,6 @@
 {
   "ward_clustering": {
       "n_clusters": 0,
-      "affinity": "euclidean",
       "tune_ward_clustering": {
         "apply": true,
         "kfolds": 3,

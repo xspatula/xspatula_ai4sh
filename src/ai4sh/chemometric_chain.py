@@ -18,7 +18,7 @@ Every item is a method name (default settings) or an object {step: settings} (cu
 
 Method names (default settings)
     filter              moving-average, gauss, savitzky-golay, lowess (ml_setting filter parameter sets)
-    scatter correction  l1, l2, max, snv, msc
+    scatter correction  l1, l2, max, snv, msc, detrend
     derivative          derivative (1st)
     variable scaling    meancentring, autoscaling, paretoscaling, poissonscaling
     decomposition       pca (5 components)
@@ -26,10 +26,10 @@ Method names (default settings)
 Objects (custom settings)
     {"filter": <parameter set name | JSON path | {"savitzky-golay": {...}}>}
     {"multi_filter": <parameter set name | JSON path | {"multi_filter": {...}}>}
-    {"scatter_correction": "snv" | ["snv", "snv"]}
+    {"scatter_correction": "snv" | ["snv", "detrend"]}
     {"derivative": 2}
     {"scaling": "autoscaling"}
-    {"variance_threshold": {"threshold": 0.03, "scaler": "minmax"}}        threshold required
+    {"variance_threshold": {"threshold": 0.03}}                            threshold required (minmax-scaled bands)
     {"ward_clustering": {"n_clusters": 40, "connectivity": true}}          n_clusters required
     {"ward_clustering": <JSON path with n_clusters>}
     {"pca": 5} or {"pca": {"n_components": 5}}
@@ -50,21 +50,19 @@ import numpy as np
 import pandas as pd
 
 from sklearn.feature_selection import VarianceThreshold
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
+from sklearn.preprocessing import MinMaxScaler
 
 # Application package imports
 from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction, apply_scaling,
-                                    apply_decomposition)
+                                    apply_decomposition, SCATTER_CORRECTIONS, Scatter_abbrev)
 from src.ai4sh.filter import apply_filter, apply_multi_filter, _DEFAULT_FILTER_DIR, _FILTER_DEFAULT_FILES
 from src.ai4sh.ml_setting import Load_settings, Is_path
 from src.ai4sh.provenance import Load_config_json
 from src.ai4sh.ml_transformers import Ward_fit
 
-SCATTER_CORRECTIONS = ['l1', 'l2', 'max', 'snv', 'msc']
 VARIABLE_SCALINGS   = {'meancentring': 'mc', 'autoscaling': 'as', 'paretoscaling': 'ps', 'poissonscaling': 'poi'}
 FILTER_PRESETS      = ['moving-average', 'gauss', 'savitzky-golay', 'lowess']
 FILTER_KINDS        = ['moving_average', 'gauss', 'savitzky-golay', 'lowess']
-VT_SCALERS          = {'minmax': MinMaxScaler, 'standard': StandardScaler, 'robust': RobustScaler}
 
 METHOD_NAMES = FILTER_PRESETS + SCATTER_CORRECTIONS + ['derivative'] + list(VARIABLE_SCALINGS) + ['pca']
 OBJECT_KEYS  = ['filter', 'multi_filter', 'scatter_correction', 'derivative', 'scaling', 'variance_threshold',
@@ -171,7 +169,7 @@ def _Step(item, resolve_path):
         bad = [x for x in scalers if x not in SCATTER_CORRECTIONS]
         if bad or not scalers:
             raise ValueError('scatter_correction %s: use %s' % (val, ', '.join(SCATTER_CORRECTIONS)))
-        return {'kind': 'scatter_correction', 'scaler': scalers, 'suffix': ''.join(scalers)}
+        return {'kind': 'scatter_correction', 'scaler': scalers, 'suffix': Scatter_abbrev(scalers)}
 
     if key == 'derivative':
         n = val.get('derivative', 1) if isinstance(val, dict) else val
@@ -187,15 +185,13 @@ def _Step(item, resolve_path):
 
     if key == 'variance_threshold':
         if not isinstance(val, dict) or 'threshold' not in val:
-            raise ValueError('variance_threshold needs {"threshold": <value>} (scaler minmax, standard or robust)')
-        scaler = str(val.get('scaler', 'minmax')).strip().lower()
-        if scaler not in VT_SCALERS:
-            raise ValueError('variance_threshold scaler %s: use %s' % (scaler, ', '.join(VT_SCALERS)))
+            raise ValueError('variance_threshold needs {"threshold": <value>} (variance of minmax-scaled bands)')
+        if str(val.get('scaler', 'minmax')).strip().lower() != 'minmax':
+            raise ValueError('variance_threshold: the scaler is always minmax (standard and robust were removed)')
         thr = float(val['threshold'])
         if thr <= 0:
             raise ValueError('variance_threshold threshold must be > 0')
-        return {'kind': 'variance_threshold', 'scaler': scaler, 'threshold': thr,
-                'suffix': 'vt%s%s' % (scaler[0], Num_tag(thr))}
+        return {'kind': 'variance_threshold', 'threshold': thr, 'suffix': 'vt%s' % Num_tag(thr)}
 
     if key == 'ward_clustering':
         source = _Source(val)
@@ -270,8 +266,7 @@ def Chain_from_companion(companion):
         elif proc == 'spectra_scaling':
             item, source = {'scaling': par.get('method', 'meancentring')}, None
         elif proc == 'select_variance_threshold':
-            item, source = {'variance_threshold': {'threshold': par.get('threshold'),
-                                                   'scaler': par.get('scaler', 'minmax')}}, None
+            item, source = {'variance_threshold': {'threshold': par.get('threshold')}}, None
         elif proc == 'ward_clustering':
             item = {'ward_clustering': {'n_clusters': par.get('n_clusters_applied'),
                                         'connectivity': par.get('connectivity', False)}}
@@ -309,9 +304,9 @@ def Check_spectral_range(companion, wavelengths):
                          % (wl[0], wl[-1], step, begin, end, bw))
 
 
-def _Variance_select(df, cols, scaler, threshold):
-    '''Bands kept by the variance threshold, as in select_variance_threshold / VarianceThresholdSelect.'''
-    X = VT_SCALERS[scaler]().fit_transform(df[cols].values.astype(float))
+def _Variance_select(df, cols, threshold):
+    '''Bands kept by the variance threshold (minmax-scaled bands), as in select_variance_threshold / VarianceThresholdSelect.'''
+    X = MinMaxScaler().fit_transform(df[cols].values.astype(float))
     support = VarianceThreshold(threshold=0.0).fit(X).variances_ > threshold
     if not support.any():
         raise ValueError('variance threshold %s removes every band' % threshold)
@@ -358,9 +353,9 @@ def Apply_chain(df, cols, steps):
             label = 'variable scaling: %s' % st['method']
 
         elif kind == 'variance_threshold':
-            d, c = _Variance_select(cur_df, cur_cols, st['scaler'], st['threshold'])
+            d, c = _Variance_select(cur_df, cur_cols, st['threshold'])
             info = {'process': 'select_variance_threshold',
-                    'parameters': {'scaler': st['scaler'], 'threshold': st['threshold']}}
+                    'parameters': {'threshold': st['threshold']}}
             label = 'variance threshold %s (%d of %d bands)' % (st['threshold'], len(c), len(cur_cols))
 
         elif kind == 'ward_clustering':

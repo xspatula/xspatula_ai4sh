@@ -34,7 +34,7 @@
               "parameter_type": "array",
               "required": false,
               "default_value": "",
-              "hint": "Steps applied in the listed order. Each item is a method name with default settings: moving-average, gauss, savitzky-golay, lowess (filters), l1, l2, max, snv, msc (scatter correction), derivative (1st), meancentring, autoscaling, paretoscaling, poissonscaling (variable scaling), pca (5 components); or an object with custom settings: {\"filter\": <set name, JSON path or settings>}, {\"multi_filter\": ...}, {\"scatter_correction\": [\"snv\",\"snv\"]}, {\"derivative\": 2}, {\"scaling\": \"autoscaling\"}, {\"variance_threshold\": {\"threshold\": 0.03, \"scaler\": \"minmax\"}}, {\"ward_clustering\": {\"n_clusters\": 40, \"connectivity\": true}} (n_clusters required), {\"pca\": 5}."
+              "hint": "Steps applied in the listed order. Each item is a method name with default settings: moving-average, gauss, savitzky-golay, lowess (filters), l1, l2, max, snv, msc, detrend (scatter correction), derivative (1st), meancentring, autoscaling, paretoscaling, poissonscaling (variable scaling), pca (5 components); or an object with custom settings: {\"filter\": <set name, JSON path or settings>}, {\"multi_filter\": ...}, {\"scatter_correction\": [\"snv\",\"detrend\"]}, {\"derivative\": 2}, {\"scaling\": \"autoscaling\"}, {\"variance_threshold\": {\"threshold\": 0.03}} (variance of minmax-scaled bands), {\"ward_clustering\": {\"n_clusters\": 40, \"connectivity\": true}} (n_clusters required), {\"pca\": 5}."
             },
             {
               "parameter": "chain_from",
@@ -158,7 +158,7 @@
               "default_value": [
                 "snv"
               ],
-              "hint": "Scatter correction, or array of 2 to apply in sequence. Available options: l1, l2, max, snv, msc; or select = plot all and choose interactively which one to apply."
+              "hint": "Scatter correction, or array of 2 or more to apply in sequence. Available options: l1, l2, max, snv, msc, detrend (2nd-order polynomial baseline removed per spectrum, typically after snv: [\"snv\", \"detrend\"]); or select = plot all and choose interactively which one to apply. l1, l2, max, snv or msc before a later snv has no effect (a warning is printed)."
             },
             {
               "parameter": "colormap",

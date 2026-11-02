@@ -23,7 +23,7 @@ from src.postgres.pg_ai4sh import PG_manage_AI4SH
 from src.lib.pilot import Get_project_path
 
 from src.ai4sh.chemometrics import (apply_transformations, apply_standardisation,
-                                    apply_scatter_correction, apply_scaling)
+                                    apply_scatter_correction, apply_scaling, SCATTER_CORRECTIONS)
 from src.ai4sh.chemometric_chain import Parse_chain, Apply_chain
 
 from src.ai4sh.filter import apply_filter, apply_multi_filter, _load_filter_config
@@ -916,13 +916,13 @@ class Process_plot(Get_schema_table):
         plt.close(fig)
 
     def _Plot_spectra_scatter_correction(self):
-        '''Compare all scatter corrections (per spectrum: l1, l2, max, snv, msc) in a stacked multiplot.'''
+        '''Compare all scatter corrections (per spectrum: l1, l2, max, snv, msc, detrend) in a stacked multiplot.'''
         p = self.process_S.process.parameters
         spec_df, wavelengths, colors, ann, _, show, save, plot_dir = self._Load_spec_df(p)
         if spec_df is None:
             return
 
-        scalers = ['l1', 'l2', 'max', 'snv', 'msc']
+        scalers = SCATTER_CORRECTIONS
         panels = [('raw', 'raw', spec_df, wavelengths)]
 
         for sc in scalers:
