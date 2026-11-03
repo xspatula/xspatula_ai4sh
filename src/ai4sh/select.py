@@ -56,7 +56,7 @@ from src.utils.json_read_write import Dump_json
 
 from src.ai4sh.feature_symbols import Load_target_units
 
-from src.ai4sh.parquet_units import Save_parquet_with_units, Read_parquet_with_units
+from src.ai4sh.parquet_units import Save_parquet_with_units, Read_parquet_with_units, INDICATOR_STEPS
 
 from src.ai4sh.previous_dataframe import Register_parquet
 
@@ -1513,8 +1513,8 @@ class Process_select(Get_schema_table):
         Inputs must be selections, not pre-processed dataframes: a preprocessing chain is fitted on all samples of
         its dataframe, and the model can only refit it on the training samples from the unprocessed source in the
         same folder. Pre-process the compiled dataset instead (chemometric_chain with chain_from reruns a chain
-        explored in the spectra folder). Outlier removal is the exception: it only removes samples (rows), and is
-        recorded per input under "inputs".
+        explored in the spectra folder). Outlier removal and indicator range are the exception: they only set indicator
+        values to missing, and are recorded per input under "inputs".
         Saves {output_name}.parquet + {output_name}.json under
         {output_root_fp}/{output_sub_fp}/{output_name}/, a folder ready to use as project_root_fp in the
         machine learning processes.
@@ -1593,7 +1593,7 @@ class Process_select(Get_schema_table):
 
             chain = in_params_D.get('preprocessing_chain') or []
 
-            fitted = [st.get('process') for st in chain if st.get('process') != 'detect_outliers']
+            fitted = [st.get('process') for st in chain if st.get('process') not in INDICATOR_STEPS]
 
             if fitted:
 

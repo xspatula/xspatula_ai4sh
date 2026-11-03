@@ -632,6 +632,9 @@ def Chain_to_steps(chain, indicator, test_size):
             notes.append('%s: indicator outliers were set to missing using all samples (not refitted)' % name)
             continue
 
+        if proc == 'indicator_range':   # fixed limits, nothing learned from the samples
+            continue
+
         if proc == 'select_variance_threshold':
             step = VarianceThresholdSelect(par.get('scaler', 'minmax'), float(par.get('threshold', 0.025)))
 

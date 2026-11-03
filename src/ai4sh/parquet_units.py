@@ -38,14 +38,18 @@ def Derived_stem(stem, abbrev):
     return '%s%s%s' % (stem, SUFFIX_SEP, abbrev)
 
 
+# Preprocessing steps that only set indicator values to missing (outliers, values outside a range): the spectra
+# are untouched, so such a dataframe may be compiled, used for prediction, and its chain is not refitted.
+INDICATOR_STEPS = ('detect_outliers', 'indicator_range')
+
 # Any known machine learning preprocessing suffix at the end of a parquet stem (derived files).
 # Scatter corrections in sequence are saved as their concatenation (snv+detrend → snvdt, l1+msc → l1msc).
 # Suffixes with a parameter value only after a dot: filters (.ma5, .gf1p5, .sg7, .lw7), outlier detector
-# (.olif, .olee, .ollof, .ol1csvm), variance threshold (.vt03; .vtm028 before 2026-10-31), Ward clusters (.wc40).
+# (.olif, .olee, .ollof, .ol1csvm), indicator range (.ir), variance threshold (.vt03; .vtm028 before 2026-10-31), Ward clusters (.wc40).
 # Any suffix may end with a user name extension: #<1-6 letters, digits or ->.
 # Both separators match: "." (current) and "_" (files written before 2026-10-29).
 DERIVED_STEM_RE = re.compile(
-    r'(?:[._](?:pred|ol|vt|ma|gf|sg|lw|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|(?:l1|l2|max|snv|msc|dt)+|mc|as|ps|poi|pca\d+|(?:[\w-]+-)?(?:pms|rfe|tree))'
+    r'(?:[._](?:pred|ol|ir|vt|ma|gf|sg|lw|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|(?:l1|l2|max|snv|msc|dt)+|mc|as|ps|poi|pca\d+|(?:[\w-]+-)?(?:pms|rfe|tree))'
     r'|\.(?:(?:ma|gf|sg|lw)[0-9p]+|ol(?:if|ee|lof|1csvm)|vt[msr]?[0-9p]+|wc\d+|default))'
     r'(?:#[A-Za-z0-9-]{1,6})?$'
 )

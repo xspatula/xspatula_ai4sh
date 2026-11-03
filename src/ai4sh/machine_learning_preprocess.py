@@ -227,6 +227,8 @@ def _step_abbrev_from_info(process_name, parameters):
         return 'vt'
     if process_name == 'detect_outliers':
         return _OUTLIER_SUFFIX.get(str(parameters.get('detector', '')).lower(), 'ol')
+    if process_name == 'indicator_range':
+        return 'ir'
     if process_name == 'filter_spectra':
         cfg = parameters.get('filter_cfg', {})
         if 'savitzky-golay' in cfg: return 'sg'
@@ -484,8 +486,49 @@ def _chem_abbrev(step_name, label, append=False):
     return ''.join(c for c in label.lower() if c.isalnum())[:6]
 
 
+def _Parse_data_range(raw):
+    '''data_range parameter → {indicator: (min, max)} (None = open end). Accepts a JSON string or a dict of
+    {indicator: {"min": .., "max": ..}} (as in select_indicator_only); empty → {}. Raises ValueError if invalid.'''
+    if hasattr(raw, '__dict__') and not isinstance(raw, type):
+        raw = {k: (vars(v) if hasattr(v, '__dict__') else v) for k, v in vars(raw).items()}
+    if isinstance(raw, str):
+        if not raw.strip() or raw.strip().lower() == 'none':
+            return {}
+        try:
+            raw = json.loads(raw)
+        except json.JSONDecodeError as e:
+            raise ValueError('data_range is not valid JSON: %s' % e)
+    ranges = {}
+    for col, r in (raw or {}).items():
+        if not isinstance(r, dict):
+            raise ValueError('data_range "%s": give {"min": .., "max": ..}' % col)
+        lo, hi = r.get('min'), r.get('max')
+        lo = None if lo in (None, '') else float(lo)
+        hi = None if hi in (None, '') else float(hi)
+        if lo is not None and hi is not None and lo >= hi:
+            raise ValueError('data_range "%s": min (%s) must be below max (%s)' % (col, lo, hi))
+        ranges[col] = (lo, hi)
+    return ranges
+
+
+def _Outside_range(vals, lo, hi):
+    '''Boolean array, True where a value is below lo or above hi (None = open end); NaN is never outside.'''
+    vals = np.asarray(vals, dtype=float)
+    out = np.zeros(len(vals), dtype=bool)
+    with np.errstate(invalid='ignore'):
+        if lo is not None:
+            out |= vals < lo
+        if hi is not None:
+            out |= vals > hi
+    return out
+
+
+def _Range_text(lo, hi):
+    return '[%s, %s]' % ('-' if lo is None else '%g' % lo, '-' if hi is None else '%g' % hi)
+
+
 class Process_ml_preprocess(Get_schema_table):
-    '''Machine-learning preprocessing: outlier detection per indicator.'''
+    '''Machine-learning preprocessing: indicator outliers and range, spectral preprocessing and band selection.'''
 
     def __init__(self, process_S, pg_session_C, project_root_FP):
         self.verbose = process_S.process.verbose
@@ -500,6 +543,8 @@ class Process_ml_preprocess(Get_schema_table):
     def _Sub_process(self, _json_file_key):
         if self.process_S.process.process == 'detect_outliers':
             self._Detect_outliers()
+        elif self.process_S.process.process == 'indicator_range':
+            self._Indicator_range()
         elif self.process_S.process.process == 'select_variance_threshold':
             self._Variance_threshold()
         elif self.process_S.process.process == 'delete_dataframes':
@@ -832,6 +877,181 @@ class Process_ml_preprocess(Get_schema_table):
             len(approved), 's' if len(approved) != 1 else '',
             ol_del_fp,
         ))
+
+    # ------------------------------------------------------------------ indicator range
+
+    def _Plot_indicator_range(self, df, indicator_cols, ranges, show, save, plot_dir):
+        '''Strip plot per indicator: values inside (blue) and outside (red) the range, limits as dashed lines.'''
+        plt.close('all')
+        n = len(indicator_cols)
+        fig, axes = plt.subplots(nrows=n, ncols=1, figsize=(9, 2.5 * n))
+        if n == 1:
+            axes = [axes]
+
+        for ax, col in zip(axes, indicator_cols):
+            vals = df[col].values.astype(float)
+            vals = vals[~np.isnan(vals)]
+            lo, hi = ranges[col]
+            outside = _Outside_range(vals, lo, hi)
+            plot_df = pd.DataFrame({'value': vals, 'status': np.where(outside, 'outside', 'inside'), '_': ''})
+            sns.stripplot(data=plot_df, x='value', y='_', hue='status',
+                          palette={'inside': 'steelblue', 'outside': 'red'}, hue_order=['inside', 'outside'],
+                          alpha=0.55, jitter=True, size=4, orient='h', ax=ax)
+            for limit in (lo, hi):
+                if limit is not None:
+                    ax.axvline(limit, color='red', linestyle='--', linewidth=0.9)
+            ax.set_ylabel('')
+            ax.set_xlabel(col)
+            ax.set_title('%s  (%d of %d outside %s)' % (col, int(outside.sum()), len(vals), _Range_text(lo, hi)))
+            ax.legend(loc='upper right', fontsize=7, framealpha=0.6)
+
+        plt.tight_layout()
+
+        if save and plot_dir:
+            out_fp = os.path.join(plot_dir, 'range_%s.png' % '_'.join(c.replace(' ', '_') for c in indicator_cols))
+            fig.savefig(out_fp, dpi=150, bbox_inches='tight')
+            if self.verbose >= 1:
+                print('    Plot saved: %s' % out_fp)
+
+        if show:
+            plt.show()
+        else:
+            plt.close(fig)
+
+    def _Print_indicator_range(self, df, indicator_cols, ranges):
+        '''Table per indicator: distribution (min, 1 %, median, 99 %, max), range and number of values outside.'''
+        print('\n    %-14s %6s %9s %9s %9s %9s %9s   %-18s %s' % (
+            'indicator', 'n', 'min', 'p1', 'median', 'p99', 'max', 'range', 'outside'))
+        for col in indicator_cols:
+            vals = df[col].values.astype(float)
+            vals = vals[~np.isnan(vals)]
+            lo, hi = ranges[col]
+            if not len(vals):
+                print('    %-14s %6d' % (col, 0))
+                continue
+            q = np.percentile(vals, [0, 1, 50, 99, 100])
+            print('    %-14s %6d %9.3g %9.3g %9.3g %9.3g %9.3g   %-18s %d' % (
+                col, len(vals), q[0], q[1], q[2], q[3], q[4], _Range_text(lo, hi),
+                int(_Outside_range(vals, lo, hi).sum())))
+
+    def _Indicator_range(self):
+        '''Set indicator values outside a [min, max] range to missing (NaN), per indicator.
+
+        data_range gives the start ranges, as in select_indicator_only: {"c-org": {"min": 0, "max": 10}}; an
+        indicator without an entry starts open. With interactive true the distributions and ranges are printed and
+        plotted, and a range is changed by typing "<indicator> <min> <max>" ("-" = open end) until Enter accepts.
+        Unlike outlier detection, nothing is learned from the samples: the limits are fixed, so the step is the same
+        for training and independent data. Output suffix .ir (+ optional #name_extension).
+        '''
+        p = self.process_S.process.parameters
+
+        project_root_fp = str(p.project_root_fp).strip()
+        if not os.path.isabs(project_root_fp):
+            project_root_fp = Get_project_path(self.project_root_FP, project_root_fp)
+        if not os.path.exists(project_root_fp):
+            print('    ERROR: project_root_fp not found: %s' % project_root_fp)
+            return
+
+        ext = _name_extension(p)
+        if ext is None:
+            return
+        interactive     = bool(getattr(p, 'interactive', True))
+        show            = getattr(p, 'show', True)
+        save            = getattr(p, 'save', False)
+        overwrite       = self._Overwrite(p)
+        dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
+
+        try:
+            data_range = _Parse_data_range(getattr(p, 'data_range', ''))
+        except ValueError as e:
+            print('    ERROR: %s' % e)
+            return
+
+        parquet_fp = _resolve_dataframe(project_root_fp, dataframe_param)
+        if parquet_fp is None:
+            return
+        df, units_D = Read_parquet_with_units(parquet_fp)
+        if self.verbose >= 1:
+            print('    Loaded %d rows from %s' % (len(df), os.path.basename(parquet_fp)))
+        stem = os.path.splitext(os.path.basename(parquet_fp))[0]
+
+        all_indicators = [c for c in df.columns if not _is_metadata_col(c) and not _is_spectral_col(c)
+                          and pd.api.types.is_numeric_dtype(df[c])]
+        requested = _parse_array_param(getattr(p, 'indicator_array', []))
+        for col in requested + [c for c in data_range if c not in requested]:
+            if col not in all_indicators:
+                print('    WARNING: indicator "%s" not found in parquet, skipping.' % col)
+        indicator_cols = [c for c in (requested or all_indicators) if c in all_indicators]
+        if not indicator_cols:
+            print('    ERROR: no valid indicator columns to process.')
+            return
+
+        ranges = {c: data_range.get(c, (None, None)) for c in indicator_cols}
+        plot_dir = self._Build_plot_output_path(project_root_fp) if save else None
+
+        while True:
+            self._Print_indicator_range(df, indicator_cols, ranges)
+            if show or save:
+                self._Plot_indicator_range(df, indicator_cols, ranges, show, save, plot_dir)
+            if not interactive:
+                break
+            raw = input('\n    Change a range: <indicator> <min> <max> ("-" = open end); '
+                        'Enter = accept, 0 = skip: ').strip()
+            if raw == '':
+                break
+            if raw == '0':
+                print('    Indicator range skipped.')
+                return
+            parts = raw.rsplit(maxsplit=2)
+            if len(parts) != 3 or parts[0] not in ranges:
+                print('    Give an indicator (%s), a min and a max, e.g. "%s 0 10".'
+                      % (', '.join(indicator_cols), indicator_cols[0]))
+                continue
+            try:
+                lo, hi = [None if v == '-' else float(v) for v in parts[1:]]
+            except ValueError:
+                print('    min and max must be numbers or "-".')
+                continue
+            if lo is not None and hi is not None and lo >= hi:
+                print('    min must be below max.')
+                continue
+            ranges[parts[0]] = (lo, hi)
+
+        masks = {c: _Outside_range(df[c].values.astype(float), *ranges[c]) for c in indicator_cols}
+        applied = {c: ranges[c] for c in indicator_cols if masks[c].any()}
+        if not applied:
+            print('    No indicator values outside the ranges — nothing saved.')
+            return
+
+        ir_fp = os.path.join(project_root_fp, Derived_stem(stem, 'ir' + ext) + '.parquet')
+        previous = [{'dataframe': os.path.basename(ir_fp), 'indicator': None, 'regressor': None, 'selector': None}]
+        if os.path.exists(ir_fp) and not overwrite:
+            print('    Output already exists. Use overwrite=True to save. Skipping save.')
+            _write_previous_df(project_root_fp, 'indicator_range', previous)
+            return
+
+        df_out = df.copy()
+        for col in applied:
+            df_out.loc[masks[col], col] = np.nan
+
+        Save_parquet_with_units(df_out, ir_fp, units_D)
+        _write_previous_df(project_root_fp, 'indicator_range', previous)
+
+        spectral_kept = [c for c in df.columns if _is_spectral_col(c)]
+        _write_companion_json(
+            project_root_fp, stem, os.path.splitext(os.path.basename(ir_fp))[0], spectral_kept,
+            {'_id': 'ir' + ext,
+             'process': 'indicator_range',
+             'parameters': {'data_range': {c: {'min': lo, 'max': hi} for c, (lo, hi) in applied.items()},
+                            'indicator_array': list(applied)}},
+            Signal_type_of(units_D, spectral_kept) if spectral_kept else None,
+            indicator_cols=all_indicators,
+        )
+
+        n_removed = sum(int(masks[c].sum()) for c in applied)
+        print('    Set %d value%s outside the range to missing across %d indicator%s (%s). Saved: %s' % (
+            n_removed, 's' if n_removed != 1 else '', len(applied), 's' if len(applied) != 1 else '',
+            ', '.join('%s %s' % (c, _Range_text(*r)) for c, r in applied.items()), ir_fp))
 
     # ------------------------------------------------------------------ variance threshold plot
 

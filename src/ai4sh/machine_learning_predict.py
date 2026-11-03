@@ -35,7 +35,7 @@ from importlib import metadata
 
 from src.postgres import Get_schema_table
 from src.lib.pilot import Get_project_path
-from src.ai4sh.parquet_units import Read_parquet_with_units, Save_parquet_with_units
+from src.ai4sh.parquet_units import Read_parquet_with_units, Save_parquet_with_units, INDICATOR_STEPS
 from src.ai4sh.previous_dataframe import Register_parquet
 from src.ai4sh.provenance import File_sha256
 from src.ai4sh.spectral_columns import Signal_type_of
@@ -185,7 +185,7 @@ class Process_predict(Get_schema_table):
 
         # The models refit their own preprocessing — preprocessed spectra (same band names!) would give wrong values
         changed = [st.get('process') for st in (_load_companion_json(os.path.dirname(parquet_fp), stem) or {})
-                   .get('preprocessing_chain', []) if st.get('process') != 'detect_outliers']
+                   .get('preprocessing_chain', []) if st.get('process') not in INDICATOR_STEPS]
         if changed:
             print('    ERROR: %s holds preprocessed spectra (%s); give the unprocessed spectra, the models '
                   'apply their own preprocessing.' % (os.path.basename(parquet_fp), ', '.join(changed)))

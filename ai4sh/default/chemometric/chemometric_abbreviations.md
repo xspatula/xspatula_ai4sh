@@ -27,6 +27,7 @@ Every pre-process adds its abbreviation to the name of its input dataframe, sepa
 | `olee` | Elliptic envelope outlier detection | Indicator outliers |
 | `ollof` | Local outlier factor outlier detection | Indicator outliers |
 | `ol1csvm` | One-class SVM outlier detection | Indicator outliers |
+| `ir` | Indicator values outside a [min, max] range set to missing | Indicator range |
 | `ma{n}` | Moving average, n = kernel length (e.g. `ma5`) | Filter |
 | `gf{n}` | Gaussian filter, n = sigma (e.g. `gf2`, `gf1p5`) | Filter |
 | `sg{n}` | Savitzky-Golay smoothing, n = window length (e.g. `sg7`) | Filter |
@@ -57,7 +58,7 @@ Every pre-process adds its abbreviation to the name of its input dataframe, sepa
 
 ## User name extension
 
-Outlier detection, filters, the multi-filter, variance threshold, Ward clustering and the chemometric chain accept the parameter `name_extension` (1-6 letters, digits or `-`), added after a hashtag: `1350-2500_10.ma5#12321` for a moving average with the kernel weights [1, 2, 3, 2, 1]. Use it to tell apart outputs whose settings the abbreviation does not show.
+Outlier detection, indicator range, filters, the multi-filter, variance threshold, Ward clustering and the chemometric chain accept the parameter `name_extension` (1-6 letters, digits or `-`), added after a hashtag: `1350-2500_10.ma5#12321` for a moving average with the kernel weights [1, 2, 3, 2, 1]. Use it to tell apart outputs whose settings the abbreviation does not show.
 
 ## Chaining rules
 
