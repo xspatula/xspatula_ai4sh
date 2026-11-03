@@ -60,7 +60,8 @@ from src.ai4sh.parquet_units import Save_parquet_with_units, Read_parquet_with_u
 
 from src.ai4sh.previous_dataframe import Register_parquet
 
-from src.ai4sh.spectral_columns import Band_col_name, Normalize_signal_type, Set_signal_type, DEFAULT_SIGNAL_TYPE
+from src.ai4sh.spectral_columns import (Band_col_name, Is_band_col, Normalize_signal_type, Set_signal_type,
+                                       DEFAULT_SIGNAL_TYPE)
 
 # Process → role of the selection
 SELECT_ROLE_D = {
@@ -1663,6 +1664,13 @@ class Process_select(Get_schema_table):
             print('    ⚠️  No samples in common between the inputs — nothing to save')
 
             return
+
+        # Which columns hold what (indicator, covariate, spectra); the model processes read the covariates from here
+        params_D['column_blocks'] = {
+            'indicator': [c for c in params_D.get('indicator_array', []) if c in df.columns],
+            'covariate': [c for c in params_D.get('covariate_array', []) if c in df.columns],
+            'spectra': [c for c in df.columns if Is_band_col(c)],
+        }
 
         params_D.update({'role': 'compiled', 'output_name': output_name, 'inputs': inputs_L, 'n_samples': len(df)})
 

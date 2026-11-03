@@ -5,7 +5,9 @@ Created on 26 April 2026
 '''
 
 import os
+import re
 import json
+import hashlib
 
 from datetime import datetime
 
@@ -57,8 +59,9 @@ from src.ai4sh.machine_learning_preprocess import (
 from src.ai4sh.parquet_units import Read_parquet_with_units, Find_selected_parquet
 from src.ai4sh.chemometrics import (_load_transform_config, _DEFAULT_TRANSFORMATION_FPN,
                                      _DEFAULT_STANDARDISE_FPN)
-from src.ai4sh.ml_transformers import (Chain_to_steps, Column_index, Holdout_test_mask, IndicatorTransformer,
-                                       Indicator_target_settings, RegressorFrame, Target_domain_mask)
+from src.ai4sh.ml_transformers import (Chain_to_steps, Column_index, CovariateBlocks, Group_classes,
+                                       Holdout_test_mask, IndicatorTransformer, Indicator_target_settings,
+                                       Model_blocks, Parse_class_grouping, RegressorFrame, Target_domain_mask)
 from src.ai4sh.spectral_columns import Signal_type_of
 from src.ai4sh.project_paths import Default_fpn
 from src.ai4sh.provenance import Provenance_snapshot, File_sha256
@@ -174,12 +177,26 @@ def _plot_scatter(obs, pred, model_key, indicator, mode_label, metrics,
 
 def _plot_importance(importances, wavelengths, model_key, indicator, label,
                      color='steelblue'):
+    '''Bars per spectral feature; covariates (cv:... names), if any, in a second panel.'''
     imp_arr = np.asarray(importances)
-    wl_arr  = np.asarray(wavelengths)
+    is_cov  = np.array([isinstance(w, str) for w in wavelengths], dtype=bool)
+    wl_arr  = np.asarray([w for w in wavelengths if not isinstance(w, str)], dtype=float)
+    spec_imp = imp_arr[~is_cov]
 
-    bar_w = max(1, (wl_arr[1] - wl_arr[0]) * 0.8) if len(wl_arr) > 1 else 5
-    fig, ax = plt.subplots(figsize=(9, 3))
-    ax.bar(wl_arr, imp_arr, width=bar_w, color=color, alpha=0.75)
+    if is_cov.any():
+        fig, (ax, ax_cv) = plt.subplots(1, 2, figsize=(12, 3), gridspec_kw={'width_ratios': [3, 1]})
+        cv_names = [w[len('cv:'):] for w in wavelengths if isinstance(w, str)]
+        ax_cv.barh(range(len(cv_names)), imp_arr[is_cov], color=color, alpha=0.75)
+        ax_cv.set_yticks(range(len(cv_names)))
+        ax_cv.set_yticklabels(cv_names, fontsize=7)
+        ax_cv.set_xlabel('Importance')
+        ax_cv.set_title('Covariates', fontsize=9)
+    else:
+        fig, ax = plt.subplots(figsize=(9, 3))
+
+    if len(wl_arr):
+        bar_w = max(1, (wl_arr[1] - wl_arr[0]) * 0.8) if len(wl_arr) > 1 else 5
+        ax.bar(wl_arr, spec_imp, width=bar_w, color=color, alpha=0.75)
     ax.set_xlabel('Wavelength (nm)')
     ax.set_ylabel('Importance')
     ax.set_title('Feature importance [%s]: %s — %s' % (label, model_key, indicator))
@@ -214,7 +231,7 @@ def _plot_permutation(pi_result, wavelengths, model_key, indicator, mode_label,
         ax.set_yticks([])
 
     ax.set_xlabel('Mean decrease in score')
-    ax.set_ylabel('Wavelength (nm)')
+    ax.set_ylabel('Feature' if any(isinstance(w, str) for w in sorted_wl) else 'Wavelength (nm)')
     ax.set_title('Permutation importance [%s]: %s — %s' % (mode_label, model_key, indicator))
     plt.tight_layout()
     return fig
@@ -286,6 +303,30 @@ class _Fitted_tail(RegressorMixin, BaseEstimator):
         return pred
 
 
+# ------------------------------------------------------------------ covariates
+
+def _Companion_covariates(companion):
+    '''Covariate columns of a dataset: column_blocks (compiled dataset) or covariate_array (selection).'''
+    return list((companion.get('column_blocks') or {}).get('covariate') or companion.get('covariate_array') or [])
+
+
+def _Covariate_tag(covariate_cols):
+    '''Part of the model/plot names telling which covariates were used: _cv-<labels> (hashed if long).'''
+    tag = '-'.join(re.sub(r'[^0-9a-z]+', '', c.lower()) for c in covariate_cols)
+    if len(tag) > 40:
+        tag = hashlib.md5('|'.join(covariate_cols).encode()).hexdigest()[:8]
+    return '_cv-' + tag
+
+
+def _Fitted_covariates(model, covariates_D):
+    '''Covariates of a fitted model for its manifest: numeric labels, nominal labels with the classes (after
+    grouping) seen in training, and the class grouping.'''
+    blocks = Model_blocks(model)
+    if blocks is None:
+        return {}
+    return dict(covariates_D, levels=blocks.levels_)
+
+
 # ------------------------------------------------------------------ main class
 
 class Process_regression_model(Get_schema_table):
@@ -343,6 +384,59 @@ class Process_regression_model(Get_schema_table):
             return False
         return True
 
+    def _Covariates(self, df, units_D, companion, covariate_array, class_grouping):
+        '''(numeric, nominal) covariate columns for covariate_array ([] = none, ["all"] = every covariate of the
+        dataset); None (error printed) for a covariate not in the dataset or an invalid class_grouping.'''
+        if [c.lower() for c in covariate_array] == ['all']:
+            covariate_cols = [c for c in _Companion_covariates(companion) if c in df.columns]
+            if not covariate_cols:
+                print('    ⚠️  covariate_array "all": the dataset has no covariates — spectra only')
+        else:
+            covariate_cols = list(covariate_array)
+        missing = [c for c in covariate_cols if c not in df.columns]
+        if missing:
+            print('    ERROR: covariate(s) not in the dataset: %s' % ', '.join(missing))
+            return None
+        spectral = [c for c in covariate_cols if _is_spectral_col(c)]
+        if spectral:
+            print('    ERROR: spectral columns can not be covariates: %s' % ', '.join(spectral))
+            return None
+        nominal = [c for c in covariate_cols
+                   if units_D.get(c) == 'class' or not pd.api.types.is_numeric_dtype(df[c])]
+        numeric = [c for c in covariate_cols if c not in nominal]
+        for label, class_D in class_grouping.items():
+            if label not in nominal:
+                print('    ERROR: class_grouping for "%s", which is not a nominal covariate of this model' % label)
+                return None
+            classes = set(Group_classes(df[label].values).dropna())
+            ungrouped = sorted(classes - set(class_D))
+            if ungrouped:
+                print('    ERROR: class_grouping for "%s" does not place the class(es): %s'
+                      % (label, ', '.join(ungrouped)))
+                return None
+        return numeric, nominal
+
+    def _Drop_unseen_classes(self, df, tr_mask, te_mask, nominal_cov, class_grouping, indicator):
+        '''Test mask without the samples whose class (after grouping) has no training sample.'''
+        for label in nominal_cov:
+            classes = Group_classes(df[label].values, class_grouping.get(label)).values
+            seen = set(classes[tr_mask])
+            unseen = te_mask & np.array([c not in seen for c in classes], dtype=bool)
+            if unseen.any():
+                print('    ⚠️  %s: %d test sample(s) with a %s class not in the training samples (%s), skipped'
+                      % (indicator, int(unseen.sum()), label, ', '.join(sorted(set(classes[unseen])))))
+                te_mask = te_mask & ~unseen
+        return te_mask
+
+    def _Warn_rare_classes(self, df, valid_mask, nominal_cov, class_grouping, folds, indicator):
+        '''k-fold: a class with fewer samples than folds is missing from some training folds (all-zero encoding).'''
+        for label in nominal_cov:
+            counts = Group_classes(df.loc[valid_mask, label].values, class_grouping.get(label)).value_counts()
+            rare = counts[counts < folds]
+            if len(rare):
+                print('    ⚠️  %s: %s class(es) with fewer samples than folds (%d): %s — consider class_grouping'
+                      % (indicator, label, folds, ', '.join('%s (%d)' % (c, n) for c, n in rare.items())))
+
     def _print_summary(self, results_D, indicator_cols, regressor_keys):
         modes = []
         for ind in indicator_cols:
@@ -380,6 +474,7 @@ class Process_regression_model(Get_schema_table):
 
         dataframe_param    = str(getattr(p, 'dataframe',    'raw')).strip()
         indicator_array    = _parse_array_param(getattr(p, 'indicator_array',  []))
+        covariate_array    = _parse_array_param(getattr(p, 'covariate_array',  []))
         regressor_array    = _parse_array_param(getattr(p, 'regressor_array',  []))
         model_params_param = str(getattr(p, 'model_parameters_fp', 'default')).strip()
         traintest          = bool(getattr(p, 'traintest', True))
@@ -402,6 +497,11 @@ class Process_regression_model(Get_schema_table):
 
         if not regressor_array:
             print('    ERROR: regressor_array is empty.')
+            return
+        try:
+            class_grouping = Parse_class_grouping(getattr(p, 'class_grouping', []))
+        except ValueError as e:
+            print('    ERROR: %s' % e)
             return
         if not traintest and not do_kfold:
             print('    ERROR: both traintest and kfold are false — nothing to run.')
@@ -458,19 +558,47 @@ class Process_regression_model(Get_schema_table):
         # Header row 2 — stored on each saved model and in the results JSON
         spectral_header_D = {c: signal_type for c in col_names}
 
+        covariates = self._Covariates(df, units_D, companion, covariate_array, class_grouping)
+        if covariates is None:
+            return
+        numeric_cov, nominal_cov = covariates
+        covariate_cols = numeric_cov + nominal_cov
+
+        # Covariates (input parquet, same rows as the source parquet) next to the spectra; samples missing any of
+        # them are skipped
+        covariate_ok = np.ones(len(df), dtype=bool)
+        cov_tag = ''
+        if covariate_cols:
+            X_all = pd.concat([X_all, df[covariate_cols].reset_index(drop=True)], axis=1)
+            covariate_ok = df[covariate_cols].notna().all(axis=1).values
+            cov_tag = _Covariate_tag(covariate_cols)
+            if self.verbose >= 1:
+                print('    Covariates: %s' % ', '.join(
+                    covariate_cols if not class_grouping else
+                    ['%s (%d groups)' % (c, len(set(class_grouping[c].values()))) if c in class_grouping else c
+                     for c in covariate_cols]))
+            if (~covariate_ok).any():
+                print('    ⚠️  %d sample(s) without a value for every covariate, skipped' % int((~covariate_ok).sum()))
+        covariates_D = {'numeric': numeric_cov, 'nominal': nominal_cov,
+                        'class_grouping': {c: g for c, g in class_grouping.items() if c in nominal_cov}}
+
+        # A covariate of this model is never its indicator; the other covariates of the dataset are only
+        # indicators when named in indicator_array
         all_indicators = [
             c for c in df.columns
             if not _is_metadata_col(c)
             and not _is_spectral_col(c)
+            and c not in covariate_cols
             and pd.api.types.is_numeric_dtype(df[c])
         ]
         if indicator_array:
             for col in indicator_array:
                 if col not in all_indicators:
-                    print('    WARNING: indicator "%s" not in parquet, skipping.' % col)
+                    print('    WARNING: indicator "%s" not in parquet (or a covariate of this model), skipping.' % col)
             indicator_cols = [c for c in indicator_array if c in all_indicators]
         else:
-            indicator_cols = all_indicators
+            dataset_cov = set(_Companion_covariates(companion))
+            indicator_cols = [c for c in all_indicators if c not in dataset_cov]
         if not indicator_cols:
             print('    ERROR: no valid indicator columns.')
             return
@@ -511,12 +639,12 @@ class Process_regression_model(Get_schema_table):
         # Saved models: model_fp (relative to the project root) or <project_root_fp>/models
         models_root   = (os.path.join(project_root_fp, 'models') if not model_fp_param
                          else self._Settings_fp(model_fp_param))
-        models_dir_tt = os.path.join(models_root, stem + '_tt')
-        models_dir_kf = os.path.join(models_root, stem + '_kf')
-        plot_dir_tt   = os.path.join(project_root_fp, 'plot',                stem + '_tt')
-        plot_dir_kf   = os.path.join(project_root_fp, 'plot',                stem + '_kf')
-        cov_dir_tt    = os.path.join(project_root_fp, 'covariate_importance', stem + '_tt')
-        cov_dir_kf    = os.path.join(project_root_fp, 'covariate_importance', stem + '_kf')
+        models_dir_tt = os.path.join(models_root, stem + cov_tag + '_tt')
+        models_dir_kf = os.path.join(models_root, stem + cov_tag + '_kf')
+        plot_dir_tt   = os.path.join(project_root_fp, 'plot',                stem + cov_tag + '_tt')
+        plot_dir_kf   = os.path.join(project_root_fp, 'plot',                stem + cov_tag + '_kf')
+        cov_dir_tt    = os.path.join(project_root_fp, 'covariate_importance', stem + cov_tag + '_tt')
+        cov_dir_kf    = os.path.join(project_root_fp, 'covariate_importance', stem + cov_tag + '_kf')
         if traintest:
             os.makedirs(models_dir_tt, exist_ok=True)
             os.makedirs(plot_dir_tt,   exist_ok=True)
@@ -554,6 +682,7 @@ class Process_regression_model(Get_schema_table):
             '''Save the whole fitted chain (preprocessing + regressor + indicator transformation) and its manifest.'''
             model.spectral_header_ = spectral_header_D
             model.input_columns_   = col_names
+            model.covariates_      = covariates_D
             model.pipeline_info_   = pipeline_D
             joblib.dump(model, fp)
             metrics['model_fp']     = fp
@@ -571,7 +700,8 @@ class Process_regression_model(Get_schema_table):
                 'regressor':           model_key,
                 'hyper_parameters':    model_params.get(model_key, {}).get('hyper_parameters', {}),
                 'mode':                mode,
-                'input':               {'columns': col_names, 'signal_type': signal_type, 'n_bands': len(col_names)},
+                'input':               {'columns': col_names, 'signal_type': signal_type, 'n_bands': len(col_names),
+                                        'covariates': _Fitted_covariates(model, covariates_D)},
                 'pipeline':            pipeline_D,
                 'preprocessing_chain': companion.get('preprocessing_chain', []),
                 'data':                dict(data_D, sample_id_key=holdout_key, n_train=len(ids), train_sample_ids=ids),
@@ -590,7 +720,7 @@ class Process_regression_model(Get_schema_table):
             transform, standardise = Indicator_target_settings(indicator, transformation_raw, standardise_raw)
             in_domain  = Target_domain_mask(np.nan_to_num(y_all, nan=1.0), transform)
             n_domain   = int((~np.isnan(y_all) & ~in_domain).sum())
-            valid_mask = ~np.isnan(y_all) & in_domain
+            valid_mask = ~np.isnan(y_all) & in_domain & covariate_ok
             if n_domain:
                 print('    ⚠️  %s: %d value(s) can not be %s-transformed, excluded' % (indicator, n_domain, transform))
 
@@ -608,7 +738,12 @@ class Process_regression_model(Get_schema_table):
                 print('    ⚠️  %s' % note)
 
             target = IndicatorTransformer(transform, standardise)
-            pipe   = Pipeline(steps + [('frame', RegressorFrame()), ('regressor', None)])
+            if covariate_cols:
+                blocks = CovariateBlocks(Pipeline(steps), tuple(numeric_cov), tuple(nominal_cov),
+                                         covariates_D['class_grouping'])
+                pipe = Pipeline([('blocks', blocks), ('frame', RegressorFrame()), ('regressor', None)])
+            else:
+                pipe = Pipeline(steps + [('frame', RegressorFrame()), ('regressor', None)])
 
             def _make_model(regressor):
                 model = clone(pipe).set_params(regressor=clone(regressor))
@@ -622,6 +757,7 @@ class Process_regression_model(Get_schema_table):
                 'indicator': {'transform': transform, 'standardise': standardise},
                 'holdout':   {'test_size': test_size, 'key': holdout_key},
                 'notes':     notes,
+                'covariates': covariates_D,
             }
 
             X = X_all[valid_mask]
@@ -630,13 +766,18 @@ class Process_regression_model(Get_schema_table):
             ind_s     = _ind_safe(indicator)
             ind_color = tgt_sym_D.get(indicator, {}).get('color', 'steelblue')
 
+            if do_kfold:
+                self._Warn_rare_classes(df, valid_mask, nominal_cov, class_grouping, folds, indicator)
+
             if self.verbose >= 1:
-                print('    Indicator: %s  (%d samples, %d bands, transform=%s, standardise=%s)' % (
-                    indicator, n_valid, X.shape[1], transform, standardise))
+                print('    Indicator: %s  (%d samples, %d bands%s, transform=%s, standardise=%s)' % (
+                    indicator, n_valid, len(col_names),
+                    ', %d covariates' % len(covariate_cols) if covariate_cols else '', transform, standardise))
 
             if traintest:
                 tr_mask = valid_mask & ~test_rows
                 te_mask = valid_mask & test_rows
+                te_mask = self._Drop_unseen_classes(df, tr_mask, te_mask, nominal_cov, class_grouping, indicator)
                 X_tr, y_tr = X_all[tr_mask], y_all[tr_mask]
                 X_te, y_te = X_all[te_mask], y_all[te_mask]
                 if len(y_te) < 2 or len(y_tr) < 10:
@@ -661,7 +802,7 @@ class Process_regression_model(Get_schema_table):
                     fitted_D = dict(pipeline_D, indicator=_Fitted_target(model_tt))
                     metrics_tt['indicator_transformation'] = fitted_D['indicator']
                     jl_fp = os.path.join(models_dir_tt,
-                                         '%s_%s_%s_tt.joblib' % (stem, ind_s, model_key))
+                                         '%s%s_%s_%s_tt.joblib' % (stem, cov_tag, ind_s, model_key))
                     _save_model(model_tt, jl_fp, fitted_D, indicator, model_key, 'traintest', metrics_tt, tr_mask)
 
                     if show_scatter or save_scatter:
@@ -730,7 +871,7 @@ class Process_regression_model(Get_schema_table):
                     fitted_D = dict(pipeline_D, indicator=_Fitted_target(model_kf))
                     metrics_kf['indicator_transformation'] = fitted_D['indicator']
                     jl_fp = os.path.join(models_dir_kf,
-                                         '%s_%s_%s_kf.joblib' % (stem, ind_s, model_key))
+                                         '%s%s_%s_%s_kf.joblib' % (stem, cov_tag, ind_s, model_key))
                     _save_model(model_kf, jl_fp, fitted_D, indicator, model_key, 'kfold', metrics_kf, valid_mask)
 
                     if show_scatter or save_scatter:
@@ -779,10 +920,11 @@ class Process_regression_model(Get_schema_table):
             'preprocessing_chain': companion.get('preprocessing_chain', []),
             'signal_type':         signal_type,
             'feature_columns':     col_names,
+            'covariates':          covariates_D,
             'results':             results_D,
             'provenance':          Provenance_snapshot(),
         }
-        result_fp = os.path.join(project_root_fp, stem + '_regression.json')
+        result_fp = os.path.join(project_root_fp, stem + cov_tag + '_regression.json')
         with open(result_fp, 'w') as fh:
             json.dump(out_json, fh, indent=2)
         print('    Results saved: %s' % result_fp)

@@ -17,9 +17,16 @@ index (wl_nm_550 → 550, d555 → 555, pc1 → 1), the same convention as the e
 Holdout_test_mask() defines the test samples from a hash of the sample id. It does not depend on row order or on
 which rows are missing for an indicator, so the supervised band selection steps and the model use the same test
 samples as long as they read the same set of samples.
+
+Covariates (other than spectra) enter a model through CovariateBlocks: the spectral columns pass through the
+refitted chain, numeric covariates are kept as they are and nominal covariates (classes, e.g. soil texture) are
+one-hot encoded, optionally after pooling classes into groups (class_grouping). Covariate columns are named
+cv:<label> and cv:<label>=<class>; Column_index leaves these names as they are.
 '''
 
 # Standard library imports
+import re
+import json
 import hashlib
 
 import numpy as np
@@ -28,7 +35,7 @@ import pandas as pd
 from scipy.stats import boxcox
 from scipy.special import inv_boxcox
 
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.cluster import FeatureAgglomeration
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest, VarianceThreshold, f_regression
@@ -43,16 +50,23 @@ HOLDOUT_SEED = 42
 
 HOLDOUT_KEYS = ('sample_id', 'sample_name')
 
+# Prefix of the covariate columns that CovariateBlocks adds to the spectral features
+COVARIATE_PREFIX = 'cv:'
+
 
 # ------------------------------------------------------------------ columns and holdout
 
 def Column_index(col):
-    '''Numeric index of a spectral column: wl_nm_550 → 550, d555 → 555, pc1 → 1, wc3 → 3, 550 → 550.'''
+    '''Numeric index of a spectral column: wl_nm_550 → 550, d555 → 555, pc1 → 1, wc3 → 3, 550 → 550.
+    Covariate columns (cv:<label>, cv:<label>=<class>) are returned as they are.'''
 
     if isinstance(col, (int, float, np.integer, np.floating)):
         return col
 
     s = str(col)
+
+    if s.startswith(COVARIATE_PREFIX):
+        return s
 
     if Is_band_col(s):
         return Band_value(s)
@@ -364,7 +378,121 @@ class RegressorFrame(_Stateless, BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         X = _Numeric_frame(X)
-        return X.set_axis(['f_%s' % c for c in X.columns], axis=1)
+        return X.set_axis(['f_%s' % (re.sub(r'[^0-9A-Za-z]+', '_', c) if isinstance(c, str) else c)
+                           for c in X.columns], axis=1)
+
+
+# ------------------------------------------------------------------ covariates
+
+def Parse_class_grouping(raw):
+    '''class_grouping parameter → {covariate label: {class: group name}}. Raises ValueError if invalid.
+
+    raw: array of objects {"covariate": <label>, "groups": [[class, class ...], [class ...] ...]} (a JSON string of
+    that array is also accepted). A group is named by its classes joined with "|".
+    '''
+    if hasattr(raw, '__dict__') and not isinstance(raw, type):
+        raw = vars(raw)
+
+    if isinstance(raw, str):
+        s = raw.strip()
+        while len(s) >= 2 and s[0] + s[-1] == '{}' and not s.startswith('{"'):
+            s = s[1:-1].strip()
+        if not s:
+            return {}
+        try:
+            raw = json.loads(s)
+        except json.JSONDecodeError as e:
+            raise ValueError('class_grouping is not valid JSON: %s' % e)
+
+    if isinstance(raw, dict):
+        raw = [raw]
+
+    grouping = {}
+
+    for item in raw or []:
+        if hasattr(item, '__dict__') and not isinstance(item, type):
+            item = vars(item)
+        if not isinstance(item, dict) or 'covariate' not in item or 'groups' not in item:
+            raise ValueError('class_grouping items must be {"covariate": <label>, "groups": [[classes] ...]}, got %s'
+                             % (item,))
+        class_D = {}
+        for group in item['groups']:
+            members = [str(c) for c in (group if isinstance(group, (list, tuple)) else [group])]
+            for c in members:
+                if c in class_D:
+                    raise ValueError('class_grouping %s: class "%s" in more than one group' % (item['covariate'], c))
+                class_D[c] = '|'.join(members)
+        grouping[str(item['covariate'])] = class_D
+
+    return grouping
+
+
+def Group_classes(values, class_D=None):
+    '''Class values as strings (missing → None), pooled into groups by class_D {class: group}; a class not in
+    class_D is kept as it is.'''
+
+    out = pd.Series(values).astype(object)
+
+    out = out.where(out.notna(), None).map(lambda v: None if v is None else str(v))
+
+    return out.map(lambda v: v if v is None or not class_D else class_D.get(v, v))
+
+
+class CovariateBlocks(BaseEstimator, TransformerMixin):
+    '''Spectra + covariates as one feature frame.
+
+    spectra: Pipeline refitting the preprocessing chain, applied to every column that is not a covariate.
+    numeric: covariates kept as they are (cv:<label>).
+    nominal: class covariates, pooled by grouping {label: {class: group}} and one-hot encoded with the classes of
+    the training samples (cv:<label>=<class>). A class not seen in training gives all zeros; the model and predict
+    processes skip such samples.
+    '''
+
+    def __init__(self, spectra=None, numeric=(), nominal=(), grouping=None):
+        self.spectra = spectra
+        self.numeric = numeric
+        self.nominal = nominal
+        self.grouping = grouping
+
+    def _Classes(self, X, label):
+        return Group_classes(X[label].values, (self.grouping or {}).get(label)).values
+
+    def fit(self, X, y=None):
+        covariates = list(self.numeric) + list(self.nominal)
+        self.spectral_columns_ = [c for c in X.columns if c not in covariates]
+        self.spectra_ = clone(self.spectra).fit(X[self.spectral_columns_], y)
+        self.levels_ = {label: sorted({c for c in self._Classes(X, label) if c is not None})
+                        for label in self.nominal}
+        return self
+
+    def transform(self, X):
+        parts = [self.spectra_.transform(X[self.spectral_columns_]).set_axis(X.index, axis=0)]
+        if len(self.numeric):
+            parts.append(pd.DataFrame({COVARIATE_PREFIX + label: X[label].astype(float).values
+                                       for label in self.numeric}, index=X.index))
+        for label in self.nominal:
+            classes = self._Classes(X, label)
+            parts.append(pd.DataFrame({'%s%s=%s' % (COVARIATE_PREFIX, label, c): (classes == c).astype(float)
+                                       for c in self.levels_[label]}, index=X.index))
+        return pd.concat(parts, axis=1)
+
+    def Unseen(self, X):
+        '''Boolean array, True for rows with a missing covariate or a class (after grouping) not seen in training.'''
+        bad = np.zeros(len(X), dtype=bool)
+        for label in self.numeric:
+            bad |= pd.isna(X[label]).values
+        for label in self.nominal:
+            levels = set(self.levels_[label])
+            bad |= np.array([c is None or c not in levels for c in self._Classes(X, label)], dtype=bool)
+        return bad
+
+
+def Model_blocks(model):
+    '''The fitted CovariateBlocks step of a saved model, or None for a spectra-only model.'''
+
+    pipe = getattr(model, 'regressor_', model)
+
+    return getattr(pipe, 'named_steps', {}).get('blocks')
 
 
 # ------------------------------------------------------------------ indicator (target) transformer

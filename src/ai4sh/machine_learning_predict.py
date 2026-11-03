@@ -42,6 +42,7 @@ from src.ai4sh.spectral_columns import Signal_type_of
 from src.ai4sh.machine_learning_preprocess import (_resolve_input_parquet, _resolve_single_previous,
                                                    _is_spectral_col, _parse_array_param, _load_companion_json)
 from src.ai4sh.machine_learning_model import Manifest_fp, _compute_metrics
+from src.ai4sh.ml_transformers import Model_blocks
 from src.ai4sh.ml_setting import Is_path
 from src.ai4sh.ml_model import Registered_model, Record_independent_metrics
 
@@ -86,36 +87,47 @@ def Load_model(model_fp, verbose=1):
 
 def Check_spectra(manifest, columns, units_D=None):
     '''List of problems that prevent applying the model to spectra with these columns (and units); [] if none.'''
-
     issues = []
-
     wanted = manifest['input']['columns']
-
     missing = [c for c in wanted if c not in set(columns)]
-
     if missing:
         issues.append('%d of the %d model bands are missing (e.g. %s) — the spectra must have the same bands as '
                       'the unprocessed source parquet of the model' % (len(missing), len(wanted), missing[:3]))
-
     if units_D is not None and not missing:
-
         signal_type = Signal_type_of(units_D, wanted)
-
         if signal_type != manifest['input']['signal_type']:
             issues.append('signal type %s, the model was trained on %s' % (signal_type, manifest['input']['signal_type']))
-
+    covariates = _Model_covariates(manifest)
+    missing_cov = [c for c in covariates if c not in set(columns)]
+    if missing_cov:
+        issues.append('covariate(s) of the model missing in the input: %s' % ', '.join(missing_cov))
     return issues
 
 
+def _Model_covariates(manifest):
+    '''Covariate columns a model needs next to the spectra (numeric + nominal).'''
+    cov = manifest['input'].get('covariates') or {}
+    return list(cov.get('numeric', [])) + list(cov.get('nominal', []))
+
+
 def Predict_spectra(model, manifest, spectra_df, units_D=None):
-    '''Predict the indicator (native unit) for every row of spectra_df (unprocessed spectra, model bands).'''
-
+    '''Predict the indicator (native unit) for every row of spectra_df (unprocessed spectra, model bands, plus the
+    covariates of the model). Rows with a missing covariate or a class not seen in training get NaN.'''
     issues = Check_spectra(manifest, spectra_df.columns, units_D)
-
     if issues:
         raise ValueError('; '.join(issues))
-
-    return np.ravel(model.predict(spectra_df[manifest['input']['columns']]))
+    X = spectra_df[manifest['input']['columns'] + _Model_covariates(manifest)]
+    blocks = Model_blocks(model)
+    if blocks is None:
+        return np.ravel(model.predict(X))
+    skip = blocks.Unseen(X)
+    pred = np.full(len(X), np.nan)
+    if skip.any():
+        print('    ⚠️  %d sample(s) with a missing covariate or a class not in the training samples, not predicted'
+              % int(skip.sum()))
+    if (~skip).any():
+        pred[~skip] = np.ravel(model.predict(X[~skip]))
+    return pred
 
 
 class Process_predict(Get_schema_table):

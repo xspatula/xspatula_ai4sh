@@ -46,6 +46,20 @@
               "hint": "Comma separated list of the indicators to evaluate."
             },
             {
+              "parameter": "covariate_array",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Covariates used next to the spectra: empty = spectra only, all = every covariate of the (compiled) dataset, or the covariate names. Numeric covariates are used as they are, nominal (class) covariates are one-hot encoded. Samples missing a covariate are skipped, also when predicting."
+            },
+            {
+              "parameter": "class_grouping",
+              "parameter_type": "array",
+              "required": false,
+              "default_value": "",
+              "hint": "Pool the classes of nominal covariates into groups before encoding: [{\"covariate\": \"soil texture usda\", \"groups\": [[\"sand\", \"loamy sand\"], [\"loam\", \"silt loam\"], ...]}]. Every class in the data must be placed in a group. Predefined groupings are separate covariates, e.g. soil texture usda major group."
+            },
+            {
               "parameter": "regressor_array",
               "parameter_type": "array",
               "required": false,
