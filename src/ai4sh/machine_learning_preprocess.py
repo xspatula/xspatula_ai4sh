@@ -152,6 +152,19 @@ def _normalize_params_to_companion(d):
     return out
 
 
+def _Default_indicators(parquet_fp, numeric_cols, verbose=0, named=()):
+    '''Columns an indicator step processes when indicator_array is empty: the numeric non-spectral columns minus the
+    covariates of a compiled dataset (column_blocks in the companion JSON, inherited by derived files). A covariate
+    named in indicator_array, or in named (e.g. the data_range of indicator_range), is processed.'''
+    companion = _load_companion_json(os.path.dirname(parquet_fp),
+                                     os.path.splitext(os.path.basename(parquet_fp))[0]) or {}
+    covariates = set((companion.get('column_blocks') or {}).get('covariate') or []) - set(named)
+    skipped = [c for c in numeric_cols if c in covariates]
+    if skipped and verbose >= 1:
+        print('    Covariates not processed (name them in indicator_array to include): %s' % ', '.join(skipped))
+    return [c for c in numeric_cols if c not in covariates]
+
+
 def _load_companion_json(project_root_fp, stem):
     '''Load the companion {stem}.json of a parquet stem, or None if there is none.'''
     fp = os.path.join(project_root_fp, stem + '.json')
@@ -728,7 +741,7 @@ class Process_ml_preprocess(Get_schema_table):
                     print('    WARNING: indicator "%s" not found in parquet, skipping.' % col)
             indicator_cols = [c for c in requested if c in all_indicators]
         else:
-            indicator_cols = all_indicators
+            indicator_cols = _Default_indicators(parquet_fp, all_indicators, self.verbose)
 
         if not indicator_cols:
             print('    ERROR: no valid indicator columns to process.')
@@ -981,7 +994,8 @@ class Process_ml_preprocess(Get_schema_table):
         for col in requested + [c for c in data_range if c not in requested]:
             if col not in all_indicators:
                 print('    WARNING: indicator "%s" not found in parquet, skipping.' % col)
-        indicator_cols = [c for c in (requested or all_indicators) if c in all_indicators]
+        defaults = [] if requested else _Default_indicators(parquet_fp, all_indicators, self.verbose, data_range)
+        indicator_cols = [c for c in (requested or defaults) if c in all_indicators]
         if not indicator_cols:
             print('    ERROR: no valid indicator columns to process.')
             return
@@ -1906,7 +1920,7 @@ class Process_ml_preprocess(Get_schema_table):
                     print('    WARNING: indicator "%s" not found or not numeric, skipping.' % col)
             indicator_cols = [c for c in indicator_array if c in all_indicators]
         else:
-            indicator_cols = all_indicators
+            indicator_cols = _Default_indicators(parquet_fp, all_indicators, self.verbose)
 
         if not indicator_cols:
             print('    ERROR: no valid indicator columns found.')
