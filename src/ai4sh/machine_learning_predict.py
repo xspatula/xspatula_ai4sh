@@ -126,7 +126,8 @@ def Predict_spectra(model, manifest, spectra_df, units_D=None):
         raise ValueError('; '.join(issues))
     unchecked = Unchecked_covariate_units(manifest, units_D)
     if unchecked:
-        print('    ⚠️  no unit recorded in the input for covariate(s) %s — unit not checked' % ', '.join(unchecked))
+        print('    ⚠️  %s: no unit recorded in the input for covariate(s) %s — unit not checked'
+              % (manifest.get('model_file', 'model'), ', '.join(unchecked)))
     X = spectra_df[manifest['input']['columns'] + _Model_covariates(manifest)]
     blocks = Model_blocks(model)
     if blocks is None:
