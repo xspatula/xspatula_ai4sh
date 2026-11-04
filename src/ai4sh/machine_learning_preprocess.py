@@ -1421,13 +1421,13 @@ class Process_ml_preprocess(Get_schema_table):
 
     def _Load_named_settings(self, family, param, default_fpn=None):
         '''Settings of a parameter set name (ml_setting), "default" or a JSON path relative to the project root;
-        {} for none or a missing file (warning).'''
+        {} for none, None for a missing file or an unknown name (error printed: the caller stops).'''
         try:
             return Load_settings(family, param, default_fpn, resolve_path=self._Resolve_filter_fp,
                                  verbose=self.verbose) or {}
         except (FileNotFoundError, ValueError) as e:
             print('    ERROR: %s' % e)
-            return {}
+            return None
 
     def _Filter_spectra(self):
         '''Single smoothing filter; filter_fp "select" compares the filters in filter_array and asks.
@@ -2089,6 +2089,8 @@ class Process_ml_preprocess(Get_schema_table):
         model_params = self._Load_named_settings('regressor', model_params_param or 'default', _DEFAULT_MODEL_PARAMS_FP)
         sel_defaults = self._Load_named_settings('selector', 'default',
                                                  Default_fpn('selector', 'selector_default_settings.json'))
+        if model_params is None or sel_defaults is None:
+            return
         # keys of the settings file: permutation / tree_based (older code read permutation_selector / tree_based_selector)
         perm_cfg     = sel_defaults.get('permutation', sel_defaults.get('permutation_selector', {}))
         tree_cfg     = sel_defaults.get('tree_based', sel_defaults.get('tree_based_selector', {}))
@@ -2553,6 +2555,11 @@ class Process_ml_preprocess(Get_schema_table):
             return
 
         scalers = _parse_array_param(getattr(p, 'scaler', ['snv']))
+        unknown = [sc for sc in scalers if sc not in SCATTER_CORRECTIONS] if scalers != ['select'] else []
+        if unknown:
+            print('    ERROR: unknown scatter correction %s (%s or select).'
+                  % (', '.join('"%s"' % sc for sc in unknown), ', '.join(SCATTER_CORRECTIONS)))
+            return
         apply_fn = lambda sc: apply_scatter_correction(inp['spec_df'], inp['wavelengths'],
                                                        {'scaler': sc if isinstance(sc, list) else [sc]})
         confirm = True
@@ -2593,6 +2600,9 @@ class Process_ml_preprocess(Get_schema_table):
             return
 
         method   = str(getattr(p, 'method', 'meancentring')).strip()
+        if method not in VARIABLE_SCALINGS + ['select']:
+            print('    ERROR: unknown scaling method "%s" (%s or select).' % (method, ', '.join(VARIABLE_SCALINGS)))
+            return
         apply_fn = lambda m: apply_scaling(inp['spec_df'], inp['wavelengths'], {'method': m})
         confirm  = True
         if method == 'select':

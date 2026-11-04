@@ -21,13 +21,11 @@ _DEFAULT_TRANSFORMATION_FPN = Default_fpn('transform', 'indicator_transformation
 
 
 def _load_transform_config(param, default_fpn, verbose, family='transformation'):
-    '''param: none | default | parameter set name (ml_setting) | path to a transformation / standardise JSON.'''
-    try:
-        return Load_settings(family, param, default_fpn, verbose=verbose)
-    except FileNotFoundError as e:
-        if verbose >= 1:
-            print('    Warning: %s' % e)
-        return None
+    '''param: none | default | parameter set name (ml_setting) | path to a transformation / standardise JSON.
+
+    None for none. Raises FileNotFoundError (missing file) or ValueError (unknown parameter set name): the caller
+    reports the error and stops instead of silently using no transformation.'''
+    return Load_settings(family, param, default_fpn, verbose=verbose)
 
 
 def _snv(X):

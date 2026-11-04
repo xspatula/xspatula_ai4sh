@@ -368,13 +368,13 @@ class Process_regression_model(Get_schema_table):
         return Get_project_path(self.project_root_FP, s)
 
     def _Settings(self, family, param, default_fpn, default_name='standard'):
-        '''Settings dict of a parameter set / file ({} for none; missing file → warning and {}).'''
+        '''Settings dict of a parameter set / file ({} for none); None for a missing file or an unknown parameter set
+        name (error printed: the caller stops instead of running with library defaults).'''
         try:
             return Load_settings(family, param, default_fpn, default_name, self._Settings_fp, self.verbose) or {}
-        except FileNotFoundError as e:
-            if self.verbose >= 1:
-                print('    WARNING: %s' % e)
-            return {}
+        except (FileNotFoundError, ValueError) as e:
+            print('    ERROR: %s' % e)
+            return None
 
     def _Source_parquet(self, project_root_fp, companion):
         '''The unprocessed parquet a preprocessing chain starts from, or None (error printed).'''
@@ -625,15 +625,21 @@ class Process_regression_model(Get_schema_table):
         model_params = self._Settings('regressor', model_params_param or 'default', _DEFAULT_MODEL_PARAMS_FP)
 
         # Indicator transformation and standardisation — only what the process sets, default none
-        transformation_raw = _load_transform_config(self._Settings_fp(transformation_param),
-                                                    _DEFAULT_TRANSFORMATION_FPN, self.verbose)
-        standardise_raw    = _load_transform_config(self._Settings_fp(standardisation_param),
-                                                    _DEFAULT_STANDARDISE_FPN, self.verbose, 'standardisation')
+        try:
+            transformation_raw = _load_transform_config(self._Settings_fp(transformation_param),
+                                                        _DEFAULT_TRANSFORMATION_FPN, self.verbose)
+            standardise_raw    = _load_transform_config(self._Settings_fp(standardisation_param),
+                                                        _DEFAULT_STANDARDISE_FPN, self.verbose, 'standardisation')
+        except (FileNotFoundError, ValueError) as e:
+            print('    ERROR: %s' % e)
+            return
 
         regr_sym_raw = self._Settings('plot_symbol', regr_sym_param or 'default', _DEFAULT_REGR_SYMBOLS_FP,
                                       'regressionmodelsymbols')
         tgt_sym_raw  = self._Settings('plot_symbol', tgt_sym_param or 'default', _DEFAULT_TARGET_SYMBOLS_FP,
                                       'targetfeaturesymbols')
+        if model_params is None or regr_sym_raw is None or tgt_sym_raw is None:
+            return
         regr_sym_D   = regr_sym_raw.get('regressionModelSymbols', regr_sym_raw)
         tgt_sym_D    = tgt_sym_raw.get('targetFeatureSymbols',    tgt_sym_raw)
 
