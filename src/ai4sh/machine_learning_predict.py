@@ -102,6 +102,8 @@ def Check_spectra(manifest, columns, units_D=None):
     if missing_cov:
         issues.append('covariate(s) of the model missing in the input: %s' % ', '.join(missing_cov))
     if units_D is not None:
+        # Units are compared as text: they come from the indicator definitions in the database (selection, compile),
+        # so the same unit has the same spelling. A hand-made file must use those spellings ("weight percent", not "%").
         trained = (manifest['input'].get('covariates') or {}).get('numeric_units') or {}
         wrong = ['%s in %s, the model was trained on %s' % (c, units_D.get(c), u) for c, u in trained.items()
                  if u and units_D.get(c) and units_D.get(c) != u and c not in missing_cov]
@@ -122,6 +124,9 @@ def Predict_spectra(model, manifest, spectra_df, units_D=None):
     issues = Check_spectra(manifest, spectra_df.columns, units_D)
     if issues:
         raise ValueError('; '.join(issues))
+    unchecked = Unchecked_covariate_units(manifest, units_D)
+    if unchecked:
+        print('    ⚠️  no unit recorded in the input for covariate(s) %s — unit not checked' % ', '.join(unchecked))
     X = spectra_df[manifest['input']['columns'] + _Model_covariates(manifest)]
     blocks = Model_blocks(model)
     if blocks is None:
@@ -134,6 +139,12 @@ def Predict_spectra(model, manifest, spectra_df, units_D=None):
     if (~skip).any():
         pred[~skip] = np.ravel(model.predict(X[~skip]))
     return pred
+
+
+def Unchecked_covariate_units(manifest, units_D):
+    '''Numeric covariates with a unit in the model but none in the input data: their unit could not be checked.'''
+    trained = ((manifest['input'].get('covariates') or {}).get('numeric_units') or {})
+    return ['%s (model: %s)' % (c, u) for c, u in trained.items() if u and not (units_D or {}).get(c)]
 
 
 class Process_predict(Get_schema_table):

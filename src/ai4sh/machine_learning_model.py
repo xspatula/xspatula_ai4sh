@@ -696,6 +696,8 @@ class Process_regression_model(Get_schema_table):
             'directory':      project_root_fp,
         }
 
+        constant_noted = set()   # (indicator, mode): the "does not vary" note does not depend on the regressor
+
         def _save_model(model, fp, pipeline_D, indicator, model_key, mode, metrics, train_rows):
             '''Save the whole fitted chain (preprocessing + regressor + indicator transformation) and its manifest.'''
             model.spectral_header_ = spectral_header_D
@@ -715,9 +717,10 @@ class Process_regression_model(Get_schema_table):
                       % (indicator, model_key, 'tt' if mode == 'traintest' else 'kf', cap))
             blocks = Model_blocks(model)
             constant = blocks.Constant_covariates() if blocks is not None else []
-            if constant:
-                print('        ⚠️  %s %s [%s]: covariate(s) %s do not vary in the training samples — no effect'
-                      % (indicator, model_key, 'tt' if mode == 'traintest' else 'kf', ', '.join(constant)))
+            if constant and (indicator, mode) not in constant_noted:
+                constant_noted.add((indicator, mode))
+                print('        ⚠️  %s [%s]: covariate(s) %s do not vary in the training samples — no effect'
+                      % (indicator, 'tt' if mode == 'traintest' else 'kf', ', '.join(constant)))
             ids = (df.loc[train_rows, holdout_key].tolist() if holdout_key in df.columns
                    else np.flatnonzero(train_rows).tolist())
             manifest = {
