@@ -332,16 +332,17 @@ def _Covariate_tag(covariate_cols):
     return '_cv-' + tag
 
 
-def _Fitted_covariates(model, covariates_D):
-    '''Covariates of a fitted model for its manifest: numeric labels with the training mean and standard deviation
-    they are standardised with, nominal labels with the classes (after grouping) seen in training, and the class
-    grouping.'''
+def _Fitted_covariates(model, covariates_D, units_D=None):
+    '''Covariates of a fitted model for its manifest: numeric labels with their unit and the training mean and
+    standard deviation they are standardised with (6 significant digits), nominal labels with the classes (after
+    grouping) seen in training, and the class grouping.'''
     blocks = Model_blocks(model)
     if blocks is None:
         return {}
-    standardisation = {label: {'mean': round(mean, 6), 'std': round(blocks.numeric_std_[label], 6)}
+    standardisation = {label: {'mean': float('%.6g' % mean), 'std': float('%.6g' % blocks.numeric_std_[label])}
                        for label, mean in getattr(blocks, 'numeric_mean_', {}).items()}
-    return dict(covariates_D, levels=blocks.levels_, numeric_standardisation=standardisation)
+    units = {label: (units_D or {}).get(label) for label in blocks.numeric}
+    return dict(covariates_D, levels=blocks.levels_, numeric_standardisation=standardisation, numeric_units=units)
 
 
 # ------------------------------------------------------------------ main class
@@ -712,6 +713,11 @@ class Process_regression_model(Get_schema_table):
             if cap:
                 print('        ⚠️  %s %s [%s]: %s — fewer components than requested'
                       % (indicator, model_key, 'tt' if mode == 'traintest' else 'kf', cap))
+            blocks = Model_blocks(model)
+            constant = blocks.Constant_covariates() if blocks is not None else []
+            if constant:
+                print('        ⚠️  %s %s [%s]: covariate(s) %s do not vary in the training samples — no effect'
+                      % (indicator, model_key, 'tt' if mode == 'traintest' else 'kf', ', '.join(constant)))
             ids = (df.loc[train_rows, holdout_key].tolist() if holdout_key in df.columns
                    else np.flatnonzero(train_rows).tolist())
             manifest = {
@@ -726,7 +732,7 @@ class Process_regression_model(Get_schema_table):
                 'fitted_hyper_parameters': fitted_hp,
                 'mode':                mode,
                 'input':               {'columns': col_names, 'signal_type': signal_type, 'n_bands': len(col_names),
-                                        'covariates': _Fitted_covariates(model, covariates_D)},
+                                        'covariates': _Fitted_covariates(model, covariates_D, units_D)},
                 'pipeline':            pipeline_D,
                 'preprocessing_chain': companion.get('preprocessing_chain', []),
                 'data':                dict(data_D, sample_id_key=holdout_key, n_train=len(ids), train_sample_ids=ids),

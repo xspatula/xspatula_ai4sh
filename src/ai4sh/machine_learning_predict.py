@@ -101,6 +101,12 @@ def Check_spectra(manifest, columns, units_D=None):
     missing_cov = [c for c in covariates if c not in set(columns)]
     if missing_cov:
         issues.append('covariate(s) of the model missing in the input: %s' % ', '.join(missing_cov))
+    if units_D is not None:
+        trained = (manifest['input'].get('covariates') or {}).get('numeric_units') or {}
+        wrong = ['%s in %s, the model was trained on %s' % (c, units_D.get(c), u) for c, u in trained.items()
+                 if u and units_D.get(c) and units_D.get(c) != u and c not in missing_cov]
+        if wrong:
+            issues.append('covariate unit differs: %s' % '; '.join(wrong))
     return issues
 
 

@@ -500,8 +500,7 @@ class CovariateBlocks(BaseEstimator, TransformerMixin):
         for label in self.numeric:
             values = X[label].astype(float).values
             self.numeric_mean_[label] = float(np.nanmean(values))
-            std = float(np.nanstd(values))
-            self.numeric_std_[label] = std if std > 0 else 1.0   # constant covariate: centred only
+            self.numeric_std_[label] = float(np.nanstd(values))   # 0: constant, only centred (Constant_covariates)
         self.levels_ = {label: sorted({c for c in self._Classes(X, label) if c is not None})
                         for label in self.nominal}
         return self
@@ -511,12 +510,17 @@ class CovariateBlocks(BaseEstimator, TransformerMixin):
         if len(self.numeric):
             mean, std = getattr(self, 'numeric_mean_', {}), getattr(self, 'numeric_std_', {})
             parts.append(pd.DataFrame({COVARIATE_PREFIX + label: (X[label].astype(float).values - mean.get(label, 0.0))
-                                       / std.get(label, 1.0) for label in self.numeric}, index=X.index))
+                                       / (std.get(label, 1.0) or 1.0) for label in self.numeric}, index=X.index))
         for label in self.nominal:
             classes = self._Classes(X, label)
             parts.append(pd.DataFrame({'%s%s=%s' % (COVARIATE_PREFIX, label, c): (classes == c).astype(float)
                                        for c in self.levels_[label]}, index=X.index))
         return pd.concat(parts, axis=1)
+
+    def Constant_covariates(self):
+        '''Covariates that did not vary in the training samples (numeric std 0, nominal one class): no effect.'''
+        return ([label for label, std in getattr(self, 'numeric_std_', {}).items() if std == 0]
+                + [label for label in self.nominal if len(self.levels_[label]) < 2])
 
     def Unseen(self, X):
         '''Boolean array, True for rows with a missing covariate or a class (after grouping) not seen in training.'''
