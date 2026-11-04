@@ -61,7 +61,7 @@ from src.ai4sh.chemometrics import (_load_transform_config, _DEFAULT_TRANSFORMAT
 from src.ai4sh.ml_transformers import (CappedPLSRegression, Chain_to_steps, Column_index, CovariateBlocks,
                                        Group_classes, Holdout_test_mask, IndicatorTransformer,
                                        Indicator_target_settings, Model_blocks, Parse_class_grouping,
-                                       RegressorFrame, Reset_pls_cap_warnings, Target_domain_mask)
+                                       Pls_cap_text, RegressorFrame, Target_domain_mask)
 from src.ai4sh.spectral_columns import Signal_type_of
 from src.ai4sh.project_paths import Default_fpn
 from src.ai4sh.provenance import Provenance_snapshot, File_sha256
@@ -275,10 +275,15 @@ def _Fitted_target(model):
     return {'transform': 'linear', 'standardise': False}
 
 
+def _Fitted_regressor(model):
+    '''The fitted regressor (last pipeline step) of a model, inside the indicator transformation if any.'''
+    return (model.regressor_ if isinstance(model, TransformedTargetRegressor) else model)[-1]
+
+
 def _Fitted_hyper_parameters(model):
     '''Hyper-parameters the fitted regressor used where they can differ from the requested ones
     (plsr: n_components capped to the training samples and the features left after the chain); {} otherwise.'''
-    regressor = (model.regressor_ if isinstance(model, TransformedTargetRegressor) else model)[-1]
+    regressor = _Fitted_regressor(model)
     if hasattr(regressor, 'n_components_'):
         return {'n_components': int(regressor.n_components_)}
     return {}
@@ -473,7 +478,6 @@ class Process_regression_model(Get_schema_table):
 
     def _Regression_modeling(self):
         p = self.process_S.process.parameters
-        Reset_pls_cap_warnings()
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
@@ -701,6 +705,10 @@ class Process_regression_model(Get_schema_table):
             fitted_hp = _Fitted_hyper_parameters(model)
             if fitted_hp:
                 metrics['fitted_hyper_parameters'] = fitted_hp
+            cap = Pls_cap_text(_Fitted_regressor(model))
+            if cap:
+                print('        ⚠️  %s %s [%s]: %s — fewer components than requested'
+                      % (indicator, model_key, 'tt' if mode == 'traintest' else 'kf', cap))
             ids = (df.loc[train_rows, holdout_key].tolist() if holdout_key in df.columns
                    else np.flatnonzero(train_rows).tolist())
             manifest = {

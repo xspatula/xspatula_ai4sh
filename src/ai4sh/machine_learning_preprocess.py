@@ -2049,8 +2049,6 @@ class Process_ml_preprocess(Get_schema_table):
         '''Band selection: permutation importance, RFE, or tree-based — across regressor × selector.'''
         # Lazy imports — machine_learning_model.py imports from this module (circular guard)
         from src.ai4sh.machine_learning_model import _build_regressor, _DEFAULT_MODEL_PARAMS_FP
-        from src.ai4sh.ml_transformers import Reset_pls_cap_warnings
-        Reset_pls_cap_warnings()
         from sklearn.feature_selection import RFE, RFECV
         from sklearn.ensemble import ExtraTreesRegressor
         from sklearn.model_selection import train_test_split

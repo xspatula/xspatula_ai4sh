@@ -24,7 +24,8 @@ one-hot encoded, optionally after pooling classes into groups (class_grouping). 
 cv:<label> and cv:<label>=<class>; Column_index leaves these names as they are.
 
 CappedPLSRegression is the plsr regressor: n_components is capped at fit to what the training samples and the bands
-left after the chain allow, min(n_samples - 1, n_features), with one warning per run, instead of failing.
+left after the chain allow, min(n_samples - 1, n_features), instead of failing. It prints nothing (k-fold and RFE
+fit it many times); Pls_cap_text() gives the note that regression modeling prints per indicator and mode.
 '''
 
 # Standard library imports
@@ -386,35 +387,31 @@ class RegressorFrame(_Stateless, BaseEstimator, TransformerMixin):
                            for c in X.columns], axis=1)
 
 
-_PLS_CAP_WARNED = set()
-
-
-def Reset_pls_cap_warnings():
-    '''Print the plsr cap warning again (call at the start of each run: the set lives as long as the kernel).'''
-    _PLS_CAP_WARNED.clear()
-
-
 class CappedPLSRegression(PLSRegression):
     '''PLSRegression with n_components capped at fit to min(n_samples - 1, n_features) (rank of the centred X).
 
-    The requested n_components stays the parameter (clone, get_params, manifest); the number used is n_components_.
+    The requested n_components stays the parameter (clone, get_params, manifest); the number used is n_components_,
+    and fit_shape_ the (samples, features) it was fitted on.
     '''
 
     def fit(self, X, y=None, **kwargs):
         requested = self.n_components
-        cap = max(1, min(np.shape(X)[0] - 1, np.shape(X)[1]))   # centring takes one degree of freedom
+        self.fit_shape_ = tuple(int(n) for n in np.shape(X)[:2])
+        cap = max(1, min(self.fit_shape_[0] - 1, self.fit_shape_[1]))   # centring takes one degree of freedom
         self.n_components_ = min(requested, cap)
-        if self.n_components_ < requested:
-            msg = ('plsr: n_components %d is more than the training data allow (%d samples, %d features) — using %d'
-                   % (requested, np.shape(X)[0], np.shape(X)[1], self.n_components_))
-            if msg not in _PLS_CAP_WARNED:
-                _PLS_CAP_WARNED.add(msg)
-                print('    ⚠️  %s' % msg)
         self.n_components = self.n_components_
         try:
             return super().fit(X, y, **kwargs)
         finally:
             self.n_components = requested
+
+
+def Pls_cap_text(regressor):
+    '''"n_components 10 → 5 (120 samples, 5 features)" if a fitted CappedPLSRegression was capped, else "".'''
+    used = getattr(regressor, 'n_components_', None)
+    if used is None or used >= regressor.n_components:
+        return ''
+    return 'n_components %d → %d (%d samples, %d features)' % ((regressor.n_components, used) + regressor.fit_shape_)
 
 
 # ------------------------------------------------------------------ covariates
