@@ -47,7 +47,8 @@
   },
   "plsr": {
     "hyper_parameters": {
-      "n_components": 10
+      "n_components": 10,
+      "scale": false
     }
   },
   "cubist": {

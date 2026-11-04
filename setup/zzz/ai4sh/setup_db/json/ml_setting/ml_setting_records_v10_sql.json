@@ -1441,7 +1441,7 @@
               2,
               "preset",
               "setup",
-              "Standard regressor hyper-parameters (random_state 42 for stochastic regressors; plsr with 10 components).",
+              "Standard regressor hyper-parameters (random_state 42 for stochastic regressors; plsr with 10 components on the spectra as the chain leaves them, scale false).",
               {
                 "ols": {
                   "hyper_parameters": {
@@ -1491,7 +1491,8 @@
                 },
                 "plsr": {
                   "hyper_parameters": {
-                    "n_components": 10
+                    "n_components": 10,
+                    "scale": false
                   }
                 },
                 "cubist": {
@@ -1500,7 +1501,7 @@
                   }
                 }
               },
-              "ed2833697923743f574701c0bae2d9894b97b8bc53169f68315dbf64d11b8f2d"
+              "4601c7ceeb5f58f7022f7ac2d6ec4deb9892659cc81310926ce03009635a8b2e"
             ]
           ]
         }
