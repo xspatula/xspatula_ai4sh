@@ -22,6 +22,9 @@ Covariates (other than spectra) enter a model through CovariateBlocks: the spect
 refitted chain, numeric covariates are kept as they are and nominal covariates (classes, e.g. soil texture) are
 one-hot encoded, optionally after pooling classes into groups (class_grouping). Covariate columns are named
 cv:<label> and cv:<label>=<class>; Column_index leaves these names as they are.
+
+CappedPLSRegression is the plsr regressor: n_components is capped at fit to what the training samples and the bands
+left after the chain allow, min(n_samples - 1, n_features), with one warning, instead of failing.
 '''
 
 # Standard library imports
@@ -37,6 +40,7 @@ from scipy.special import inv_boxcox
 
 from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.cluster import FeatureAgglomeration
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest, VarianceThreshold, f_regression
 from sklearn.preprocessing import (MinMaxScaler, StandardScaler, RobustScaler,
@@ -380,6 +384,32 @@ class RegressorFrame(_Stateless, BaseEstimator, TransformerMixin):
         X = _Numeric_frame(X)
         return X.set_axis(['f_%s' % (re.sub(r'[^0-9A-Za-z]+', '_', c) if isinstance(c, str) else c)
                            for c in X.columns], axis=1)
+
+
+_PLS_CAP_WARNED = set()
+
+
+class CappedPLSRegression(PLSRegression):
+    '''PLSRegression with n_components capped at fit to min(n_samples - 1, n_features) (rank of the centred X).
+
+    The requested n_components stays the parameter (clone, get_params, manifest); the number used is n_components_.
+    '''
+
+    def fit(self, X, y=None, **kwargs):
+        requested = self.n_components
+        cap = max(1, min(np.shape(X)[0] - 1, np.shape(X)[1]))   # centring takes one degree of freedom
+        self.n_components_ = min(requested, cap)
+        if self.n_components_ < requested:
+            msg = ('plsr: n_components %d is more than the training data allow (%d samples, %d bands) — using %d'
+                   % (requested, np.shape(X)[0], np.shape(X)[1], self.n_components_))
+            if msg not in _PLS_CAP_WARNED:
+                _PLS_CAP_WARNED.add(msg)
+                print('    ⚠️  %s' % msg)
+        self.n_components = self.n_components_
+        try:
+            return super().fit(X, y, **kwargs)
+        finally:
+            self.n_components = requested
 
 
 # ------------------------------------------------------------------ covariates

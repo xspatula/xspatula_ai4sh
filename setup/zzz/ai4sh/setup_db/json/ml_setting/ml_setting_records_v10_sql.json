@@ -1415,6 +1415,96 @@
           ]
         }
       }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": false,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "parameter_set",
+        "command": {
+          "columns": [
+            "family",
+            "name",
+            "version",
+            "category",
+            "creator",
+            "abstract",
+            "content",
+            "content_hash"
+          ],
+          "values": [
+            [
+              "regressor",
+              "standard",
+              2,
+              "preset",
+              "setup",
+              "Standard regressor hyper-parameters (random_state 42 for stochastic regressors; plsr with 10 components).",
+              {
+                "ols": {
+                  "hyper_parameters": {
+                    "fit_intercept": true
+                  }
+                },
+                "theil_sen": {
+                  "hyper_parameters": {
+                    "random_state": 42
+                  }
+                },
+                "huber": {
+                  "hyper_parameters": {}
+                },
+                "knn": {
+                  "hyper_parameters": {}
+                },
+                "dectree": {
+                  "hyper_parameters": {
+                    "random_state": 42
+                  }
+                },
+                "svr": {
+                  "hyper_parameters": {
+                    "kernel": "linear",
+                    "C": 1.5,
+                    "epsilon": 0.05
+                  }
+                },
+                "randfor": {
+                  "hyper_parameters": {
+                    "n_estimators": 30,
+                    "random_state": 42
+                  }
+                },
+                "mlp": {
+                  "hyper_parameters": {
+                    "hidden_layer_sizes": [
+                      100,
+                      100
+                    ],
+                    "max_iter": 200,
+                    "tol": 0.001,
+                    "epsilon": 1e-08,
+                    "random_state": 42
+                  }
+                },
+                "plsr": {
+                  "hyper_parameters": {
+                    "n_components": 10
+                  }
+                },
+                "cubist": {
+                  "hyper_parameters": {
+                    "random_state": 42
+                  }
+                }
+              },
+              "ed2833697923743f574701c0bae2d9894b97b8bc53169f68315dbf64d11b8f2d"
+            ]
+          ]
+        }
+      }
     }
   ]
 }

@@ -45,6 +45,11 @@
       "random_state": 42
     }
   },
+  "plsr": {
+    "hyper_parameters": {
+      "n_components": 10
+    }
+  },
   "cubist": {
     "hyper_parameters": {
       "random_state": 42

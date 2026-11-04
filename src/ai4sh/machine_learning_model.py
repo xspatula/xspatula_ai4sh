@@ -43,7 +43,6 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.compose import TransformedTargetRegressor
-from sklearn.cross_decomposition import PLSRegression
 from sklearn.base import BaseEstimator, RegressorMixin, clone
 from sklearn.model_selection import cross_val_predict, cross_val_score
 from sklearn.inspection import permutation_importance as sk_permutation_importance
@@ -59,9 +58,10 @@ from src.ai4sh.machine_learning_preprocess import (
 from src.ai4sh.parquet_units import Read_parquet_with_units, Find_selected_parquet
 from src.ai4sh.chemometrics import (_load_transform_config, _DEFAULT_TRANSFORMATION_FPN,
                                      _DEFAULT_STANDARDISE_FPN)
-from src.ai4sh.ml_transformers import (Chain_to_steps, Column_index, CovariateBlocks, Group_classes,
-                                       Holdout_test_mask, IndicatorTransformer, Indicator_target_settings,
-                                       Model_blocks, Parse_class_grouping, RegressorFrame, Target_domain_mask)
+from src.ai4sh.ml_transformers import (CappedPLSRegression, Chain_to_steps, Column_index, CovariateBlocks,
+                                       Group_classes, Holdout_test_mask, IndicatorTransformer,
+                                       Indicator_target_settings, Model_blocks, Parse_class_grouping,
+                                       RegressorFrame, Target_domain_mask)
 from src.ai4sh.spectral_columns import Signal_type_of
 from src.ai4sh.project_paths import Default_fpn
 from src.ai4sh.provenance import Provenance_snapshot, File_sha256
@@ -85,7 +85,7 @@ def _build_regressor(key, hp):
     if k == 'randfor':    return RandomForestRegressor(**hp)
     if k == 'mlp':
         return Pipeline([('scl', StandardScaler()), ('clf', MLPRegressor(**hp))])
-    if k == 'plsr':       return PLSRegression(**hp)
+    if k == 'plsr':       return CappedPLSRegression(**hp)
     if k == 'cubist':
         if not _CUBIST_AVAILABLE:
             return None
