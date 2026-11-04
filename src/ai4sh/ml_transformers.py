@@ -20,7 +20,9 @@ samples as long as they read the same set of samples.
 
 Covariates (other than spectra) enter a model through CovariateBlocks: the spectral columns pass through the
 refitted chain, numeric covariates are kept as they are and nominal covariates (classes, e.g. soil texture) are
-one-hot encoded, optionally after pooling classes into groups (class_grouping). Covariate columns are named
+one-hot encoded, optionally after pooling classes into groups (class_grouping). Numeric covariates are standardised
+with the mean and standard deviation of the training samples, so a model does not depend on their unit (% or g/kg)
+and a high-variance covariate does not dominate a plsr component or a knn/svr/mlp distance. Covariate columns are named
 cv:<label> and cv:<label>=<class>; Column_index leaves these names as they are.
 
 CappedPLSRegression is the plsr regressor: n_components is capped at fit to what the training samples and the bands
@@ -474,7 +476,8 @@ class CovariateBlocks(BaseEstimator, TransformerMixin):
     '''Spectra + covariates as one feature frame.
 
     spectra: Pipeline refitting the preprocessing chain, applied to every column that is not a covariate.
-    numeric: covariates kept as they are (cv:<label>).
+    numeric: covariates standardised with the mean and standard deviation of the training samples (cv:<label>);
+    models saved before the standardisation have no numeric_mean_ and keep the values as they are.
     nominal: class covariates, pooled by grouping {label: {class: group}} and one-hot encoded with the classes of
     the training samples (cv:<label>=<class>). A class not seen in training gives all zeros; the model and predict
     processes skip such samples.
@@ -493,6 +496,12 @@ class CovariateBlocks(BaseEstimator, TransformerMixin):
         covariates = list(self.numeric) + list(self.nominal)
         self.spectral_columns_ = [c for c in X.columns if c not in covariates]
         self.spectra_ = clone(self.spectra).fit(X[self.spectral_columns_], y)
+        self.numeric_mean_, self.numeric_std_ = {}, {}
+        for label in self.numeric:
+            values = X[label].astype(float).values
+            self.numeric_mean_[label] = float(np.nanmean(values))
+            std = float(np.nanstd(values))
+            self.numeric_std_[label] = std if std > 0 else 1.0   # constant covariate: centred only
         self.levels_ = {label: sorted({c for c in self._Classes(X, label) if c is not None})
                         for label in self.nominal}
         return self
@@ -500,8 +509,9 @@ class CovariateBlocks(BaseEstimator, TransformerMixin):
     def transform(self, X):
         parts = [self.spectra_.transform(X[self.spectral_columns_]).set_axis(X.index, axis=0)]
         if len(self.numeric):
-            parts.append(pd.DataFrame({COVARIATE_PREFIX + label: X[label].astype(float).values
-                                       for label in self.numeric}, index=X.index))
+            mean, std = getattr(self, 'numeric_mean_', {}), getattr(self, 'numeric_std_', {})
+            parts.append(pd.DataFrame({COVARIATE_PREFIX + label: (X[label].astype(float).values - mean.get(label, 0.0))
+                                       / std.get(label, 1.0) for label in self.numeric}, index=X.index))
         for label in self.nominal:
             classes = self._Classes(X, label)
             parts.append(pd.DataFrame({'%s%s=%s' % (COVARIATE_PREFIX, label, c): (classes == c).astype(float)

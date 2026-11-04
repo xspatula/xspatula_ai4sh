@@ -333,12 +333,15 @@ def _Covariate_tag(covariate_cols):
 
 
 def _Fitted_covariates(model, covariates_D):
-    '''Covariates of a fitted model for its manifest: numeric labels, nominal labels with the classes (after
-    grouping) seen in training, and the class grouping.'''
+    '''Covariates of a fitted model for its manifest: numeric labels with the training mean and standard deviation
+    they are standardised with, nominal labels with the classes (after grouping) seen in training, and the class
+    grouping.'''
     blocks = Model_blocks(model)
     if blocks is None:
         return {}
-    return dict(covariates_D, levels=blocks.levels_)
+    standardisation = {label: {'mean': round(mean, 6), 'std': round(blocks.numeric_std_[label], 6)}
+                       for label, mean in getattr(blocks, 'numeric_mean_', {}).items()}
+    return dict(covariates_D, levels=blocks.levels_, numeric_standardisation=standardisation)
 
 
 # ------------------------------------------------------------------ main class
