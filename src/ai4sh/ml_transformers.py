@@ -24,7 +24,7 @@ one-hot encoded, optionally after pooling classes into groups (class_grouping). 
 cv:<label> and cv:<label>=<class>; Column_index leaves these names as they are.
 
 CappedPLSRegression is the plsr regressor: n_components is capped at fit to what the training samples and the bands
-left after the chain allow, min(n_samples - 1, n_features), with one warning, instead of failing.
+left after the chain allow, min(n_samples - 1, n_features), with one warning per run, instead of failing.
 '''
 
 # Standard library imports
@@ -389,6 +389,11 @@ class RegressorFrame(_Stateless, BaseEstimator, TransformerMixin):
 _PLS_CAP_WARNED = set()
 
 
+def Reset_pls_cap_warnings():
+    '''Print the plsr cap warning again (call at the start of each run: the set lives as long as the kernel).'''
+    _PLS_CAP_WARNED.clear()
+
+
 class CappedPLSRegression(PLSRegression):
     '''PLSRegression with n_components capped at fit to min(n_samples - 1, n_features) (rank of the centred X).
 
@@ -400,7 +405,7 @@ class CappedPLSRegression(PLSRegression):
         cap = max(1, min(np.shape(X)[0] - 1, np.shape(X)[1]))   # centring takes one degree of freedom
         self.n_components_ = min(requested, cap)
         if self.n_components_ < requested:
-            msg = ('plsr: n_components %d is more than the training data allow (%d samples, %d bands) — using %d'
+            msg = ('plsr: n_components %d is more than the training data allow (%d samples, %d features) — using %d'
                    % (requested, np.shape(X)[0], np.shape(X)[1], self.n_components_))
             if msg not in _PLS_CAP_WARNED:
                 _PLS_CAP_WARNED.add(msg)

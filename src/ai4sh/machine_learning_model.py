@@ -61,7 +61,7 @@ from src.ai4sh.chemometrics import (_load_transform_config, _DEFAULT_TRANSFORMAT
 from src.ai4sh.ml_transformers import (CappedPLSRegression, Chain_to_steps, Column_index, CovariateBlocks,
                                        Group_classes, Holdout_test_mask, IndicatorTransformer,
                                        Indicator_target_settings, Model_blocks, Parse_class_grouping,
-                                       RegressorFrame, Target_domain_mask)
+                                       RegressorFrame, Reset_pls_cap_warnings, Target_domain_mask)
 from src.ai4sh.spectral_columns import Signal_type_of
 from src.ai4sh.project_paths import Default_fpn
 from src.ai4sh.provenance import Provenance_snapshot, File_sha256
@@ -275,6 +275,15 @@ def _Fitted_target(model):
     return {'transform': 'linear', 'standardise': False}
 
 
+def _Fitted_hyper_parameters(model):
+    '''Hyper-parameters the fitted regressor used where they can differ from the requested ones
+    (plsr: n_components capped to the training samples and the features left after the chain); {} otherwise.'''
+    regressor = (model.regressor_ if isinstance(model, TransformedTargetRegressor) else model)[-1]
+    if hasattr(regressor, 'n_components_'):
+        return {'n_components': int(regressor.n_components_)}
+    return {}
+
+
 class _Fitted_tail(RegressorMixin, BaseEstimator):
     '''The fitted regressor (+ inverse indicator transformation) of a model, applied to preprocessed features.
 
@@ -464,6 +473,7 @@ class Process_regression_model(Get_schema_table):
 
     def _Regression_modeling(self):
         p = self.process_S.process.parameters
+        Reset_pls_cap_warnings()
 
         project_root_fp = str(p.project_root_fp).strip()
         if not os.path.isabs(project_root_fp):
@@ -688,6 +698,9 @@ class Process_regression_model(Get_schema_table):
             metrics['model_fp']     = fp
             metrics['model_sha256'] = File_sha256(fp)
             metrics['manifest_fp']  = Manifest_fp(fp)
+            fitted_hp = _Fitted_hyper_parameters(model)
+            if fitted_hp:
+                metrics['fitted_hyper_parameters'] = fitted_hp
             ids = (df.loc[train_rows, holdout_key].tolist() if holdout_key in df.columns
                    else np.flatnonzero(train_rows).tolist())
             manifest = {
@@ -699,13 +712,15 @@ class Process_regression_model(Get_schema_table):
                 'indicator_unit':      units_D.get(indicator),
                 'regressor':           model_key,
                 'hyper_parameters':    model_params.get(model_key, {}).get('hyper_parameters', {}),
+                'fitted_hyper_parameters': fitted_hp,
                 'mode':                mode,
                 'input':               {'columns': col_names, 'signal_type': signal_type, 'n_bands': len(col_names),
                                         'covariates': _Fitted_covariates(model, covariates_D)},
                 'pipeline':            pipeline_D,
                 'preprocessing_chain': companion.get('preprocessing_chain', []),
                 'data':                dict(data_D, sample_id_key=holdout_key, n_train=len(ids), train_sample_ids=ids),
-                'metrics':             {k: v for k, v in metrics.items() if k not in ('model_fp', 'manifest_fp')},
+                'metrics':             {k: v for k, v in metrics.items()
+                                        if k not in ('model_fp', 'manifest_fp', 'fitted_hyper_parameters')},
                 'provenance':          Provenance_snapshot(),
             }
             with open(metrics['manifest_fp'], 'w') as fh:
