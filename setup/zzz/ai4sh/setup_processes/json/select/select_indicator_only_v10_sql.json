@@ -113,7 +113,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "JSON string with per-indicator min/max filters, e.g. {\"c-org\": {\"min\": 0, \"max\": 100}}; empty = no filter",
+              "hint": "JSON string with per-indicator min/max filters, e.g. {\"c-org\": {\"min\": 0, \"max\": 100}}; a value outside its range is set to missing, the other values of the sample are kept; empty = no filter",
               "schema_table": {
                 "schema": "observation",
                 "table": "sample",

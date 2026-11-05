@@ -1451,9 +1451,10 @@ class Process_select(Get_schema_table):
             print('    Excluded by depth filter: %d' % (before - len(df)))
 
         # ---- 4. Data range filter ----
+        # A value outside its range is set to missing; the other values of the sample are kept (as indicator_range)
         data_range = self._Parse_data_range()
 
-        range_excluded = 0
+        range_blanked = {}
 
         for label, rng in data_range.items():
 
@@ -1463,19 +1464,40 @@ class Process_select(Get_schema_table):
 
                 continue
 
-            before = len(df)
+            values = pd.to_numeric(df[label], errors='coerce')
+
+            outside = pd.Series(False, index=df.index)
 
             if 'min' in rng:
-                df = df[df[label] >= rng['min']]
+                outside |= values < rng['min']
 
             if 'max' in rng:
-                df = df[df[label] <= rng['max']]
+                outside |= values > rng['max']
 
-            range_excluded += before - len(df)
+            if outside.any():
 
-        if self.verbose and range_excluded:
+                df.loc[outside, label] = np.nan
 
-            print('    Excluded by data range filter: %d' % range_excluded)
+                range_blanked[label] = int(outside.sum())
+
+        if range_blanked and self.verbose:
+
+            print('    Set to missing by data_range: %s' % ', '.join('%s %d' % kv for kv in range_blanked.items()))
+
+        # A sample left without any indicator value is of no use
+        indicator_cols = [c for c in feature_labels_D.get('indicator', []) if c in df.columns]
+
+        if range_blanked and indicator_cols:
+
+            empty = df[indicator_cols].isna().all(axis=1)
+
+            if empty.any():
+
+                df = df[~empty]
+
+                if self.verbose:
+
+                    print('    Excluded, no indicator value left after data_range: %d' % int(empty.sum()))
 
         if df.empty:
 
