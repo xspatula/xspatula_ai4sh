@@ -238,11 +238,14 @@ class Process_select(Get_schema_table):
 
         return AGGREGATE_D[method]
 
-    def _Restrict_observation_logs(self, recs, name_idx, what):
-        '''Keep the records of the observation logs in observation_log_array (names or tags) — per kind of data.
+    def _Restrict_observation_logs(self, recs, name_idx, what, label_idx=None, label_D=None):
+        '''Keep the records of the observation logs in observation_log_array (names or tags) — per kind of data,
+        and with label_idx per indicator/covariate.
 
         A log restricts only the data it holds: spectral logs the spectra, lab logs the indicators. If none of the
         listed logs holds this kind of data (e.g. only spectral logs are listed), all its logs are kept, with a note.
+        With label_idx (the indicator id; label_D maps it to its label) the same per label: a label with no record in
+        the listed logs (e.g. a covariate held only in a field log) keeps all its logs, with a note.
         recs: rows with the observation log name at name_idx and its tag at name_idx + 1.
         '''
         logs = set(self._Parse_array('observation_log_array'))
@@ -251,16 +254,43 @@ class Process_select(Get_schema_table):
 
             return recs
 
-        kept = [r for r in recs if r[name_idx] in logs or r[name_idx + 1] in logs]
+        def _Listed(r):
+            return r[name_idx] in logs or r[name_idx + 1] in logs
 
-        if kept:
+        if label_idx is None:
 
-            return kept
+            groups = {None: recs}
 
-        print('    Note: observation_log_array names no observation log with %s data — all logs used (%s)' % (
-            what, ', '.join(sorted({str(r[name_idx]) for r in recs}))))
+        else:
 
-        return recs
+            groups = {}
+
+            for r in recs:
+                groups.setdefault(r[label_idx], []).append(r)
+
+        kept, unlisted = [], []
+
+        for key, group in groups.items():
+
+            listed = [r for r in group if _Listed(r)]
+
+            kept += listed or group
+
+            if not listed:
+                unlisted.append((key, group))
+
+        if len(unlisted) == len(groups):   # none of the listed logs holds this kind of data: one note
+
+            unlisted = [(None, recs)]
+
+        for key, group in unlisted:
+
+            label = '' if key is None else ' for %s' % (label_D or {}).get(key, key)
+
+            print('    Note: observation_log_array names no observation log with %s data%s — all its logs used (%s)' % (
+                what, label, ', '.join(sorted({str(r[name_idx]) for r in group}))))
+
+        return kept
 
     def _Single_observation_log(self, log_df, keys, what):
         '''True if every group of keys (e.g. sample_id, or sample_id + label) comes from one observation log.
@@ -1110,7 +1140,7 @@ class Process_select(Get_schema_table):
                 return None
 
             recs = self._Restrict_observation_logs(self.pg_ai4sh_C._Retrieve_measurements_for_scope(
-                scope_D, list(label_D), self.pg_session_C), 5, 'indicator/covariate')
+                scope_D, list(label_D), self.pg_session_C), 5, 'indicator/covariate', 1, label_D)
 
             if recs:
 
@@ -1149,9 +1179,16 @@ class Process_select(Get_schema_table):
 
             label_D = {f['id']: f['label'] for f in classes}
 
-            recs = self.pg_ai4sh_C._Retrieve_classifications_for_scope(scope_D, list(label_D), self.pg_session_C)
+            recs = self._Restrict_observation_logs(self.pg_ai4sh_C._Retrieve_classifications_for_scope(
+                scope_D, list(label_D), self.pg_session_C), 4, 'class', 1, label_D)
 
             if recs:
+
+                log_df = pd.DataFrame([(r[0], label_D[r[1]], r[3], r[4], r[5]) for r in recs],
+                                      columns=['sample_id', 'label', 'log_id', 'log_name', 'log_tag'])
+
+                if not self._Single_observation_log(log_df, ['sample_id', 'label'], 'sample/class pairs'):
+                    return None
 
                 class_df = pd.DataFrame([(r[0], label_D[r[1]], r[2]) for r in recs], columns=['sample_id', 'label', 'value'])
 

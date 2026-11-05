@@ -1117,13 +1117,15 @@ class PG_manage_AI4SH:
         return pg_session_C._Execute_search_all_sql(sql, [list(indicator_ids)] + params + log_params) or []
 
     def _Retrieve_classifications_for_scope(self, scope_D, indicator_ids, pg_session_C):
-        '''Return (sample_id, indicator_id, class_name) for nominal (class) indicators of samples in scope.'''
+        '''Return (sample_id, indicator_id, class_name, observation_log_id, observation_log_name,
+        observation_log_tag) for nominal (class) indicators of samples in scope.'''
 
         scope_sql, params = self._Scope_sql(scope_D)
 
-        sql = 'SELECT OO.sample_id, OOC.indicator_id, OUNC.name \
+        sql = 'SELECT OO.sample_id, OOC.indicator_id, OUNC.name, OOL.id, OOL.name, OOL.tag \
             FROM observation.observation_classification AS OOC \
             INNER JOIN observation.observation AS OO ON OOC.observation_id = OO.id \
+            INNER JOIN observation.observation_log AS OOL ON OO.observation_log_id = OOL.id \
             INNER JOIN observation_utility.nominal_classification AS OUNC ON OUNC.id = OOC.value_id \
             WHERE OOC.indicator_id = ANY(%%s) AND OO.sample_id IN (%s);' % scope_sql
 
