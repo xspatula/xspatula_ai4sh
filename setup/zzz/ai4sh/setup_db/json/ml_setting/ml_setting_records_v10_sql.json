@@ -1201,149 +1201,6 @@
             ],
             [
               "plot_layout",
-              "modelplot",
-              "preset",
-              "setup",
-              "Plot layout modelplot (not yet used by the code).",
-              {
-                "modelPlot": {
-                  "apply": true,
-                  "tightLayout": false,
-                  "singles": {
-                    "apply": true,
-                    "figSize": {
-                      "x": 0,
-                      "y": 0,
-                      "xadd": 0.25,
-                      "yadd": 0.25
-                    },
-                    "screenShow": false,
-                    "savePng": true
-                  },
-                  "rows": {
-                    "apply": true,
-                    "subFigSize": {
-                      "x": 3,
-                      "y": 3,
-                      "xadd": 0.1,
-                      "yadd": 0.1
-                    },
-                    "screenShow": false,
-                    "savePng": true,
-                    "targetFeatures": {
-                      "apply": true,
-                      "figSize": {
-                        "x": 0,
-                        "y": 0,
-                        "xadd": 0,
-                        "yadd": 0
-                      },
-                      "hwspace": {
-                        "hspace": 0.25,
-                        "wspace": 0.25
-                      },
-                      "columns": [
-                        "permutationImportance",
-                        "treeBasedImportance",
-                        "featureImportance",
-                        "trainTest"
-                      ]
-                    },
-                    "regressionModels": {
-                      "apply": true,
-                      "figSize": {
-                        "x": 0,
-                        "y": 0,
-                        "xadd": 0.25,
-                        "yadd": 0.25
-                      },
-                      "hwspace": {
-                        "hspace": 0.25,
-                        "wspace": 0.25
-                      },
-                      "columns": [
-                        "permutationImportance",
-                        "treeBasedImportance",
-                        "trainTest"
-                      ]
-                    }
-                  }
-                }
-              },
-              "822771f21dd9806253a1cbb39cbbfa53c055c9e68bd1aadfc83f6c80d90db1de"
-            ],
-            [
-              "plot_layout",
-              "modelplotlayout",
-              "preset",
-              "setup",
-              "Plot layout modelplotlayout (not yet used by the code).",
-              {
-                "modelPlotLayout": {
-                  "tightLayout": false,
-                  "singles": {
-                    "apply": true,
-                    "figSize": {
-                      "x": 0,
-                      "y": 0,
-                      "xadd": 0.25,
-                      "yadd": 0.25
-                    },
-                    "screenShow": false,
-                    "savePng": true
-                  },
-                  "rows": {
-                    "apply": true,
-                    "subFigSize": {
-                      "x": 3,
-                      "y": 3,
-                      "xadd": 0.1,
-                      "yadd": 0.1
-                    },
-                    "screenShow": false,
-                    "savePng": true,
-                    "targetFeatures": {
-                      "apply": true,
-                      "figSize": {
-                        "x": 0,
-                        "y": 0,
-                        "xadd": 0,
-                        "yadd": 0
-                      },
-                      "hwspace": {
-                        "hspace": 0.25,
-                        "wspace": 0.25
-                      },
-                      "columns": [
-                        "permutationImportance",
-                        "featureImportance",
-                        "trainTest"
-                      ]
-                    },
-                    "regressionModels": {
-                      "apply": true,
-                      "figSize": {
-                        "x": 0,
-                        "y": 0,
-                        "xadd": 0.25,
-                        "yadd": 0.25
-                      },
-                      "hwspace": {
-                        "hspace": 0.25,
-                        "wspace": 0.25
-                      },
-                      "columns": [
-                        "permutationImportance",
-                        "trainTest"
-                      ]
-                    }
-                  }
-                }
-              },
-              "93923e99eee7553ba64c16ee4c098158db9d20905005c6077a700adaebf5805e"
-            ],
-            [
-              "plot_layout",
               "outliersplotlayout",
               "preset",
               "setup",
@@ -1411,6 +1268,146 @@
                 }
               },
               "9c4ece07608682e233a3f63e924f38efde1258fb6414d9a00277395b12d9e64a"
+            ],
+            [
+              "plot_layout",
+              "scatter-1",
+              "preset",
+              "setup",
+              "Observed/predicted scatter, 1 per row; one row per indicator (with one regressor the indicators flow, 1 per row). One grid at the end of the run.",
+              {
+                "columns": [
+                  "scatter"
+                ],
+                "wrap": 1,
+                "group_by": "indicator",
+                "draw": "run",
+                "panel_size": [
+                  3,
+                  3
+                ],
+                "max_units_per_row": 4,
+                "importance_width": 2,
+                "max_permutation_bars": 6
+              },
+              "5cd84abb24cca3810d53c0fa32c2d343f3123626dad6815e755e116c03006334"
+            ],
+            [
+              "plot_layout",
+              "scatter-2",
+              "preset",
+              "setup",
+              "Observed/predicted scatter, 2 per row; one row per indicator (with one regressor the indicators flow, 2 per row). One grid at the end of the run.",
+              {
+                "columns": [
+                  "scatter"
+                ],
+                "wrap": 2,
+                "group_by": "indicator",
+                "draw": "run",
+                "panel_size": [
+                  3,
+                  3
+                ],
+                "max_units_per_row": 4,
+                "importance_width": 2,
+                "max_permutation_bars": 6
+              },
+              "0980c90809c63d0ed9a0d44618ad081fb45acb95460f151cd08d0b4621894b6d"
+            ],
+            [
+              "plot_layout",
+              "scatter-3",
+              "preset",
+              "setup",
+              "Observed/predicted scatter, 3 per row; one row per indicator (with one regressor the indicators flow, 3 per row). One grid at the end of the run.",
+              {
+                "columns": [
+                  "scatter"
+                ],
+                "wrap": 3,
+                "group_by": "indicator",
+                "draw": "run",
+                "panel_size": [
+                  3,
+                  3
+                ],
+                "max_units_per_row": 4,
+                "importance_width": 2,
+                "max_permutation_bars": 6
+              },
+              "3c6d5263cabf091b7a9f4f246f753ebe217487b7f4608448bbb5d14d4ff2d161"
+            ],
+            [
+              "plot_layout",
+              "scatter-4",
+              "preset",
+              "setup",
+              "Observed/predicted scatter, 4 per row; one row per indicator (with one regressor the indicators flow, 4 per row). One grid at the end of the run.",
+              {
+                "columns": [
+                  "scatter"
+                ],
+                "wrap": 4,
+                "group_by": "indicator",
+                "draw": "run",
+                "panel_size": [
+                  3,
+                  3
+                ],
+                "max_units_per_row": 4,
+                "importance_width": 2,
+                "max_permutation_bars": 6
+              },
+              "e86575389a466c633702e0636ba0af52df163fa32557160c70bc34b049c22d01"
+            ],
+            [
+              "plot_layout",
+              "scatter-tt-kf",
+              "preset",
+              "setup",
+              "Observed/predicted scatter, train/test and k-fold side by side; one row per indicator and regressor. One grid at the end of the run.",
+              {
+                "columns": [
+                  "scatter"
+                ],
+                "wrap": 0,
+                "group_by": "indicator",
+                "draw": "run",
+                "panel_size": [
+                  3,
+                  3
+                ],
+                "max_units_per_row": 4,
+                "importance_width": 2,
+                "max_permutation_bars": 6
+              },
+              "250e57d3e5b981bed640be12c77f2070effed3f6f31ebfb63c6f417bb406e755"
+            ],
+            [
+              "plot_layout",
+              "importance",
+              "preset",
+              "setup",
+              "Scatter, feature importance (2 wide) and permutation importance (top 6) per indicator and regressor; train/test and k-fold on separate rows when wider than 4 units. One grid per indicator.",
+              {
+                "columns": [
+                  "scatter",
+                  "importance",
+                  "permutation"
+                ],
+                "wrap": 0,
+                "group_by": "indicator",
+                "draw": "indicator",
+                "panel_size": [
+                  3,
+                  3
+                ],
+                "max_units_per_row": 4,
+                "importance_width": 2,
+                "max_permutation_bars": 6
+              },
+              "4f63b75d31b6f19fdf3700ec8f52888776e57bf8df5f4a2e0a474a989d0d8997"
             ]
           ]
         }
@@ -1502,6 +1499,31 @@
                 }
               },
               "4601c7ceeb5f58f7022f7ac2d6ec4deb9892659cc81310926ce03009635a8b2e"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "process_id": "table_insert",
+      "overwrite": false,
+      "delete": true,
+      "parameters": {
+        "schema": "ml_setting",
+        "table": "parameter_set",
+        "command": {
+          "columns": [
+            "family",
+            "name"
+          ],
+          "values": [
+            [
+              "plot_layout",
+              "modelplot"
+            ],
+            [
+              "plot_layout",
+              "modelplotlayout"
             ]
           ]
         }
