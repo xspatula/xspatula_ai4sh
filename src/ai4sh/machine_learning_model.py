@@ -44,7 +44,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.base import BaseEstimator, RegressorMixin, clone
-from sklearn.model_selection import cross_val_predict, cross_val_score
+from sklearn.model_selection import KFold, cross_val_predict, cross_val_score
 from sklearn.inspection import permutation_importance as sk_permutation_importance
 from sklearn.metrics import (mean_squared_error, r2_score, mean_absolute_error,
                               mean_absolute_percentage_error, median_absolute_error)
@@ -143,6 +143,29 @@ def _feature_importance(model, key, feature_names=None):
 
 
 # ------------------------------------------------------------------ plot helpers
+
+class _Pooled_permutation:
+    '''Permutation importances (features × repeats) pooled over folds, with mean and std like sklearn's result.'''
+
+    def __init__(self, importances):
+        self.importances      = importances
+        self.importances_mean = importances.mean(axis=1)
+        self.importances_std  = importances.std(axis=1)
+
+
+def _Permutation_out_of_fold(make_model, X, y, folds, features):
+    '''Permutation importance on held-out samples: in every fold (the folds of cross_val_predict) a model fitted on
+    the other folds is permuted on the fold; the repeats of all folds are pooled. None if a fold ends with other
+    features than the model on all samples (e.g. a band selection step that selects per fold).'''
+    parts = []
+    for tr, te in KFold(folds).split(X):
+        tail = _Fitted_tail(make_model().fit(X.iloc[tr], y[tr]))
+        if list(tail.Features(X.iloc[te])) != list(features):
+            return None
+        parts.append(sk_permutation_importance(tail, tail.Preprocess(X.iloc[te]), y[te], scoring='r2',
+                                               n_repeats=10, random_state=42).importances)
+    return _Pooled_permutation(np.concatenate(parts, axis=1))
+
 
 def _save_permutation_data(pi_result, wavelengths, model_key, indicator, mode_label, out_dir):
     means = pi_result.importances_mean
@@ -590,14 +613,12 @@ class Process_regression_model(Get_schema_table):
         plot_dir_kf   = os.path.join(project_root_fp, 'plot',                stem + cov_tag + '_kf')
         cov_dir_tt    = os.path.join(project_root_fp, 'covariate_importance', stem + cov_tag + '_tt')
         cov_dir_kf    = os.path.join(project_root_fp, 'covariate_importance', stem + cov_tag + '_kf')
-        if traintest:
-            os.makedirs(models_dir_tt, exist_ok=True)
-            os.makedirs(plot_dir_tt,   exist_ok=True)
-            os.makedirs(cov_dir_tt,    exist_ok=True)
-        if do_kfold:
-            os.makedirs(models_dir_kf, exist_ok=True)
-            os.makedirs(plot_dir_kf,   exist_ok=True)
-            os.makedirs(cov_dir_kf,    exist_ok=True)
+        # Folders of what is saved (plot folders are made by _handle_fig when a plot is saved)
+        for on, models_dir, cov_dir in ((traintest, models_dir_tt, cov_dir_tt), (do_kfold, models_dir_kf, cov_dir_kf)):
+            if on and not importance_only:
+                os.makedirs(models_dir, exist_ok=True)
+            if on and save_perm:
+                os.makedirs(cov_dir, exist_ok=True)
 
         def _ind_safe(ind):
             return ind.replace(' ', '-').replace('/', '-')
@@ -828,7 +849,8 @@ class Process_regression_model(Get_schema_table):
                                os.path.join(plot_dir_tt, 'permutation_%s_%s_tt.png' % (ind_s, model_key)),
                                indicator=indicator, regressor=model_key, means=pi.importances_mean,
                                stds=pi.importances_std, features=feat_wl, color=ind_color)
-                        _save_permutation_data(pi, feat_wl, model_key, indicator, 'tt', cov_dir_tt)
+                        if save_perm:
+                            _save_permutation_data(pi, feat_wl, model_key, indicator, 'tt', cov_dir_tt)
 
                     if importance_only:
                         if self.verbose >= 1:
@@ -896,20 +918,28 @@ class Process_regression_model(Get_schema_table):
                                    color=ind_color)
 
                     if (show_perm or save_perm) and model_key.lower() != 'cubist':
+                        # On held-out samples, fold by fold (on the training samples it overrates the features
+                        # the model overfits)
                         feat_wl = tail.Features(X)
-                        pi = sk_permutation_importance(
-                            tail, tail.Preprocess(X), y, scoring='r2', n_repeats=10, random_state=42)
+                        pi = _Permutation_out_of_fold(lambda: _make_model(model_proto), X, y, folds, feat_wl)
+                        if pi is None:
+                            print('        ⚠️  %s %s [kf]: the folds select different features — permutation '
+                                  'importance on the training samples' % (indicator, model_key))
+                            pi = sk_permutation_importance(
+                                tail, tail.Preprocess(X), y, scoring='r2', n_repeats=10, random_state=42)
                         _Panel('permutation', 'kf', show_perm, save_perm,
                                lambda: Plot_permutation(pi, feat_wl, model_key, indicator, 'kf',
                                                         color=ind_color, max_cov=max_cov),
                                os.path.join(plot_dir_kf, 'permutation_%s_%s_kf.png' % (ind_s, model_key)),
                                indicator=indicator, regressor=model_key, means=pi.importances_mean,
                                stds=pi.importances_std, features=feat_wl, color=ind_color)
-                        _save_permutation_data(pi, feat_wl, model_key, indicator, 'kf', cov_dir_kf)
+                        if save_perm:
+                            _save_permutation_data(pi, feat_wl, model_key, indicator, 'kf', cov_dir_kf)
 
                     if importance_only:
                         if self.verbose >= 1:
-                            print('        [kf] importance mapped (fitted and permuted on all %d samples)' % len(y))
+                            print('        [kf] importance mapped (fitted on all %d samples, permuted per held-out fold)'
+                                  % len(y))
                     else:
                         results_D[indicator].setdefault('kfold', {})[model_key] = metrics_kf
                         if self.verbose >= 1:
@@ -923,7 +953,10 @@ class Process_regression_model(Get_schema_table):
             _Draw_grid(grid_panels, indicator_cols, '')
 
         if importance_only:
-            print('    importance_only: importance plots and permutation data saved, no models or results')
+            saved = [what for what, on in (('feature importance plots', save_feat),
+                                           ('permutation importance plots and data', save_perm)) if on]
+            print('    importance_only: %s; no models or results' % (
+                'saved %s' % ' and '.join(saved) if saved else 'shown only, nothing saved'))
             return
 
         if results_D:
