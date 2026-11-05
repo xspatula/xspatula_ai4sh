@@ -1,0 +1,6 @@
+{
+  "columns": ["importance_kf", "permutation_kf", "scatter_kf"],
+  "group_by": "indicator",
+  "draw": "run",
+  "max_permutation_bars": 6
+}

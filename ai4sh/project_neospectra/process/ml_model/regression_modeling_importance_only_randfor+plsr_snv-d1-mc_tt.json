@@ -1,0 +1,57 @@
+{
+  "process": [
+    {
+      "process": "regression_modeling",
+      "overwrite": true,
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/compiled/neospectra_10nm_olif_texture",
+        "dataframe": "neospectra_10nm_olif_texture.snv.d1.mc",
+        "covariate_array": [
+          "soil texture usda"
+        ],
+        "class_grouping": [
+          {
+            "covariate": "soil texture usda",
+            "groups": [
+              [
+                "sand",
+                "loamy sand",
+                "sandy loam"
+              ],
+              [
+                "loam",
+                "silt loam",
+                "silt",
+                "sandy clay loam"
+              ],
+              [
+                "clay loam",
+                "silty clay loam",
+                "sandy clay",
+                "silty clay",
+                "clay"
+              ]
+            ]
+          }
+        ],
+        "model_parameters_fp": "./project_neospectra/regressors/regression_model_parameters_tuned.json",
+        "indicator_array": [
+          "c-org",
+          "n-tot",
+          "clay"
+        ],
+        "regressor_array": [
+          "plsr",
+          "randfor"
+        ],
+        "traintest": true,
+        "test_size": 0.3,
+        "kfold": false,
+        "importance_only": true,
+        "show_feature_importance": true,
+        "show_permutation_importance": true,
+        "plot_layout": "default"
+      }
+    }
+  ]
+}
