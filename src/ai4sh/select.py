@@ -1358,11 +1358,11 @@ class Process_select(Get_schema_table):
             if not self._Confirm_missing(not_found, 'indicator/covariate'):
                 return
 
-        # A compiled dataset is indicators + spectra and/or covariates
-        if role == 'compiled' and (not indicators or not (spectra_D or covariates)):
+        # A compiled dataset is spectra and/or covariates, with indicators for modeling, without for prediction
+        if role == 'compiled' and not (spectra_D or covariates):
 
-            print('    ❌ ERROR: %s requires indicators (indicator_array) and spectra (spectra_provision) and/or '
-                  'covariates (covariate_array)' % self.process_S.process.process)
+            print('    ❌ ERROR: %s requires spectra (spectra_provision) and/or covariates (covariate_array), and '
+                  'indicators (indicator_array) for a dataset to model on' % self.process_S.process.process)
 
             return
 
@@ -1516,12 +1516,15 @@ class Process_select(Get_schema_table):
 
             covariate_cols = [c for c in feature_labels_D.get('covariate', []) if df[c].notna().any()]
 
-            if not indicator_cols or not (wl_col_names or covariate_cols):
+            if not (wl_col_names or covariate_cols):
 
-                print('    ❌ ERROR: no %s with data for the samples in scope — nothing saved' % (
-                    'indicators' if not indicator_cols else 'covariates'))
+                print('    ❌ ERROR: no spectra or covariates with data for the samples in scope — nothing saved')
 
                 return
+
+            if not indicator_cols:
+
+                print('    ⚠️  no indicators — saved as a dataset for prediction (purpose: prediction), not for modeling')
 
         # ---- 5. Save ----
         os.makedirs(out_dir, exist_ok=True)
@@ -1577,6 +1580,8 @@ class Process_select(Get_schema_table):
                                          'spectra': list(wl_col_names)}
 
             params_D['inputs'] = [{'file': '', 'source': 'database', 'role': 'compiled', 'n_samples': len(df)}]
+
+            params_D['purpose'] = 'modeling' if indicator_cols else 'prediction'
 
         Dump_json(params_fpn, params_D, verbose=self.verbose)
 
@@ -1764,15 +1769,20 @@ class Process_select(Get_schema_table):
 
         blocks = params_D['column_blocks']
 
-        if not blocks['indicator'] or not (blocks['spectra'] or blocks['covariate']):
+        if not (blocks['spectra'] or blocks['covariate']):
 
-            print('    ❌ ERROR: a compiled dataset needs indicators and spectra and/or covariates; the inputs give '
-                  '%d indicator(s), %d band(s), %d covariate(s) — nothing saved' % (
+            print('    ❌ ERROR: a compiled dataset needs spectra and/or covariates (and indicators to model on); the '
+                  'inputs give %d indicator(s), %d band(s), %d covariate(s) — nothing saved' % (
                       len(blocks['indicator']), len(blocks['spectra']), len(blocks['covariate'])))
 
             return
 
-        params_D.update({'role': 'compiled', 'output_name': output_name, 'inputs': inputs_L, 'n_samples': len(df)})
+        if not blocks['indicator']:
+
+            print('    ⚠️  no indicators — saved as a dataset for prediction (purpose: prediction), not for modeling')
+
+        params_D.update({'role': 'compiled', 'output_name': output_name, 'inputs': inputs_L, 'n_samples': len(df),
+                         'purpose': 'modeling' if blocks['indicator'] else 'prediction'})
 
         os.makedirs(out_dir, exist_ok=True)
 

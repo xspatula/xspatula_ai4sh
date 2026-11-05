@@ -17,7 +17,7 @@
         "process": "compile_dataset",
         "min_user_stratum": 1,
         "title": "Compile a dataset from selected subsets",
-        "label": "Join saved selections (spectra, indicator and covariate Parquet files) on sample_id into one dataset, keeping only samples present in all inputs. The output folder can be used as project_root_fp in the machine learning processes."
+        "label": "Join saved selections (spectra, indicator and covariate Parquet files) on sample_id into one dataset, keeping only samples present in all inputs. The output folder can be used as project_root_fp in the machine learning processes. Spectra and/or covariates are required; without indicators the dataset is for prediction only."
       },
       "nodes": [
         {

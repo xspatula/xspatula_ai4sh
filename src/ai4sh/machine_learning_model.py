@@ -529,7 +529,9 @@ class Process_regression_model(Get_schema_table):
             dataset_cov = set(_Companion_covariates(companion))
             indicator_cols = [c for c in all_indicators if c not in dataset_cov]
         if not indicator_cols:
-            print('    ERROR: no valid indicator columns.')
+            print('    ERROR: no valid indicator columns.%s' % (
+                ' %s is a dataset for prediction (compiled without indicators).' % stem
+                if companion.get('purpose') == 'prediction' else ''))
             return
 
         # Settings: parameter set name (ml_setting), "default", "none" or a JSON path relative to the project root
