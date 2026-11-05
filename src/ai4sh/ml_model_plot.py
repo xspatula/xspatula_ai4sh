@@ -58,6 +58,15 @@ LAYOUT_DEFAULTS = {
 
 # ------------------------------------------------------------------ panels drawn into given axes
 
+def _Feature_axis_label(features):
+    '''Wavelength (nm) for bands; Component for the numbered components of a decomposition (PCA), which come out
+    of the preprocessing as small integers (1, 2, …) — wavelengths are hundreds of nm.'''
+    numeric = [f for f in features if not isinstance(f, str)]
+    if numeric and max(float(f) for f in numeric) < 100:
+        return 'Component'
+    return 'Wavelength (nm)'
+
+
 def Draw_scatter(ax, obs, pred, model_key, indicator, mode_label, metrics, regr_sym_D, tgt_sym_D, compact=False):
     sym    = regr_sym_D.get(model_key, {})
     marker = sym.get('marker', 'o')
@@ -117,7 +126,7 @@ def Draw_importance(ax, ax_cv, importances, wavelengths, model_key, indicator, l
     if len(wl_arr):
         bar_w = max(1, (wl_arr[1] - wl_arr[0]) * 0.8) if len(wl_arr) > 1 else 5
         ax.bar(wl_arr, spec_imp, width=bar_w, color=color, alpha=0.75)
-    ax.set_xlabel('Wavelength (nm)', fontsize=fs)
+    ax.set_xlabel(_Feature_axis_label(wavelengths), fontsize=fs)
     ax.set_ylabel('Importance', fontsize=fs)
     if compact:
         ax.tick_params(labelsize=7)
@@ -153,7 +162,8 @@ def Draw_permutation(ax, means, stds, wavelengths, model_key, indicator, mode_la
 
     fs = 7 if compact else None
     ax.set_xlabel('Mean decrease in score', fontsize=fs)
-    ax.set_ylabel('Feature' if any(isinstance(w, str) for w in sorted_wl) else 'Wavelength (nm)', fontsize=fs)
+    ax.set_ylabel('Feature' if any(isinstance(w, str) for w in sorted_wl) else _Feature_axis_label(sorted_wl),
+                  fontsize=fs)
     if compact:
         ax.tick_params(axis='x', labelsize=7)
         ax.set_title('Permutation [%s]: %s — %s' % (mode_label, model_key, indicator), fontsize=9)
