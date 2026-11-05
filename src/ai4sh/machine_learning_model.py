@@ -626,7 +626,8 @@ class Process_regression_model(Get_schema_table):
             print('    ERROR: %s' % e)
             return
         if layout is not None and self.verbose >= 1:
-            print('    Plot layout: %s (grid drawn per %s)' % (layout['name'], layout['draw']))
+            print('    Plot layout: %s%s (grid drawn per %s)' % (
+                layout['name'], ' on %s' % layout['base'] if layout.get('base') else '', layout['draw']))
         grid_panels = []
 
         def _Panel(ptype, mode, shown, save, make_fig, fp, **data):

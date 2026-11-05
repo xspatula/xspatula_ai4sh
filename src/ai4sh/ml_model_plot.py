@@ -11,7 +11,7 @@ A plot layout (parameter set content, or a user's JSON file of the same shape):
 
     {
       "columns": ["scatter", "importance", "permutation"],   panel types of one row, in order
-      "wrap": 0,                       0: one row per indicator × regressor; n > 0: panels flow, n per row
+      "wrap": 0,                       0: one row per indicator × regressor; n > 0: panels flow, n units per row
       "group_by": "indicator",         indicator | regressor — the outer loop of the rows
       "draw": "indicator",             indicator: a grid per indicator, as soon as it is done; run: one grid at the end
       "panel_size": [3, 3],            inches of one panel unit
@@ -20,12 +20,19 @@ A plot layout (parameter set content, or a user's JSON file of the same shape):
       "max_permutation_bars": 6        the most important features shown in a permutation panel
     }
 
+Widths are in units: a scatter or permutation panel is 1 unit, a feature importance panel importance_width units
+(2: so wrap 4 fits two importance panels, or one importance + two others, per row).
+
+A file only needs the keys it changes. Optional "base": a preset name (e.g. "importance") the other keys change. A
+file without "base" and without "columns"/"wrap" changes the preset "default" would pick; a file with "columns" or
+"wrap" but no "base" starts from the built-in defaults above.
+
 Panel types: scatter, importance, permutation (every mode run) or with the mode: scatter_tt, scatter_kf,
 importance_tt, … When every column is a bare type, the row is ordered mode by mode (all train/test panels, then
 the k-fold panels); otherwise the columns are taken as listed.
 
 wrap > 0 (the scatter-<n> presets): a new indicator starts a new row, unless there is only one regressor; then the
-indicators flow, n per row (group_by regressor: the same with regressors and indicators swapped).
+indicators flow, n units per row (group_by regressor: the same with regressors and indicators swapped).
 
 "default" picks a preset from the process settings (Default_layout_name); "none" shows the single figures.
 '''
@@ -57,6 +64,29 @@ LAYOUT_DEFAULTS = {
 
 
 # ------------------------------------------------------------------ panels drawn into given axes
+
+def _Covariate_labels(features):
+    '''Short tick labels for covariate features ("cv:<covariate>=<class>[|<class>…]" for one-hot classes, "cv:<name>"
+    for numeric covariates): a group of classes shows its first class and the number of others ("clay loam +4"). With
+    one nominal covariate its name is returned apart (for the title) and left out of the labels.
+    Returns (labels for every feature, common covariate name or '').'''
+    names = [f[len('cv:'):] if f.startswith('cv:') else f for f in features if isinstance(f, str)]
+    covs = {n.partition('=')[0] for n in names if '=' in n}
+    common = covs.pop() if len(covs) == 1 and all('=' in n for n in names) else ''
+    labels = []
+    for f in features:
+        if not isinstance(f, str):
+            labels.append(str(f))
+            continue
+        n = f[len('cv:'):] if f.startswith('cv:') else f
+        cov, eq, cls = n.partition('=')
+        if eq:
+            classes = cls.split('|')
+            cls = classes[0] + (' +%d' % (len(classes) - 1) if len(classes) > 1 else '')
+            n = cls if common else '%s=%s' % (cov, cls)
+        labels.append(n)
+    return labels, common
+
 
 def _Feature_axis_label(features):
     '''Wavelength (nm) for bands; Component for the numbered components of a decomposition (PCA), which come out
@@ -114,12 +144,12 @@ def Draw_importance(ax, ax_cv, importances, wavelengths, model_key, indicator, l
     fs = 7 if compact else None
 
     if ax_cv is not None and is_cov.any():
-        cv_names = [w[len('cv:'):] for w in wavelengths if isinstance(w, str)]
+        cv_names, common = _Covariate_labels([w for w in wavelengths if isinstance(w, str)])
         ax_cv.barh(range(len(cv_names)), imp_arr[is_cov], color=color, alpha=0.75)
         ax_cv.set_yticks(range(len(cv_names)))
         ax_cv.set_yticklabels(cv_names, fontsize=7)
         ax_cv.set_xlabel('Importance', fontsize=fs)
-        ax_cv.set_title('Covariates', fontsize=9)
+        ax_cv.set_title(common or 'Covariates', fontsize=8 if compact else 9)
         if compact:
             ax_cv.tick_params(axis='x', labelsize=7)
 
@@ -156,7 +186,8 @@ def Draw_permutation(ax, means, stds, wavelengths, model_key, indicator, mode_la
 
     if n_bars <= 40:
         ax.set_yticks(range(n_bars))
-        ax.set_yticklabels([str(w) for w in sorted_wl], fontsize=7)
+        ax.set_yticklabels(_Covariate_labels(sorted_wl)[0] if any(isinstance(w, str) for w in sorted_wl)
+                           else [str(w) for w in sorted_wl], fontsize=7)
     else:
         ax.set_yticks([])
 
@@ -215,17 +246,27 @@ def Default_layout_name(show_scatter, show_feat, show_perm, modes, n_indicators,
     return 'scatter-%d' % max(1, min(4, n))
 
 
-def Layout_content(raw, name):
-    '''The layout in raw (a parameter set's content, or the fallback file holding every preset by name), completed
-    with the defaults and checked. Raises ValueError.'''
+_LAYOUT_KEYS = set(LAYOUT_DEFAULTS) | {'base'}
+
+
+def _Layout_raw(raw, name):
+    '''The layout keys of raw: a parameter set's content or a user's file, or from the fallback file holding every
+    preset by name the one called name. Raises ValueError.'''
     if not isinstance(raw, dict):
         raise ValueError('plot layout "%s" is not a JSON object' % name)
-    if 'columns' not in raw and 'wrap' not in raw:
-        key = os.path.splitext(os.path.basename(str(name)))[0].lower()
-        if not isinstance(raw.get(key), dict):
-            raise ValueError('plot layout "%s" not found (no "columns" in it)' % name)
-        raw = raw[key]
-    layout = dict(LAYOUT_DEFAULTS, **raw)
+    if set(raw) & _LAYOUT_KEYS:
+        return raw
+    key = os.path.splitext(os.path.basename(str(name)))[0].lower()
+    if not isinstance(raw.get(key), dict):
+        raise ValueError('plot layout "%s" not found (no layout keys in it: %s)' % (name, ', '.join(sorted(_LAYOUT_KEYS))))
+    return raw[key]
+
+
+def Layout_content(raw, name, base=None):
+    '''The layout raw (see _Layout_raw) on top of base (a completed layout) or the built-in defaults, checked.
+    Raises ValueError.'''
+    raw = _Layout_raw(raw, name)
+    layout = dict(base or LAYOUT_DEFAULTS, **{k: v for k, v in raw.items() if k != 'base'})
 
     columns = layout['columns']
     if isinstance(columns, str):
@@ -258,17 +299,31 @@ def Load_layout(param, default_name, default_fpn, resolve_path, verbose=1):
     name = default_name if s.lower() == 'default' else s
     if name is None:
         return None
+    raw = _Layout_raw(_Load_layout_raw(name, default_fpn, resolve_path, verbose), name)
+
+    # A partial layout changes a preset: the one named by "base", else the one "default" picks
+    base_name = raw.get('base') or (default_name if 'columns' not in raw and 'wrap' not in raw else None)
+    base = None
+    if base_name:
+        base = Layout_content(_Load_layout_raw(base_name, default_fpn, resolve_path, verbose), base_name)
+    layout = Layout_content(raw, name, base)
+    if base_name:
+        layout['base'] = base_name
+    return layout
+
+
+def _Load_layout_raw(name, default_fpn, resolve_path, verbose):
+    '''The content of the layout parameter set or file name; a preset missing from the database is taken from the
+    fallback file.'''
     try:
-        raw = Load_settings('plot_layout', name, default_fpn, name, resolve_path, verbose)
+        return Load_settings('plot_layout', name, default_fpn, name, resolve_path, verbose)
     except ValueError:
         if os.path.exists(default_fpn) and name.lower() in Load_settings('plot_layout', default_fpn):
             if verbose >= 1:
                 print('    ⚠️  plot layout "%s" not in ml_setting.parameter_set (rerun setup_db) — taken from %s'
                       % (name, os.path.basename(default_fpn)))
-            raw = Load_settings('plot_layout', default_fpn)
-        else:
-            raise
-    return Layout_content(raw, name)
+            return Load_settings('plot_layout', default_fpn)
+        raise
 
 
 def In_layout(layout, ptype, mode):
