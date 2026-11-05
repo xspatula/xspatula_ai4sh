@@ -154,11 +154,13 @@ def _normalize_params_to_companion(d):
 
 def _Default_indicators(parquet_fp, numeric_cols, verbose=0, named=()):
     '''Columns an indicator step processes when indicator_array is empty: the numeric non-spectral columns minus the
-    covariates of a compiled dataset (column_blocks in the companion JSON, inherited by derived files). A covariate
-    named in indicator_array, or in named (e.g. the data_range of indicator_range), is processed.'''
+    covariates of the dataset (column_blocks of a compiled dataset, else covariate_array of a selection with role all;
+    inherited by derived files). A covariate named in indicator_array, or in named (e.g. the data_range of
+    indicator_range), is processed.'''
     companion = _load_companion_json(os.path.dirname(parquet_fp),
                                      os.path.splitext(os.path.basename(parquet_fp))[0]) or {}
-    covariates = set((companion.get('column_blocks') or {}).get('covariate') or []) - set(named)
+    covariates = set((companion.get('column_blocks') or {}).get('covariate') or companion.get('covariate_array')
+                     or []) - set(named)
     skipped = [c for c in numeric_cols if c in covariates]
     if skipped and verbose >= 1:
         print('    Covariates not processed (name them in indicator_array to include): %s' % ', '.join(skipped))

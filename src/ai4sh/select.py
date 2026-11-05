@@ -10,7 +10,10 @@ One function (_Select_data) serves all select processes; the process sets the ro
     select_spectra_only    → spectra      spectra only
     select_indicator_only  → indicator    target features (e.g. wetlab indicators)
     select_covariate_only  → covariate    other covariates (e.g. field pH, land cover, eDNA taxa)
-    select_spectra         → all          spectra + indicators (+ covariates) in one file
+    compile_dataset_from_db → compiled    indicators + spectra and/or covariates, saved as a compiled dataset
+                                          ({output_root_fp}/compiled/{output_name}/), the same as compile_dataset
+                                          makes from separate selections (select_spectra and
+                                          select_indicators_spectra_covariates are earlier names of this process)
 
 The kind of data behind an indicator or covariate name is looked up in the database, not set by the
 process: numeric indicators (observation_measurement), nominal indicators (observation_classification)
@@ -68,7 +71,9 @@ SELECT_ROLE_D = {
     'select_spectra_only': 'spectra',
     'select_indicator_only': 'indicator',
     'select_covariate_only': 'covariate',
-    'select_spectra': 'all',
+    'compile_dataset_from_db': 'compiled',
+    'select_indicators_spectra_covariates': 'compiled',   # earlier names of compile_dataset_from_db
+    'select_spectra': 'compiled',
 }
 
 # Key columns in every selected Parquet file; sample_id is the join key as sample names are only
@@ -792,7 +797,11 @@ class Process_select(Get_schema_table):
 
         sub_fp = self._Param('output_sub_fp', 'default')
 
-        if sub_fp in ('', 'default'):
+        if sub_fp in ('', 'default') and role == 'compiled':
+
+            sub_fp = 'compiled'
+
+        elif sub_fp in ('', 'default'):
 
             sub_L = [role]
 
@@ -834,7 +843,8 @@ class Process_select(Get_schema_table):
         if suffix and suffix != 'none':
             output_name += '__%s' % suffix
 
-        out_dir = os.path.join(root_fp, sub_fp)
+        # A compiled dataset gets a folder of its own, ready to use as project_root_fp (as from compile_dataset)
+        out_dir = os.path.join(root_fp, sub_fp, output_name) if role == 'compiled' else os.path.join(root_fp, sub_fp)
 
         return (out_dir, os.path.join(out_dir, '%s.json' % output_name),
                 os.path.join(out_dir, '%s.parquet' % output_name), output_name)
@@ -1287,7 +1297,7 @@ class Process_select(Get_schema_table):
 
         output_signal_type = None
 
-        if role in ('spectra', 'all'):
+        if role == 'spectra' or (role == 'compiled' and self._Param('spectra_provision')):
 
             spectra_D = self._Resolve_spectra()
 
@@ -1314,13 +1324,13 @@ class Process_select(Get_schema_table):
 
         indicators, covariates, not_found = [], [], []
 
-        if role in ('indicator', 'all'):
+        if role in ('indicator', 'compiled'):
 
             indicators, missing = self._Resolve_features(self._Parse_array('indicator_array'))
 
             not_found += missing
 
-        if role in ('covariate', 'all'):
+        if role in ('covariate', 'compiled'):
 
             covariates, missing = self._Resolve_features(self._Parse_array('covariate_array'))
 
@@ -1342,11 +1352,19 @@ class Process_select(Get_schema_table):
 
             print('    ❌ ERROR: not found as indicator or landscape covariate: %s' % not_found)
 
-            if not indicators and not covariates and role != 'all':
+            if not indicators and not covariates and role != 'compiled':
                 return
 
             if not self._Confirm_missing(not_found, 'indicator/covariate'):
                 return
+
+        # A compiled dataset is indicators + spectra and/or covariates
+        if role == 'compiled' and (not indicators or not (spectra_D or covariates)):
+
+            print('    ❌ ERROR: %s requires indicators (indicator_array) and spectra (spectra_provision) and/or '
+                  'covariates (covariate_array)' % self.process_S.process.process)
+
+            return
 
         out_dir, params_fpn, data_fpn, output_name = self._Ml_output_paths(role, scope_D, spectra_D, indicators, covariates)
 
@@ -1465,6 +1483,19 @@ class Process_select(Get_schema_table):
 
             return
 
+        if role == 'compiled':
+
+            indicator_cols = [c for c in feature_labels_D.get('indicator', []) if df[c].notna().any()]
+
+            covariate_cols = [c for c in feature_labels_D.get('covariate', []) if df[c].notna().any()]
+
+            if not indicator_cols or not (wl_col_names or covariate_cols):
+
+                print('    ❌ ERROR: no %s with data for the samples in scope — nothing saved' % (
+                    'indicators' if not indicator_cols else 'covariates'))
+
+                return
+
         # ---- 5. Save ----
         os.makedirs(out_dir, exist_ok=True)
 
@@ -1511,6 +1542,14 @@ class Process_select(Get_schema_table):
                 'output_unit': output_signal_type,
                 'output_wavelengths': [int(w) for w in output_wl],
             })
+
+        if role == 'compiled':
+
+            # The same blocks as from compile_dataset; the model processes read the covariates from here
+            params_D['column_blocks'] = {'indicator': indicator_cols, 'covariate': covariate_cols,
+                                         'spectra': list(wl_col_names)}
+
+            params_D['inputs'] = [{'file': '', 'source': 'database', 'role': 'compiled', 'n_samples': len(df)}]
 
         Dump_json(params_fpn, params_D, verbose=self.verbose)
 
@@ -1695,6 +1734,16 @@ class Process_select(Get_schema_table):
             'covariate': [c for c in params_D.get('covariate_array', []) if c in df.columns],
             'spectra': [c for c in df.columns if Is_band_col(c)],
         }
+
+        blocks = params_D['column_blocks']
+
+        if not blocks['indicator'] or not (blocks['spectra'] or blocks['covariate']):
+
+            print('    ❌ ERROR: a compiled dataset needs indicators and spectra and/or covariates; the inputs give '
+                  '%d indicator(s), %d band(s), %d covariate(s) — nothing saved' % (
+                      len(blocks['indicator']), len(blocks['spectra']), len(blocks['covariate'])))
+
+            return
 
         params_D.update({'role': 'compiled', 'output_name': output_name, 'inputs': inputs_L, 'n_samples': len(df)})
 

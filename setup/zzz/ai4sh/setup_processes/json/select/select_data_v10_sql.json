@@ -14,10 +14,10 @@
       "overwrite": true,
       "parameters": {
         "root_process": "select_data",
-        "process": "select_spectra",
+        "process": "compile_dataset_from_db",
         "min_user_stratum": 1,
-        "title": "Select spectral data subset",
-        "label": "Select spectra, indicators and optionally covariates for the samples in scope in one call and save as one local Parquet file (role all)."
+        "title": "Compile a dataset from the database",
+        "label": "Select indicators plus spectra and/or covariates for the samples in scope in one call and save them as a compiled dataset ({output_root_fp}/compiled/{output_name}/), ready to use as project_root_fp in the machine learning processes."
       },
       "nodes": [
         {
@@ -99,9 +99,9 @@
             {
               "parameter": "spectra_provision",
               "parameter_type": "text",
-              "required": true,
+              "required": false,
               "default_value": "",
-              "hint": "Name, tag or alias of the provision identifying which spectral sensor data to select",
+              "hint": "Optional: the spectra provision (name, tag or alias); leave empty for a dataset of indicators and covariates only",
               "schema_table": {
                 "schema": "observation_utility",
                 "table": "provision",
@@ -379,7 +379,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "default",
-              "hint": "Sub path under output_root_fp, default = all/{spectra provision tag}/{preparation alias}/{scope tag}; scope tag = sampling_log, campaign or dataset tag (most specific given) or sample_select",
+              "hint": "Sub path under output_root_fp, default = compiled; the dataset is saved in {output_root_fp}/{output_sub_fp}/{output_name}/",
               "schema_table": {
                 "schema": "observation",
                 "table": "sample",
@@ -391,7 +391,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "default",
-              "hint": "Name of the Parquet subset, saved as {output_name}.parquet with {output_name}.json; default = {begin}-{end}_{bandwidth}+{indicator aliases}[+{covariate aliases}]_{min_profile}-{max_profile}",
+              "hint": "Name of the compiled dataset (folder, {output_name}.parquet and {output_name}.json); default = [{begin}-{end}_{bandwidth}+]{indicator aliases}[+{covariate aliases}]_{min_profile}-{max_profile}",
               "schema_table": {
                 "schema": "observation",
                 "table": "sample",

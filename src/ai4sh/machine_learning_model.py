@@ -569,9 +569,6 @@ class Process_regression_model(Get_schema_table):
                       'samples, test metrics are optimistic.' % (len(chain), os.path.basename(parquet_fp)))
             chain = []
 
-        if not spectral_cols:
-            print('    ERROR: no spectral columns found.')
-            return
         col_names = [str(c) for c in spectral_cols]
         # Header row 2 — stored on each saved model and in the results JSON
         spectral_header_D = {c: signal_type for c in col_names}
@@ -581,6 +578,11 @@ class Process_regression_model(Get_schema_table):
             return
         numeric_cov, nominal_cov = covariates
         covariate_cols = numeric_cov + nominal_cov
+
+        # A model needs spectra and/or covariates
+        if not spectral_cols and not covariate_cols:
+            print('    ERROR: no spectral columns and no covariates (covariate_array) — nothing to model on.')
+            return
 
         # Covariates (input parquet, same rows as the source parquet) next to the spectra; samples missing any of
         # them are skipped
