@@ -191,6 +191,20 @@
               "required": false,
               "default_value": false,
               "hint": "Save feature importance plot to file or not."
+            },
+            {
+              "parameter": "plot_layout",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "How the shown plots are arranged: default (picked from what is shown, the modes and the number of indicators/regressors), a preset (scatter-1, scatter-2, scatter-3, scatter-4, scatter-tt-kf, importance), a custom plot_layout parameter set, a JSON file (relative or absolute path), or none (one figure per plot, as before). Saved plots are always single figures."
+            },
+            {
+              "parameter": "save_plot_layout",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Also save the grid figures of plot_layout, under plot/<dataframe>_grid/."
             }
           ]
         }

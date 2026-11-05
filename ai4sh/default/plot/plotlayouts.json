@@ -1,0 +1,94 @@
+{
+  "scatter-1": {
+    "columns": [
+      "scatter"
+    ],
+    "wrap": 1,
+    "group_by": "indicator",
+    "draw": "run",
+    "panel_size": [
+      3,
+      3
+    ],
+    "max_units_per_row": 4,
+    "importance_width": 2,
+    "max_permutation_bars": 6
+  },
+  "scatter-2": {
+    "columns": [
+      "scatter"
+    ],
+    "wrap": 2,
+    "group_by": "indicator",
+    "draw": "run",
+    "panel_size": [
+      3,
+      3
+    ],
+    "max_units_per_row": 4,
+    "importance_width": 2,
+    "max_permutation_bars": 6
+  },
+  "scatter-3": {
+    "columns": [
+      "scatter"
+    ],
+    "wrap": 3,
+    "group_by": "indicator",
+    "draw": "run",
+    "panel_size": [
+      3,
+      3
+    ],
+    "max_units_per_row": 4,
+    "importance_width": 2,
+    "max_permutation_bars": 6
+  },
+  "scatter-4": {
+    "columns": [
+      "scatter"
+    ],
+    "wrap": 4,
+    "group_by": "indicator",
+    "draw": "run",
+    "panel_size": [
+      3,
+      3
+    ],
+    "max_units_per_row": 4,
+    "importance_width": 2,
+    "max_permutation_bars": 6
+  },
+  "scatter-tt-kf": {
+    "columns": [
+      "scatter"
+    ],
+    "wrap": 0,
+    "group_by": "indicator",
+    "draw": "run",
+    "panel_size": [
+      3,
+      3
+    ],
+    "max_units_per_row": 4,
+    "importance_width": 2,
+    "max_permutation_bars": 6
+  },
+  "importance": {
+    "columns": [
+      "scatter",
+      "importance",
+      "permutation"
+    ],
+    "wrap": 0,
+    "group_by": "indicator",
+    "draw": "indicator",
+    "panel_size": [
+      3,
+      3
+    ],
+    "max_units_per_row": 4,
+    "importance_width": 2,
+    "max_permutation_bars": 6
+  }
+}

@@ -66,10 +66,13 @@ from src.ai4sh.spectral_columns import Signal_type_of
 from src.ai4sh.project_paths import Default_fpn
 from src.ai4sh.provenance import Provenance_snapshot, File_sha256
 from src.ai4sh.ml_setting import Load_settings, Is_path
+from src.ai4sh.ml_model_plot import (Default_layout_name, In_layout, Load_layout, Plot_grid,
+                                     Plot_importance, Plot_permutation, Plot_scatter)
 
 _DEFAULT_MODEL_PARAMS_FP = Default_fpn('regressors', 'regression_model_parameters.json')
 _DEFAULT_REGR_SYMBOLS_FP = Default_fpn('plot', 'regressionmodelsymbols.json')
 _DEFAULT_TARGET_SYMBOLS_FP = Default_fpn('plot', 'targetfeaturesymbols.json')
+_DEFAULT_PLOT_LAYOUT_FP = Default_fpn('plot', 'plotlayouts.json')
 
 
 # ------------------------------------------------------------------ model registry
@@ -140,102 +143,6 @@ def _feature_importance(model, key, feature_names=None):
 
 
 # ------------------------------------------------------------------ plot helpers
-
-def _plot_scatter(obs, pred, model_key, indicator, mode_label, metrics,
-                  regr_sym_D, tgt_sym_D):
-    sym    = regr_sym_D.get(model_key, {})
-    marker = sym.get('marker', 'o')
-    size   = sym.get('size',   40)
-    tgt    = tgt_sym_D.get(indicator, {})
-    color  = tgt.get('color', 'steelblue')
-    alpha  = float(tgt.get('alpha', 0.6))
-
-    fig, ax = plt.subplots(figsize=(5, 5))
-    ax.scatter(obs, pred, marker=marker, s=size, color=color, alpha=alpha,
-               edgecolors='black', linewidths=0.3)
-
-    lo = min(obs.min(), pred.min())
-    hi = max(obs.max(), pred.max())
-    ax.plot([lo, hi], [lo, hi], 'k--', linewidth=0.8)
-
-    if 'n_train' in metrics:
-        n_str = 'n_train=%d  n_test=%d' % (metrics['n_train'], metrics['n_test'])
-    else:
-        n_str = 'n=%d' % metrics.get('n', len(obs))
-    txt = ('r²=%(r2).3f\nRMSE=%(rmse).3f\nRPIQ=%(rpiq).3f\n%(n)s'
-           % {'r2': metrics['r2'], 'rmse': metrics['rmse'],
-              'rpiq': metrics['rpiq'], 'n': n_str})
-    ax.text(0.04, 0.96, txt, transform=ax.transAxes,
-            va='top', ha='left', fontsize=7.5, color='dimgray',
-            bbox=dict(boxstyle='round,pad=0.3', fc='white', alpha=0.7))
-    ax.set_xlabel('Observed')
-    ax.set_ylabel('Predicted')
-    ax.set_title('%s — %s (%s)' % (indicator, model_key, mode_label))
-    plt.tight_layout()
-    return fig
-
-
-def _plot_importance(importances, wavelengths, model_key, indicator, label,
-                     color='steelblue'):
-    '''Bars per spectral feature; covariates (cv:... names), if any, in a second panel.'''
-    imp_arr = np.asarray(importances)
-    is_cov  = np.array([isinstance(w, str) for w in wavelengths], dtype=bool)
-    wl_arr  = np.asarray([w for w in wavelengths if not isinstance(w, str)], dtype=float)
-    spec_imp = imp_arr[~is_cov]
-
-    if is_cov.any():
-        fig, (ax, ax_cv) = plt.subplots(1, 2, figsize=(12, 3), gridspec_kw={'width_ratios': [3, 1]})
-        cv_names = [w[len('cv:'):] for w in wavelengths if isinstance(w, str)]
-        ax_cv.barh(range(len(cv_names)), imp_arr[is_cov], color=color, alpha=0.75)
-        ax_cv.set_yticks(range(len(cv_names)))
-        ax_cv.set_yticklabels(cv_names, fontsize=7)
-        ax_cv.set_xlabel('Importance')
-        ax_cv.set_title('Covariates', fontsize=9)
-    else:
-        fig, ax = plt.subplots(figsize=(9, 3))
-
-    if len(wl_arr):
-        bar_w = max(1, (wl_arr[1] - wl_arr[0]) * 0.8) if len(wl_arr) > 1 else 5
-        ax.bar(wl_arr, spec_imp, width=bar_w, color=color, alpha=0.75)
-    ax.set_xlabel('Wavelength (nm)')
-    ax.set_ylabel('Importance')
-    ax.set_title('Feature importance [%s]: %s — %s' % (label, model_key, indicator))
-    plt.tight_layout()
-    return fig
-
-
-def _plot_permutation(pi_result, wavelengths, model_key, indicator, mode_label,
-                      color='steelblue', max_cov=0):
-    means = pi_result.importances_mean
-    stds  = pi_result.importances_std
-    order = np.argsort(means)   # ascending — least important at bottom
-
-    sorted_wl    = [wavelengths[i] for i in order]
-    sorted_means = means[order]
-    sorted_stds  = stds[order]
-
-    if max_cov > 0 and len(sorted_wl) > max_cov:
-        sorted_wl    = sorted_wl[-max_cov:]
-        sorted_means = sorted_means[-max_cov:]
-        sorted_stds  = sorted_stds[-max_cov:]
-
-    n_bars = len(sorted_wl)
-    fig, ax = plt.subplots(figsize=(5, max(4, n_bars * 0.04)))
-    ax.barh(range(n_bars), sorted_means, xerr=sorted_stds,
-            color=color, alpha=0.75, height=0.8)
-
-    if n_bars <= 40:
-        ax.set_yticks(range(n_bars))
-        ax.set_yticklabels([str(w) for w in sorted_wl], fontsize=7)
-    else:
-        ax.set_yticks([])
-
-    ax.set_xlabel('Mean decrease in score')
-    ax.set_ylabel('Feature' if any(isinstance(w, str) for w in sorted_wl) else 'Wavelength (nm)')
-    ax.set_title('Permutation importance [%s]: %s — %s' % (mode_label, model_key, indicator))
-    plt.tight_layout()
-    return fig
-
 
 def _save_permutation_data(pi_result, wavelengths, model_key, indicator, mode_label, out_dir):
     means = pi_result.importances_mean
@@ -512,6 +419,8 @@ class Process_regression_model(Get_schema_table):
         save_perm          = bool(getattr(p, 'save_permutation_importance', True))
         show_feat          = bool(getattr(p, 'show_feature_importance',    False))
         save_feat          = bool(getattr(p, 'save_feature_importance',    True))
+        layout_param       = str(getattr(p, 'plot_layout', 'default') or 'default').strip()
+        save_layout        = bool(getattr(p, 'save_plot_layout', False))
 
         if not regressor_array:
             print('    ERROR: regressor_array is empty.')
@@ -696,6 +605,35 @@ class Process_regression_model(Get_schema_table):
                     print('    Saved: %s' % fp)
             plt.close(fig)
 
+        # Plot layout: the shown plots composed into grid figures; the saved PNGs stay single panels
+        modes = [m for m, on in (('tt', traintest), ('kf', do_kfold)) if on]
+        try:
+            layout = Load_layout(layout_param,
+                                 Default_layout_name(show_scatter, show_feat, show_perm, modes,
+                                                     len(indicator_cols), len(regressors)),
+                                 _DEFAULT_PLOT_LAYOUT_FP, self._Settings_fp, self.verbose)
+        except (FileNotFoundError, ValueError) as e:
+            print('    ERROR: %s' % e)
+            return
+        if layout is not None and self.verbose >= 1:
+            print('    Plot layout: %s (grid drawn per %s)' % (layout['name'], layout['draw']))
+        grid_panels = []
+
+        def _Panel(ptype, mode, shown, save, make_fig, fp, **data):
+            '''A shown panel the layout has goes to the grid; the single figure is made when saved or shown alone.'''
+            in_grid = shown and In_layout(layout, ptype, mode)
+            if in_grid:
+                grid_panels.append(dict(data, type=ptype, mode=mode))
+            if save or (shown and not in_grid):
+                _handle_fig(make_fig(), fp, shown and not in_grid, save)
+
+        def _Draw_grid(panels, indicators, suffix):
+            fig = Plot_grid(panels, layout, indicators, list(regressors), regr_sym_D, tgt_sym_D,
+                            title=stem + cov_tag)
+            if fig is not None:
+                _handle_fig(fig, os.path.join(project_root_fp, 'plot', stem + cov_tag + '_grid',
+                                              '%s%s.png' % (layout['name'], suffix)), True, save_layout)
+
         data_D = {
             'input_parquet':  os.path.basename(parquet_fp),
             'input_sha256':   File_sha256(parquet_fp),
@@ -849,35 +787,34 @@ class Process_regression_model(Get_schema_table):
                     _save_model(model_tt, jl_fp, fitted_D, indicator, model_key, 'traintest', metrics_tt, tr_mask)
 
                     if show_scatter or save_scatter:
-                        fig = _plot_scatter(y_te, pred_tt, model_key, indicator,
-                                            'train/test', metrics_tt, regr_sym_D, tgt_sym_D)
-                        _handle_fig(fig,
-                                    os.path.join(plot_dir_tt,
-                                                 'scatter_%s_%s_tt.png' % (ind_s, model_key)),
-                                    show_scatter, save_scatter)
+                        _Panel('scatter', 'tt', show_scatter, save_scatter,
+                               lambda: Plot_scatter(y_te, pred_tt, model_key, indicator,
+                                                    'train/test', metrics_tt, regr_sym_D, tgt_sym_D),
+                               os.path.join(plot_dir_tt, 'scatter_%s_%s_tt.png' % (ind_s, model_key)),
+                               indicator=indicator, regressor=model_key, obs=y_te, pred=pred_tt, metrics=metrics_tt)
 
                     tail = _Fitted_tail(model_tt)
                     if show_feat or save_feat:
                         imp = _feature_importance(tail.regressor, model_key)
                         if imp is not None:
-                            fig2 = _plot_importance(imp, tail.Features(X_tr), model_key, indicator, 'tt',
-                                                    color=ind_color)
-                            _handle_fig(fig2,
-                                        os.path.join(plot_dir_tt,
-                                                     'importance_%s_%s_tt.png' % (ind_s, model_key)),
-                                        show_feat, save_feat)
+                            feats = tail.Features(X_tr)
+                            _Panel('importance', 'tt', show_feat, save_feat,
+                                   lambda: Plot_importance(imp, feats, model_key, indicator, 'tt', color=ind_color),
+                                   os.path.join(plot_dir_tt, 'importance_%s_%s_tt.png' % (ind_s, model_key)),
+                                   indicator=indicator, regressor=model_key, importances=imp, features=feats,
+                                   color=ind_color)
 
                     if (show_perm or save_perm) and model_key.lower() != 'cubist':
                         Xt_te = tail.Preprocess(X_te)
                         feat_wl = tail.Features(X_te)
                         pi = sk_permutation_importance(
                             tail, Xt_te, y_te, scoring='r2', n_repeats=10, random_state=42)
-                        fig3 = _plot_permutation(pi, feat_wl, model_key, indicator, 'train/test',
-                                                 color=ind_color, max_cov=max_cov)
-                        _handle_fig(fig3,
-                                    os.path.join(plot_dir_tt,
-                                                 'permutation_%s_%s_tt.png' % (ind_s, model_key)),
-                                    show_perm, save_perm)
+                        _Panel('permutation', 'tt', show_perm, save_perm,
+                               lambda: Plot_permutation(pi, feat_wl, model_key, indicator, 'train/test',
+                                                        color=ind_color, max_cov=max_cov),
+                               os.path.join(plot_dir_tt, 'permutation_%s_%s_tt.png' % (ind_s, model_key)),
+                               indicator=indicator, regressor=model_key, means=pi.importances_mean,
+                               stds=pi.importances_std, features=feat_wl, color=ind_color)
                         _save_permutation_data(pi, feat_wl, model_key, indicator, 'tt', cov_dir_tt)
 
                     results_D[indicator].setdefault('traintest', {})[model_key] = metrics_tt
@@ -918,40 +855,45 @@ class Process_regression_model(Get_schema_table):
                     _save_model(model_kf, jl_fp, fitted_D, indicator, model_key, 'kfold', metrics_kf, valid_mask)
 
                     if show_scatter or save_scatter:
-                        fig = _plot_scatter(y, pred_kf, model_key, indicator,
-                                            'k-fold', metrics_kf, regr_sym_D, tgt_sym_D)
-                        _handle_fig(fig,
-                                    os.path.join(plot_dir_kf,
-                                                 'scatter_%s_%s_kf.png' % (ind_s, model_key)),
-                                    show_scatter, save_scatter)
+                        _Panel('scatter', 'kf', show_scatter, save_scatter,
+                               lambda: Plot_scatter(y, pred_kf, model_key, indicator,
+                                                    'k-fold', metrics_kf, regr_sym_D, tgt_sym_D),
+                               os.path.join(plot_dir_kf, 'scatter_%s_%s_kf.png' % (ind_s, model_key)),
+                               indicator=indicator, regressor=model_key, obs=y, pred=pred_kf, metrics=metrics_kf)
 
                     tail = _Fitted_tail(model_kf)
                     if show_feat or save_feat:
                         imp = _feature_importance(tail.regressor, model_key)
                         if imp is not None:
-                            fig2 = _plot_importance(imp, tail.Features(X), model_key, indicator, 'kf',
-                                                    color=ind_color)
-                            _handle_fig(fig2,
-                                        os.path.join(plot_dir_kf,
-                                                     'importance_%s_%s_kf.png' % (ind_s, model_key)),
-                                        show_feat, save_feat)
+                            feats = tail.Features(X)
+                            _Panel('importance', 'kf', show_feat, save_feat,
+                                   lambda: Plot_importance(imp, feats, model_key, indicator, 'kf', color=ind_color),
+                                   os.path.join(plot_dir_kf, 'importance_%s_%s_kf.png' % (ind_s, model_key)),
+                                   indicator=indicator, regressor=model_key, importances=imp, features=feats,
+                                   color=ind_color)
 
                     if (show_perm or save_perm) and model_key.lower() != 'cubist':
                         feat_wl = tail.Features(X)
                         pi = sk_permutation_importance(
                             tail, tail.Preprocess(X), y, scoring='r2', n_repeats=10, random_state=42)
-                        fig3 = _plot_permutation(pi, feat_wl, model_key, indicator, 'k-fold',
-                                                 color=ind_color, max_cov=max_cov)
-                        _handle_fig(fig3,
-                                    os.path.join(plot_dir_kf,
-                                                 'permutation_%s_%s_kf.png' % (ind_s, model_key)),
-                                    show_perm, save_perm)
+                        _Panel('permutation', 'kf', show_perm, save_perm,
+                               lambda: Plot_permutation(pi, feat_wl, model_key, indicator, 'k-fold',
+                                                        color=ind_color, max_cov=max_cov),
+                               os.path.join(plot_dir_kf, 'permutation_%s_%s_kf.png' % (ind_s, model_key)),
+                               indicator=indicator, regressor=model_key, means=pi.importances_mean,
+                               stds=pi.importances_std, features=feat_wl, color=ind_color)
                         _save_permutation_data(pi, feat_wl, model_key, indicator, 'kf', cov_dir_kf)
 
                     results_D[indicator].setdefault('kfold', {})[model_key] = metrics_kf
                     if self.verbose >= 1:
                         print('        [kf] r2=%.3f  rmse=%.3f  rpiq=%.3f' % (
                             metrics_kf['r2'], metrics_kf['rmse'], metrics_kf['rpiq']))
+
+            if layout is not None and layout['draw'] == 'indicator':
+                _Draw_grid([p for p in grid_panels if p['indicator'] == indicator], [indicator], '_' + ind_s)
+
+        if layout is not None and layout['draw'] == 'run':
+            _Draw_grid(grid_panels, indicator_cols, '')
 
         if results_D:
             self._print_summary(results_D, indicator_cols, list(regressors.keys()))
