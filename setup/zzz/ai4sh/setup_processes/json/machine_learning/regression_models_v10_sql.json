@@ -205,6 +205,13 @@
               "required": false,
               "default_value": false,
               "hint": "Also save the grid figures of plot_layout, under plot/<dataframe>_grid/."
+            },
+            {
+              "parameter": "importance_only",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Only map the feature and permutation importance: the regressors are fitted (train/test: on the training samples, permutation on the test samples; kfold: on all samples), but no scatter, metrics, k-fold predictions or models are made or saved."
             }
           ]
         }

@@ -421,6 +421,7 @@ class Process_regression_model(Get_schema_table):
         save_feat          = bool(getattr(p, 'save_feature_importance',    True))
         layout_param       = str(getattr(p, 'plot_layout', 'default') or 'default').strip()
         save_layout        = bool(getattr(p, 'save_plot_layout', False))
+        importance_only    = bool(getattr(p, 'importance_only', False))
 
         if not regressor_array:
             print('    ERROR: regressor_array is empty.')
@@ -433,6 +434,13 @@ class Process_regression_model(Get_schema_table):
         if not traintest and not do_kfold:
             print('    ERROR: both traintest and kfold are false — nothing to run.')
             return
+        if importance_only:
+            # Fit and map the importance only: no model tests (scatter, metrics, k-fold predictions), nothing saved
+            # but the importance plots and the permutation data
+            show_scatter = save_scatter = False
+            if not (show_feat or save_feat or show_perm or save_perm):
+                print('    ERROR: importance_only needs show/save_feature_importance or show/save_permutation_importance.')
+                return
 
         if dataframe_param.lower() == 'previous':
             parquet_fp = _resolve_single_previous(project_root_fp)
@@ -776,17 +784,19 @@ class Process_regression_model(Get_schema_table):
                 if traintest and len(y_te) >= 2 and len(y_tr) >= 10:
                     model_tt = _make_model(model_proto)
                     model_tt.fit(X_tr, y_tr)
-                    pred_tt  = np.ravel(model_tt.predict(X_te))
 
-                    metrics_tt = _compute_metrics(y_te, pred_tt)
-                    metrics_tt['n_train'] = len(y_tr)
-                    metrics_tt['n_test']  = len(y_te)
+                    if not importance_only:
+                        pred_tt  = np.ravel(model_tt.predict(X_te))
 
-                    fitted_D = dict(pipeline_D, indicator=_Fitted_target(model_tt))
-                    metrics_tt['indicator_transformation'] = fitted_D['indicator']
-                    jl_fp = os.path.join(models_dir_tt,
-                                         '%s%s_%s_%s_tt.joblib' % (stem, cov_tag, ind_s, model_key))
-                    _save_model(model_tt, jl_fp, fitted_D, indicator, model_key, 'traintest', metrics_tt, tr_mask)
+                        metrics_tt = _compute_metrics(y_te, pred_tt)
+                        metrics_tt['n_train'] = len(y_tr)
+                        metrics_tt['n_test']  = len(y_te)
+
+                        fitted_D = dict(pipeline_D, indicator=_Fitted_target(model_tt))
+                        metrics_tt['indicator_transformation'] = fitted_D['indicator']
+                        jl_fp = os.path.join(models_dir_tt,
+                                             '%s%s_%s_%s_tt.joblib' % (stem, cov_tag, ind_s, model_key))
+                        _save_model(model_tt, jl_fp, fitted_D, indicator, model_key, 'traintest', metrics_tt, tr_mask)
 
                     if show_scatter or save_scatter:
                         _Panel('scatter', 'tt', show_scatter, save_scatter,
@@ -819,13 +829,22 @@ class Process_regression_model(Get_schema_table):
                                stds=pi.importances_std, features=feat_wl, color=ind_color)
                         _save_permutation_data(pi, feat_wl, model_key, indicator, 'tt', cov_dir_tt)
 
-                    results_D[indicator].setdefault('traintest', {})[model_key] = metrics_tt
-                    if self.verbose >= 1:
-                        print('        [tt] r2=%.3f  rmse=%.3f  rpiq=%.3f' % (
-                            metrics_tt['r2'], metrics_tt['rmse'], metrics_tt['rpiq']))
+                    if importance_only:
+                        if self.verbose >= 1:
+                            print('        [tt] importance mapped (fitted on %d, permutation on %d samples)'
+                                  % (len(y_tr), len(y_te)))
+                    else:
+                        results_D[indicator].setdefault('traintest', {})[model_key] = metrics_tt
+                        if self.verbose >= 1:
+                            print('        [tt] r2=%.3f  rmse=%.3f  rpiq=%.3f' % (
+                                metrics_tt['r2'], metrics_tt['rmse'], metrics_tt['rpiq']))
 
                 # ---- k-fold (the whole pipeline is refitted in every fold)
-                if do_kfold:
+                if do_kfold and importance_only:
+                    model_kf = _make_model(model_proto)
+                    model_kf.fit(X, y)
+
+                if do_kfold and not importance_only:
                     pred_kf  = np.ravel(cross_val_predict(_make_model(model_proto), X, y, cv=folds))
                     metrics_kf = _compute_metrics(y, pred_kf)
                     metrics_kf['n'] = len(y)
@@ -856,6 +875,7 @@ class Process_regression_model(Get_schema_table):
                                          '%s%s_%s_%s_kf.joblib' % (stem, cov_tag, ind_s, model_key))
                     _save_model(model_kf, jl_fp, fitted_D, indicator, model_key, 'kfold', metrics_kf, valid_mask)
 
+                if do_kfold:
                     if show_scatter or save_scatter:
                         _Panel('scatter', 'kf', show_scatter, save_scatter,
                                lambda: Plot_scatter(y, pred_kf, model_key, indicator,
@@ -886,16 +906,24 @@ class Process_regression_model(Get_schema_table):
                                stds=pi.importances_std, features=feat_wl, color=ind_color)
                         _save_permutation_data(pi, feat_wl, model_key, indicator, 'kf', cov_dir_kf)
 
-                    results_D[indicator].setdefault('kfold', {})[model_key] = metrics_kf
-                    if self.verbose >= 1:
-                        print('        [kf] r2=%.3f  rmse=%.3f  rpiq=%.3f' % (
-                            metrics_kf['r2'], metrics_kf['rmse'], metrics_kf['rpiq']))
+                    if importance_only:
+                        if self.verbose >= 1:
+                            print('        [kf] importance mapped (fitted and permuted on all %d samples)' % len(y))
+                    else:
+                        results_D[indicator].setdefault('kfold', {})[model_key] = metrics_kf
+                        if self.verbose >= 1:
+                            print('        [kf] r2=%.3f  rmse=%.3f  rpiq=%.3f' % (
+                                metrics_kf['r2'], metrics_kf['rmse'], metrics_kf['rpiq']))
 
             if layout is not None and layout['draw'] == 'indicator':
                 _Draw_grid([p for p in grid_panels if p['indicator'] == indicator], [indicator], '_' + ind_s)
 
         if layout is not None and layout['draw'] == 'run':
             _Draw_grid(grid_panels, indicator_cols, '')
+
+        if importance_only:
+            print('    importance_only: importance plots and permutation data saved, no models or results')
+            return
 
         if results_D:
             self._print_summary(results_D, indicator_cols, list(regressors.keys()))
