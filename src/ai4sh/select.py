@@ -233,6 +233,30 @@ class Process_select(Get_schema_table):
 
         return AGGREGATE_D[method]
 
+    def _Restrict_observation_logs(self, recs, name_idx, what):
+        '''Keep the records of the observation logs in observation_log_array (names or tags) — per kind of data.
+
+        A log restricts only the data it holds: spectral logs the spectra, lab logs the indicators. If none of the
+        listed logs holds this kind of data (e.g. only spectral logs are listed), all its logs are kept, with a note.
+        recs: rows with the observation log name at name_idx and its tag at name_idx + 1.
+        '''
+        logs = set(self._Parse_array('observation_log_array'))
+
+        if not logs or not recs:
+
+            return recs
+
+        kept = [r for r in recs if r[name_idx] in logs or r[name_idx + 1] in logs]
+
+        if kept:
+
+            return kept
+
+        print('    Note: observation_log_array names no observation log with %s data — all logs used (%s)' % (
+            what, ', '.join(sorted({str(r[name_idx]) for r in recs}))))
+
+        return recs
+
     def _Single_observation_log(self, log_df, keys, what):
         '''True if every group of keys (e.g. sample_id, or sample_id + label) comes from one observation log.
 
@@ -885,8 +909,8 @@ class Process_select(Get_schema_table):
         if aggregate is None:
             return None
 
-        spectra_recs = self.pg_ai4sh_C._Retrieve_spectra_for_scope(
-            scope_D, provision[0], preparation_id, self.pg_session_C, self._Parse_array('observation_log_array'))
+        spectra_recs = self._Restrict_observation_logs(self.pg_ai4sh_C._Retrieve_spectra_for_scope(
+            scope_D, provision[0], preparation_id, self.pg_session_C), 3, 'spectral')
 
         if not spectra_recs:
 
@@ -1075,8 +1099,8 @@ class Process_select(Get_schema_table):
             if aggregate is None:
                 return None
 
-            recs = self.pg_ai4sh_C._Retrieve_measurements_for_scope(
-                scope_D, list(label_D), self.pg_session_C, self._Parse_array('observation_log_array'))
+            recs = self._Restrict_observation_logs(self.pg_ai4sh_C._Retrieve_measurements_for_scope(
+                scope_D, list(label_D), self.pg_session_C), 5, 'indicator/covariate')
 
             if recs:
 
