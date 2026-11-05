@@ -1,0 +1,27 @@
+{
+  "process": [
+    {
+      "process": "regression_modeling",
+      "overwrite": true,
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/compiled/neospectra_olif_10nm",
+        "dataframe": "neospectra_olif_10nm.snv.d1.mc.pca5",
+        "indicator_array": ["c-org", "n-tot"],
+        "regressor_array": ["ols", "huber"],
+        "indicator_transformation": "none",
+        "model_parameters_fp": "./project_neospectra/regressors/regression_model_parameters.json",
+        "traintest": true,
+        "test_size": 0.3,
+        "kfold": false,
+        "importance_only": true,
+        "show_feature_importance": true,
+        "save_feature_importance": true,
+        "show_permutation_importance": true,
+        "save_permutation_importance": true,
+        "n_top_features_in_plot": 0,
+        "plot_layout": "./project_neospectra/plot_layout/importance_pca.json",
+        "save_plot_layout": true
+      }
+    }
+  ]
+}

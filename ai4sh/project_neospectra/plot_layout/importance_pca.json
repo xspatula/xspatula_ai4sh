@@ -1,0 +1,9 @@
+{
+  "columns": ["importance_tt", "permutation_tt"],
+  "wrap": 4,
+  "group_by": "indicator",
+  "draw": "run",
+  "panel_size": [3, 2.6],
+  "importance_width": 1,
+  "max_permutation_bars": 5
+}

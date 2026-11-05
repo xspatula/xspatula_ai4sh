@@ -1,0 +1,8 @@
+{
+  "columns": ["scatter_kf"],
+  "wrap": 4,
+  "group_by": "indicator",
+  "draw": "run",
+  "panel_size": [2.6, 2.6],
+  "max_units_per_row": 4
+}
