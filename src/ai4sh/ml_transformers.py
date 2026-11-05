@@ -26,8 +26,9 @@ and a high-variance covariate does not dominate a plsr component or a knn/svr/ml
 cv:<label> and cv:<label>=<class>; Column_index leaves these names as they are.
 
 CappedPLSRegression is the plsr regressor: n_components is capped at fit to what the training samples and the bands
-left after the chain allow, min(n_samples - 1, n_features), instead of failing. It prints nothing (k-fold and RFE
-fit it many times); Pls_cap_text() gives the note that regression modeling prints per indicator and mode.
+left after the chain allow, the rank of the centred X (at most n_samples - 1), instead of failing. It prints nothing
+(k-fold and RFE fit it many times); Pls_cap_text() gives the note that regression modeling prints per indicator and
+mode.
 '''
 
 # Standard library imports
@@ -390,16 +391,20 @@ class RegressorFrame(_Stateless, BaseEstimator, TransformerMixin):
 
 
 class CappedPLSRegression(PLSRegression):
-    '''PLSRegression with n_components capped at fit to min(n_samples - 1, n_features) (rank of the centred X).
+    '''PLSRegression with n_components capped at fit to the rank of the centred X (at most n_samples - 1).
 
+    The rank, not the number of features: the one-hot columns of a nominal covariate sum to 1, so after centring they
+    lose one dimension. A component beyond the rank is numerical noise and gives wild coefficients.
     The requested n_components stays the parameter (clone, get_params, manifest); the number used is n_components_,
-    and fit_shape_ the (samples, features) it was fitted on.
+    fit_shape_ the (samples, features) it was fitted on and fit_rank_ the rank of the centred X.
     '''
 
     def fit(self, X, y=None, **kwargs):
         requested = self.n_components
         self.fit_shape_ = tuple(int(n) for n in np.shape(X)[:2])
-        cap = max(1, min(self.fit_shape_[0] - 1, self.fit_shape_[1]))   # centring takes one degree of freedom
+        Xa = np.asarray(X, dtype=float)
+        self.fit_rank_ = int(np.linalg.matrix_rank(Xa - Xa.mean(axis=0))) if Xa.size else 0
+        cap = max(1, min(self.fit_shape_[0] - 1, self.fit_rank_))   # centring takes one degree of freedom
         self.n_components_ = min(requested, cap)
         self.n_components = self.n_components_
         try:
@@ -409,11 +414,15 @@ class CappedPLSRegression(PLSRegression):
 
 
 def Pls_cap_text(regressor):
-    '''"n_components 10 → 5 (120 samples, 5 features)" if a fitted CappedPLSRegression was capped, else "".'''
+    '''"n_components 10 → 5 (120 samples, 5 features)" if a fitted CappedPLSRegression was capped, else "".
+    The rank is added when it is below the number of features, e.g. "(130 samples, 8 features, rank 7)".'''
     used = getattr(regressor, 'n_components_', None)
     if used is None or used >= regressor.n_components:
         return ''
-    return 'n_components %d → %d (%d samples, %d features)' % ((regressor.n_components, used) + regressor.fit_shape_)
+    n, p = regressor.fit_shape_
+    rank = getattr(regressor, 'fit_rank_', p)
+    return 'n_components %d → %d (%d samples, %d features%s)' % (
+        regressor.n_components, used, n, p, ', rank %d' % rank if rank < p else '')
 
 
 # ------------------------------------------------------------------ covariates
