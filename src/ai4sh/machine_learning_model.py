@@ -377,7 +377,7 @@ class Process_regression_model(Get_schema_table):
             header = '    %-12s' % ''
             for mode in modes:
                 for key in regressor_keys:
-                    header += '  %-18s' % ('%s/%s' % (key, mode[:2]))
+                    header += '  %-18s' % ('%s/%s' % (key, 'tt' if mode == 'traintest' else 'kf'))
             print(header)
             for metric in ('r2', 'rmse', 'rpiq'):
                 row = '    %-12s' % metric
@@ -822,7 +822,7 @@ class Process_regression_model(Get_schema_table):
                         pi = sk_permutation_importance(
                             tail, Xt_te, y_te, scoring='r2', n_repeats=10, random_state=42)
                         _Panel('permutation', 'tt', show_perm, save_perm,
-                               lambda: Plot_permutation(pi, feat_wl, model_key, indicator, 'train/test',
+                               lambda: Plot_permutation(pi, feat_wl, model_key, indicator, 'tt',
                                                         color=ind_color, max_cov=max_cov),
                                os.path.join(plot_dir_tt, 'permutation_%s_%s_tt.png' % (ind_s, model_key)),
                                indicator=indicator, regressor=model_key, means=pi.importances_mean,
@@ -899,7 +899,7 @@ class Process_regression_model(Get_schema_table):
                         pi = sk_permutation_importance(
                             tail, tail.Preprocess(X), y, scoring='r2', n_repeats=10, random_state=42)
                         _Panel('permutation', 'kf', show_perm, save_perm,
-                               lambda: Plot_permutation(pi, feat_wl, model_key, indicator, 'k-fold',
+                               lambda: Plot_permutation(pi, feat_wl, model_key, indicator, 'kf',
                                                         color=ind_color, max_cov=max_cov),
                                os.path.join(plot_dir_kf, 'permutation_%s_%s_kf.png' % (ind_s, model_key)),
                                indicator=indicator, regressor=model_key, means=pi.importances_mean,
