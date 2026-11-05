@@ -1,0 +1,21 @@
+{
+  "process": [
+    {
+      "process": "select_covariate_only",
+      "overwrite": false,
+      "parameters": {
+        "dataset": "ai4sh",
+        "campaign": "",
+        "sampling_log": "",
+        "min_profile": 0,
+        "max_profile": 20,
+        "covariate_array": [
+          "soil texture usda",
+          "soil texture usda major group"
+        ],
+        "output_root_fp": "./project_neospectra/data",
+        "output_name": "texture-usda_0-20"
+      }
+    }
+  ]
+}

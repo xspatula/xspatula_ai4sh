@@ -1,0 +1,49 @@
+{
+  "process": [
+    {
+      "process": "compile_dataset_from_db",
+      "overwrite": false,
+      "parameters": {
+        "dataset": "ai4sh",
+        "campaign": "",
+        "sampling_log": "",
+        "indicator_array": [
+          "clay",
+          "n-tot",
+          "c-org",
+          "ph-water"
+        ],
+        "data_range": "{\"c-org\": {\"min\": 0, \"max\": 10}, \"n-tot\": {\"min\": 0, \"max\": 1}}",
+        "spectra_provision": "neospectra",
+        "spectra_preparation_name": "ds2",
+        "observation_log_array": [
+          "ai4sh_dk_foulum_2024@neospectra.ds2",
+          "ai4sh_es_arkaute_2024@neospectra.ds2",
+          "ai4sh_fi_jokioinen_2024@neospectra.ds2",
+          "ai4sh_fr_estrees-mons_2025@neospectra.ds2",
+          "ai4sh_gb-eng_woodoaks_2025@neospectra.ds2",
+          "ai4sh_gb-wls_plynlimon_2025@neospectra.ds2",
+          "ai4sh_gr_ktima-gerovassiliou_2023@neospectra.ds2",
+          "ai4sh_hr_neretva_2024@neospectra.ds2",
+          "ai4sh_nl_boermarke-zeijen_2025@neospectra.ds2",
+          "ai4sh_se_loennstorp_2024@neospectra.ds2"
+        ],
+        "begin_wavelength": 1350,
+        "end_wavelength": 2500,
+        "output_bandwidth": 10,
+        "output_spectra_signal": "reflectance",
+        "output_root_fp": "./project_neospectra/data",
+        "output_name" : "neospectra_10nm_db"
+      }
+    },
+    {
+      "process": "chemometric_chain",
+      "overwrite": false,
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/compiled/neospectra_10nm_db",
+        "dataframe": "neospectra_10nm_db",
+        "chain_from": "./project_neospectra/data/spectra/neospectra/ds2/ai4sh/1350-2500_10.snv.d1.mc.pca5.json"
+      }
+    }
+  ]
+}

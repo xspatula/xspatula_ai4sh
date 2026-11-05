@@ -1,0 +1,36 @@
+{
+  "plsr": {
+    "hyper_parameters": {
+      "n_components": 5,
+      "scale": false
+    }
+  },
+  "svr": {
+    "hyper_parameters": {
+      "kernel": "linear",
+      "C": 10,
+      "epsilon": 0.01
+    }
+  },
+  "cubist": {
+    "hyper_parameters": {
+      "n_committees": 10,
+      "random_state": 42
+    }
+  },
+  "randfor": {
+    "hyper_parameters": {
+      "n_estimators": 300,
+      "max_features": 0.33,
+      "random_state": 42
+    }
+  },
+  "mlp": {
+    "hyper_parameters": {
+      "hidden_layer_sizes": [20],
+      "alpha": 10.0,
+      "max_iter": 2000,
+      "random_state": 42
+    }
+  }
+}
