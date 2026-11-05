@@ -1454,6 +1454,10 @@ class Process_select(Get_schema_table):
         # A value outside its range is set to missing; the other values of the sample are kept (as indicator_range)
         data_range = self._Parse_data_range()
 
+        indicator_cols = [c for c in feature_labels_D.get('indicator', []) if c in df.columns]
+
+        empty_before = df[indicator_cols].isna().all(axis=1) if indicator_cols else None
+
         range_blanked = {}
 
         for label, rng in data_range.items():
@@ -1484,20 +1488,21 @@ class Process_select(Get_schema_table):
 
             print('    Set to missing by data_range: %s' % ', '.join('%s %d' % kv for kv in range_blanked.items()))
 
-        # A sample left without any indicator value is of no use
-        indicator_cols = [c for c in feature_labels_D.get('indicator', []) if c in df.columns]
-
-        if range_blanked and indicator_cols:
+        # A sample without any indicator value is of no use for modeling (removed whenever indicators are selected)
+        if indicator_cols:
 
             empty = df[indicator_cols].isna().all(axis=1)
 
             if empty.any():
 
+                n_range = int((empty & ~empty_before).sum())
+
                 df = df[~empty]
 
                 if self.verbose:
 
-                    print('    Excluded, no indicator value left after data_range: %d' % int(empty.sum()))
+                    print('    Excluded, no indicator value: %d%s' % (
+                        int(empty.sum()), ' (%d emptied by data_range)' % n_range if n_range else ''))
 
         if df.empty:
 
