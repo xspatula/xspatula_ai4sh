@@ -216,6 +216,73 @@ def apply_standardisation(df, indicators, param, verbose=0):
 # Spectral (chemometric) transformations
 # ---------------------------------------------------------------------------
 
+WAVELET_MODES = ('denoise', 'coefficients')
+
+
+def Wavelet_settings(cfg):
+    '''Validated wavelet settings {mode, wavelet, level, details}; raises ValueError.
+
+    mode: denoise (same bands) or coefficients (features wt1 .. wtn). wavelet: a discrete PyWavelets wavelet (db4,
+    sym8, coif3, haar ...). level: decomposition levels. details: coefficients only — the number of detail levels kept
+    next to the approximation, coarsest first (0 = approximation only).
+    '''
+    try:
+        import pywt
+    except ImportError:
+        raise ValueError('wavelets need the PyWavelets package: pip install PyWavelets')
+    cfg = cfg or {}
+    mode = str(cfg.get('mode', 'denoise')).strip().lower()
+    if mode not in WAVELET_MODES:
+        raise ValueError('wavelet mode %s: use %s' % (mode, ' or '.join(WAVELET_MODES)))
+    wavelet = str(cfg.get('wavelet', 'db4')).strip().lower()
+    if wavelet not in pywt.wavelist(kind='discrete'):
+        raise ValueError('wavelet %s: use a discrete wavelet, e.g. db4, sym8, coif3, haar' % wavelet)
+    level = int(cfg.get('level', 3))
+    details = int(cfg.get('details', 0))
+    if level < 1:
+        raise ValueError('wavelet level must be ≥ 1')
+    if not 0 <= details <= level:
+        raise ValueError('wavelet details must be between 0 and level (%d)' % level)
+    return {'mode': mode, 'wavelet': wavelet, 'level': level, 'details': details}
+
+
+def Wavelet_abbrev(cfg):
+    '''File abbreviation: wd (denoise) or wt (coefficients).'''
+    return 'wd' if Wavelet_settings(cfg)['mode'] == 'denoise' else 'wt'
+
+
+def apply_wavelet(df, columns, cfg):
+    '''Discrete wavelet transform (DWT) of every spectrum. Returns (df_out, columns_out, label).
+
+    denoise: the detail coefficients are soft-thresholded with the universal threshold (noise sigma from the median
+    absolute deviation of the finest details; Donoho & Johnstone 1994) and the spectrum is reconstructed: same bands.
+    coefficients: the approximation coefficients at `level` (+ `details` detail levels, coarsest first) are the
+    features, columns wt1 .. wtn. The level is capped to the maximum the number of bands allows.
+    '''
+    import pywt
+    s = Wavelet_settings(cfg)
+    X = df[columns].values.astype(float)
+    n = X.shape[1]
+    level = min(s['level'], pywt.dwt_max_level(n, s['wavelet']))
+    if level < 1:
+        raise ValueError('wavelet %s: %d bands are too few for one decomposition level' % (s['wavelet'], n))
+    coeffs = pywt.wavedec(X, s['wavelet'], level=level, axis=1, mode='symmetric')
+    tag = '%s, level %d%s' % (s['wavelet'], level, ' (capped from %d)' % s['level'] if level < s['level'] else '')
+    if s['mode'] == 'denoise':
+        sigma = np.median(np.abs(coeffs[-1]), axis=1, keepdims=True) / 0.6745
+        thr = sigma * np.sqrt(2.0 * np.log(n))
+        coeffs = [coeffs[0]] + [np.sign(c) * np.maximum(np.abs(c) - thr, 0.0) for c in coeffs[1:]]
+        out = pywt.waverec(coeffs, s['wavelet'], axis=1, mode='symmetric')[:, :n]
+        return pd.DataFrame(out, columns=list(columns), index=df.index), list(columns), 'wavelet denoise (%s)' % tag
+    kept = coeffs[:1 + min(s['details'], level)]
+    keep = np.concatenate(kept, axis=1)
+    cols = ['wt%d' % (i + 1) for i in range(keep.shape[1])]
+    out = pd.DataFrame(keep, columns=cols, index=df.index)
+    # Blocks for plots: A<level> (approximation), D<level>, D<level-1> ... (details, coarsest first)
+    out.attrs['wavelet_blocks'] = [('A%d' % level, kept[0].shape[1])] + [
+        ('D%d' % (level - j), c.shape[1]) for j, c in enumerate(kept[1:])]
+    return out, cols, 'wavelet coefficients (%s, %d detail level(s))' % (tag, min(s['details'], level))
+
 def apply_derivative(df, columns, cfg):
     '''Apply nth-order finite-difference derivative to spectral DataFrame.
 

@@ -50,7 +50,7 @@ from sklearn.feature_selection import SelectKBest, VarianceThreshold, f_regressi
 from sklearn.preprocessing import (MinMaxScaler, StandardScaler, RobustScaler,
                                    PowerTransformer, QuantileTransformer)
 
-from src.ai4sh.chemometrics import apply_derivative, _snv, _msc, _detrend, Scaling_parameters
+from src.ai4sh.chemometrics import apply_derivative, apply_wavelet, _snv, _msc, _detrend, Scaling_parameters
 from src.ai4sh.filter import apply_filter, apply_multi_filter
 from src.ai4sh.spectral_columns import Is_band_col, Band_value
 
@@ -65,7 +65,7 @@ COVARIATE_PREFIX = 'cv:'
 # ------------------------------------------------------------------ columns and holdout
 
 def Column_index(col):
-    '''Numeric index of a spectral column: wl_nm_550 → 550, d555 → 555, pc1 → 1, wc3 → 3, 550 → 550.
+    '''Numeric index of a spectral column: wl_nm_550 → 550, d555 → 555, pc1 → 1, wc3 → 3, wt2 → 2, 550 → 550.
     Covariate columns (cv:<label>, cv:<label>=<class>) are returned as they are.'''
 
     if isinstance(col, (int, float, np.integer, np.floating)):
@@ -79,7 +79,7 @@ def Column_index(col):
     if Is_band_col(s):
         return Band_value(s)
 
-    if s[:2] in ('pc', 'wc'):
+    if s[:2] in ('pc', 'wc', 'wt'):
         return int(s[2:])
 
     if s.startswith('d'):
@@ -201,6 +201,21 @@ class Derivative(_Stateless, BaseEstimator, TransformerMixin):
         out, _, _ = apply_derivative(X, list(X.columns), {'derivative': int(self.derivative)})
         if self.append:
             out = pd.concat([X, out], axis=1)
+        return out
+
+
+class Wavelet(_Stateless, BaseEstimator, TransformerMixin):
+    '''Discrete wavelet transform per spectrum: denoise (same bands) or coefficients (wt1 .. wtn); stateless.'''
+
+    def __init__(self, wavelet_cfg=None):
+        self.wavelet_cfg = wavelet_cfg
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        X = _Numeric_frame(X)
+        out, _, _ = apply_wavelet(X, list(X.columns), self.wavelet_cfg or {})
         return out
 
 
@@ -708,6 +723,9 @@ def Chain_to_steps(chain, indicator, test_size):
 
         elif proc == 'spectra_scatter_correction':
             step = ScatterCorrection(par.get('scaler', ['snv']))
+
+        elif proc == 'spectra_wavelet':
+            step = Wavelet(par)
 
         elif proc == 'spectra_scaling':
             step = SpectralScaling(par.get('method', 'meancentring'))

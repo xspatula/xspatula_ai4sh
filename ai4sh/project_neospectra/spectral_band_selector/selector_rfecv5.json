@@ -1,0 +1,13 @@
+{
+  "permutation": {
+    "permutation_repeats": 6,
+    "folds": 5
+  },
+  "rfe": {
+    "CV": 5,
+    "step": 0.1
+  },
+  "tree_based": {
+    "n_estimators": 100
+  }
+}

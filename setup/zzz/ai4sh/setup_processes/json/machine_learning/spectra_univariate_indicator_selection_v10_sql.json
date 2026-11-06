@@ -7,8 +7,8 @@
         "root_process": "machine_learning",
         "process": "spectra_indicator_univariate_selection",
         "min_user_stratum": 3,
-        "title": "Spectra indicator univariate selection",
-        "label": "Select spectra for specific indicator using univariate selection."
+        "title": "Select spectral bands per indicator by univariate (F-test) selection",
+        "label": "Select the spectral bands with the strongest univariate (F-test) relation to an indicator (SelectKBest). Needs a dataframe with spectra and indicators, e.g. a compiled dataset; covariates are not selected, and only used as indicators when named in indicator_array. Selected on the training samples; with separate_selections regression_modeling refits the selection on its own training samples."
       },
       "nodes": [
         {
@@ -34,7 +34,7 @@
               "parameter_type": "array",
               "required": false,
               "default_value": "",
-              "hint": "Comma separated list of the indicators to use for univariate selection"
+              "hint": "Indicators to select bands for; empty = every numeric indicator of the dataframe except the covariates of a compiled dataset (a covariate named here is processed)."
             },
             {
               "parameter": "separate_selections",
@@ -46,9 +46,16 @@
             {
               "parameter": "univariate_selector_fp",
               "parameter_type": "text",
-              "required": true,
+              "required": false,
               "default_value": "none",
-              "hint": "The relative or absolute path to the univariate selector to apply, if set to none, no ward clustering will be applied even if the process is called. You have to define the ward clustering to apply and set the relative or absolute path to the ward_clustering.JSON file as the parameter."
+              "hint": "Optional JSON with {\"SelectKBest\": {\"n_features\": 20}} (path relative to the project root); none = use n_features."
+            },
+            {
+              "parameter": "n_features",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "Number of bands to retain, saved without asking; overrides the selector file. 0 = from univariate_selector_fp, then asked before saving."
             },
             {
               "parameter": "test_size",
@@ -63,6 +70,34 @@
               "required": false,
               "default_value": "default",
               "hint": "Colour ramp for plotting spectra: a matplotlib colormap name, or default = the spectra_plot parameter set (ml_setting, \"jet\")."
+            },
+            {
+              "parameter": "max_spectra",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 100,
+              "hint": "Maximum number of spectra drawn in the plot."
+            },
+            {
+              "parameter": "show",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "Show the selection plot(s)."
+            },
+            {
+              "parameter": "save",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Save the selection plot(s) (plot/selection_plot for permutation/RFE/tree, plus the band scores under band_selection/; plot/ for univariate)."
+            },
+            {
+              "parameter": "name_extension",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional user extension (1-6 letters, digits or -) added to the file suffix after a hashtag, e.g. .c-org-plsr-pms#k20, to tell apart outputs with different settings."
             }
           ]
         }

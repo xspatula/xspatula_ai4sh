@@ -7,8 +7,8 @@
         "root_process": "machine_learning",
         "process": "spectra_indicator_permutation_selection",
         "min_user_stratum": 3,
-        "title": "Spectra indicator permutation selection",
-        "label": "Select spectra for specific indicator and model using univariate selection."
+        "title": "Select spectral bands per indicator by permutation importance, RFE or tree-based importance",
+        "label": "Select the spectral bands that matter for an indicator, ranked by permutation importance (out-of-fold on the training samples), recursive feature elimination (RFE/RFECV, regressors with coefficients or feature importances) or tree-based (extra trees) importance. Needs a dataframe with spectra and indicators, e.g. a compiled dataset; covariates are not selected, and only used as indicators when named in indicator_array. The selection is made on the training samples (the holdout of regression_modeling) and replayed as fixed bands by regression_modeling."
       },
       "nodes": [
         {
@@ -34,28 +34,28 @@
               "parameter_type": "array",
               "required": false,
               "default_value": "",
-              "hint": "Comma separated list of the indicators to use for univariate selection"
+              "hint": "Indicators to select bands for; empty = every numeric indicator of the dataframe except the covariates of a compiled dataset (a covariate named here is processed)."
             },
             {
               "parameter": "selector_array",
               "parameter_type": "array",
               "required": true,
               "default_value": "",
-              "hint": "Comma separated list of the indicators to use for univariate selection, valid entries: permutation, rfe,tree_based"
+              "hint": "Selectors to run: permutation, rfe, tree_based. rfe falls back to permutation for regressors without coefficients or feature importances (knn, mlp, svr rbf)."
             },
             {
               "parameter": "regressor_array",
               "parameter_type": "array",
               "required": true,
               "default_value": "",
-              "hint": "Comma separated list of the regressor to apply, valid entries: ols, theilsen, huber, knn, detree, svr, mlp, cubist, plsr."
+              "hint": "Regressors used by permutation and rfe (ols, theil_sen, huber, knn, dectree, randfor, svr, mlp, cubist, plsr); one selection per regressor. Not used by tree_based."
             },
             {
               "parameter": "selector_parameters",
               "parameter_type": "text",
               "required": false,
               "default_value": "default",
-              "hint": "The parameterisation for each selector if applied, if not set to default you have to give the relative or absolute path."
+              "hint": "Selector settings: default, none, a selector parameter set name or a JSON path relative to the project root. Keys: permutation {permutation_repeats, folds (default 5)}, rfe {CV (0 = RFE, >0 = RFECV with that many folds, picks the number of bands), step (>= 1 bands, < 1 fraction removed per round)}, tree_based {n_estimators}."
             },
             {
               "parameter": "separate_selections",
@@ -69,7 +69,7 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "default",
-              "hint": "Relative or absolute path to the JSON file with regressor hyperparameters. If not set, uses the package default."
+              "hint": "Regressor hyper-parameters: default, none, a parameter set name or a JSON path relative to the project root."
             },
             {
               "parameter": "n_top_features_in_plot",
@@ -77,6 +77,13 @@
               "required": false,
               "default_value": 0,
               "hint": "Maximum number of features to show in the selector bar plot. 0 = show all. Y-axis labels are suppressed when showing more than 40 features."
+            },
+            {
+              "parameter": "n_features",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "Number of top-ranked bands to retain and save. 0 = the number RFECV chose (rfe with CV > 0), else asked after the plot (0 typed = not saved)."
             },
             {
               "parameter": "test_size",
@@ -91,6 +98,27 @@
               "required": false,
               "default_value": "default",
               "hint": "Colour ramp for plotting spectra: a matplotlib colormap name, or default = the spectra_plot parameter set (ml_setting, \"jet\")."
+            },
+            {
+              "parameter": "show",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "Show the selection plot(s)."
+            },
+            {
+              "parameter": "save",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Save the selection plot(s) (plot/selection_plot for permutation/RFE/tree, plus the band scores under band_selection/; plot/ for univariate)."
+            },
+            {
+              "parameter": "name_extension",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional user extension (1-6 letters, digits or -) added to the file suffix after a hashtag, e.g. .c-org-plsr-pms#k20, to tell apart outputs with different settings."
             }
           ]
         }

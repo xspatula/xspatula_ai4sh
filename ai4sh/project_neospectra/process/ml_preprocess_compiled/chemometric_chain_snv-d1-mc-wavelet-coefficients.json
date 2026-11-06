@@ -1,0 +1,25 @@
+{
+  "process": [
+    {
+      "process": "chemometric_chain",
+      "overwrite": true,
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/compiled/neospectra_10nm_olif_texture",
+        "dataframe": "neospectra_10nm_olif_texture",
+        "chemometrics_array": [
+          "snv",
+          "derivative",
+          "meancentring",
+          {
+            "wavelet": {
+              "mode": "coefficients",
+              "wavelet": "db4",
+              "level": 3,
+              "details": 1
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

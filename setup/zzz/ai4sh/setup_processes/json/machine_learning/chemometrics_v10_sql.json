@@ -34,7 +34,7 @@
               "parameter_type": "array",
               "required": false,
               "default_value": "",
-              "hint": "Steps applied in the listed order. Each item is a method name with default settings: moving-average, gauss, savitzky-golay, lowess (filters), l1, l2, max, snv, msc, detrend (scatter correction), derivative (1st), meancentring, autoscaling, paretoscaling, poissonscaling (variable scaling), pca (5 components); or an object with custom settings: {\"filter\": <set name, JSON path or settings>}, {\"multi_filter\": ...}, {\"scatter_correction\": [\"snv\",\"detrend\"]}, {\"derivative\": 2}, {\"scaling\": \"autoscaling\"}, {\"variance_threshold\": {\"threshold\": 0.03}} (variance of minmax-scaled bands), {\"ward_clustering\": {\"n_clusters\": 40, \"connectivity\": true}} (n_clusters required), {\"pca\": 5}."
+              "hint": "Steps applied in the listed order. Each item is a method name with default settings: moving-average, gauss, savitzky-golay, lowess (filters), l1, l2, max, snv, msc, detrend (scatter correction), derivative (1st), meancentring, autoscaling, paretoscaling, poissonscaling (variable scaling), pca (5 components), wavelet (denoise, db4, level 3); or an object with custom settings: {\"filter\": <set name, JSON path or settings>}, {\"multi_filter\": ...}, {\"scatter_correction\": [\"snv\",\"detrend\"]}, {\"derivative\": 2}, {\"scaling\": \"autoscaling\"}, {\"variance_threshold\": {\"threshold\": 0.03}} (variance of minmax-scaled bands), {\"ward_clustering\": {\"n_clusters\": 40, \"connectivity\": true}} (n_clusters required), {\"pca\": 5}, {\"wavelet\": {\"mode\": \"coefficients\", \"wavelet\": \"db4\", \"level\": 3, \"details\": 0}}."
             },
             {
               "parameter": "chain_from",
@@ -274,6 +274,102 @@
               "required": false,
               "default_value": "default",
               "hint": "Colour ramp for plotting spectra: a matplotlib colormap name, or default = the spectra_plot parameter set (ml_setting, \"jet\")."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "process": "add_process",
+      "overwrite": true,
+      "parameters": {
+        "root_process": "machine_learning",
+        "process": "spectra_wavelet",
+        "min_user_stratum": 3,
+        "title": "Discrete wavelet transform of spectra (denoise or coefficients)",
+        "label": "Discrete wavelet transform (DWT, PyWavelets) of every spectrum. mode denoise: the detail coefficients are soft-thresholded (universal threshold) and the spectrum reconstructed, same bands, suffix .wd. mode coefficients: the approximation coefficients (+ detail levels) replace the bands as features wt1 .. wtn, suffix .wt; band selection (univariate, permutation, RFE) then selects coefficients. Unsupervised: no indicators needed; replayed by regression_modeling."
+      },
+      "nodes": [
+        {
+          "parent": "process",
+          "element": "parameters",
+          "parameter": [
+            {
+              "parameter": "project_root_fp",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "The root fp of the project"
+            },
+            {
+              "parameter": "dataframe",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "raw",
+              "hint": "The dataframe to use as input, raw = original spectra, previous = the latest saved parquet file(s), or state the name of the parquet file with spectra derived from earlier step(s) to use as input."
+            },
+            {
+              "parameter": "mode",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "denoise",
+              "hint": "denoise (same bands, .wd) or coefficients (features wt1 .. wtn, .wt)."
+            },
+            {
+              "parameter": "wavelet",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "db4",
+              "hint": "Discrete wavelet: db1-db38 (Daubechies; db1 = haar), sym2-sym20, coif1-coif17, bior/rbio ... ."
+            },
+            {
+              "parameter": "level",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 3,
+              "hint": "Decomposition levels; capped to the maximum the number of bands allows. Coefficients: each level halves the number of approximation coefficients."
+            },
+            {
+              "parameter": "details",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 0,
+              "hint": "mode coefficients: number of detail levels kept next to the approximation, coarsest first (0 = approximation only)."
+            },
+            {
+              "parameter": "show",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "Show the input/output spectra plot."
+            },
+            {
+              "parameter": "save",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Save the plot under plot/."
+            },
+            {
+              "parameter": "max_spectra",
+              "parameter_type": "integer",
+              "required": false,
+              "default_value": 100,
+              "hint": "Maximum number of spectra drawn in the plot."
+            },
+            {
+              "parameter": "colormap",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "Colour ramp for plotting spectra: a matplotlib colormap name, or default = the spectra_plot parameter set (ml_setting, \"jet\")."
+            },
+            {
+              "parameter": "name_extension",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Optional user extension (1-6 letters, digits or -) added to the file suffix after a hashtag, e.g. .wt#db4l4, to tell apart outputs with different settings."
             }
           ]
         }
