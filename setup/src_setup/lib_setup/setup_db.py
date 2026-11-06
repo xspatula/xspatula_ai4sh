@@ -290,6 +290,10 @@ class PG_session:
 
                 return
 
+        if self.delete:   # nothing (left) to delete: a delete block never creates
+
+            return
+
         if self.verbose > 2:
 
             print ('            CREATE SCHEMA', schema)
@@ -372,7 +376,11 @@ class PG_session:
 
                 return
 
-        elif self.verbose:
+        if self.delete:   # nothing (left) to delete: a delete block never creates
+
+            return
+
+        if self.verbose:
 
             print ('.   Creating schema.table: %s.%s' %(schema, table))
 
@@ -529,7 +537,11 @@ class PG_session:
 
                 return
 
-        elif self.verbose:
+        if self.delete:   # nothing (left) to delete: a delete block never creates
+
+            return
+
+        if self.verbose:
 
             print ('.   Creating trigger %s on %s.%s' % (trigger, schema, table))
 
@@ -880,6 +892,11 @@ class PG_session:
                         print ('            Record already exists\n')
 
                     continue
+
+            # A delete block only deletes: a record that is not there (e.g. deleted by an earlier run) is not inserted
+            if self.delete:
+
+                continue
 
             if len(columns) != len(values):
 
