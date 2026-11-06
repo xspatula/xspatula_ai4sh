@@ -8,6 +8,7 @@ import os
 import re
 import json
 import hashlib
+import warnings
 
 from datetime import datetime
 
@@ -46,6 +47,7 @@ from sklearn.compose import TransformedTargetRegressor
 from sklearn.base import BaseEstimator, RegressorMixin, clone
 from sklearn.model_selection import KFold, cross_val_predict, cross_val_score
 from sklearn.inspection import permutation_importance as sk_permutation_importance
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import (mean_squared_error, r2_score, mean_absolute_error,
                               mean_absolute_percentage_error, median_absolute_error)
 
@@ -275,6 +277,42 @@ def _Fitted_covariates(model, covariates_D, units_D=None):
     return dict(covariates_D, levels=blocks.levels_, numeric_standardisation=standardisation, numeric_units=units)
 
 
+class _Convergence_counter:
+    '''Counts the ConvergenceWarnings of each model (every fold and fit warns) and prints one line per model instead.'''
+
+    def __enter__(self):
+        self.label, self.count = '', 0
+        self._catch = warnings.catch_warnings()
+        self._catch.__enter__()
+        warnings.simplefilter('always', ConvergenceWarning)
+        self._show = warnings.showwarning
+        warnings.showwarning = self._Show
+        return self
+
+    def _Show(self, message, category, filename, lineno, file=None, line=None):
+        if issubclass(category, ConvergenceWarning):
+            self.count += 1
+        else:
+            self._show(message, category, filename, lineno, file, line)
+
+    def Label(self, label):
+        '''Start counting for the next model (the count of the previous one is printed).'''
+        self.Flush()
+        self.label = label
+
+    def Flush(self):
+        if self.count:
+            print('        ⚠️  %s: %d fit(s) stopped at max_iter before converging — raise max_iter in the '
+                  'hyper-parameters (model_parameters_fp)' % (self.label, self.count))
+        self.count = 0
+
+    def __exit__(self, *exc):
+        self.Flush()
+        warnings.showwarning = self._show
+        self._catch.__exit__(*exc)
+        return False
+
+
 # ------------------------------------------------------------------ main class
 
 class Process_regression_model(Get_schema_table):
@@ -287,7 +325,8 @@ class Process_regression_model(Get_schema_table):
 
     def _Sub_process(self, _):
         if self.process_S.process.process == 'regression_modeling':
-            self._Regression_modeling()
+            with _Convergence_counter() as self._convergence:
+                self._Regression_modeling()
 
     def _Settings_fp(self, param):
         '''A relative settings file path resolved against the project root; anything else (none, default,
@@ -799,6 +838,7 @@ class Process_regression_model(Get_schema_table):
 
             for model_key, model_proto in regressors.items():
 
+                self._convergence.Label('%s %s' % (indicator, model_key))
                 if self.verbose >= 1:
                     print('      Model: %s' % model_key)
 
@@ -949,6 +989,7 @@ class Process_regression_model(Get_schema_table):
             if layout is not None and layout['draw'] == 'indicator':
                 _Draw_grid([p for p in grid_panels if p['indicator'] == indicator], [indicator], '_' + ind_s)
 
+        self._convergence.Flush()
         if layout is not None and layout['draw'] == 'run':
             _Draw_grid(grid_panels, indicator_cols, '')
 
