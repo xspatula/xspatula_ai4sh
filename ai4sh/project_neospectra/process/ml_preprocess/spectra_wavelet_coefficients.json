@@ -1,0 +1,17 @@
+{
+  "process": [
+    {
+      "process": "spectra_wavelet",
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/spectra/neospectra/ds2/ai4sh",
+        "dataframe": "raw",
+        "mode": "coefficients",
+        "wavelet": "db4",
+        "level": 3,
+        "details": 1,
+        "show": true,
+        "save": false
+      }
+    }
+  ]
+}

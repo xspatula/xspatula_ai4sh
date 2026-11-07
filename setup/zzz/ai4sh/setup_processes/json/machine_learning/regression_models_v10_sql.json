@@ -17,7 +17,7 @@
         "process": "regression_modeling",
         "min_user_stratum": 3,
         "title": "Regression modeling of indicators from different covariates",
-        "label": "Regression modeling of indicators from different covariates using an array of the machine learning models. Available regression models include: ols (ordinary least square), theilsen (theilsen robust regressor), huber (huber robust regressor), knn (K-nearest neighbor regressor), detree (decision tree regressor), svr (support vector machine regressor), mlp (multi-layer perception), cubit (an expert based regressor) and plsr (partial least square regressor)."
+        "label": "Regression modeling of indicators from spectra and/or covariates with an array of machine learning regressors: ols (ordinary least squares), theil_sen (Theil-Sen robust regressor), huber (Huber robust regressor), knn (k-nearest neighbours), dectree (decision tree), randfor (random forest), svr (support vector regressor), mlp (multi-layer perceptron), cubist (rule-based) and plsr (partial least squares)."
       },
       "nodes": [
         {
@@ -64,11 +64,11 @@
               "parameter_type": "array",
               "required": false,
               "default_value": "",
-              "hint": "Comma separated list of the regressor to apply, valid entries: ols, theilsen, huber, knn, detree, svr, mlp, cubist, plsr."
+              "hint": "Regressors to apply: ols, theil_sen, huber, knn, dectree, randfor, svr, mlp, cubist, plsr."
             },
             {
               "parameter": "model_parameters_fp",
-              "parameter_type": "test",
+              "parameter_type": "text",
               "required": false,
               "default_value": "",
               "hint": "Regressor hyper-parameters: default (the standard regressor set), none (scikit-learn defaults), a parameter set name[@version] or a JSON file path relative to the project root."

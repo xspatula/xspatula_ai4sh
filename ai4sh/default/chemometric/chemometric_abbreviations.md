@@ -50,11 +50,13 @@ Every pre-process adds its abbreviation to the name of its input dataframe, sepa
 | `vt{n}` | Variance threshold on minmax-scaled bands, n = threshold without the leading "0." (e.g. `vt028`; files before 2026-10-31: `vtm028`) | Band reduction |
 | `wc{n}` | Ward agglomerative clustering, n = number of clusters (e.g. `wc40`) | Band reduction |
 | `pca{n}` | PCA, n = number of components (e.g. `pca5`) | Decomposition |
+| `wd` | Wavelet denoise (DWT, soft-thresholded details; same bands) | Wavelet |
+| `wt` | Wavelet coefficients as features (`wt1 .. wtn`) | Wavelet |
 | `uv` | Univariate selection — combined across indicators | Feature selection |
 | `uv-{indicator}` | Univariate selection for one indicator (spaces → hyphens) | Feature selection |
 | `{indicator}-{regressor}-pms` | Permutation importance selection | Feature selection |
 | `{indicator}-{regressor}-rfe` | Recursive feature elimination | Feature selection |
-| `{indicator}-{regressor}-tree` | Tree-based importance selection | Feature selection |
+| `{indicator}-tree` | Tree-based (extra trees) importance selection | Feature selection |
 
 ## User name extension
 

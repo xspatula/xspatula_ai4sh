@@ -8,6 +8,7 @@ import os
 import json
 import numbers
 import re
+from types import SimpleNamespace
 
 import numpy as np
 import pandas as pd
@@ -23,7 +24,8 @@ from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_regressi
 from sklearn.model_selection import KFold
 
 from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction,
-                                     apply_scaling, apply_decomposition, SCATTER_CORRECTIONS, Scatter_abbrev)
+                                     apply_scaling, apply_decomposition, SCATTER_CORRECTIONS, Scatter_abbrev,
+                                     apply_wavelet, Wavelet_settings, Wavelet_abbrev)
 from src.ai4sh.chemometric_chain import (Parse_chain, Apply_chain, Chain_from_companion, Check_spectral_range,
                                          Num_tag as _num_tag,
                                          Filter_suffix as _filter_suffix)
@@ -117,8 +119,8 @@ def _name_extension(p):
 _DERIVED_RE = DERIVED_STEM_RE
 
 # Spectral column patterns: wl_nm_1350 (band, see spectral_columns.py), d1350 (derivative),
-# pc1 (PCA), wc1 (Ward cluster)
-_DERIVED_SPECTRAL_COL_RE = re.compile(r'^(?:d\d+|pc\d+|wc\d+)$')
+# pc1 (PCA), wc1 (Ward cluster), wt1 (wavelet coefficient)
+_DERIVED_SPECTRAL_COL_RE = re.compile(r'^(?:d\d+|pc\d+|wc\d+|wt\d+)$')
 
 
 def _is_spectral_col(col):
@@ -130,7 +132,7 @@ def _col_to_index(col):
     s = str(col)
     if Is_band_col(s):
         return Band_value(s)
-    if s.startswith('pc') or s.startswith('wc'):
+    if s[:2] in ('pc', 'wc', 'wt'):
         return int(s[2:])
     if s.startswith('d'):
         return int(s[1:])
@@ -194,6 +196,21 @@ def _build_output_data(out_cols, signal_type=None, indicator_cols=None):
     return out
 
 
+def _Mark_wavelet_blocks(ax, df):
+    '''Wavelet coefficients (df.attrs wavelet_blocks from apply_wavelet): a line between the approximation and detail
+    blocks and their labels (A3 | D3 ...) at the top of the panel.'''
+    blocks = getattr(df, 'attrs', {}).get('wavelet_blocks')
+    if not blocks:
+        return
+    start = 0.5
+    for i, (label, n) in enumerate(blocks):
+        if i:
+            ax.axvline(start, color='dimgray', lw=0.8, ls='--')
+        ax.text(start + n / 2.0, 0.98, label, transform=ax.get_xaxis_transform(), ha='center', va='top',
+                fontsize=8, color='dimgray')
+        start += n
+
+
 def _build_output_format(out_cols):
     '''Describe the column format of the output column names.'''
     if not out_cols:
@@ -203,6 +220,12 @@ def _build_output_format(out_cols):
         return {
             'data_type': 'pca',
             'column_format': 'pc{n} — n is component number starting at 1',
+            'spectral_array': list(range(1, len(out_cols) + 1)),
+        }
+    if first.startswith('wt'):
+        return {
+            'data_type': 'wavelet',
+            'column_format': 'wt{n} — n is the wavelet coefficient index (approximation first)',
             'spectral_array': list(range(1, len(out_cols) + 1)),
         }
     if first.startswith('wc'):
@@ -238,6 +261,8 @@ def _step_abbrev_from_info(process_name, parameters):
                     parameters.get('method', ''), 'sc')
     if process_name == 'spectra_decomposition':
         return 'pca%d' % parameters.get('n_components', 5)
+    if process_name == 'spectra_wavelet':
+        return Wavelet_abbrev(parameters)
     if process_name == 'select_variance_threshold':
         return 'vt'
     if process_name == 'detect_outliers':
@@ -470,6 +495,10 @@ def _spectra_x_axis_ml(columns):
     first = str(columns[0])
     if first.startswith('pc'):
         return list(range(1, len(columns) + 1)), 'Component'
+    if first.startswith('wt'):
+        return list(range(1, len(columns) + 1)), 'Wavelet coefficient'
+    if Is_band_col(first):
+        return [Band_value(c) for c in columns], 'Wavelength (nm)'
     try:
         vals = [int(str(c).lstrip('d')) for c in columns]
         return vals, 'Wavelength (nm)'
@@ -574,6 +603,8 @@ class Process_ml_preprocess(Get_schema_table):
             self._Spectra_scaling()
         elif self.process_S.process.process == 'spectra_decomposition':
             self._Spectra_decomposition()
+        elif self.process_S.process.process == 'spectra_wavelet':
+            self._Spectra_wavelet()
         elif self.process_S.process.process == 'filter_spectra':
             self._Filter_spectra()
         elif self.process_S.process.process in ('multi_filter_spectra', 'mulit_filter_spectra'):
@@ -1332,6 +1363,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         for i, row in enumerate(spec_out.values):
             ax_out.plot(wl_out, row, color=colors[i], linewidth=0.5, alpha=0.6)
+        _Mark_wavelet_blocks(ax_out, spec_out)
         ax_out.set_xlabel(xl_out)
         ax_out.set_ylabel('Value')
         ax_out.set_title(title_out)
@@ -1364,6 +1396,7 @@ class Process_ml_preprocess(Get_schema_table):
             wl, xl = _spectra_x_axis_ml(cols)
             for i, row in enumerate(sub.values):
                 ax.plot(wl, row, color=colors[i], linewidth=0.5, alpha=0.6)
+            _Mark_wavelet_blocks(ax, spec_full)
             ax.set_xlabel(xl)
             ax.set_ylabel('Value')
             ax.set_title(label)
@@ -1400,7 +1433,7 @@ class Process_ml_preprocess(Get_schema_table):
         if confirm:
             ans = input('\n    Accept and save %s result? [y/n]: ' % abbrev).strip().lower()
             if ans != 'y':
-                print('    Result discarded.')
+                print('    Result discarded (answer y to save %s).' % Derived_stem(stem, abbrev))
                 return None, False
 
         non_spectral = [c for c in df_orig.columns if not _is_spectral_col(c)]
@@ -1801,7 +1834,8 @@ class Process_ml_preprocess(Get_schema_table):
 
     def _Plot_uv_result(self, spec_df, spec_retained, spec_discarded,
                          wavelengths, retained_wl, discarded_wl,
-                         title_suffix, ann, show, save, plot_dir, fname, colormap, max_spectra):
+                         title_suffix, ann, show, save, plot_dir, fname, colormap, max_spectra,
+                         xlabel='Wavelength (nm)'):
         '''3-panel univariate selection plot: input / retained (highest F) / discarded (lowest F).
 
         Each panel has a row of small dots along the bottom x-axis marking band positions:
@@ -1818,6 +1852,18 @@ class Process_ml_preprocess(Get_schema_table):
         _zeros  = lambda n: [0] * n   # y=0 in axes-fraction coords (bottom)
 
         fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 9), sharex=False)
+        pos = {w: i for i, w in enumerate(wavelengths)}
+
+        def _Gapped(subset, values):
+            '''x, y with NaN where the subset skips bands, so no line is drawn across a gap.'''
+            xs, ys = [], []
+            for j, (w, v) in enumerate(zip(subset, values)):
+                if j and pos[w] != pos[subset[j - 1]] + 1:
+                    xs.append(np.nan)
+                    ys.append(np.nan)
+                xs.append(w)
+                ys.append(v)
+            return xs, ys
 
         for i, row_i in enumerate(idx):
             ax1.plot(wavelengths, spec_df.iloc[row_i].values,
@@ -1832,8 +1878,9 @@ class Process_ml_preprocess(Get_schema_table):
                  ha='right', va='top', fontsize=7, color='dimgray')
 
         for i, row_i in enumerate(idx):
-            ax2.plot(retained_wl, spec_retained.iloc[row_i].values,
-                     color=colors[i], linewidth=0.5, alpha=0.6)
+            ax2.plot(*_Gapped(retained_wl, spec_retained.iloc[row_i].values),
+                     color=colors[i], linewidth=0.5, alpha=0.6,
+                     marker='.', markersize=1.5)   # a band kept alone is a dot
         t2 = ax2.get_xaxis_transform()
         ax2.plot(retained_wl, _zeros(len(retained_wl)), color='green', transform=t2, **_dot_kw)
         ax2.set_ylabel('Value')
@@ -1841,12 +1888,13 @@ class Process_ml_preprocess(Get_schema_table):
             len(retained_wl), len(wavelengths), title_suffix))
 
         for i, row_i in enumerate(idx):
-            ax3.plot(discarded_wl, spec_discarded.iloc[row_i].values,
-                     color=colors[i], linewidth=0.5, alpha=0.6)
+            ax3.plot(*_Gapped(discarded_wl, spec_discarded.iloc[row_i].values),
+                     color=colors[i], linewidth=0.5, alpha=0.6,
+                     marker='.', markersize=1.5)   # a band kept alone is a dot
         t3 = ax3.get_xaxis_transform()
         ax3.plot(discarded_wl, _zeros(len(discarded_wl)), color='red', transform=t3, **_dot_kw)
         ax3.set_ylabel('Value')
-        ax3.set_xlabel('Wavelength (nm)')
+        ax3.set_xlabel(xlabel)
         ax3.set_title('Discarded  (%d of %d bands) — lowest F-score' % (
             len(discarded_wl), len(wavelengths)))
 
@@ -1871,18 +1919,25 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: project_root_fp not found: %s' % project_root_fp)
             return
 
-        uv_fp_param = str(getattr(p, 'univariate_selector_fp', 'none')).strip()
+        uv_fp_param = str(getattr(p, 'univariate_selector_fp', 'none') or 'none').strip()
+        n_features  = int(getattr(p, 'n_features', 0) or 0)
         uv_fp       = self._Resolve_filter_fp(uv_fp_param)
-        if uv_fp is None:
-            print('    ERROR: univariate_selector_fp is required.')
+        if uv_fp is None and n_features <= 0:
+            print('    ERROR: give n_features or univariate_selector_fp.')
             return
-        if not os.path.exists(uv_fp):
+        if uv_fp is not None and not os.path.exists(uv_fp):
             print('    ERROR: univariate selector file not found: %s' % uv_fp)
             return
 
-        cfg = Load_config_json(uv_fp)
-
-        n_features          = int(cfg.get('SelectKBest', {}).get('n_features', 20))
+        # n_features overrides SelectKBest n_features of the selector file
+        cfg = Load_config_json(uv_fp) if uv_fp is not None else {}
+        confirm = n_features <= 0    # asked only when the number of bands comes from the selector file
+        if n_features <= 0:
+            n_features = int(cfg.get('SelectKBest', {}).get('n_features', 20))
+        cfg = dict(cfg, SelectKBest=dict(cfg.get('SelectKBest', {}), n_features=n_features))
+        ext = _name_extension(p)
+        if ext is None:
+            return
         test_size           = float(getattr(p, 'test_size', 0.3))
         dataframe_param     = str(getattr(p, 'dataframe', 'raw')).strip()
         indicator_array     = _parse_array_param(getattr(p, 'indicator_array', []))
@@ -1941,7 +1996,7 @@ class Process_ml_preprocess(Get_schema_table):
 
         if separate_selections:
             for indicator in indicator_cols:
-                abbrev     = 'uv-' + indicator.replace(' ', '-')
+                abbrev     = 'uv-' + indicator.replace(' ', '-') + ext
                 valid_mask = ~df[indicator].isna() & train_rows
                 n_valid    = int(valid_mask.sum())
                 if n_valid < 5:
@@ -1976,7 +2031,7 @@ class Process_ml_preprocess(Get_schema_table):
                     spec_df, spec_out_df, spec_dis_df,
                     wavelengths, retained_wl, discarded_wl,
                     indicator, ann_shown, show, save, plot_dir,
-                    'univariate_%s.png' % abbrev, colormap, max_spectra,
+                    'univariate_%s.png' % abbrev, colormap, max_spectra, _spectra_x_axis_ml(spectral_cols)[1],
                 )
 
                 step_info = {
@@ -1992,11 +2047,11 @@ class Process_ml_preprocess(Get_schema_table):
                     'selected_bands': retained_wl,
                     'holdout': holdout,
                 }
-                self._Accept_and_save(df, spec_out_df, retained_wl, abbrev,
-                                       stem, project_root_fp, overwrite, step_info, units_D)
+                self._Accept_and_save(df, spec_out_df, retained_cols, abbrev,
+                                       stem, project_root_fp, overwrite, step_info, units_D, confirm=confirm)
 
         else:
-            # Combined: average F-scores across all indicators
+            # Combined: F-scores scaled 0–1 per indicator, then averaged across the indicators
             scores_sum  = np.zeros(n_bands)
             n_valid_ind = 0
             for indicator in indicator_cols:
@@ -2009,7 +2064,9 @@ class Process_ml_preprocess(Get_schema_table):
                 y_valid = df.loc[valid_mask, indicator].values.astype(float)
                 sel = SelectKBest(f_regression, k='all')
                 sel.fit(X_valid, y_valid)
-                scores_sum  += np.nan_to_num(sel.scores_, nan=0.0)
+                sc  = np.nan_to_num(sel.scores_, nan=0.0)
+                rng = sc.max() - sc.min()   # scaled 0–1 per indicator: larger F-scores of one indicator do not dominate
+                scores_sum  += (sc - sc.min()) / rng if rng > 0 else np.zeros(n_bands)
                 n_valid_ind += 1
 
             if n_valid_ind == 0:
@@ -2026,8 +2083,8 @@ class Process_ml_preprocess(Get_schema_table):
             discarded_wl  = [wavelengths[i]   for i in discard_idx]
 
             if self.verbose >= 1:
-                print('    Combined (%d indicators): retained F-score range [%.1f – %.1f],  '
-                      'discarded range [%.1f – %.1f]' % (
+                print('    Combined (%d indicators): retained mean scaled F-score [%.2f – %.2f],  '
+                      'discarded [%.2f – %.2f]' % (
                           n_valid_ind,
                           mean_scores[top_k_sorted].min(), mean_scores[top_k_sorted].max(),
                           mean_scores[discard_idx].min(),  mean_scores[discard_idx].max()))
@@ -2040,11 +2097,11 @@ class Process_ml_preprocess(Get_schema_table):
                 spec_df, spec_out_df, spec_dis_df,
                 wavelengths, retained_wl, discarded_wl,
                 'combined (%d indicators)' % n_valid_ind, ann_shown,
-                show, save, plot_dir, 'univariate_uv.png', colormap, max_spectra,
+                show, save, plot_dir, 'univariate_uv.png', colormap, max_spectra, _spectra_x_axis_ml(spectral_cols)[1],
             )
 
             step_info = {
-                '_id': 'uv',
+                '_id': 'uv' + ext,
                 'process': 'spectra_indicator_univariate_selection',
                 'parameters': {
                     'univariate_selector_fp': uv_fp_param,
@@ -2056,8 +2113,8 @@ class Process_ml_preprocess(Get_schema_table):
                 'selected_bands': retained_wl,
                 'holdout': holdout,
             }
-            self._Accept_and_save(df, spec_out_df, retained_wl, 'uv',
-                                   stem, project_root_fp, overwrite, step_info, units_D)
+            self._Accept_and_save(df, spec_out_df, retained_cols, 'uv' + ext,
+                                   stem, project_root_fp, overwrite, step_info, units_D, confirm=confirm)
 
     # ------------------------------------------------------------------ permutation / RFE / tree selector
 
@@ -2067,7 +2124,7 @@ class Process_ml_preprocess(Get_schema_table):
         from src.ai4sh.machine_learning_model import _build_regressor, _DEFAULT_MODEL_PARAMS_FP
         from sklearn.feature_selection import RFE, RFECV
         from sklearn.ensemble import ExtraTreesRegressor
-        from sklearn.model_selection import train_test_split
+        from sklearn.model_selection import KFold
         from sklearn.inspection import permutation_importance as sk_perm_importance
         from sklearn.base import clone
 
@@ -2087,8 +2144,15 @@ class Process_ml_preprocess(Get_schema_table):
         model_params_param  = str(getattr(p, 'model_parameters_fp', 'default')).strip()
         separate_selections = bool(getattr(p, 'separate_selections', False))
         n_top               = int(getattr(p, 'n_top_features_in_plot', 0))
+        n_features          = int(getattr(p, 'n_features', 0) or 0)
+        selector_param      = str(getattr(p, 'selector_parameters', 'default') or 'default').strip()
+        show                = bool(getattr(p, 'show', True))
+        save                = bool(getattr(p, 'save', True))
         overwrite           = self._Overwrite(p)
         test_size           = float(getattr(p, 'test_size', 0.3))
+        ext                 = _name_extension(p)
+        if ext is None:
+            return
 
         if not selector_array:
             print('    ERROR: selector_array is empty.')
@@ -2103,16 +2167,17 @@ class Process_ml_preprocess(Get_schema_table):
 
         # Model hyperparameters and selector settings (parameter set name, default, none or JSON path)
         model_params = self._Load_named_settings('regressor', model_params_param or 'default', _DEFAULT_MODEL_PARAMS_FP)
-        sel_defaults = self._Load_named_settings('selector', 'default',
+        sel_defaults = self._Load_named_settings('selector', selector_param,
                                                  Default_fpn('selector', 'selector_default_settings.json'))
         if model_params is None or sel_defaults is None:
             return
         # keys of the settings file: permutation / tree_based (older code read permutation_selector / tree_based_selector)
         perm_cfg     = sel_defaults.get('permutation', sel_defaults.get('permutation_selector', {}))
         tree_cfg     = sel_defaults.get('tree_based', sel_defaults.get('tree_based_selector', {}))
-        perm_repeats = int(perm_cfg.get('permutation_repeats', 6))
+        perm_repeats = int(perm_cfg.get('permutation_repeats', perm_cfg.get('repeats', 6)))
+        perm_folds   = int(perm_cfg.get('folds', 5))
         rfe_cv       = int(sel_defaults.get('rfe', {}).get('CV', 0))
-        rfe_step     = int(sel_defaults.get('rfe', {}).get('step', 1))
+        rfe_step     = float(sel_defaults.get('rfe', {}).get('step', 1))   # >= 1 bands, < 1 fraction per round
         tree_n_est   = int(tree_cfg.get('n_estimators', 20))
 
         # Load parquet
@@ -2161,7 +2226,7 @@ class Process_ml_preprocess(Get_schema_table):
                     print('    WARNING: indicator "%s" not found, skipping.' % col)
             indicator_cols = [c for c in indicator_array if c in all_indicators]
         else:
-            indicator_cols = all_indicators
+            indicator_cols = _Default_indicators(parquet_fp, all_indicators, self.verbose)
         if not indicator_cols:
             print('    ERROR: no valid indicator columns.')
             return
@@ -2179,14 +2244,20 @@ class Process_ml_preprocess(Get_schema_table):
             print('    ERROR: no valid regressors built.')
             return
 
-        # Output dirs
-        plot_dir = os.path.join(project_root_fp, 'plot', 'selection_plot')
-        cov_dir  = os.path.join(project_root_fp, 'covariate_importance')
-        os.makedirs(plot_dir, exist_ok=True)
-        os.makedirs(cov_dir,  exist_ok=True)
+        # Output dirs (made when something is saved)
+        plot_dir  = os.path.join(project_root_fp, 'plot', 'selection_plot')
+        score_dir = os.path.join(project_root_fp, 'band_selection')
+        if save:
+            os.makedirs(plot_dir,  exist_ok=True)
+            os.makedirs(score_dir, exist_ok=True)
+        band_label = _spectra_x_axis_ml(spectral_cols)[1]
+        unit = {'Wavelet coefficient': 'coefficients', 'Component': 'components'}.get(band_label, 'bands')
 
         def _ind_safe(ind):
             return ind.replace(' ', '-').replace('/', '-')
+
+        def _Is_tree(sel_key):
+            return sel_key.lower() in ('tree_based', 'tree', 'treebased')
 
         def _sel_suffix(sel_key):
             k = sel_key.lower()
@@ -2196,76 +2267,81 @@ class Process_ml_preprocess(Get_schema_table):
                 return 'rfe'
             return 'tree'
 
+        def _Name(ind_s, reg_key, suffix):
+            '''<indicator>-<regressor>-pms|rfe, <indicator>-tree (extra trees, no regressor) + the name extension.'''
+            return ('%s-%s' % (ind_s, suffix) if suffix == 'tree' else '%s-%s-%s' % (ind_s, reg_key, suffix)) + ext
+
+        def _Permutation_scores(regressor, X, y):
+            '''Permutation importance out-of-fold on the training samples: in every fold a model fitted on the other
+            folds is permuted on the fold; the repeats of all folds are pooled.'''
+            parts = []
+            for tr, te in KFold(n_splits=min(perm_folds, len(y)), shuffle=True, random_state=42).split(X):
+                model = clone(regressor).fit(X[tr], y[tr])
+                parts.append(sk_perm_importance(model, X[te], y[te], scoring='r2', n_repeats=perm_repeats,
+                                                random_state=42).importances)
+            importances = np.concatenate(parts, axis=1)
+            pi = SimpleNamespace(importances=importances, importances_mean=importances.mean(axis=1),
+                                 importances_std=importances.std(axis=1))
+            return {'scores': pi.importances_mean, 'pi': pi, 'method': 'Permutation importance',
+                    'axis': 'Permutation importance (decrease in r², out-of-fold)'}
+
+        def _Rfe_scores(selector):
+            '''Rounds a band survived the elimination (rank 1 = kept to the end); the kept bands ordered by the
+            |coefficient| or importance of the final estimator (fraction added below the next round).'''
+            ranking = selector.ranking_.astype(float)
+            scores = ranking.max() + 1.0 - ranking
+            est = selector.estimator_
+            imp = getattr(est, 'feature_importances_', None)
+            if imp is None and getattr(est, 'coef_', None) is not None:
+                imp = np.abs(np.atleast_2d(est.coef_)).sum(axis=0)
+            if imp is not None and len(imp) == int((ranking == 1).sum()) and np.max(imp) > 0:
+                scores[ranking == 1] += 0.99 * np.asarray(imp, dtype=float) / np.max(imp)
+            return scores
+
         def _compute_scores(sel_key, regressor, X, y):
-            '''
-            Returns (scores_1d, pi_or_None) — scores are higher-is-better.
-            regressor is ignored for tree_based (uses its own ExtraTreesRegressor).
-            '''
+            '''{scores (higher = more important), pi (permutation) or None, n_auto (RFECV) or None, method, axis,
+            rfecv curve or None}. X, y: the training samples. regressor is not used by tree_based.'''
             k = sel_key.lower()
             if k in ('permutation', 'permutation_selector'):
-                X_tr, X_te, y_tr, y_te = train_test_split(
-                    X, y, test_size=0.3, random_state=42, shuffle=True)
-                model = clone(regressor)
-                model.fit(X_tr, y_tr)
-                pi = sk_perm_importance(model, X_te, y_te,
-                                        n_repeats=perm_repeats, random_state=42)
-                return pi.importances_mean, pi
+                return dict(_Permutation_scores(regressor, X, y), n_auto=None, curve=None)
             if k == 'rfe':
-                X_tr, X_te, y_tr, y_te = train_test_split(
-                    X, y, test_size=0.3, random_state=42, shuffle=True)
-
-                # Probe-fit to check whether this regressor exposes coef_ or
-                # feature_importances_ — required for RFE's importance_getter='auto'.
-                # Models like knn and svr(rbf) don't, so RFE cannot use them.
+                # RFE ranks the bands by the coefficients or impurity importance of the regressor; knn, mlp and svr
+                # (rbf) have neither — permutation importance instead
                 probe = clone(regressor)
-                rfe_compatible = False
                 try:
-                    n_probe = min(20, len(X_tr))
-                    probe.fit(X_tr[:n_probe], y_tr[:n_probe])
-                    rfe_compatible = (
-                        hasattr(probe, 'feature_importances_') or
-                        hasattr(probe, 'coef_') or
-                        (hasattr(probe, 'named_steps') and
-                         hasattr(probe.named_steps.get('clf', object()), 'coef_'))
-                    )
+                    probe.fit(X[:min(len(y), 40)], y[:min(len(y), 40)])
                 except Exception:
                     pass
-
-                if rfe_compatible:
-                    if hasattr(probe, 'named_steps') and not hasattr(probe, 'coef_'):
-                        def imp_getter(est):
-                            return np.abs(est.named_steps['clf'].coef_).ravel()
-                    else:
-                        imp_getter = 'auto'
-                    model = clone(regressor)
-                    if rfe_cv > 0:
-                        selector = RFECV(model, min_features_to_select=1,
-                                         step=rfe_step, cv=rfe_cv,
-                                         importance_getter=imp_getter)
-                    else:
-                        selector = RFE(model, n_features_to_select=1, step=rfe_step,
-                                       importance_getter=imp_getter)
-                    selector.fit(X_tr, y_tr)
-                    return 1.0 / selector.ranking_.astype(float), None
-                else:
-                    # RFE cannot handle this model — skip RFE entirely and fall
-                    # back to standalone permutation importance on the full set.
-                    print('      ⚠️  %s is RFE-incompatible (no coef_/feature_importances_); '
-                          'using permutation importance instead.'
-                          % type(probe).__name__)
-                    model = clone(regressor)
-                    model.fit(X_tr, y_tr)
-                    pi = sk_perm_importance(model, X_te, y_te,
-                                            n_repeats=perm_repeats, random_state=42)
-                    return pi.importances_mean, pi
-            if k in ('tree_based', 'tree', 'treebased'):
+                if not (hasattr(probe, 'coef_') or hasattr(probe, 'feature_importances_')):
+                    print('      ⚠️  %s has no coefficients or feature importances — permutation importance instead of RFE'
+                          % type(regressor).__name__)
+                    return dict(_Permutation_scores(regressor, X, y), n_auto=None, curve=None)
+                step = int(rfe_step) if rfe_step >= 1 else rfe_step
+                axis = 'RFE: elimination rounds survived (kept bands ordered by importance)'
+                if rfe_cv > 0:
+                    selector = RFECV(clone(regressor), min_features_to_select=1, step=step,
+                                     cv=KFold(n_splits=rfe_cv, shuffle=True, random_state=42), scoring='r2')
+                    selector.fit(X, y)
+                    if self.verbose >= 1:
+                        print('        RFECV: %d %s give the best cross-validated r2' % (selector.n_features_, unit))
+                    cv = selector.cv_results_
+                    curve = (np.asarray(cv['n_features']), np.asarray(cv['mean_test_score']),
+                             np.asarray(cv['std_test_score']))
+                    return {'scores': _Rfe_scores(selector), 'pi': None, 'n_auto': int(selector.n_features_),
+                            'method': 'RFECV', 'axis': axis, 'curve': curve}
+                selector = RFE(clone(regressor), n_features_to_select=1, step=step)
+                selector.fit(X, y)
+                return {'scores': _Rfe_scores(selector), 'pi': None, 'n_auto': None, 'method': 'RFE', 'axis': axis,
+                        'curve': None}
+            if _Is_tree(k):
                 model = ExtraTreesRegressor(n_estimators=tree_n_est, random_state=42)
                 model.fit(X, y)
-                return model.feature_importances_, None
+                return {'scores': model.feature_importances_, 'pi': None, 'n_auto': None,
+                        'method': 'Tree-based importance', 'axis': 'Impurity importance (extra trees)', 'curve': None}
             print('    WARNING: unknown selector type "%s", skipping.' % sel_key)
-            return None, None
+            return None
 
-        def _make_bar_plot(scores, pi_or_none, title):
+        def _make_bar_plot(scores, pi_or_none, title, xlabel):
             '''Horizontal bar of top-N scores; best bar at top. Returns (fig, order).'''
             order    = np.argsort(scores)[::-1]
             n_show   = min(n_top, n_bands) if n_top > 0 else n_bands
@@ -2283,43 +2359,88 @@ class Process_ml_preprocess(Get_schema_table):
                 ax.set_yticklabels([str(w) for w in plot_wl], fontsize=7)
             else:
                 ax.set_yticks([])
-            ax.set_xlabel('Score (higher = more important)')
-            ax.set_ylabel('Wavelength (nm)')
-            ax.set_title(title)
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(band_label)
+            ax.set_title(title, fontsize=10)
             plt.tight_layout()
             return fig, order
 
-        def _save_scores_json(scores, pi_or_none, indicator, reg_key, sel_key, ind_s):
+        def _Curve_plot(curve, n_auto, title):
+            '''RFECV: mean ± std cross-validated r² against the number of bands, the chosen number marked.'''
+            n, mean, std = curve
+            fig, ax = plt.subplots(figsize=(6, 3.5))
+            ax.plot(n, mean, color='steelblue', lw=1.2)
+            ax.fill_between(n, mean - std, mean + std, color='steelblue', alpha=0.2, lw=0)
+            ax.axvline(n_auto, color='firebrick', lw=1, ls='--')
+            ax.text(n_auto, ax.get_ylim()[1], ' %d %s' % (n_auto, unit), color='firebrick', va='top', fontsize=8)
+            ax.set_xlabel('Number of %s kept' % unit)
+            ax.set_ylabel('Cross-validated r² (mean ± std)')
+            ax.set_title(title, fontsize=10)
+            plt.tight_layout()
+            return fig
+
+        def _Show_save(fig, plot_fn):
+            if show:
+                plt.show()
+            if save:
+                fig.savefig(os.path.join(plot_dir, plot_fn), dpi=150, bbox_inches='tight')
+            plt.close(fig)
+
+        def _save_scores_json(res, indicator, reg_key, sel_key, name):
+            '''Band scores, best first (saved with the plots, under band_selection/).'''
+            if not save:
+                return
+            scores, pi_or_none = res['scores'], res['pi']
             order     = np.argsort(scores)[::-1]
-            ranked_wl = [wavelengths[i]            for i in order]
-            ranked_sc = [round(float(scores[i]), 6) for i in order]
             data = {
                 'indicator':  indicator,
                 'regressor':  reg_key,
                 'selector':   sel_key,
-                'wavelengths': ranked_wl,
-                'scores':      ranked_sc,
+                'score':      res['axis'],
+                'wavelengths': [wavelengths[i] for i in order],
+                'scores':      [round(float(scores[i]), 6) for i in order],
             }
             if pi_or_none is not None:
                 data['importances_std'] = [
                     round(float(pi_or_none.importances_std[i]), 6) for i in order]
                 data['importances_all'] = [
                     [round(float(v), 6) for v in pi_or_none.importances[i]] for i in order]
-            fname = '%s_%s_%s_%s.json' % (stem, ind_s, reg_key, sel_key)
-            with open(os.path.join(cov_dir, fname), 'w') as fh:
+            if res.get('curve') is not None:
+                n, mean, std = res['curve']
+                data['rfecv'] = {'n_features_selected': res['n_auto'], 'n_features': [int(v) for v in n],
+                                 'mean_r2': [round(float(v), 6) for v in mean], 'std_r2': [round(float(v), 6) for v in std]}
+            with open(os.path.join(score_dir, '%s.%s.json' % (stem, name)), 'w') as fh:
                 json.dump(data, fh, indent=2)
 
-        def _prompt_and_write(order, indicator, reg_key, sel_key, suffix, ind_s):
-            '''Prompt for number of bands to retain, then save parquet + companion JSON.'''
+        def _Plots(res, label, reg_key, sel_key, name):
             n_shown = min(n_top, n_bands) if n_top > 0 else n_bands
-            try:
-                ans = int(input(
-                    '\n    How many top bands to retain for "%s" / %s / %s? '
-                    '(0 = skip saving, %d bands shown in plot): '
-                    % (indicator, reg_key, sel_key, n_shown)
-                ).strip())
-            except (ValueError, EOFError):
-                ans = 0
+            title = '%s — %s%s  (top %d of %d)' % (res['method'], label, '' if _Is_tree(sel_key) else ' / ' + reg_key,
+                                                  n_shown, n_bands)
+            fig, order = _make_bar_plot(res['scores'], res['pi'], title, res['axis'])
+            _Show_save(fig, '%s.png' % name)
+            if res.get('curve') is not None:
+                _Show_save(_Curve_plot(res['curve'], res['n_auto'],
+                                       'RFECV — %s / %s: %d %s chosen' % (label, reg_key, res['n_auto'], unit)),
+                           '%s_rfecv.png' % name)
+            _save_scores_json(res, label, reg_key, sel_key, name)
+            return order
+
+        def _prompt_and_write(order, indicator, reg_key, sel_key, name, n_auto=None):
+            '''Bands to retain: n_features, else the number RFECV chose, else asked; then save parquet + companion JSON.'''
+            n_shown = min(n_top, n_bands) if n_top > 0 else n_bands
+            if n_features > 0 or n_auto:
+                ans = n_features if n_features > 0 else n_auto
+                if self.verbose >= 1:
+                    print('    Retaining the top %d bands for "%s" / %s / %s' % (ans, indicator, reg_key, sel_key))
+            else:
+                try:
+                    ans = int(input(
+                        '\n    How many top bands to retain for "%s" / %s / %s? '
+                        '(0 = skip saving, %d bands shown in plot): '
+                        % (indicator, reg_key, sel_key, n_shown)
+                    ).strip())
+                except (ValueError, EOFError):
+                    ans = 0
             if ans <= 0:
                 print('    Skipping save.')
                 return
@@ -2327,7 +2448,7 @@ class Process_ml_preprocess(Get_schema_table):
             top_idx  = sorted(order[:n_retain])
             top_cols = [spectral_cols[i] for i in top_idx]
             top_wl   = [wavelengths[i]   for i in top_idx]
-            abbrev   = '%s-%s-%s' % (ind_s, reg_key, suffix)
+            abbrev   = name
             out_stem = Derived_stem(stem, abbrev)
             out_fp   = os.path.join(project_root_fp, out_stem + '.parquet')
             if os.path.exists(out_fp) and not overwrite:
@@ -2340,8 +2461,7 @@ class Process_ml_preprocess(Get_schema_table):
                 })
                 return
             non_spectral = [c for c in df.columns if not _is_spectral_col(c)]
-            spec_out = df[top_cols].copy()
-            spec_out.columns = [Band_col_name(wl) for wl in top_wl]
+            spec_out = df[top_cols].copy()   # column names kept: wl_nm_<n>, d<n>, pc<n>, wt<n>
             signal_type = Signal_type_of(units_D, top_cols)
             df_save = pd.concat([
                 df[non_spectral].reset_index(drop=True),
@@ -2358,6 +2478,7 @@ class Process_ml_preprocess(Get_schema_table):
                     'indicator':          indicator,
                     'n_features_selected': n_retain,
                     'test_size':          test_size,
+                    'selector_parameters': selector_param,
                 },
                 'selected_bands': top_wl,
                 'holdout': holdout,
@@ -2394,36 +2515,24 @@ class Process_ml_preprocess(Get_schema_table):
 
                 for sel_key in selector_array:
                     suffix = _sel_suffix(sel_key)
-                    k      = sel_key.lower()
                     # tree_based needs no external regressor
-                    reg_items = (list(regressors.items())
-                                 if k not in ('tree_based', 'tree', 'treebased')
-                                 else [('tree_based', None)])
+                    reg_items = [('extra_trees', None)] if _Is_tree(sel_key) else list(regressors.items())
                     for reg_key, regressor in reg_items:
                         if self.verbose >= 1:
                             print('      %s / %s' % (sel_key, reg_key))
-                        scores, pi = _compute_scores(sel_key, regressor, X, y)
-                        if scores is None:
+                        res = _compute_scores(sel_key, regressor, X, y)
+                        if res is None:
                             continue
-                        title = '%s — %s / %s / %s  (top %d of %d)' % (
-                            suffix.upper(), indicator, reg_key, sel_key,
-                            min(n_top, n_bands) if n_top > 0 else n_bands, n_bands)
-                        fig, order = _make_bar_plot(scores, pi, title)
-                        plt.show()
-                        plot_fn = '%s_%s_%s_%s.png' % (ind_s, reg_key, sel_key, suffix)
-                        fig.savefig(os.path.join(plot_dir, plot_fn), dpi=150, bbox_inches='tight')
-                        plt.close(fig)
-                        _save_scores_json(scores, pi, indicator, reg_key, sel_key, ind_s)
-                        _prompt_and_write(order, indicator, reg_key, sel_key, suffix, ind_s)
+                        name  = _Name(ind_s, reg_key, suffix)
+                        order = _Plots(res, indicator, reg_key, sel_key, name)
+                        _prompt_and_write(order, indicator, reg_key, sel_key, name, res['n_auto'])
 
         else:
-            # Combined: average scores across indicators, one result per (regressor × selector)
+            # Combined: one result per (regressor × selector); the scores of each indicator are scaled to 0–1 before
+            # they are averaged, so an indicator with larger scores does not dominate
             for sel_key in selector_array:
                 suffix = _sel_suffix(sel_key)
-                k      = sel_key.lower()
-                reg_items = (list(regressors.items())
-                             if k not in ('tree_based', 'tree', 'treebased')
-                             else [('tree_based', None)])
+                reg_items = [('extra_trees', None)] if _Is_tree(sel_key) else list(regressors.items())
                 for reg_key, regressor in reg_items:
                     if self.verbose >= 1:
                         print('    %s / %s (combined, %d indicators)' % (
@@ -2436,32 +2545,68 @@ class Process_ml_preprocess(Get_schema_table):
                             continue
                         X = X_all[valid_mask]
                         y = df.loc[valid_mask, indicator].values.astype(float)
-                        sc, _ = _compute_scores(sel_key, regressor, X, y)
-                        if sc is None:
+                        res = _compute_scores(sel_key, regressor, X, y)
+                        if res is None:
                             continue
-                        scores_sum  += sc
+                        sc = np.asarray(res['scores'], dtype=float)
+                        rng = sc.max() - sc.min()
+                        scores_sum  += (sc - sc.min()) / rng if rng > 0 else np.zeros(n_bands)
                         n_valid_ind += 1
                     if n_valid_ind == 0:
                         print('    WARNING: no valid indicators for %s / %s.' % (sel_key, reg_key))
                         continue
-                    mean_scores = scores_sum / n_valid_ind
                     label = 'combined (%d indicators)' % n_valid_ind
-                    title = '%s — %s / %s / %s  (top %d of %d)' % (
-                        suffix.upper(), label, reg_key, sel_key,
-                        min(n_top, n_bands) if n_top > 0 else n_bands, n_bands)
-                    fig, order = _make_bar_plot(mean_scores, None, title)
-                    plt.show()
-                    plot_fn = 'combined_%s_%s_%s.png' % (reg_key, sel_key, suffix)
-                    fig.savefig(os.path.join(plot_dir, plot_fn), dpi=150, bbox_inches='tight')
-                    plt.close(fig)
-                    _save_scores_json(mean_scores, None, label, reg_key, sel_key, 'combined')
-                    _prompt_and_write(order, label, reg_key, sel_key, suffix, 'combined')
+                    res = {'scores': scores_sum / n_valid_ind, 'pi': None, 'n_auto': None, 'curve': None,
+                           'method': res['method'], 'axis': 'Mean score, scaled 0–1 per indicator'}
+                    name  = _Name('combined', reg_key, suffix)
+                    order = _Plots(res, label, reg_key, sel_key, name)
+                    _prompt_and_write(order, label, reg_key, sel_key, name)
 
         if _prev_entries_acc:
             _write_previous_df(project_root_fp, 'spectra_indicator_permutation_selection',
                                _prev_entries_acc)
 
     # ------------------------------------------------------------------ individual steps
+
+    def _Spectra_wavelet(self):
+        '''Discrete wavelet transform: denoise (same bands, .wd) or the coefficients as features (wt1 .. wtn, .wt).'''
+        p   = self.process_S.process.parameters
+        ext = _name_extension(p)
+        if ext is None:
+            return
+        try:
+            settings = Wavelet_settings({k: getattr(p, k) for k in ('mode', 'wavelet', 'level', 'details')
+                                         if getattr(p, k, None) not in (None, '')})
+        except ValueError as e:
+            print('    ERROR: %s' % e)
+            return
+        inp = self._Load_spec_inputs(p)
+        if inp is None:
+            return
+        try:
+            spec_out, cols_out, label = apply_wavelet(inp['spec_df'], inp['wavelengths'], settings)
+        except ValueError as e:
+            print('    ERROR: %s' % e)
+            return
+        if self.verbose >= 1:
+            print('    %s: %d bands → %d %s' % (label, len(inp['wavelengths']), len(cols_out),
+                                             'bands' if settings['mode'] == 'denoise' else 'coefficients'))
+
+        sub_in,  colors, n_shown = self._Sub_spec(inp['spec_df'], inp['max_spectra'], inp['colormap'])
+        sub_out, _,      _       = self._Sub_spec(spec_out,       inp['max_spectra'], inp['colormap'])
+        abbrev = Wavelet_abbrev(settings) + ext
+        self._Plot_input_output(
+            sub_in, sub_out, inp['wavelengths'], list(cols_out), colors,
+            'Input spectra: %s' % inp['stem'], label.capitalize(),
+            '%s  shown=%d' % (inp['ann'], n_shown), inp['show'], inp['save'], inp['plot_dir'],
+            'chemometric_%s.png' % abbrev,
+        )
+        self._Accept_and_save(
+            inp['df'], spec_out, list(cols_out), abbrev,
+            inp['stem'], inp['project_root_fp'], inp['overwrite'],
+            {'_id': abbrev, 'process': 'spectra_wavelet', 'parameters': settings},
+            inp['units_D'],
+        )
 
     def _Spectra_derivative(self):
         '''Derivative; with more than one dataframe in dataframe_array the derivative of every input is

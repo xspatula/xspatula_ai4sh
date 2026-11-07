@@ -22,6 +22,7 @@ Method names (default settings)
     derivative          derivative (1st)
     variable scaling    meancentring, autoscaling, paretoscaling, poissonscaling
     decomposition       pca (5 components)
+    wavelet             wavelet (denoise, db4, level 3)
 
 Objects (custom settings)
     {"filter": <parameter set name | JSON path | {"savitzky-golay": {...}}>}
@@ -33,6 +34,7 @@ Objects (custom settings)
     {"ward_clustering": {"n_clusters": 40, "connectivity": true}}          n_clusters required
     {"ward_clustering": <JSON path with n_clusters>}
     {"pca": 5} or {"pca": {"n_components": 5}}
+    {"wavelet": {"mode": "denoise" | "coefficients", "wavelet": "db4", "level": 3, "details": 0}}
 
 Each step records the same companion-JSON chain entry and file suffix as the corresponding single process, so a chain
 gives the same file (e.g. 1350-2500_10.snv.sg5.d1.mc.wc40.pca5) and the same model replay as running the steps one
@@ -54,7 +56,8 @@ from sklearn.preprocessing import MinMaxScaler
 
 # Application package imports
 from src.ai4sh.chemometrics import (apply_derivative, apply_scatter_correction, apply_scaling,
-                                    apply_decomposition, SCATTER_CORRECTIONS, Scatter_abbrev)
+                                    apply_decomposition, apply_wavelet, SCATTER_CORRECTIONS, Scatter_abbrev,
+                                    Wavelet_settings, Wavelet_abbrev)
 from src.ai4sh.filter import apply_filter, apply_multi_filter, _DEFAULT_FILTER_DIR, _FILTER_DEFAULT_FILES
 from src.ai4sh.ml_setting import Load_settings, Is_path
 from src.ai4sh.provenance import Load_config_json
@@ -64,9 +67,9 @@ VARIABLE_SCALINGS   = {'meancentring': 'mc', 'autoscaling': 'as', 'paretoscaling
 FILTER_PRESETS      = ['moving-average', 'gauss', 'savitzky-golay', 'lowess']
 FILTER_KINDS        = ['moving_average', 'gauss', 'savitzky-golay', 'lowess']
 
-METHOD_NAMES = FILTER_PRESETS + SCATTER_CORRECTIONS + ['derivative'] + list(VARIABLE_SCALINGS) + ['pca']
+METHOD_NAMES = FILTER_PRESETS + SCATTER_CORRECTIONS + ['derivative'] + list(VARIABLE_SCALINGS) + ['pca', 'wavelet']
 OBJECT_KEYS  = ['filter', 'multi_filter', 'scatter_correction', 'derivative', 'scaling', 'variance_threshold',
-                'ward_clustering', 'pca']
+                'ward_clustering', 'pca', 'wavelet']
 
 
 def Num_tag(v):
@@ -139,6 +142,8 @@ def _Step(item, resolve_path):
             return _Step({'scaling': name}, resolve_path)
         if name == 'pca':
             return _Step({'pca': 5}, resolve_path)
+        if name == 'wavelet':
+            return _Step({'wavelet': {}}, resolve_path)
         if name in ('ward_clustering', 'variance_threshold'):
             raise ValueError('"%s" needs its settings: {"%s": {%s}}' % (
                 name, name, '"n_clusters": 40' if name == 'ward_clustering' else '"threshold": 0.03'))
@@ -213,6 +218,12 @@ def _Step(item, resolve_path):
             raise ValueError('pca %s: n_components must be an integer ≥ 1' % (val,))
         return {'kind': 'pca', 'n_components': int(n), 'suffix': 'pca%d' % int(n)}
 
+    if key == 'wavelet':
+        if not isinstance(val, dict):
+            raise ValueError('wavelet needs an object, e.g. {"wavelet": {"mode": "denoise", "wavelet": "db4", "level": 3}}')
+        cfg = Wavelet_settings(val)
+        return {'kind': 'wavelet', 'cfg': cfg, 'suffix': Wavelet_abbrev(cfg)}
+
     raise ValueError('unknown step "%s"; objects: %s; method names: %s' % (
         key, ', '.join(OBJECT_KEYS), ', '.join(METHOD_NAMES)))
 
@@ -273,10 +284,12 @@ def Chain_from_companion(companion):
             source = par.get('ward_clustering_fp', 'inline')
         elif proc == 'spectra_decomposition':
             item, source = {'pca': par.get('n_components', 5)}, None
+        elif proc == 'spectra_wavelet':
+            item, source = {'wavelet': par}, None
         else:
             raise ValueError('step %d: "%s" cannot be run in a chain (only spectral pre-processes without '
                              'indicators: filter, scatter correction, derivative, scaling, variance threshold, '
-                             'ward clustering, pca)' % (i + 1, proc))
+                             'ward clustering, pca, wavelet)' % (i + 1, proc))
         if item[next(iter(item))] is None:
             raise ValueError('step %d (%s): the settings are not recorded in the chain' % (i + 1, proc))
         try:
@@ -346,6 +359,10 @@ def Apply_chain(df, cols, steps):
             d, c, _ = apply_derivative(cur_df, cur_cols, {'derivative': st['derivative']})
             info = {'process': 'spectra_derivative', 'parameters': {'derivative': st['derivative'], 'append': False}}
             label = 'derivative %d' % st['derivative']
+
+        elif kind == 'wavelet':
+            d, c, label = apply_wavelet(cur_df, cur_cols, st['cfg'])
+            info = {'process': 'spectra_wavelet', 'parameters': st['cfg']}
 
         elif kind == 'scaling':
             d, c, _ = apply_scaling(cur_df, cur_cols, {'method': st['method']})

@@ -1,0 +1,20 @@
+{
+  "process": [
+    {
+      "process": "spectra_indicator_univariate_selection",
+      "overwrite": true,
+      "parameters": {
+        "project_root_fp": "./project_neospectra/data/compiled/neospectra_10nm_olif_texture",
+        "dataframe": "neospectra_10nm_olif_texture.snv.d1.mc",
+        "indicator_array": [
+          "c-org",
+          "n-tot"
+        ],
+        "separate_selections": true,
+        "n_features": 30,
+        "show": true,
+        "save": true
+      }
+    }
+  ]
+}
