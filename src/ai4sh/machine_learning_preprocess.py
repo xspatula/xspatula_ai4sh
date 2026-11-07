@@ -2051,7 +2051,7 @@ class Process_ml_preprocess(Get_schema_table):
                                        stem, project_root_fp, overwrite, step_info, units_D, confirm=confirm)
 
         else:
-            # Combined: average F-scores across all indicators
+            # Combined: F-scores scaled 0–1 per indicator, then averaged across the indicators
             scores_sum  = np.zeros(n_bands)
             n_valid_ind = 0
             for indicator in indicator_cols:
@@ -2064,7 +2064,9 @@ class Process_ml_preprocess(Get_schema_table):
                 y_valid = df.loc[valid_mask, indicator].values.astype(float)
                 sel = SelectKBest(f_regression, k='all')
                 sel.fit(X_valid, y_valid)
-                scores_sum  += np.nan_to_num(sel.scores_, nan=0.0)
+                sc  = np.nan_to_num(sel.scores_, nan=0.0)
+                rng = sc.max() - sc.min()   # scaled 0–1 per indicator: larger F-scores of one indicator do not dominate
+                scores_sum  += (sc - sc.min()) / rng if rng > 0 else np.zeros(n_bands)
                 n_valid_ind += 1
 
             if n_valid_ind == 0:
@@ -2081,8 +2083,8 @@ class Process_ml_preprocess(Get_schema_table):
             discarded_wl  = [wavelengths[i]   for i in discard_idx]
 
             if self.verbose >= 1:
-                print('    Combined (%d indicators): retained F-score range [%.1f – %.1f],  '
-                      'discarded range [%.1f – %.1f]' % (
+                print('    Combined (%d indicators): retained mean scaled F-score [%.2f – %.2f],  '
+                      'discarded [%.2f – %.2f]' % (
                           n_valid_ind,
                           mean_scores[top_k_sorted].min(), mean_scores[top_k_sorted].max(),
                           mean_scores[discard_idx].min(),  mean_scores[discard_idx].max()))
@@ -2249,6 +2251,7 @@ class Process_ml_preprocess(Get_schema_table):
             os.makedirs(plot_dir,  exist_ok=True)
             os.makedirs(score_dir, exist_ok=True)
         band_label = _spectra_x_axis_ml(spectral_cols)[1]
+        unit = {'Wavelet coefficient': 'coefficients', 'Component': 'components'}.get(band_label, 'bands')
 
         def _ind_safe(ind):
             return ind.replace(' ', '-').replace('/', '-')
@@ -2320,7 +2323,7 @@ class Process_ml_preprocess(Get_schema_table):
                                      cv=KFold(n_splits=rfe_cv, shuffle=True, random_state=42), scoring='r2')
                     selector.fit(X, y)
                     if self.verbose >= 1:
-                        print('        RFECV: %d bands give the best cross-validated r2' % selector.n_features_)
+                        print('        RFECV: %d %s give the best cross-validated r2' % (selector.n_features_, unit))
                     cv = selector.cv_results_
                     curve = (np.asarray(cv['n_features']), np.asarray(cv['mean_test_score']),
                              np.asarray(cv['std_test_score']))
@@ -2369,8 +2372,8 @@ class Process_ml_preprocess(Get_schema_table):
             ax.plot(n, mean, color='steelblue', lw=1.2)
             ax.fill_between(n, mean - std, mean + std, color='steelblue', alpha=0.2, lw=0)
             ax.axvline(n_auto, color='firebrick', lw=1, ls='--')
-            ax.text(n_auto, ax.get_ylim()[1], ' %d bands' % n_auto, color='firebrick', va='top', fontsize=8)
-            ax.set_xlabel('Number of bands kept')
+            ax.text(n_auto, ax.get_ylim()[1], ' %d %s' % (n_auto, unit), color='firebrick', va='top', fontsize=8)
+            ax.set_xlabel('Number of %s kept' % unit)
             ax.set_ylabel('Cross-validated r² (mean ± std)')
             ax.set_title(title, fontsize=10)
             plt.tight_layout()
@@ -2417,7 +2420,7 @@ class Process_ml_preprocess(Get_schema_table):
             _Show_save(fig, '%s.png' % name)
             if res.get('curve') is not None:
                 _Show_save(_Curve_plot(res['curve'], res['n_auto'],
-                                       'RFECV — %s / %s: %d bands chosen' % (label, reg_key, res['n_auto'])),
+                                       'RFECV — %s / %s: %d %s chosen' % (label, reg_key, res['n_auto'], unit)),
                            '%s_rfecv.png' % name)
             _save_scores_json(res, label, reg_key, sel_key, name)
             return order
