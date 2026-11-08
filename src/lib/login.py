@@ -116,12 +116,18 @@ def Project_login(default_parameter_D):
     
     if not rec:
 
-        print ('❌ ERROR: unrecognised user (%s) - exiting' %(default_parameter_D['user_project']['user_name']))
+        user_project_D = default_parameter_D['user_project']
+
+        print ('❌ ERROR: unrecognised user (%s) - exiting' %(user_project_D.get('user_name') or user_project_D.get('user_netrc_id')))
 
         return None
     # TG TODO - this param is duplicated in the PG_user_status function - should be defined in one place only
     params = ['id', 'email', 'first_name', 'middle_name', 'last_name', 'user_name', 'stratum_code', 'status_code']
 
     user_status_D = dict(zip(params, rec))
+
+    # The logged-in community.user record is authoritative: fill user_name so a scheme
+    # giving only "user_netrc_id" works downstream (e.g. 'creator' in manage_process)
+    default_parameter_D['user_project']['user_name'] = user_status_D['user_name']
 
     return user_status_D

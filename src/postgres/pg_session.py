@@ -116,7 +116,19 @@ def User_netrc_credentials(user_netrc_id):
     """
 
     # Retrieve login and password from the .netrc file
-    secrets = netrc.netrc()
+    try:
+        secrets = netrc.netrc()
+
+    except netrc.NetrcParseError as e:
+        # Never print e.msg / str(e): it quotes the offending token, which is
+        # often a password (e.g. a line missing the 'password' keyword)
+        print ('❌ ERROR - .netrc parse error at line %s of %s' %(e.lineno, e.filename))
+        print ('    Every entry must read: machine <id> login <user> password <secret>')
+        return None
+
+    except FileNotFoundError:
+        print ('❌ ERROR - No .netrc file found in your home directory')
+        return None
 
     # Authenticate username, account and password
     try:

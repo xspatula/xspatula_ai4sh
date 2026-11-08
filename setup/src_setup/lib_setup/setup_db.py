@@ -42,6 +42,62 @@ REVOKE_D = Read_json(path.join(_LIB_SETUP_DIR, 'revoke_privileges.json'))
 
 ROLES_D = Read_json(path.join(_LIB_SETUP_DIR, 'roles_grants.json'))
 
+INITIAL_USER_PLACEHOLDER = '{initial_user}'
+
+def Apply_initial_user(columns, valueL, scheme_params_D):
+    """
+    @brief Fill community.user seed rows that carry the '{initial_user}' password placeholder.
+
+    @details The scheme's `initial_user` (resolved by Resolve_initial_user in
+    setup_db_initiate.py) supplies the login (user_name, or email if it contains '@')
+    and a bcrypt hash of the .netrc password; any other keys in `initial_user` that
+    match a seed column (email, first_name, ...) override the seed value. Rows with
+    the placeholder are skipped (with a warning) when the scheme has no initial_user,
+    so a seed never inserts the literal placeholder as a password.
+
+    @return (columns, valueL) as plain lists; unchanged if no placeholder row exists.
+    """
+
+    columns = list(columns)
+
+    valueL = [list(row) for row in valueL]
+
+    if 'password' not in columns:
+
+        return columns, valueL
+
+    pw_idx = columns.index('password')
+
+    resolved_D = scheme_params_D.get('initial_user', {}).get('_resolved')
+
+    out_L = []
+
+    for row in valueL:
+
+        if row[pw_idx] != INITIAL_USER_PLACEHOLDER:
+
+            out_L.append(row)
+
+            continue
+
+        if not resolved_D:
+
+            print('⚠️  community.user seed row with %s placeholder skipped - no "initial_user" in scheme' % (INITIAL_USER_PLACEHOLDER))
+
+            continue
+
+        for col, val in resolved_D['columns'].items():
+
+            if col in columns:
+
+                row[columns.index(col)] = val
+
+        row[pw_idx] = resolved_D['password_hash']
+
+        out_L.append(row)
+
+    return columns, out_L
+
 def _Unstruct(value):
     '''Plain dicts/lists from Struct-wrapped JSON (the process parameters are Struct objects).'''
 
@@ -191,7 +247,14 @@ class PG_session:
 
             elif process.process_id == 'table_insert':
 
-                self._Table_insert(process.parameters.schema,process.parameters.table,process.parameters.command.columns,process.parameters.command.values)
+                columns, values = process.parameters.command.columns, process.parameters.command.values
+
+                if (process.parameters.schema, process.parameters.table) == ('community', 'user'):
+
+                    # Fill rows whose password is the '{initial_user}' placeholder from the scheme's initial_user
+                    columns, values = Apply_initial_user(columns, values, scheme_params_D)
+
+                self._Table_insert(process.parameters.schema,process.parameters.table,columns,values)
 
             elif process.process_id == 'table_update':
 
@@ -1356,6 +1419,32 @@ def Revoke_db_roles(session, postgresDB_D, role_key, user_id):
 
         session.conn.commit()
 
+ROLE_ATTRIBUTES_L = ['SUPERUSER', 'CREATEDB', 'CREATEROLE', 'LOGIN', 'REPLICATION', 'BYPASSRLS']
+
+def Role_attributes(cmd):
+    """
+    @brief Full attribute list for ALTER ROLE, taken from a role's CREATE USER statement.
+
+    @details Every attribute in ROLE_ATTRIBUTES_L is set explicitly: given in the
+    CREATE USER ... WITH clause -> ATTR, otherwise -> NOATTR. Only these fixed keywords
+    are emitted (never text copied from the JSON), so the result is safe to compose
+    into SQL. CREATE USER implies LOGIN even when not written.
+
+    @param cmd Role SQL from roles_grants.json (formatted, password as %(pw)s).
+
+    @return String such as 'SUPERUSER NOCREATEDB NOCREATEROLE LOGIN NOREPLICATION NOBYPASSRLS'.
+    """
+
+    create = next((s for s in cmd.split(';') if s.strip().upper().startswith('CREATE USER')), '')
+
+    words = set(create.upper().replace('%(PW)S', '').split())
+
+    if 'NOLOGIN' not in words:
+
+        words.add('LOGIN')
+
+    return ' '.join(a if a in words else 'NO' + a for a in ROLE_ATTRIBUTES_L)
+
 def Create_db_roles(session, postgresDB_D):
     """
     @brief Create or update PostgreSQL roles and grants from configuration.
@@ -1380,7 +1469,7 @@ def Create_db_roles(session, postgresDB_D):
 
         role = item['role']
 
-        password = item.get('password', '').replace("'", "''")
+        password = item.get('password', '')
 
         sql = ROLES_D.get(role)
 
@@ -1390,7 +1479,9 @@ def Create_db_roles(session, postgresDB_D):
 
             continue
 
-        cmd = sql.format(db=db, user=user_id, password=password)
+        # The password is passed as a bound parameter (%(pw)s), never formatted into
+        # the SQL text, and is not part of the grants hash stored as a role comment
+        cmd = sql.replace("'{password}'", '%(pw)s').format(db=db, user=user_id)
 
         sql_hash = md5(cmd.encode()).hexdigest()[:12]
 
@@ -1401,6 +1492,22 @@ def Create_db_roles(session, postgresDB_D):
         )
 
         row = session.cursor.fetchone()
+
+        if row:
+
+            # Re-apply the role attributes from roles_grants.json (LOGIN, SUPERUSER, ...)
+            # and the password on every run, so roles_grants.json + .netrc stay
+            # authoritative - roles are cluster-wide, survive dropping the database,
+            # and manual ALTER ROLE changes (e.g. NOLOGIN) would otherwise persist
+            alter_sql = pgsql.SQL("ALTER ROLE {} WITH " + Role_attributes(cmd)).format(pgsql.Identifier(user_id))
+
+            if password:
+
+                alter_sql = alter_sql + pgsql.SQL(" PASSWORD %s")
+
+            session.cursor.execute(alter_sql + pgsql.SQL(";"), (password,) if password else None)
+
+            session.conn.commit()
 
         if row:
 
@@ -1430,7 +1537,13 @@ def Create_db_roles(session, postgresDB_D):
 
                 continue
 
-            session.cursor.execute(statement)
+            if '%(pw)s' in statement:
+
+                session.cursor.execute(statement, {'pw': password})
+
+            else:
+
+                session.cursor.execute(statement)
 
         session.conn.commit()
 

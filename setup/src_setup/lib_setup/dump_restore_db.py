@@ -63,7 +63,7 @@ from src.postgres import User_netrc_credentials, User_login_pswd
 
 from .setup_db import Initiate_session, Setup_prod_roles, INITIAL_DATABASE_NAME
 
-from .setup_db_initiate import Get_user_response_boolean, Create_db_environment_dot
+from .setup_db_initiate import Get_user_response_boolean, Create_db_environment_dot, Resolve_db_users
 
 DEFAULT_DUMP_FOLDER = '~/xspatula/db_dump'
 
@@ -301,8 +301,9 @@ def Restore_database(notebook_FP, scheme_file):
     confirmation) and recreated empty before pg_restore runs. Object ownership is
     assigned to the restoring user (--no-owner) so the dump also restores on a
     server with a different superuser name. Table privileges are kept, and if the
-    scheme lists db_users, Setup_prod_roles runs afterwards to create any role
-    missing from this server.
+    scheme lists db_users, they are resolved from .netrc up front (abort before
+    any drop if that fails) and Setup_prod_roles runs after pg_restore to create
+    any role missing from this server.
 
     @param notebook_FP Full path to the calling notebook.
     @param scheme_file Path to the scheme file (relative to the notebook, ~/ or absolute).
@@ -325,6 +326,16 @@ def Restore_database(notebook_FP, scheme_file):
         print('❌ ERROR - dump file does not exist:\n    %s' % (dump_FPN))
 
         return None
+
+    # Resolve db_users (.netrc lookup, in memory only) BEFORE anything destructive:
+    # a missing .netrc entry must abort here, not after the database has been dropped.
+    if 'db_users' in scheme_params_D['postgresdb']:
+
+        if not Resolve_db_users(scheme_params_D['postgresdb']):
+
+            print('❌ ERROR - db_users not resolved - nothing dropped or restored')
+
+            return None
 
     session = Initiate_session(INITIAL_DATABASE_NAME, scheme_params_D)
 

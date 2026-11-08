@@ -176,3 +176,6 @@ setup/zzz/ai4sh/setup_db/db_audit.txt
 
 # Raw partner lab results (Digit Soil EEA/enzymes) - not for a public repo
 ai4sh/import_data/digit_soil/analys-suelo/
+
+# Scheme files holding plaintext passwords - use *_netrc_id instead
+*_pswd.json

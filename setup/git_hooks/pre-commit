@@ -1,0 +1,15 @@
+#!/bin/sh
+# Block commits of JSON files that carry a plaintext password value.
+# Allowed values: empty, the "{initial_user}" placeholder, bcrypt hashes ($2a/$2b/$2y).
+# Install (per repo):  cp setup/git_hooks/pre-commit .git/hooks/ && chmod +x .git/hooks/pre-commit
+# Override deliberately with: git commit --no-verify
+bad=$(git diff --cached --name-only --diff-filter=ACM -- '*.json' | while read -r f; do
+  git show ":$f" | grep -Eq '"(password|pswd|user_password)"[[:space:]]*:[[:space:]]*"([^"${]|\$[^2])' && echo "$f"
+done)
+if [ -n "$bad" ]; then
+  echo "❌ pre-commit: plaintext password in:"
+  echo "$bad"
+  echo "   Use user_netrc_id / host_netrc_id instead."
+  exit 1
+fi
+exit 0

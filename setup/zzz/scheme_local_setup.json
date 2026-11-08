@@ -4,51 +4,45 @@
     "host": "localhost",
     "port": 5432,
     "db": "ai4sh",
-    "user_name": "karttur",
-    "password": "weg-iK8-tng-w9k",
+    "host_netrc_id": "karttur",
     "dump_path": "~/xspatula/db_dump/xspatula_ai4sh.dump",
     "db_users": [
       {
-        "user_id": "community_admin",
-        "password": "guessing-rubble-garden-opera",
+        "user_netrc_id": "community_admin",
         "role": "community_admin"
       },
       {
-        "user_id": "login_evaluation",
-        "password": "hippodrome-bicycle-concert-shuttle",
+        "user_netrc_id": "login_evaluation",
         "role": "login_evaluation"
       },
       {
-        "user_id": "user_cat_0",
-        "password": "tablecloth-summerleaf-riverbasin-vacuumcleaner",
+        "user_netrc_id": "user_cat_0",
         "role": "user_cat_1"
       },
       {
-        "user_id": "user_cat_1",
-        "password": "secret-parsimony-archipelago-hedgehog",
+        "user_netrc_id": "user_cat_1",
         "role": "user_cat_1"
       },
       {
-        "user_id": "user_cat_2",
-        "password": "sailing-courageous-upsidedown-castle",
+        "user_netrc_id": "user_cat_2",
         "role": "user_cat_2"
       },
       {
-        "user_id": "user_cat_3",
-        "password": "rollerscates-forever-skyline-coconut",
+        "user_netrc_id": "user_cat_3",
         "role": "user_cat_3"
       },
       {
-        "user_id": "user_cat_4",
-        "password": "superfluid-altruistic-guitarplayer-climatechange",
+        "user_netrc_id": "user_cat_4",
         "role": "user_cat_4"
       },
       {
-        "user_id": "user_cat_5",
-        "password": "fireplace-olympicgames-grassroot-luminescence",
+        "user_netrc_id": "user_cat_5",
         "role": "user_cat_5"
       }
     ]
+  },
+  "initial_user": {
+    "user_netrc_id": "thomasg_ai4sh"
   },
   "process": [
     {

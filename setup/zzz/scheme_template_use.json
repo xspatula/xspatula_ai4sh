@@ -1,8 +1,7 @@
 {
-  "project_path": "./ai4sh",
+  "project_path": "./my_project",
   "user_project": {
-    "user_name": "thomasg",
-    "password": "tarzana22"
+    "user_netrc_id": "my_initial_user"
   },
   "process": [
     {

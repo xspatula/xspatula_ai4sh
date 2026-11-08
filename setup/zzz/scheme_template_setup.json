@@ -1,0 +1,58 @@
+{
+  "project_path": "./my_project",
+  "postgresdb": {
+    "host": "localhost",
+    "port": 5432,
+    "db": "my_database",
+    "host_netrc_id": "my_pg_superuser",
+    "dump_path": "~/xspatula/db_dump/my_database.dump",
+    "db_users": [
+      {
+        "user_netrc_id": "community_admin",
+        "role": "community_admin"
+      },
+      {
+        "user_netrc_id": "login_evaluation",
+        "role": "login_evaluation"
+      },
+      {
+        "user_netrc_id": "user_cat_1",
+        "role": "user_cat_1"
+      },
+      {
+        "user_netrc_id": "user_cat_2",
+        "role": "user_cat_2"
+      },
+      {
+        "user_netrc_id": "user_cat_3",
+        "role": "user_cat_3"
+      },
+      {
+        "user_netrc_id": "user_cat_4",
+        "role": "user_cat_4"
+      },
+      {
+        "user_netrc_id": "user_cat_5",
+        "role": "user_cat_5"
+      }
+    ]
+  },
+  "initial_user": {
+    "user_netrc_id": "my_initial_user",
+    "email": "first.user@example.com",
+    "email_alt": "first.user.alt@example.com",
+    "first_name": "First",
+    "last_name": "User",
+    "organisation_id__organisation_name": "my_organisation",
+    "territory_id__territory_name": "my_territory",
+    "stratum_code": "5"
+  },
+  "process": [
+    {
+      "execute": true,
+      "verbose": 1,
+      "overwrite": false,
+      "delete": false
+    }
+  ]
+}

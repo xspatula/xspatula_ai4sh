@@ -20,7 +20,9 @@
 """
 
 # Standard library imports
-from os import path, makedirs
+from os import path, makedirs, chmod
+
+from base64 import b64decode
 
 from shutil import rmtree
 
@@ -32,6 +34,8 @@ from setup.src_setup.lib_setup.setup_db import Setup_prod_roles
 from setup.src_setup.lib_setup.setup_db_audit import Assemble_audit_config
 
 from src.lib import Full_path_locate, Get_scheme_project_path_setup
+
+from src.postgres import User_netrc_credentials
 
 from src_setup.lib_setup import Setup_prod_DB, Setup_schemas_tables
 
@@ -68,6 +72,101 @@ def Delete_db_environments(notebook_FP):
     if path.exists(environment_path):
         
         rmtree(environment_path)
+
+def Resolve_db_users(postgresDB_D):
+    """
+    @brief Resolve each `db_users` entry to `user_id` + `password`, in memory only.
+
+    @details Two notations per entry:
+      - `{"user_netrc_id": "<machine>", "role": "<role>"}` (recommended): login and
+        password are read from ~/.netrc; the netrc `login` becomes the pg role name
+        unless an explicit `user_id` is also given.
+      - `{"user_id": "<name>", "password": "<pw>", "role": "<role>"}` (legacy):
+        plaintext password in the scheme file - works, but prints a warning.
+    The resolved values are written into the in-memory dict only, never to the
+    scheme file. Fails fast (no partial setup) if any entry cannot be resolved.
+
+    @param postgresDB_D The scheme's `postgresdb` dict (modified in place).
+
+    @return True if every entry was resolved, False otherwise.
+    """
+
+    ok = True
+
+    for item in postgresDB_D.get('db_users', []):
+
+        netrc_id = item.get('user_netrc_id')
+
+        if netrc_id:
+
+            credential_D = User_netrc_credentials(netrc_id)
+
+            if not credential_D or not credential_D['user_name']:
+
+                print(f'❌ ERROR - db_user <{netrc_id}> (role {item.get("role")}) not resolved from .netrc')
+
+                ok = False
+
+                continue
+
+            item.setdefault('user_id', credential_D['user_name'])
+
+            item['password'] = b64decode(credential_D['pswd']).decode('utf-8')
+
+        elif item.get('user_id') and item.get('password'):
+
+            print(f'⚠️  db_user {item["user_id"]}: plaintext password in scheme file - consider "user_netrc_id"')
+
+        else:
+
+            print(f'❌ ERROR - db_user entry {item} needs "user_netrc_id" or "user_id" + "password"')
+
+            ok = False
+
+    return ok
+
+def Resolve_initial_user(scheme_params_D):
+    """
+    @brief Resolve the scheme's optional `initial_user` from .netrc and bcrypt-hash its password.
+
+    @details Scheme notation (top level, sibling of `postgresdb`):
+        "initial_user": {"user_netrc_id": "<machine>", "email": "...", "first_name": "...", ...}
+    The netrc `login` becomes `user_name` (or `email` if it contains '@'); the netrc
+    password is hashed here and kept in memory only (`initial_user['_resolved']`).
+    Any other keys override the matching columns of the community.user seed row whose
+    password is the '{initial_user}' placeholder (see Apply_initial_user in setup_db.py).
+
+    @return True if absent or resolved, False on error.
+    """
+
+    initial_D = scheme_params_D.get('initial_user')
+
+    if not initial_D:
+
+        return True
+
+    netrc_id = initial_D.get('user_netrc_id')
+
+    credential_D = User_netrc_credentials(netrc_id) if netrc_id else None
+
+    if not credential_D or not credential_D['user_name']:
+
+        print(f'❌ ERROR - initial_user <{netrc_id}> not resolved from .netrc')
+
+        return False
+
+    from src.community.password import Hash_password
+
+    login = credential_D['user_name']
+
+    columns_D = {k: v for k, v in initial_D.items() if k != 'user_netrc_id' and not k.startswith('_')}
+
+    columns_D['email' if '@' in login else 'user_name'] = login
+
+    initial_D['_resolved'] = {'columns': columns_D,
+                              'password_hash': Hash_password(b64decode(credential_D['pswd']).decode('utf-8'))}
+
+    return True
 
 def Create_db_environment_dot(notebook_FP, postgresDB_D):
     """
@@ -106,6 +205,9 @@ def Create_db_environment_dot(notebook_FP, postgresDB_D):
             f.write(f"DB_PASSWORD={password}\n")
             f.write(f"DB_HOST={postgresDB_D['host']}\n")
             f.write(f"DB_PORT={postgresDB_D['port']}\n")
+
+        # Owner read/write only - the file holds a plaintext password
+        chmod(dot_env_file, 0o600)
 
     print(f'\n. Database environment files created in: {environment_path}')
 
@@ -168,6 +270,16 @@ def Initiate_database(notebook_FP,scheme_file, proj_proc_file):
                 return None
 
         print ('\n. Setting up system production database: %s' %(scheme_params_D['postgresdb']['db']))
+
+        # Resolve pg_user credentials (from .netrc or the scheme) before touching the database
+        if not Resolve_db_users(scheme_params_D['postgresdb']):
+
+            return None
+
+        # Resolve the optional initial (bootstrap) community user from .netrc
+        if not Resolve_initial_user(scheme_params_D):
+
+            return None
 
         # Create the environment files for the database users, which will be used to connect to the database in the subsequent steps. This is done before setting up the database itself, so that the environment files are available for any database setup scripts that may need to connect to the database during setup.
         Create_db_environment_dot(notebook_FP, scheme_params_D['postgresdb'])
