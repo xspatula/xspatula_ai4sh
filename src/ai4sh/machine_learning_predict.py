@@ -197,14 +197,16 @@ class Process_predict(Get_schema_table):
         regr_sym_D = dict(regr_sym_D.get('regressionModelSymbols', regr_sym_D))
         tgt_sym_D  = tgt_sym_D.get('targetFeatureSymbols', tgt_sym_D)
 
-        # Two models with the same indicator, regressor and mode (e.g. other preprocessing): numbered, same symbol
+        # Two models with the same indicator, regressor and mode (e.g. other preprocessing): numbered, same symbol;
+        # a model with covariates (plsr+biogeo16) has the symbol of its regressor
         seen = {}
         for panel in panels:
+            regr_sym_D.setdefault(panel['regressor'], regr_sym_D.get(panel.get('symbol'), {}))
             k = (panel['indicator'], panel['regressor'], panel['mode'])
             seen[k] = seen.get(k, 0) + 1
             if seen[k] > 1:
                 label = '%s-%d' % (panel['regressor'], seen[k])
-                regr_sym_D[label] = regr_sym_D.get(panel['regressor'], {})
+                regr_sym_D[label] = regr_sym_D.get(panel.get('symbol', panel['regressor']), {})
                 panel['regressor'] = label
 
         indicators = list(dict.fromkeys(q['indicator'] for q in panels))
@@ -263,7 +265,8 @@ class Process_predict(Get_schema_table):
 
         dataframe_param = str(getattr(p, 'dataframe', 'raw')).strip()
         model_array     = _parse_array_param(getattr(p, 'model_array', []))
-        overwrite       = bool(getattr(p, 'overwrite', False))
+        # "overwrite" is set on the process block (next to "parameters"); a parameter of that name also counts
+        overwrite       = bool(getattr(self.process_S.process, 'overwrite', False)) or bool(getattr(p, 'overwrite', False))
         dst_param       = str(getattr(p, 'dst_fp', '') or '').strip()
 
         if not model_array:
@@ -326,7 +329,9 @@ class Process_predict(Get_schema_table):
                 continue
 
             indicator = manifest['indicator']
-            col = '%s__%s_%s' % (indicator, manifest['regressor'], 'tt' if manifest['mode'] == 'traintest' else 'kf')
+            # A model with covariates is told apart from the spectra-only model: <indicator>__<regressor>+<cov>_<mode>
+            regressor = manifest['regressor'] + ''.join('+' + c for c in _Model_covariates(manifest))
+            col = '%s__%s_%s' % (indicator, regressor, 'tt' if manifest['mode'] == 'traintest' else 'kf')
             out_df[col] = pred
             if manifest.get('indicator_unit'):
                 out_units[col] = manifest['indicator_unit']
@@ -353,9 +358,9 @@ class Process_predict(Get_schema_table):
                     model_D['independent_metrics'] = metrics
                     mode = 'tt' if manifest['mode'] == 'traintest' else 'kf'
                     panels.append({'type': 'scatter', 'mode': mode, 'indicator': indicator,
-                                   'regressor': manifest['regressor'], 'obs': obs[eval_rows],
+                                   'regressor': regressor, 'symbol': manifest['regressor'], 'obs': obs[eval_rows],
                                    'pred': pred[eval_rows], 'metrics': metrics,
-                                   'label': 'independent, %s model' % mode})
+                                   'label': 'indep. %s' % mode})
                     Record_independent_metrics(self.pg_session_C, manifest['model_sha256'], parquet_fp, metrics, self.verbose)
                     if self.verbose >= 1:
                         print('    %s  independent: n=%d  r2=%.3f  rmse=%.3f  rpiq=%.3f'

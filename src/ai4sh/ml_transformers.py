@@ -442,11 +442,16 @@ def Pls_cap_text(regressor):
 
 # ------------------------------------------------------------------ covariates
 
+OTHER_CLASSES = '*'   # key in a class grouping {class: group}: the group of every class not listed (None = excluded)
+
+
 def Parse_class_grouping(raw):
     '''class_grouping parameter → {covariate label: {class: group name}}. Raises ValueError if invalid.
 
-    raw: array of objects {"covariate": <label>, "groups": [[class, class ...], [class ...] ...]} (a JSON string of
-    that array is also accepted). A group is named by its classes joined with "|".
+    raw: array of objects {"covariate": <label>, "groups": [[class, class ...], [class ...] ...], "other": ...}
+    (a JSON string of that array is also accepted). A group is named by its classes joined with "|".
+    "other" (optional) handles the classes not in any group: "exclude" leaves their samples out (not modelled, not
+    predicted), any other text pools them into a group of that name. Without "other" every class must be placed.
     '''
     if hasattr(raw, '__dict__') and not isinstance(raw, type):
         raw = vars(raw)
@@ -480,6 +485,9 @@ def Parse_class_grouping(raw):
                 if c in class_D:
                     raise ValueError('class_grouping %s: class "%s" in more than one group' % (item['covariate'], c))
                 class_D[c] = '|'.join(members)
+        other = item.get('other')
+        if other not in (None, ''):
+            class_D[OTHER_CLASSES] = None if str(other).strip().lower() == 'exclude' else str(other)
         grouping[str(item['covariate'])] = class_D
 
     return grouping
@@ -487,13 +495,13 @@ def Parse_class_grouping(raw):
 
 def Group_classes(values, class_D=None):
     '''Class values as strings (missing → None), pooled into groups by class_D {class: group}; a class not in
-    class_D is kept as it is.'''
+    class_D goes to class_D["*"] (None = excluded, see Parse_class_grouping) or, without "*", is kept as it is.'''
 
     out = pd.Series(values).astype(object)
 
     out = out.where(out.notna(), None).map(lambda v: None if v is None else str(v))
 
-    return out.map(lambda v: v if v is None or not class_D else class_D.get(v, v))
+    return out.map(lambda v: v if v is None or not class_D else class_D.get(v, class_D.get(OTHER_CLASSES, v)))
 
 
 class CovariateBlocks(BaseEstimator, TransformerMixin):
@@ -525,7 +533,7 @@ class CovariateBlocks(BaseEstimator, TransformerMixin):
             values = X[label].astype(float).values
             self.numeric_mean_[label] = float(np.nanmean(values))
             self.numeric_std_[label] = float(np.nanstd(values))   # 0: constant, only centred (Constant_covariates)
-        self.levels_ = {label: sorted({c for c in self._Classes(X, label) if c is not None})
+        self.levels_ = {label: sorted({c for c in self._Classes(X, label) if pd.notna(c)})
                         for label in self.nominal}
         return self
 
@@ -553,7 +561,7 @@ class CovariateBlocks(BaseEstimator, TransformerMixin):
             bad |= pd.isna(X[label]).values
         for label in self.nominal:
             levels = set(self.levels_[label])
-            bad |= np.array([c is None or c not in levels for c in self._Classes(X, label)], dtype=bool)
+            bad |= np.array([pd.isna(c) or c not in levels for c in self._Classes(X, label)], dtype=bool)
         return bad
 
 

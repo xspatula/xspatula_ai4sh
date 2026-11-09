@@ -57,7 +57,7 @@
               "parameter_type": "array",
               "required": false,
               "default_value": "",
-              "hint": "Pool the classes of nominal covariates into groups before encoding: [{\"covariate\": \"soil texture usda\", \"groups\": [[\"sand\", \"loamy sand\"], [\"loam\", \"silt loam\"], ...]}]. Every class in the data must be placed in a group. Predefined groupings are separate covariates, e.g. soil texture usda major group."
+              "hint": "Pool the classes of nominal covariates into groups before encoding: [{\"covariate\": \"soil texture usda\", \"groups\": [[\"sand\", \"loamy sand\"], [\"loam\", \"silt loam\"], ...]}]. Every class in the data must be placed in a group. Predefined groupings are separate covariates, e.g. soil texture usda major group. Optional \"other\": \"exclude\" leaves the samples of classes not in any group out (not modelled, not predicted); \"other\": \"<name>\" pools them into one group."
             },
             {
               "parameter": "regressor_array",

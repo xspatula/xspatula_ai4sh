@@ -127,7 +127,10 @@ def Draw_scatter(ax, obs, pred, model_key, indicator, mode_label, metrics, regr_
         ax.set_xlabel('Observed', fontsize=8)
         ax.set_ylabel('Predicted', fontsize=8)
         ax.tick_params(labelsize=7)
-        ax.set_title('%s — %s (%s)' % (indicator, model_key, mode_label), fontsize=9)
+        title = '%s — %s (%s)' % (indicator, model_key, mode_label)
+        if len(title) > 38 and '+' in model_key:   # covariate model: the covariate on a second line
+            title = title.replace('+', '\n+', 1)
+        ax.set_title(title, fontsize=9)
     else:
         ax.set_xlabel('Observed')
         ax.set_ylabel('Predicted')

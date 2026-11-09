@@ -62,7 +62,7 @@ from src.ai4sh.chemometrics import (_load_transform_config, _DEFAULT_TRANSFORMAT
                                      _DEFAULT_STANDARDISE_FPN)
 from src.ai4sh.ml_transformers import (CappedPLSRegression, Chain_to_steps, Column_index, CovariateBlocks,
                                        Group_classes, Holdout_test_mask, IndicatorTransformer,
-                                       Indicator_target_settings, Model_blocks, Parse_class_grouping,
+                                       Indicator_target_settings, Model_blocks, OTHER_CLASSES, Parse_class_grouping,
                                        Pls_cap_text, RegressorFrame, Target_domain_mask)
 from src.ai4sh.spectral_columns import Signal_type_of, Spectral_range
 from src.ai4sh.project_paths import Default_fpn
@@ -398,7 +398,7 @@ class Process_regression_model(Get_schema_table):
                 return None
             classes = set(Group_classes(df[label].values).dropna())
             ungrouped = sorted(classes - set(class_D))
-            if ungrouped:
+            if ungrouped and OTHER_CLASSES not in class_D:
                 print('    ERROR: class_grouping for "%s" does not place the class(es): %s'
                       % (label, ', '.join(ungrouped)))
                 return None
@@ -580,14 +580,24 @@ class Process_regression_model(Get_schema_table):
         if covariate_cols:
             X_all = pd.concat([X_all, df[covariate_cols].reset_index(drop=True)], axis=1)
             covariate_ok = df[covariate_cols].notna().all(axis=1).values
+            # Classes left out by class_grouping ("other": "exclude")
+            excluded = np.zeros(len(df), dtype=bool)
+            for label in nominal_cov:
+                if class_grouping.get(label, {}).get(OTHER_CLASSES, '') is None:
+                    excluded |= (Group_classes(df[label].values, class_grouping[label]).isna().values
+                                 & df[label].notna().values)
+            if excluded.any():
+                print('    %d sample(s) of classes left out by class_grouping, skipped' % int(excluded.sum()))
+            covariate_ok = covariate_ok & ~excluded
             cov_tag = _Covariate_tag(covariate_cols)
             if self.verbose >= 1:
                 print('    Covariates: %s' % ', '.join(
                     covariate_cols if not class_grouping else
                     ['%s (%d groups)' % (c, len(set(class_grouping[c].values()))) if c in class_grouping else c
                      for c in covariate_cols]))
-            if (~covariate_ok).any():
-                print('    ⚠️  %d sample(s) without a value for every covariate, skipped' % int((~covariate_ok).sum()))
+            if (~covariate_ok & ~excluded).any():
+                print('    ⚠️  %d sample(s) without a value for every covariate, skipped'
+                      % int((~covariate_ok & ~excluded).sum()))
         covariates_D = {'numeric': numeric_cov, 'nominal': nominal_cov,
                         'class_grouping': {c: g for c, g in class_grouping.items() if c in nominal_cov}}
 
