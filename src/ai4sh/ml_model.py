@@ -19,7 +19,9 @@ The parameter sets are taken from the provenance of the modelling run (manifest)
 produced the input parquet (.previous_dataframe of the data folder). Settings read from files are not in ml_setting;
 their content and sha256 are kept in the manifest.
 
-A registered model is not changed or replaced; register the new model under another name. retire_model marks a model
+A registered model is not changed or replaced; register the new model under another name (or with a suffix).
+The spectral range (domain, unit, band_min, band_max, band_step) is stored as columns, so models can be found by
+indicator, region and resolution; band_step is the resolution of the spectra before band selection. retire_model marks a model
 as retired (it can no longer be applied by name; its record and frozen parameter sets stay). predict_independent
 adds the metrics on independent samples of a registered model to ml_model.model_metric (dataset independent:<parquet>).
 '''
@@ -31,6 +33,7 @@ import json
 from src.ai4sh.ml_setting import Is_path, SESSION_USER_SQL
 from src.ai4sh.provenance import File_sha256
 from src.ai4sh.previous_dataframe import Read_previous_history
+from src.ai4sh.spectral_columns import Spectral_range
 
 SET_KEY_PREFIX = 'db:ml_setting.parameter_set/'
 
@@ -100,8 +103,20 @@ def Model_parameter_sets(manifest):
     return list(dict.fromkeys(used))
 
 
-def Register_model(pg_session_C, model_fp, name='', abstract='', verbose=1):
-    '''Register a saved model; returns the model id (None if it was not registered, reason printed).'''
+def _Manifest_spectral_range(manifest):
+    '''Spectral range of a manifest; manifests saved before spectral_range was added: from the input columns
+    (with refit_preprocessing these are the spectra before band selection, so the step is the resolution).'''
+
+    inp = manifest.get('input', {})
+
+    return inp['spectral_range'] if 'spectral_range' in inp else Spectral_range(inp.get('columns', []))
+
+
+def Register_model(pg_session_C, model_fp, name='', abstract='', suffix='', verbose=1):
+    '''Register a saved model; returns the model id (None if it was not registered, reason printed).
+
+    name: the registry name; empty = the model file name without .joblib. suffix is appended to the name
+    (e.g. "-swir" or "_run2") to tell apart models whose files have the same name.'''
 
     pg = pg_session_C
 
@@ -111,7 +126,11 @@ def Register_model(pg_session_C, model_fp, name='', abstract='', verbose=1):
         print('    ERROR: %s' % e)
         return None
 
-    name = (name or os.path.splitext(os.path.basename(model_fp))[0]).strip().lower()
+    name = ((name or os.path.splitext(os.path.basename(model_fp))[0]).strip() + (suffix or '').strip()).lower()
+
+    if '@' in name or '#' in name:
+        print('    ERROR: model name "%s" contains "@" or "#" (reserved)' % name)
+        return None
 
     rec = pg._Execute_search_single_sql("SELECT name FROM ml_model.model WHERE model_sha256 = %s;", (manifest['model_sha256'],))
 
@@ -120,7 +139,8 @@ def Register_model(pg_session_C, model_fp, name='', abstract='', verbose=1):
         return None
 
     if pg._Execute_search_single_sql("SELECT id FROM ml_model.model WHERE name = %s;", (name,)):
-        print('    ERROR: a different model is already registered as "%s" — choose another name' % name)
+        print('    ERROR: a different model is already registered as "%s" — give another name, or a suffix '
+              '(e.g. "-swir", "_run2") for all models of this run' % name)
         return None
 
     rec = pg._Execute_search_single_sql(
@@ -139,14 +159,19 @@ def Register_model(pg_session_C, model_fp, name='', abstract='', verbose=1):
 
     sets = Model_parameter_sets(manifest)
 
+    sr = _Manifest_spectral_range(manifest) or {}
+
     cur = pg.cursor
 
     try:
         cur.execute(
-            "INSERT INTO ml_model.model (name, indicator_id, regressor, mode, signal_type, n_bands, n_train, n_test, "
+            "INSERT INTO ml_model.model (name, indicator_id, regressor, mode, signal_type, n_bands, "
+            "spectral_domain, spectral_unit, band_min, band_max, band_step, n_train, n_test, "
             "model_fp, model_sha256, source_parquet, source_sha256, manifest, abstract, registered_by) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s, " + SESSION_USER_SQL + ") RETURNING id;",
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s, "
+            + SESSION_USER_SQL + ") RETURNING id;",
             (name, indicator_id, manifest['regressor'], manifest['mode'], inp.get('signal_type'), inp.get('n_bands'),
+             sr.get('domain'), sr.get('unit'), sr.get('band_min'), sr.get('band_max'), sr.get('band_step'),
              metrics.get('n_train', data.get('n_train')), metrics.get('n_test'), os.path.abspath(model_fp),
              manifest['model_sha256'], data.get('source_parquet'), data.get('source_sha256'),
              json.dumps(manifest, default=str), abstract or None))
@@ -194,11 +219,34 @@ def Register_model(pg_session_C, model_fp, name='', abstract='', verbose=1):
         raise
 
     if verbose >= 1:
-        print('    ✅ registered "%s" (id %s): %s %s, %s; %d step(s); parameter sets frozen: %s'
-              % (name, model_id, manifest['indicator'], manifest['regressor'], manifest['mode'],
+        rng = ('%s_%s %g–%g, step %s' % (sr['domain'], sr['unit'], sr['band_min'], sr['band_max'],
+                                          '%g' % sr['band_step'] if sr.get('band_step') else '?')) if sr else 'no band columns'
+        print('    ✅ registered "%s" (id %s): %s %s, %s; %s; %d step(s); parameter sets frozen: %s'
+              % (name, model_id, manifest['indicator'], manifest['regressor'], manifest['mode'], rng,
                  len(manifest.get('preprocessing_chain', [])), ', '.join(sorted(set(frozen))) or 'none (settings from files)'))
 
     return model_id
+
+
+def Registered_model_fp(pg_session_C, model_fp):
+    '''True if model_fp is the file of a registered (or retired) model. False without a session or registry.'''
+
+    if pg_session_C is None:
+        return False
+
+    try:
+        if not pg_session_C._Execute_search_single_sql("SELECT to_regclass('ml_model.model') IS NOT NULL;")[0]:
+            return False
+
+        return bool(pg_session_C._Execute_search_single_sql(
+            "SELECT id FROM ml_model.model WHERE model_fp = %s;", (os.path.abspath(model_fp),)))
+
+    except Exception:
+        try:
+            pg_session_C.conn.rollback()
+        except Exception:
+            pass
+        return False
 
 
 def Registered_model(pg_session_C, name):
@@ -311,6 +359,8 @@ class Process_ml_model:
 
         abstract = str(getattr(p, 'abstract', '') or '').strip()
 
+        suffix = str(getattr(p, 'suffix', '') or '').strip()
+
         if not model_array:
             print('    ERROR: model_array is empty.')
             return
@@ -325,4 +375,4 @@ class Process_ml_model:
 
             model_fp = s if os.path.isabs(s) or not Is_path(s) else Get_project_path(self.project_root_FP, s)
 
-            Register_model(self.pg_session_C, os.path.expanduser(model_fp), name, abstract, self.verbose)
+            Register_model(self.pg_session_C, os.path.expanduser(model_fp), name, abstract, suffix, self.verbose)

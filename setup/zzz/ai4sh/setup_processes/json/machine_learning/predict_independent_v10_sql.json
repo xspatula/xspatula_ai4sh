@@ -8,7 +8,7 @@
         "process": "predict_independent",
         "min_user_stratum": 3,
         "title": "Predict indicators for independent spectra with saved regression models",
-        "label": "Apply one or more models saved by regression_modeling (the whole fitted chain: preprocessing, regressor and indicator transformation) to unprocessed spectra. Saves <dataframe>_pred.parquet with one column per model in the native unit of the indicator; if the dataframe holds observed values, metrics are computed on the samples not used for training."
+        "label": "Apply one or more models saved by regression_modeling (the whole fitted chain: preprocessing, regressor and indicator transformation) to unprocessed spectra. Saves <dataframe>_pred.parquet with one column per model in the native unit of the indicator; if the dataframe holds observed values, metrics are computed on the samples not used for training, and the observed vs predicted plots are shown/saved as in regression_modeling."
       },
       "nodes": [
         {
@@ -42,6 +42,48 @@
               "required": false,
               "default_value": "",
               "hint": "Folder for the predictions (<dataframe>_pred.parquet + .json), relative to the project root. Empty = <project_root_fp>/predictions."
+            },
+            {
+              "parameter": "show_observed_predicted",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": true,
+              "hint": "Show the observed vs predicted plots (only for models whose indicator has observed values in the dataframe)."
+            },
+            {
+              "parameter": "save_observed_predicted",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Save one observed vs predicted plot per model, under <dst_fp>/plot/."
+            },
+            {
+              "parameter": "plot_layout",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "How the shown plots are arranged, as in regression_modeling: default (one indicator per row when several regressors predict it; train/test and k-fold models side by side), a preset (scatter-1 … scatter-4, scatter-tt-kf), a custom plot_layout parameter set, a JSON file, or none (one figure per model)."
+            },
+            {
+              "parameter": "save_plot_layout",
+              "parameter_type": "boolean",
+              "required": false,
+              "default_value": false,
+              "hint": "Also save the grid figures of plot_layout, under <dst_fp>/plot/grid/."
+            },
+            {
+              "parameter": "targetfeaturesymbols",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "The symbolisation of indicators: default, a plot_symbol parameter set or a JSON file."
+            },
+            {
+              "parameter": "regressionmodelsymbols",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "default",
+              "hint": "The symbolisation of regressors: default, a plot_symbol parameter set or a JSON file."
             }
           ]
         }

@@ -849,7 +849,9 @@ class Scheme_params():
         # the sample and acts as unique key when different sources give different names for the same sample.
         auto_name_D = dict( [ (i[0], i[1]) for i in auto_name_recs ] ) if auto_name_recs else {}
 
-        separator_exempt_D = {'manage_geolocation': ['name']}
+        # Separator characters a parameter may contain anyway, per process and key. A registered model name is
+        # only looked up whole (never composed or split), so "_" is safe there; "@" stays reserved (name@version).
+        separator_exempt_D = {'manage_geolocation': {'name': '_@#'}, 'register_model': {'name': '_'}}
 
         # datetime_tag must be '0' (no date) or a datestamp YYYY, YYYYMM, YYYYMMDD or YYYYMMDDhhmmss
         datetime_tag = getattr(self.process_S.process.parameters, 'datetime_tag', None)
@@ -863,13 +865,11 @@ class Scheme_params():
 
         for key in ['name', 'alias', 'tag', 'datetime_tag']:
 
-            if key in separator_exempt_D.get(self.process_S.process.process, []):
-
-                continue
+            reserved = ''.join(c for c in '_@#' if c not in separator_exempt_D.get(self.process_S.process.process, {}).get(key, ''))
 
             value = getattr(self.process_S.process.parameters, key, None)
 
-            if not isinstance(value, str) or not any(c in value for c in '_@#'):
+            if not reserved or not isinstance(value, str) or not any(c in value for c in reserved):
 
                 continue
 
@@ -877,8 +877,8 @@ class Scheme_params():
 
                 continue
 
-            error_msg = '\n          ❌ ERROR parameter <%s> = <%s> contains "_", "@" or "#" (reserved for composed names) for process <%s>\n \
-            (file: %s;  process nr: %s)' %(key, value, self.process_S.process.process,
+            error_msg = '\n          ❌ ERROR parameter <%s> = <%s> contains a reserved character (%s; used in composed names) for process <%s>\n \
+            (file: %s;  process nr: %s)' %(key, value, ' '.join('"%s"' % c for c in reserved), self.process_S.process.process,
                                              self.json_file_FN,
                                             self.p_str)
 

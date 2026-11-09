@@ -20,7 +20,10 @@ must also match the sha256 recorded when it was registered.
 The predict_independent process predicts every sample of a parquet with one or more models and saves
 <stem>_pred.parquet (key columns + one column per model) with a companion JSON in dst_fp (default
 <project_root_fp>/predictions, so the .previous_dataframe of the input folder is not changed). If the parquet also holds
-observed values of the indicator, the metrics are computed on the samples that were not used for training.
+observed values of the indicator, the metrics are computed on the samples that were not used for training, and the
+observed/predicted scatter plots are shown (and saved) as in regression_modeling: same plot_layout presets and
+symbols, one panel per model, labelled "independent". The default layout puts one indicator per row when several
+regressors predict it, train/test and k-fold models of the same indicator × regressor side by side.
 '''
 
 # Standard library imports
@@ -30,6 +33,7 @@ import json
 import numpy as np
 import pandas as pd
 import joblib
+import matplotlib.pyplot as plt
 
 from importlib import metadata
 
@@ -41,7 +45,10 @@ from src.ai4sh.provenance import File_sha256
 from src.ai4sh.spectral_columns import Signal_type_of
 from src.ai4sh.machine_learning_preprocess import (_resolve_input_parquet, _resolve_single_previous,
                                                    _is_spectral_col, _parse_array_param, _load_companion_json)
-from src.ai4sh.machine_learning_model import Manifest_fp, _compute_metrics
+from src.ai4sh.machine_learning_model import (Manifest_fp, _compute_metrics, _DEFAULT_REGR_SYMBOLS_FP,
+                                              _DEFAULT_TARGET_SYMBOLS_FP, _DEFAULT_PLOT_LAYOUT_FP)
+from src.ai4sh.ml_model_plot import Default_layout_name, Load_layout, In_layout, Plot_grid, Plot_scatter
+from src.ai4sh.ml_setting import Load_settings
 from src.ai4sh.ml_transformers import Model_blocks
 from src.ai4sh.ml_setting import Is_path
 from src.ai4sh.ml_model import Registered_model, Record_independent_metrics
@@ -164,6 +171,88 @@ class Process_predict(Get_schema_table):
     def _Path(self, s):
         return s if os.path.isabs(s) else Get_project_path(self.project_root_FP, s)
 
+    def _Settings_fp(self, param):
+        '''A relative settings file path resolved against the project root; anything else as is.'''
+        s = str(param).strip()
+        return s if not Is_path(s) or os.path.isabs(s) else self._Path(s)
+
+    def _Plot_observed_predicted(self, panels, plot_dir, title):
+        '''Observed/predicted scatter of every model with independent metrics: single figures (saved, or shown when
+        the layout is none) and grid figures from plot_layout (shown, optionally saved), as in regression_modeling.'''
+        p = self.process_S.process.parameters
+        show        = bool(getattr(p, 'show_observed_predicted', True))
+        save        = bool(getattr(p, 'save_observed_predicted', False))
+        save_layout = bool(getattr(p, 'save_plot_layout', False))
+        if not panels or not (show or save):
+            return
+
+        try:
+            regr_sym_D = Load_settings('plot_symbol', str(getattr(p, 'regressionmodelsymbols', 'default') or 'default'),
+                                       _DEFAULT_REGR_SYMBOLS_FP, 'regressionmodelsymbols', self._Settings_fp, self.verbose) or {}
+            tgt_sym_D  = Load_settings('plot_symbol', str(getattr(p, 'targetfeaturesymbols', 'default') or 'default'),
+                                       _DEFAULT_TARGET_SYMBOLS_FP, 'targetfeaturesymbols', self._Settings_fp, self.verbose) or {}
+        except (FileNotFoundError, ValueError) as e:
+            print('    ERROR: plot symbols: %s — no plots' % e)
+            return
+        regr_sym_D = dict(regr_sym_D.get('regressionModelSymbols', regr_sym_D))
+        tgt_sym_D  = tgt_sym_D.get('targetFeatureSymbols', tgt_sym_D)
+
+        # Two models with the same indicator, regressor and mode (e.g. other preprocessing): numbered, same symbol
+        seen = {}
+        for panel in panels:
+            k = (panel['indicator'], panel['regressor'], panel['mode'])
+            seen[k] = seen.get(k, 0) + 1
+            if seen[k] > 1:
+                label = '%s-%d' % (panel['regressor'], seen[k])
+                regr_sym_D[label] = regr_sym_D.get(panel['regressor'], {})
+                panel['regressor'] = label
+
+        indicators = list(dict.fromkeys(q['indicator'] for q in panels))
+        regressors = list(dict.fromkeys(q['regressor'] for q in panels))
+        modes      = [m for m in ('tt', 'kf') if any(q['mode'] == m for q in panels)]
+        try:
+            layout = Load_layout(str(getattr(p, 'plot_layout', 'default') or 'default'),
+                                 Default_layout_name(show, False, False, modes, len(indicators), len(regressors)),
+                                 _DEFAULT_PLOT_LAYOUT_FP, self._Settings_fp, self.verbose)
+        except (FileNotFoundError, ValueError) as e:
+            print('    ERROR: %s — no plots' % e)
+            return
+
+        def _Out(fig, fp, do_show, do_save):
+            if do_show:
+                plt.figure(fig.number)
+                plt.show()
+            if do_save:
+                os.makedirs(os.path.dirname(fp), exist_ok=True)
+                fig.savefig(fp, dpi=150, bbox_inches='tight')
+                if self.verbose >= 1:
+                    print('    Saved: %s' % fp)
+            plt.close(fig)
+
+        grid = []
+        for q in panels:
+            in_grid = show and In_layout(layout, 'scatter', q['mode'])
+            if in_grid:
+                grid.append(q)
+            if save or (show and not in_grid):
+                fig = Plot_scatter(q['obs'], q['pred'], q['regressor'], q['indicator'], q['label'], q['metrics'],
+                                   regr_sym_D, tgt_sym_D)
+                _Out(fig, os.path.join(plot_dir, 'scatter_%s_%s_%s.png' % (
+                    q['indicator'].replace(' ', '-').replace('/', '-'), q['regressor'], q['mode'])),
+                     show and not in_grid, save)
+
+        if not grid:
+            return
+        if self.verbose >= 1:
+            print('    Plot layout: %s%s' % (layout['name'], ' on %s' % layout['base'] if layout.get('base') else ''))
+        groups = ([(q_ind, [q for q in grid if q['indicator'] == q_ind], '_' + q_ind) for q_ind in indicators]
+                  if layout['draw'] == 'indicator' else [(None, grid, '')])
+        for ind, group, suffix in groups:
+            fig = Plot_grid(group, layout, [ind] if ind else indicators, regressors, regr_sym_D, tgt_sym_D, title=title)
+            if fig is not None:
+                _Out(fig, os.path.join(plot_dir, 'grid', '%s%s.png' % (layout['name'], suffix.replace('/', '-'))),
+                     True, save_layout)
+
     def _Predict_independent(self):
         p = self.process_S.process.parameters
 
@@ -218,6 +307,7 @@ class Process_predict(Get_schema_table):
         out_df    = df[[c for c in df.columns if not _is_spectral_col(c)]].copy()
         out_units = {c: u for c, u in units_D.items() if c in out_df.columns}
         models_L  = []
+        panels    = []   # observed/predicted scatter panels of the models with independent metrics
 
         for model_param in model_array:
 
@@ -261,6 +351,11 @@ class Process_predict(Get_schema_table):
                     metrics = _compute_metrics(obs[eval_rows], pred[eval_rows])
                     metrics['n'] = int(eval_rows.sum())
                     model_D['independent_metrics'] = metrics
+                    mode = 'tt' if manifest['mode'] == 'traintest' else 'kf'
+                    panels.append({'type': 'scatter', 'mode': mode, 'indicator': indicator,
+                                   'regressor': manifest['regressor'], 'obs': obs[eval_rows],
+                                   'pred': pred[eval_rows], 'metrics': metrics,
+                                   'label': 'independent, %s model' % mode})
                     Record_independent_metrics(self.pg_session_C, manifest['model_sha256'], parquet_fp, metrics, self.verbose)
                     if self.verbose >= 1:
                         print('    %s  independent: n=%d  r2=%.3f  rmse=%.3f  rpiq=%.3f'
@@ -284,3 +379,5 @@ class Process_predict(Get_schema_table):
         Register_parquet(out_fp, 'predict_independent', '%d model(s) applied to %d samples' % (len(models_L), len(out_df)))
 
         print('    Predictions saved: %s' % out_fp)
+
+        self._Plot_observed_predicted(panels, os.path.join(dst_fp, 'plot'), stem)

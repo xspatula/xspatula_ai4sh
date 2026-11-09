@@ -416,7 +416,7 @@ def Plot_grid(panels, layout, indicators, regressors, regr_sym_D, tgt_sym_D, tit
             w = _Width(p, layout)
             cell = gs[r, c:c + w]
             c += w
-            label = MODE_LABEL[p['mode']]
+            label = p.get('label') or MODE_LABEL[p['mode']]
             if p['type'] == 'scatter':
                 Draw_scatter(fig.add_subplot(cell), p['obs'], p['pred'], p['regressor'], p['indicator'], label,
                              p['metrics'], regr_sym_D, tgt_sym_D, compact=True)

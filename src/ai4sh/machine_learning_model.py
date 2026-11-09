@@ -64,10 +64,11 @@ from src.ai4sh.ml_transformers import (CappedPLSRegression, Chain_to_steps, Colu
                                        Group_classes, Holdout_test_mask, IndicatorTransformer,
                                        Indicator_target_settings, Model_blocks, Parse_class_grouping,
                                        Pls_cap_text, RegressorFrame, Target_domain_mask)
-from src.ai4sh.spectral_columns import Signal_type_of
+from src.ai4sh.spectral_columns import Signal_type_of, Spectral_range
 from src.ai4sh.project_paths import Default_fpn
 from src.ai4sh.provenance import Provenance_snapshot, File_sha256
 from src.ai4sh.ml_setting import Load_settings, Is_path
+from src.ai4sh.ml_model import Registered_model_fp
 from src.ai4sh.ml_model_plot import (Default_layout_name, In_layout, Load_layout, Plot_grid,
                                      Plot_importance, Plot_permutation, Plot_scatter)
 
@@ -549,6 +550,15 @@ class Process_regression_model(Get_schema_table):
             chain = []
 
         col_names = [str(c) for c in spectral_cols]
+        # Spectral range the model needs, resolution from the spectra before band selection: the source parquet
+        # (the input itself with refit_preprocessing; else the chain's source parquet when it still exists)
+        step_cols = col_names
+        if source_fp == parquet_fp and companion.get('source_parquet'):
+            fp0 = os.path.join(project_root_fp, companion['source_parquet'])
+            if os.path.exists(fp0):
+                import pyarrow.parquet as pq
+                step_cols = [str(c) for c in pq.read_schema(fp0).names]
+        spectral_range_D = Spectral_range(col_names, step_cols)
         # Header row 2 — stored on each saved model and in the results JSON
         spectral_header_D = {c: signal_type for c in col_names}
 
@@ -717,6 +727,13 @@ class Process_regression_model(Get_schema_table):
 
         def _save_model(model, fp, pipeline_D, indicator, model_key, mode, metrics, train_rows):
             '''Save the whole fitted chain (preprocessing + regressor + indicator transformation) and its manifest.'''
+            # Never overwrite the file of a registered model: save the new one as <name>-2, -3, ... instead
+            base, n = os.path.splitext(fp)[0], 1
+            while Registered_model_fp(self.pg_session_C, fp):
+                n += 1
+                fp = '%s-%d.joblib' % (base, n)
+            if n > 1:
+                print('        ⚠️  %s is a registered model — saved as %s' % (os.path.basename(base), os.path.basename(fp)))
             model.spectral_header_ = spectral_header_D
             model.input_columns_   = col_names
             model.covariates_      = covariates_D
@@ -752,6 +769,7 @@ class Process_regression_model(Get_schema_table):
                 'fitted_hyper_parameters': fitted_hp,
                 'mode':                mode,
                 'input':               {'columns': col_names, 'signal_type': signal_type, 'n_bands': len(col_names),
+                                        'spectral_range': spectral_range_D,
                                         'covariates': _Fitted_covariates(model, covariates_D, units_D)},
                 'pipeline':            pipeline_D,
                 'preprocessing_chain': companion.get('preprocessing_chain', []),

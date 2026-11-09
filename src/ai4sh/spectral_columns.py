@@ -117,3 +117,34 @@ def Header_mismatches(cols_a, units_a, cols_b, units_b):
     if sig_a != sig_b:
         issues.append('header row 2 differs: %s vs %s' % (sorted(sig_a), sorted(sig_b)))
     return issues
+
+
+def Spectral_range(cols, step_cols=None):
+    '''Spectral range of the band columns cols: {domain, unit, band_min, band_max, band_step}, or None if cols
+    holds no band columns or mixes domains/units (e.g. derived wavelet or PCA columns).
+
+    band_step is the median spacing of step_cols (default cols) — give the columns of the spectra before band
+    selection, since the selected bands are irregular and do not show the spectral resolution.
+    '''
+    def _parse(cs):
+        return [b for b in (Parse_band_col(c) for c in cs) if b is not None]
+
+    bands = _parse(cols)
+
+    if not bands or len({(d, u) for d, u, _ in bands}) > 1:
+        return None
+
+    domain, unit = bands[0][0], bands[0][1]
+
+    step_bands = [b for b in _parse(step_cols if step_cols is not None else cols) if b[:2] == (domain, unit)]
+
+    values = sorted(float(v) for _, _, v in step_bands)
+
+    diffs = sorted(b - a for a, b in zip(values, values[1:]) if b > a)
+
+    step = diffs[len(diffs) // 2] if diffs else None
+
+    vmin, vmax = min(float(v) for _, _, v in bands), max(float(v) for _, _, v in bands)
+
+    return {'domain': domain, 'unit': unit, 'band_min': vmin, 'band_max': vmax,
+            'band_step': round(step, 6) if step is not None else None}

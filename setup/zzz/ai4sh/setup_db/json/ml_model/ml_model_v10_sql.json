@@ -15,6 +15,11 @@
           "mode TEXT NOT NULL",
           "signal_type TEXT",
           "n_bands INTEGER",
+          "spectral_domain TEXT",
+          "spectral_unit TEXT",
+          "band_min REAL",
+          "band_max REAL",
+          "band_step REAL",
           "n_train INTEGER",
           "n_test INTEGER",
           "model_fp TEXT NOT NULL",
@@ -33,6 +38,18 @@
         "INSERT": true,
         "UPDATE": true,
         "DELETE": true
+      }
+    },
+    {
+      "process_id": "execute_sql",
+      "overwrite": true,
+      "delete": false,
+      "parameters": {
+        "sql": [
+          "ALTER TABLE ml_model.model ADD COLUMN IF NOT EXISTS spectral_domain TEXT, ADD COLUMN IF NOT EXISTS spectral_unit TEXT, ADD COLUMN IF NOT EXISTS band_min REAL, ADD COLUMN IF NOT EXISTS band_max REAL, ADD COLUMN IF NOT EXISTS band_step REAL;",
+          "UPDATE ml_model.model m SET spectral_domain = s.d, spectral_unit = s.u, band_min = s.mn, band_max = s.mx, band_step = s.st FROM (SELECT id, min(split_part(c, '_', 1)) AS d, min(split_part(c, '_', 2)) AS u, min(split_part(c, '_', 3)::real) AS mn, max(split_part(c, '_', 3)::real) AS mx, (max(split_part(c, '_', 3)::real) - min(split_part(c, '_', 3)::real)) / NULLIF(count(*) - 1, 0) AS st FROM ml_model.model, jsonb_array_elements_text(manifest->'input'->'columns') AS c WHERE c ~ '^(wl|wn)_(nm|um|cm-1)_[0-9.]+$' GROUP BY id HAVING count(DISTINCT split_part(c, '_', 1) || split_part(c, '_', 2)) = 1) s WHERE m.id = s.id AND m.band_min IS NULL;",
+          "CREATE INDEX IF NOT EXISTS model_spectral_idx ON ml_model.model (indicator_id, spectral_domain, spectral_unit, band_min, band_max, band_step);"
+        ]
       }
     },
     {

@@ -36,7 +36,14 @@
               "parameter_type": "text",
               "required": false,
               "default_value": "",
-              "hint": "Registry name (single model only); empty = the model file name without .joblib."
+              "hint": "Registry name (single model only); empty = the model file name without .joblib. May contain \"_\", not \"@\" or \"#\"."
+            },
+            {
+              "parameter": "suffix",
+              "parameter_type": "text",
+              "required": false,
+              "default_value": "",
+              "hint": "Appended to the registry name of every model in model_array (e.g. -swir, _run2), to tell apart models whose files have the same name."
             },
             {
               "parameter": "abstract",
