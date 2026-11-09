@@ -135,6 +135,8 @@ def Resolve_initial_user(scheme_params_D):
     password is hashed here and kept in memory only (`initial_user['_resolved']`).
     Any other keys override the matching columns of the community.user seed row whose
     password is the '{initial_user}' placeholder (see Apply_initial_user in setup_db.py).
+    In any other seed table, a '{initial_user}' cell (e.g. `creator`) becomes this
+    user's user_name (see Apply_initial_user_reference).
 
     @return True if absent or resolved, False on error.
     """
@@ -163,7 +165,10 @@ def Resolve_initial_user(scheme_params_D):
 
     columns_D['email' if '@' in login else 'user_name'] = login
 
+    # user_name known up front if given explicitly or as the netrc login; otherwise it is
+    # taken from the community.user seed row when that row is filled (Apply_initial_user)
     initial_D['_resolved'] = {'columns': columns_D,
+                              'user_name': columns_D.get('user_name'),
                               'password_hash': Hash_password(b64decode(credential_D['pswd']).decode('utf-8'))}
 
     return True

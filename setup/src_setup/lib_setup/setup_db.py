@@ -94,9 +94,58 @@ def Apply_initial_user(columns, valueL, scheme_params_D):
 
         row[pw_idx] = resolved_D['password_hash']
 
+        if 'user_name' in columns:
+
+            # Remember the user_name actually seeded, for '{initial_user}' references
+            # in other tables (e.g. process.root_process.creator) - see Apply_initial_user_reference
+            resolved_D['user_name'] = row[columns.index('user_name')]
+
         out_L.append(row)
 
     return columns, out_L
+
+def Apply_initial_user_reference(schema, table, columns, valueL, scheme_params_D):
+    """
+    @brief Replace '{initial_user}' cells in any seed table (other than community.user) with
+    the initial user's user_name.
+
+    @details Used for columns referencing community.user (user_name), such as `creator` in
+    process.root_process / process.process. The user_name comes from the scheme's
+    `initial_user`: an explicit "user_name" key, else the .netrc login (if it is not an
+    e-mail), else the user_name of the community.user seed row filled by
+    Apply_initial_user. Rows with the placeholder are skipped (with a warning) if no
+    user_name can be resolved, so the literal placeholder is never inserted.
+
+    @return (columns, valueL) as plain lists; unchanged if no cell holds the placeholder.
+    """
+
+    valueL = [list(row) for row in valueL]
+
+    if not any(val == INITIAL_USER_PLACEHOLDER for row in valueL for val in row):
+
+        return list(columns), valueL
+
+    user_name = scheme_params_D.get('initial_user', {}).get('_resolved', {}).get('user_name')
+
+    out_L = []
+
+    for row in valueL:
+
+        if INITIAL_USER_PLACEHOLDER not in row:
+
+            out_L.append(row)
+
+            continue
+
+        if not user_name:
+
+            print('⚠️  %s.%s seed row with %s skipped - no "initial_user" user_name resolved (scheme initial_user + community.user seed row)' % (schema, table, INITIAL_USER_PLACEHOLDER))
+
+            continue
+
+        out_L.append([user_name if val == INITIAL_USER_PLACEHOLDER else val for val in row])
+
+    return list(columns), out_L
 
 def _Unstruct(value):
     '''Plain dicts/lists from Struct-wrapped JSON (the process parameters are Struct objects).'''
@@ -253,6 +302,11 @@ class PG_session:
 
                     # Fill rows whose password is the '{initial_user}' placeholder from the scheme's initial_user
                     columns, values = Apply_initial_user(columns, values, scheme_params_D)
+
+                else:
+
+                    # '{initial_user}' as a reference (e.g. creator) -> the initial user's user_name
+                    columns, values = Apply_initial_user_reference(process.parameters.schema, process.parameters.table, columns, values, scheme_params_D)
 
                 self._Table_insert(process.parameters.schema,process.parameters.table,columns,values)
 

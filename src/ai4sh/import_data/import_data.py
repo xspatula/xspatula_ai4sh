@@ -209,6 +209,11 @@ class Process_import_JSON(Get_schema_table):
 
                 self.record_D[row].pop(key)
 
+            # A blank row (e.g. formatted but empty rows left in an excel sheet) is not a record
+            if not self.record_D[row]:
+
+                self.record_D.pop(row)
+
         return True
         
     def _Structure_data(self):
@@ -345,6 +350,13 @@ class Process_import_JSON(Get_schema_table):
             print ('❌ ERROR - could not structure generated process file for insert:\n   %s' %(dst_FPN))
 
             return None
+
+        # Rows that could not be structured (not ready, missing parameters) count as failed processes
+        skipped_count = getattr(structured_D, 'skipped_count', 0)
+
+        if skipped_count:
+
+            self.pg_session_C.failed_process_count = getattr(self.pg_session_C, 'failed_process_count', 0) + skipped_count
 
         for sub_key in structured_D:
 

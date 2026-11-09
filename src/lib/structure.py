@@ -1273,6 +1273,8 @@ def Job_processes_loop(scheme_params_D, process_file_FPN_L, process_parameter_C,
 
                 print (error_msg)
 
+                json_cmd_D.skipped_count += 1
+
                 continue
 
             result = Get_process_from_db(pg_session_C,process_schema,process_parameter_C,user_status_D,json_process_file_obj, p, p_str)
@@ -1289,13 +1291,14 @@ def Job_processes_loop(scheme_params_D, process_file_FPN_L, process_parameter_C,
 
             else:
 
-                continue
+                # Not in DB, user stratum too low or parameters not ready - an error, not an intended skip
+                json_cmd_D.skipped_count += 1
 
     # Main loop function
     verbose = scheme_params_D['process'][0]['verbose']
 
-    # Dict to hold all processes ready to run
-    json_cmd_D = {}
+    # Dict to hold all processes ready to run (also counts the processes skipped on error)
+    json_cmd_D = Structured_processes_D()
 
     # Loop over all json files
     for json_process_file_obj in process_file_FPN_L:
@@ -1354,6 +1357,14 @@ def Check_json_files(process_file_FPN_L):
             return None
 
     return True
+
+class Structured_processes_D(dict):
+    """
+    @brief Dict of structured processes ({json file: {process nr: process_S}}) that also carries
+    the number of processes that could not be structured and were skipped (``skipped_count``),
+    so that the final run summary can report them as failed instead of claiming success.
+    """
+    skipped_count = 0
 
 def Structure_processes(scheme_params_D, process_file_FPN_L):
     """

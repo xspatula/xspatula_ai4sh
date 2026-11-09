@@ -200,7 +200,11 @@ def Run_process(structured_process_D, scheme_params_D):
 
             Log('⚠️  Warning - could not close database session: %s' % e)
 
-    print ('\n########### ALL PROCESSES FINISHED ########### \n') 
+    print ('\n########### ALL PROCESSES FINISHED ########### \n')
+
+    # Processes skipped already when the process files were structured (Initiate_process) never reached
+    # the loop above, but they did fail
+    failed_process_count = getattr(pg_session_C, 'failed_process_count', 0) + getattr(structured_process_D, 'skipped_count', 0)
 
     if result_print_L:
 
@@ -220,17 +224,17 @@ def Run_process(structured_process_D, scheme_params_D):
 
         print ('\nData applied to the database.\n')
 
-        failed_process_count = getattr(pg_session_C, 'failed_process_count', 0)
+    if failed_process_count:
 
-        if failed_process_count == 0:
+        print ('❌ %s process(es) failed or were skipped on error - see the messages above.\n' % failed_process_count)
 
-            print ('✅ All processes completed successfully.\n')
+    elif insert_result_L:
 
-        else:
+        print ('✅ All processes completed successfully.\n')
 
-            print ('❌ %s process(es) failed.\n' % failed_process_count)
+    if insert_result_L:
 
-        if structured_process_D[key][0].process.verbose:
+        if scheme_params_D['process'][0]['verbose']:
 
             print ('   The following JSON process files were applied:')
 
