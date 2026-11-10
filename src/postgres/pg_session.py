@@ -220,7 +220,7 @@ def PG_user_status(environment_dot_file, user_netrc_id, user_name=None, user_psw
           so callers can't distinguish "unknown user" from "wrong password".
         - Closes the database session after the query.
 
-    @return Tuple containing user information (id, email, first_name, middle_name, last_name, user_name, stratum_code, status_code), or None if connection, credentials, or password verification fail.
+    @return Tuple containing user information (id, email, first_name, middle_name, last_name, user_name, stratum_code, status_code), or None if connection, credentials, or password verification fail; False if the database itself is not ready (not set up, or the login role lacks its rights there) - the reason is printed.
     """
 
     try:
@@ -271,7 +271,29 @@ def PG_user_status(environment_dot_file, user_netrc_id, user_name=None, user_psw
             'SELECT {} FROM community.user WHERE user_name = %s;'
         ).format(pgsql.SQL(select_cols))
 
-    session.cursor.execute(sql, (user_login_query_D['user_name'],))
+    try:
+
+        session.cursor.execute(sql, (user_login_query_D['user_name'],))
+
+    except (psycopg2.errors.InsufficientPrivilege, psycopg2.errors.UndefinedTable) as e:
+
+        # A database problem, not a wrong user: say what is wrong and how to fix it, and stop (False)
+        db, role = session.conn.info.dbname, session.conn.info.user
+
+        if isinstance(e, psycopg2.errors.UndefinedTable):
+
+            print ('❌ ERROR - database <%s> has no table community.user: the database is not set up.' % db)
+            print ('    Run setup/setup_db.ipynb for this database first.')
+
+        else:
+
+            print ('❌ ERROR - the login role <%s> may not read community.user in database <%s>.' % (role, db))
+            print ('    Its rights on this database are missing (roles are server-wide, their rights are per database).')
+            print ('    Run setup/setup_db.ipynb for this database again: it (re)grants the role rights. Then rerun this cell.')
+
+        session._Close()
+
+        return False
 
     row = session.cursor.fetchone()
 

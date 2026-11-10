@@ -113,7 +113,7 @@
       "quantile": false
     },
     "c-org": {
-      "log": false,
+      "log": true,
       "sqrt": false,
       "reciprocal": false,
       "boxcox": false,
@@ -121,7 +121,7 @@
       "quantile": false
     },
     "organic carbon": {
-      "log": false,
+      "log": true,
       "sqrt": false,
       "reciprocal": false,
       "boxcox": false,

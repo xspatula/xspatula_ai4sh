@@ -150,7 +150,7 @@
                     "quantile": false
                   },
                   "c-org": {
-                    "log": false,
+                    "log": true,
                     "sqrt": false,
                     "reciprocal": false,
                     "boxcox": false,
@@ -158,7 +158,7 @@
                     "quantile": false
                   },
                   "organic carbon": {
-                    "log": false,
+                    "log": true,
                     "sqrt": false,
                     "reciprocal": false,
                     "boxcox": false,
@@ -399,7 +399,7 @@
                   }
                 }
               },
-              "4c66fc57de55421dd4764036dc792fd0d09d0e44ed1a109f6c495143ec338865"
+              "b7e642e137ee60940fd1873c4987e38df519bdd058b537a307d3d14bbfad5f83"
             ],
             [
               "standardisation",

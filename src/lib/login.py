@@ -114,6 +114,11 @@ def Project_login(default_parameter_D):
 
         return None
     
+    if rec is False:
+
+        # Database not ready (not set up / login role without rights) - the reason is already printed
+        return None
+
     if not rec:
 
         user_project_D = default_parameter_D['user_project']

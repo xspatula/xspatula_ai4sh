@@ -1606,23 +1606,9 @@ def Create_db_roles(session, postgresDB_D):
 
         if row:
 
-            # Read the hash stored as a role comment from the previous run
-            session.cursor.execute(
-                "SELECT pg_catalog.shobj_description(%s::oid, 'pg_authid');",
-                (row[0],)
-            )
-
-            desc = session.cursor.fetchone()[0] or ''
-
-            stored_hash = desc.split('grants_hash:')[1][:12] if 'grants_hash:' in desc else None
-
-            if stored_hash == sql_hash:
-
-                print (f'.   Role grants for {user_id} already up to date, skipping')
-
-                continue
-
-            # SQL differs — revoke existing grants before re-applying
+            # The grants are always re-applied: a role is server-wide but its rights are per database, and the
+            # role comment (one per server) can not tell whether THIS database has them - e.g. a database dropped
+            # and set up again has none. Revoke first, so rights removed from roles_grants.json disappear too.
             Revoke_db_roles(session, postgresDB_D, role, user_id)
             
         for statement in [s.strip() for s in cmd.split(';') if s.strip()]:
@@ -1642,7 +1628,7 @@ def Create_db_roles(session, postgresDB_D):
 
         session.conn.commit()
 
-        # Store the hash as a comment on the role so future runs can detect changes
+        # Mark the role as managed by this setup (delete_database only ever drops roles with this comment)
         session.cursor.execute(
             pgsql.SQL("COMMENT ON ROLE {} IS %s;").format(pgsql.Identifier(user_id)),
             (f'grants_hash:{sql_hash}',)
