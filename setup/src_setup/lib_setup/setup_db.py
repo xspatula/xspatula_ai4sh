@@ -1232,22 +1232,78 @@ class PG_session:
 
             self._Delete_schema(schema)
 
-        # Delete all users except system users (usesysid > 100000) to reset permissions; this is done after deleting database objects to avoid permission issues
-        pg_user_L = self._Select_all_pg_user()
+        # Roles are cluster-wide, shared by every database on the server. Drop only the roles this setup manages
+        # (Create_db_roles marks them with a grants_hash comment) and only when no other database uses them;
+        # never the login running the deletion or any other role
+        for pg_user in self._Select_managed_roles():
 
-        for pg_user in pg_user_L:
+            other_db_L = self._Role_other_databases(pg_user)
 
-            if self.verbose > 1:
+            if other_db_L:
 
-                print ('    deleting user', pg_user)
+                if self.verbose:
+
+                    print ('    keeping role %s (used by database %s)' % (pg_user, ', '.join(other_db_L)))
+
+                continue
+
+            if self.verbose:
+
+                print ('    deleting role', pg_user)
 
             try:
+                # Its rights on this database would otherwise block DROP ROLE until the database itself is dropped
                 self.cursor.execute(
-                    pgsql.SQL("DROP USER {}").format(pgsql.Identifier(pg_user))
+                    pgsql.SQL("REVOKE ALL ON DATABASE {} FROM {}").format(
+                        pgsql.Identifier(self.postgresDB_D['db']), pgsql.Identifier(pg_user))
                 )
+                self.cursor.execute(pgsql.SQL("DROP OWNED BY {}").format(pgsql.Identifier(pg_user)))
+                self.cursor.execute(pgsql.SQL("DROP ROLE {}").format(pgsql.Identifier(pg_user)))
+                self.conn.commit()
+
             except Exception as e:
 
-                print ('        could not delete user %s: %s' % (pg_user, e))
+                self.conn.rollback()
+
+                print ('        could not delete role %s: %s' % (pg_user, e))
+
+    def _Select_managed_roles(self):
+        """
+        @brief Roles created by Create_db_roles (grants_hash comment), except the login of this session.
+
+        @return List of role names.
+        """
+
+        self.cursor.execute(
+            "SELECT rolname FROM pg_roles WHERE rolname <> current_user "
+            "AND shobj_description(oid, 'pg_authid') LIKE 'grants_hash:%' ORDER BY rolname;"
+        )
+
+        return [rec[0] for rec in self.cursor.fetchall()]
+
+    def _Role_other_databases(self, role):
+        """
+        @brief Databases other than the current one that use a role: objects it owns or privileges it holds
+        there (pg_shdepend), rights on the database itself, or ownership of the database.
+
+        @return Sorted list of database names; [] if the role is used only by this database.
+        """
+
+        self.cursor.execute(
+            """SELECT d.datname FROM pg_shdepend s
+               JOIN pg_database d
+                 ON d.oid = CASE WHEN s.dbid = 0 AND s.classid = 'pg_database'::regclass THEN s.objid ELSE s.dbid END
+               WHERE s.refclassid = 'pg_authid'::regclass
+                 AND s.refobjid = (SELECT oid FROM pg_roles WHERE rolname = %(role)s)
+                 AND d.datname <> current_database()
+               UNION
+               SELECT datname FROM pg_database
+               WHERE datdba = (SELECT oid FROM pg_roles WHERE rolname = %(role)s) AND datname <> current_database()
+               ORDER BY 1;""",
+            {'role': role}
+        )
+
+        return [rec[0] for rec in self.cursor.fetchall()]
 
     def _Delete_schema(self, schema):
         """
@@ -1322,21 +1378,6 @@ class PG_session:
         )
 
         self.conn.commit()
-
-    def _Select_all_pg_user(self):
-        """
-        @brief Selects all PostgreSQL users from the database.
-
-        @return List of PostgreSQL user names.
-        """
-
-        self.cursor.execute("SELECT usename FROM pg_user WHERE usesysid > 100000;;")
-
-        records = self.cursor.fetchall()
-
-        user_L = [rec[0] for rec in records]
-
-        return user_L
 
     def _Select_all_schema(self):
         """
@@ -1567,7 +1608,7 @@ def Create_db_roles(session, postgresDB_D):
 
             # Read the hash stored as a role comment from the previous run
             session.cursor.execute(
-                "SELECT pg_catalog.obj_description(%s::oid, 'pg_authid');",
+                "SELECT pg_catalog.shobj_description(%s::oid, 'pg_authid');",
                 (row[0],)
             )
 
