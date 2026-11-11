@@ -22,7 +22,7 @@ from .setup_db_audit import Assemble_audit_config
 
 from .manage_process import Run_process
 
-from .setup_db_initiate import Initiate_database, Initiate_audit
+from .setup_db_initiate import Initiate_database, Initiate_audit, Check_credentials
 
 from .dump_restore_db import Dump_database, Restore_database
 

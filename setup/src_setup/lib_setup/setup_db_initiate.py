@@ -173,6 +173,113 @@ def Resolve_initial_user(scheme_params_D):
 
     return True
 
+def Check_credentials(notebook_FP, scheme_file):
+    """
+    @brief Read-only pre-flight: are all .netrc entries a scheme file needs present?
+
+    @details Checks `postgresdb.host_netrc_id`, every `postgresdb.db_users[].user_netrc_id`,
+    `initial_user.user_netrc_id` and `user_project.user_netrc_id` (whichever the scheme has)
+    and prints OK / MISSING per id, with the login name but never a password. Also flags
+    db_users with a plaintext password in the scheme and a ~/.netrc readable by others.
+    Connects to nothing and changes nothing, so it is safe before setup, restore or any project.
+
+    @param notebook_FP Directory of the calling notebook (relative scheme paths resolve against it).
+    @param scheme_file Path to the scheme file.
+
+    @return True if every id resolves, False otherwise.
+    """
+
+    import json, netrc, os, stat
+
+    scheme_FPN = Full_path_locate(None, scheme_file, False, notebook_FP)
+
+    if not scheme_FPN or not path.exists(scheme_FPN):
+
+        print ('❌ ERROR - scheme file not found: %s' % scheme_file)
+
+        return False
+
+    with open(scheme_FPN) as f:
+
+        scheme_D = json.load(f)
+
+    netrc_FPN = path.join(path.expanduser('~'), '.netrc')
+
+    try:
+
+        secrets = netrc.netrc()
+
+    except FileNotFoundError:
+
+        print ('❌ ERROR - No .netrc file found in your home directory')
+
+        return False
+
+    except netrc.NetrcParseError as e:
+
+        # Never print the parser message: it quotes the offending token, often a password
+        print ('❌ ERROR - .netrc parse error at line %s; every entry must read: machine <id> login <user> password <secret>' % e.lineno)
+
+        return False
+
+    if os.stat(netrc_FPN).st_mode & (stat.S_IRWXG | stat.S_IRWXO):
+
+        print ('⚠️  ~/.netrc is readable by other users: run  chmod 600 ~/.netrc')
+
+    pg_D = scheme_D.get('postgresdb', {})
+
+    checks_L = []
+
+    if pg_D.get('host_netrc_id'):
+
+        checks_L.append(('postgres superuser', pg_D['host_netrc_id']))
+
+    for item in pg_D.get('db_users', []):
+
+        if item.get('user_netrc_id'):
+
+            checks_L.append(('role %s' % item.get('role', '?'), item['user_netrc_id']))
+
+        elif item.get('password'):
+
+            print ('⚠️  db_user %s: plaintext password in the scheme file - use "user_netrc_id"' % item.get('user_id', '?'))
+
+    for key, label in (('initial_user', 'initial user'), ('user_project', 'project user')):
+
+        netrc_id = scheme_D.get(key, {}).get('user_netrc_id')
+
+        if netrc_id:
+
+            checks_L.append((label, netrc_id))
+
+    if not checks_L:
+
+        print ('⚠️  The scheme file names no .netrc ids')
+
+        return False
+
+    ok = True
+
+    print ('. .netrc entries for %s:' % path.basename(scheme_FPN))
+
+    for label, netrc_id in checks_L:
+
+        auth = secrets.authenticators(netrc_id)
+
+        if auth and auth[0]:
+
+            print ('    OK       %-24s %-22s login %s' % (netrc_id, label, auth[0]))
+
+        else:
+
+            print ('    MISSING  %-24s %-22s add: machine %s login <user> password <secret>' % (netrc_id, label, netrc_id))
+
+            ok = False
+
+    print ('. All entries found.' if ok else '❌ Add the missing entries to ~/.netrc before running setup.')
+
+    return ok
+
 def Create_db_environment_dot(notebook_FP, postgresDB_D):
     """
     @brief Create per pg_user database environment files for database access.
@@ -264,6 +371,16 @@ def Initiate_database(notebook_FP,scheme_file, proj_proc_file):
         
     else:
 
+        # Resolve pg_user credentials (from .netrc or the scheme) and the optional initial (bootstrap)
+        # community user before asking: a missing .netrc entry stops here, before any confirmation
+        if not Resolve_db_users(scheme_params_D['postgresdb']):
+
+            return None
+
+        if not Resolve_initial_user(scheme_params_D):
+
+            return None
+
         if scheme_params_D['process'][0]['verbose'] > 0:
 
             print ("\n.   ⚠️  Confirm that you want to set up the database.\n")
@@ -275,16 +392,6 @@ def Initiate_database(notebook_FP,scheme_file, proj_proc_file):
                 return None
 
         print ('\n. Setting up system production database: %s' %(scheme_params_D['postgresdb']['db']))
-
-        # Resolve pg_user credentials (from .netrc or the scheme) before touching the database
-        if not Resolve_db_users(scheme_params_D['postgresdb']):
-
-            return None
-
-        # Resolve the optional initial (bootstrap) community user from .netrc
-        if not Resolve_initial_user(scheme_params_D):
-
-            return None
 
         # Create the environment files for the database users, which will be used to connect to the database in the subsequent steps. This is done before setting up the database itself, so that the environment files are available for any database setup scripts that may need to connect to the database during setup.
         Create_db_environment_dot(notebook_FP, scheme_params_D['postgresdb'])

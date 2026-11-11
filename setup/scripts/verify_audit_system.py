@@ -21,7 +21,7 @@ from src_setup.lib_setup import Assemble_audit_config
 
 
 def main():
-    scheme_file = sys.argv[1] if len(sys.argv) > 1 else path.join(SETUP_DIR, 'zzz', 'scheme_ai4sh_local_setup.json')
+    scheme_file = sys.argv[1] if len(sys.argv) > 1 else path.join(SETUP_DIR, 'zzz', 'scheme_local_setup.json')
     job_file = sys.argv[2] if len(sys.argv) > 2 else 'job_setup_db.json'
 
     success = Get_scheme_project_path_setup(scheme_file, job_file)

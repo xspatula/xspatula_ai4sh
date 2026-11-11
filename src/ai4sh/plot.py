@@ -206,6 +206,16 @@ class Process_plot(Get_schema_table):
 
         return color, label, unit
 
+    def _Axis_unit(self, unit, indicator, transform_dict, standard_dict):
+        '''Axis label for the plotted values: the unit wrapped in the applied transform (log is natural log),
+        or "z-score" when the values are standardised, so a transformed axis never shows the raw unit.'''
+
+        if standard_dict.get(indicator, 'none') != 'none':
+            return 'z-score'
+        transform = transform_dict.get(indicator, 'linear')
+        fmt = {'log': 'ln(%s)', 'sqrt': 'sqrt(%s)', 'reciprocal': '1/(%s)', 'boxcox': 'Box-Cox(%s)'}.get(transform)
+        return fmt % unit if fmt and unit else unit
+
     def _build_transform_info(self, indicator, transform_dict, standard_dict):
         '''Return (annotation_str, filename_suffix) for an individual indicator.'''
 
@@ -310,7 +320,7 @@ class Process_plot(Get_schema_table):
                 fig, ax = plt.subplots(figsize=(6, 4))
                 series.plot.hist(bins=bins, color=color, ax=ax)
                 ax.set_title(label)
-                ax.set_xlabel(unit)
+                ax.set_xlabel(self._Axis_unit(unit, indicator, transform_dict, standard_dict))
                 ax.text(0.98, 0.98, ann, transform=ax.transAxes, fontsize=7,
                         ha='right', va='top', color='gray')
 
@@ -347,7 +357,7 @@ class Process_plot(Get_schema_table):
                 ax = axs_flat[f]
                 series.plot.hist(bins=bins, color=color, ax=ax)
                 ax.set_title(label)
-                ax.set_xlabel(unit)
+                ax.set_xlabel(self._Axis_unit(unit, indicator, transform_dict, standard_dict))
                 ax.text(0.98, 0.98, ann, transform=ax.transAxes, fontsize=6,
                         ha='right', va='top', color='gray')
                 if f % n_cols != 0:
@@ -541,7 +551,7 @@ class Process_plot(Get_schema_table):
                     ax=ax
                 )
                 ax.set_title(label)
-                ax.set_xlabel(unit)
+                ax.set_xlabel(self._Axis_unit(unit, indicator, transform_dict, standard_dict))
                 ax.text(0.98, 0.98, ann, transform=ax.transAxes, fontsize=7,
                         ha='right', va='top', color='gray')
 
@@ -582,7 +592,7 @@ class Process_plot(Get_schema_table):
                     ax=ax
                 )
                 ax.set_title(label)
-                ax.set_xlabel(unit)
+                ax.set_xlabel(self._Axis_unit(unit, indicator, transform_dict, standard_dict))
                 ax.text(0.98, 0.98, ann, transform=ax.transAxes, fontsize=6,
                         ha='right', va='top', color='gray')
                 if f % n_cols != 0:
