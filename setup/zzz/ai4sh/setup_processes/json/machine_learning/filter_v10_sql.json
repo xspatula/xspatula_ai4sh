@@ -8,7 +8,7 @@
         "process": "filter_spectra",
         "min_user_stratum": 3,
         "title": "Filter spectral data with a single filter",
-        "label": "Filter (smooth) spectral data with a single filter: moving-average, gauss, savitzky-golay or LOWESS; or compare several and select one interactively."
+        "label": "Filter (smooth) spectral data with a single filter: moving-average, gauss, savitzky-golay, LOWESS or LOESS; or compare several and select one interactively."
       },
       "nodes": [
         {
@@ -34,7 +34,7 @@
               "parameter_type": "text",
               "required": true,
               "default_value": "none",
-              "hint": "The filter to apply: a filter parameter set name (moving-average, gauss, savitzky-golay, lowess or a custom set) or the path (relative to the project root, .json optional) to a filter JSON file; select = compare the filters in filter_array and choose interactively which one to apply; none = no filter."
+              "hint": "The filter to apply: a filter parameter set name (moving-average, gauss, savitzky-golay, lowess, loess or a custom set) or the path (relative to the project root, .json optional) to a filter JSON file; select = compare the filters in filter_array and choose interactively which one to apply; none = no filter."
             },
             {
               "parameter": "filter_array",
@@ -44,7 +44,8 @@
                 "moving-average",
                 "gauss",
                 "savitzky-golay",
-                "lowess"
+                "lowess",
+                "loess"
               ],
               "hint": "Only used when filter_fp is select: the filters to compare, each a filter parameter set name or a path (relative to the project root, .json optional) to a filter JSON file."
             },

@@ -90,8 +90,8 @@ def _parse_array_param(raw):
 # Options offered by scaler/method "select": per-spectrum scatter corrections and band-wise variable scalings
 VARIABLE_SCALINGS   = ['meancentring', 'autoscaling', 'paretoscaling', 'poissonscaling']
 # Filter parameter sets compared by filter_fp "select" when no filter_array is given; key → file abbreviation
-FILTER_PRESETS = ['moving-average', 'gauss', 'savitzky-golay', 'lowess']
-_FILTER_ABBREV = {'moving_average': 'ma', 'gauss': 'gf', 'savitzky-golay': 'sg', 'lowess': 'lw'}
+FILTER_PRESETS = ['moving-average', 'gauss', 'savitzky-golay', 'lowess', 'loess']
+_FILTER_ABBREV = {'moving_average': 'ma', 'gauss': 'gf', 'savitzky-golay': 'sg', 'lowess': 'lw', 'loess': 'lo'}
 
 
 # Outlier detector → file suffix (.olif, .olee, .ollof, .ol1csvm); select compares the four
@@ -275,6 +275,7 @@ def _step_abbrev_from_info(process_name, parameters):
         if 'gauss' in cfg:          return 'gf'
         if 'moving_average' in cfg: return 'ma'
         if 'lowess' in cfg:         return 'lw'
+        if 'loess' in cfg:          return 'lo'
         return 'flt'
     if process_name in ('multi_filter_spectra', 'mulit_filter_spectra'):
         return 'mf'

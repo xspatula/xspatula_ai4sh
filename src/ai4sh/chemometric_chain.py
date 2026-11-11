@@ -17,7 +17,7 @@ Every item is a method name (default settings) or an object {step: settings} (cu
     ]
 
 Method names (default settings)
-    filter              moving-average, gauss, savitzky-golay, lowess (ml_setting filter parameter sets)
+    filter              moving-average, gauss, savitzky-golay, lowess, loess (ml_setting filter parameter sets)
     scatter correction  l1, l2, max, snv, msc, detrend
     derivative          derivative (1st)
     variable scaling    meancentring, autoscaling, paretoscaling, poissonscaling
@@ -64,8 +64,8 @@ from src.ai4sh.provenance import Load_config_json
 from src.ai4sh.ml_transformers import Ward_fit
 
 VARIABLE_SCALINGS   = {'meancentring': 'mc', 'autoscaling': 'as', 'paretoscaling': 'ps', 'poissonscaling': 'poi'}
-FILTER_PRESETS      = ['moving-average', 'gauss', 'savitzky-golay', 'lowess']
-FILTER_KINDS        = ['moving_average', 'gauss', 'savitzky-golay', 'lowess']
+FILTER_PRESETS      = ['moving-average', 'gauss', 'savitzky-golay', 'lowess', 'loess']
+FILTER_KINDS        = ['moving_average', 'gauss', 'savitzky-golay', 'lowess', 'loess']
 
 METHOD_NAMES = FILTER_PRESETS + SCATTER_CORRECTIONS + ['derivative'] + list(VARIABLE_SCALINGS) + ['pca', 'wavelet']
 OBJECT_KEYS  = ['filter', 'multi_filter', 'scatter_correction', 'derivative', 'scaling', 'variance_threshold',
@@ -82,7 +82,7 @@ def Num_tag(v):
 
 def Filter_suffix(kind, cfg):
     '''File suffix of a single filter from its parameters: ma<kernel length>, gf<sigma>, sg<window_length>
-    (+ .d1 / .d2 when deriv > 0), lw<n_points>; e.g. ma5, gf1p5, sg7, sg7.d1, lw7.'''
+    (+ .d1 / .d2 when deriv > 0), lw<n_points>, lo<n_points> (loess); e.g. ma5, gf1p5, sg7, sg7.d1, lw7, lo7.'''
     fc = cfg[kind]
     if kind == 'moving_average':
         return 'ma%d' % len(fc.get('kernel', []))
@@ -92,6 +92,8 @@ def Filter_suffix(kind, cfg):
         tag = 'sg%d' % int(fc.get('window_length', 0))
         deriv = int(fc.get('deriv', 0))
         return tag + ('.d%d' % deriv if deriv > 0 else '')
+    if kind == 'loess':
+        return 'lo%d' % int(fc.get('n_points', 0))
     return 'lw%d' % int(fc.get('n_points', 0))
 
 

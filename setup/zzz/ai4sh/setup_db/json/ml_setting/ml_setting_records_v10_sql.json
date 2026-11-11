@@ -542,6 +542,19 @@
               "959730af48c07b936cab00e57e3a3ae74ed5df81966c81b0483b8a4b4888f1a1"
             ],
             [
+              "filter",
+              "loess",
+              "preset",
+              "setup",
+              "Standard loess filter (tricube-weighted local quadratic regression).",
+              {
+                "loess": {
+                  "n_points": 7
+                }
+              },
+              "ae5d18e42b61476a780e068b19e64fa6c8039cfb5f0d449a8ec1aac55f9c57a0"
+            ],
+            [
               "multi_filter",
               "standard",
               "preset",

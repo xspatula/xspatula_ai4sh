@@ -21,6 +21,7 @@ _FILTER_DEFAULT_FILES = {
     'gauss':          'gauss_default.json',
     'savitzky-golay': 'savitzky-golay_default.json',
     'lowess':         'lowess_default.json',
+    'loess':          'loess_default.json',
 }
 
 
@@ -38,43 +39,34 @@ def _load_filter_config(param, family='filter'):
     return Load_settings(family, param, default_fpn)
 
 
-def _lowess_1d(y, n_points):
-    '''Tricube-weighted local linear regression along 1-D array y.
+def _local_poly_matrix(n, n_points, degree):
+    '''Smoother matrix H (n x n, sparse) of tricube-weighted local polynomial regression.
 
-    n_points: number of neighbouring points (including the focal point) used in
-    each local regression.  Larger values give more smoothing.
+    Row i holds the weights that give the fitted value at band i as a linear combination of
+    the n_points nearest bands (including band i itself): degree 1 = LOWESS (local linear),
+    degree 2 = LOESS (local quadratic).  The bands sit on a regular index grid, so H depends
+    only on (n, n_points, degree) and is applied to all spectra at once: X_smooth = X @ H.T.
     '''
-    n = len(y)
-    n_pts = min(int(n_points), n)
+    from scipy.sparse import csr_matrix
+    n_pts = max(1, min(int(n_points), n))
     x = np.arange(n, dtype=float)
-    y_out = np.empty(n)
-
+    H = np.zeros((n, n))
     for i in range(n):
         d = np.abs(x - i)
         idx = np.argpartition(d, n_pts - 1)[:n_pts]
         d_i = d[idx]
         max_d = d_i.max()
-        if max_d == 0.0:
-            w = np.ones(n_pts)
-        else:
-            u = d_i / max_d
-            w = (1.0 - u ** 3) ** 3
-        xi = x[idx]
-        yi = y[idx]
-        sw   = w.sum()
-        swx  = (w * xi).sum()
-        swx2 = (w * xi ** 2).sum()
-        swy  = (w * yi).sum()
-        swxy = (w * xi * yi).sum()
-        denom = sw * swx2 - swx ** 2
-        if abs(denom) < 1e-10:
-            y_out[i] = swy / sw if sw > 0 else np.mean(yi)
-        else:
-            a = (swy * swx2 - swxy * swx) / denom
-            b = (sw  * swxy - swx  * swy) / denom
-            y_out[i] = a + b * i
+        w = np.ones(n_pts) if max_d == 0.0 else (1.0 - (d_i / max_d) ** 3) ** 3
+        sw = np.sqrt(w)
+        A = np.vander(x[idx] - i, degree + 1, increasing=True)   # centred: fitted value at i = beta[0]
+        H[i, idx] = np.linalg.pinv(sw[:, None] * A)[0] * sw       # pinv: rank-deficient windows degrade to a lower degree
+    return csr_matrix(H)
 
-    return y_out
+
+def _local_poly_smooth(X, n_points, degree):
+    '''Tricube-weighted local polynomial smoothing of every row of X (2-D array).'''
+    H = _local_poly_matrix(X.shape[1], n_points, degree)
+    return np.asarray((H @ X.T).T)
 
 
 def apply_filter(df, columns, cfg):
@@ -115,8 +107,16 @@ def apply_filter(df, columns, cfg):
     elif 'lowess' in cfg:
         lc = cfg['lowess']
         n_pts = int(lc['n_points'])
-        X1 = np.apply_along_axis(_lowess_1d, 1, X, n_pts)
+        X1 = _local_poly_smooth(X, n_pts, 1)
         label = 'filter:lowess'
+
+    elif 'loess' in cfg:
+        lc = cfg['loess']
+        n_pts = int(lc['n_points'])
+        if n_pts < 4:
+            raise ValueError('loess n_points must be >= 4 (quadratic fit), got %d' % n_pts)
+        X1 = _local_poly_smooth(X, n_pts, 2)
+        label = 'filter:loess'
 
     else:
         return df, list(columns), 'filter:none'
@@ -131,7 +131,7 @@ def apply_multi_filter(df, columns, cfg):
     cfg must contain a "multi_filter" dict with parallel lists:
       begin_wavelength, end_wavelength, and at least one of:
       moving_average.kernel[], savitzky-golay.window_length[], gauss.sigma[],
-      lowess.n_points[].
+      lowess.n_points[], loess.n_points[].
 
     Each region slice is filtered independently; results are concatenated in
     wavelength order.  Columns are integer wavelengths.
@@ -163,6 +163,7 @@ def apply_multi_filter(df, columns, cfg):
         sg_polys   = mf.get('savitzky-golay', {}).get('polyorder', [])
         ga_sigmas  = mf.get('gauss', {}).get('sigma', [])
         lw_npts    = mf.get('lowess', {}).get('n_points', [])
+        lo_npts    = mf.get('loess', {}).get('n_points', [])
 
         if r < len(ma_kernels) and ma_kernels[r]:
             region_cfg['moving_average'] = {'kernel': ma_kernels[r], 'mode': mode}
@@ -175,6 +176,8 @@ def apply_multi_filter(df, columns, cfg):
             region_cfg['gauss'] = {'sigma': ga_sigmas[r], 'mode': mode}
         elif r < len(lw_npts) and lw_npts[r]:
             region_cfg['lowess'] = {'n_points': lw_npts[r]}
+        elif r < len(lo_npts) and lo_npts[r]:
+            region_cfg['loess'] = {'n_points': lo_npts[r]}
 
         if region_cfg:
             df_r, cols_r, _ = apply_filter(df, r_cols, region_cfg)

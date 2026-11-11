@@ -76,7 +76,7 @@ def _step_to_abbrev(step_label):
     if step_label.startswith('filter:'):
         method = step_label.split(':', 1)[-1]
         return {'moving_average': 'ma', 'gauss': 'gf', 'savitzky-golay': 'sg',
-                'lowess': 'lw', 'multi_filter': 'mf'}.get(method, method[:4])
+                'lowess': 'lw', 'loess': 'lo', 'multi_filter': 'mf'}.get(method, method[:4])
     return ''.join(c if c.isalnum() else '' for c in step_label.lower())[:6]
 
 class Process_plot(Get_schema_table):

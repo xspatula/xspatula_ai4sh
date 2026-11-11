@@ -157,7 +157,7 @@ class BandColumns(BaseEstimator, TransformerMixin):
 
 
 class SpectralFilter(_Stateless, BaseEstimator, TransformerMixin):
-    '''Single smoothing filter (moving average, gauss, Savitzky-Golay, lowess); stateless.'''
+    '''Single smoothing filter (moving average, gauss, Savitzky-Golay, lowess, loess); stateless.'''
 
     def __init__(self, filter_cfg=None):
         self.filter_cfg = filter_cfg

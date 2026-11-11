@@ -8,7 +8,7 @@
         "process": "multi_filter_spectra",
         "min_user_stratum": 3,
         "title": "Filter spectral data with a multi filter",
-        "label": "Filter spectral data with a multi filter  that applies different filtering along the spectral range: Available filters: moving-average, gauss, savitzky-golay and LOWESS."
+        "label": "Filter spectral data with a multi filter  that applies different filtering along the spectral range: Available filters: moving-average, gauss, savitzky-golay, LOWESS and LOESS."
       },
       "nodes": [
         {

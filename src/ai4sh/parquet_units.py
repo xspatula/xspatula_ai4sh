@@ -44,13 +44,13 @@ INDICATOR_STEPS = ('detect_outliers', 'indicator_range')
 
 # Any known machine learning preprocessing suffix at the end of a parquet stem (derived files).
 # Scatter corrections in sequence are saved as their concatenation (snv+detrend → snvdt, l1+msc → l1msc).
-# Suffixes with a parameter value only after a dot: filters (.ma5, .gf1p5, .sg7, .lw7), outlier detector
+# Suffixes with a parameter value only after a dot: filters (.ma5, .gf1p5, .sg7, .lw7, .lo7), outlier detector
 # (.olif, .olee, .ollof, .ol1csvm), indicator range (.ir), variance threshold (.vt03; .vtm028 before 2026-10-31), Ward clusters (.wc40), wavelet denoise (.wd) or coefficients (.wt).
 # Any suffix may end with a user name extension: #<1-6 letters, digits or ->.
 # Both separators match: "." (current) and "_" (files written before 2026-10-29).
 DERIVED_STEM_RE = re.compile(
-    r'(?:[._](?:pred|ol|ir|vt|ma|gf|sg|lw|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|(?:l1|l2|max|snv|msc|dt)+|mc|as|ps|poi|pca\d+|wd|wt|(?:[\w-]+-)?(?:pms|rfe|tree))'
-    r'|\.(?:(?:ma|gf|sg|lw)[0-9p]+|ol(?:if|ee|lof|1csvm)|vt[msr]?[0-9p]+|wc\d+|default))'
+    r'(?:[._](?:pred|ol|ir|vt|ma|gf|sg|lw|lo|mf|wc|uv(?:-[\w-]+)?|d\d+(?:app)?|(?:l1|l2|max|snv|msc|dt)+|mc|as|ps|poi|pca\d+|wd|wt|(?:[\w-]+-)?(?:pms|rfe|tree))'
+    r'|\.(?:(?:ma|gf|sg|lw|lo)[0-9p]+|ol(?:if|ee|lof|1csvm)|vt[msr]?[0-9p]+|wc\d+|default))'
     r'(?:#[A-Za-z0-9-]{1,6})?$'
 )
 
