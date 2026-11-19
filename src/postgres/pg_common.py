@@ -940,7 +940,9 @@ class PG_common():
 
             error_msg += '     🔺 WARNING Cannot find foreign key <%s> in schema.table <%s.%s>\n ' %(value, schema_name[0], table_name)
             
-            error_msg += '    🔑 Check spelling or add the value <%s> to the column <%s> in schema.table <%s.%s>' % (value, column[0], schema_name[0], table_name)
+            # unique_columns can be empty (table with only a PRIMARY KEY): no loop variable to report
+            searched_columns = ', '.join(c[0] for c in unique_columns if not c[0].endswith('_id')) or 'no unique text column'
+            error_msg += '    🔑 Check spelling or add the value <%s> to the column <%s> in schema.table <%s.%s>' % (value, searched_columns, schema_name[0], table_name)
 
         if verbose > 2:
         

@@ -108,7 +108,9 @@ def Read_excel(FPN):
         
         return None
     try:
-        result = pd.read_excel(FPN)
+        # dtype=object: every cell keeps the type it has in the sheet - text stays text (version '093' is not
+        # turned into 93) and an integer column with blank cells stays int (not 642.0)
+        result = pd.read_excel(FPN, dtype=object)
 
         column_L =list(result.columns.values)
 
